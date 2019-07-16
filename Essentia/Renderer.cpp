@@ -24,7 +24,7 @@ void Renderer::Initialize()
 	window->Initialize(GetModuleHandle(0), width, height);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
 
-	auto device = deviceResources->GetDevice();
+	device = deviceResources->GetDevice();
 	renderTargetManager->Initialize(device);
 	resourceManager->Initialize(device);
 	
@@ -81,7 +81,7 @@ void Renderer::Clear()
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 }
 
-void Renderer::Render()
+void Renderer::Render(const FrameContext& frameContext)
 {
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
@@ -93,7 +93,6 @@ void Renderer::Present()
 {
 	auto commandQueue = deviceResources->GetCommandQueue();
 	auto swapChain = deviceResources->GetSwapChain();
-	auto device = deviceResources->GetDevice();
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	auto hr = commandList->Close();
@@ -141,10 +140,19 @@ void Renderer::EndInitialization()
 	}
 }
 
+ID3D12GraphicsCommandList* Renderer::GetDefaultCommandList()
+{
+	return commandList.Get();
+}
+
+ID3D12Device* Renderer::GetDevice()
+{
+	return device;
+}
+
 void Renderer::InitializeCommandList()
 {
 	HRESULT hr;
-	auto device = deviceResources->GetDevice();
 	for (int i = 0; i < CFrameBufferCount; i++)
 	{
 		hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocators[i].ReleaseAndGetAddressOf()));
@@ -216,7 +224,6 @@ void Renderer::CreatePSOs()
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
 
-	auto device = deviceResources->GetDevice();
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {}; 
 	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
 	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);

@@ -5,19 +5,28 @@
 #include "DeviceResources.h"
 #include "RenderTargetManager.h"
 #include "ResourceManager.h"
+#include "Camera.h"
 
 #include <memory>
+
+struct FrameContext
+{
+	Camera* Camera;
+};
 
 class Renderer
 {
 public:
 	void	Initialize();
 	void	Clear();
-	void	Render();
+	void	Render(const FrameContext& frameContext);
 	void	Present();
 	Window* GetWindow();
 	void	CleanUp();
 	void	EndInitialization();
+
+	ID3D12GraphicsCommandList*	GetDefaultCommandList();
+	ID3D12Device*				GetDevice();
 private:
 	void InitializeCommandList();
 	void CreateRootSignatures();
@@ -35,6 +44,7 @@ private:
 	D3D12_RECT		scissorRect;
 	DXGI_FORMAT		renderTargetFormat;
 	DXGI_FORMAT		depthFormat;
+	ID3D12Device*	device;
 
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;

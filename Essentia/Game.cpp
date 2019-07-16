@@ -9,6 +9,9 @@ void Game::Setup()
 	renderer->Initialize();
 	Initialize();
 	renderer->EndInitialization();
+
+	auto windowSize = renderer->GetWindow()->GetWindowSize();
+	camera = std::make_unique<Camera>((float)windowSize.Width, (float)windowSize.Height);
 }
 
 void Game::Run()
@@ -16,6 +19,7 @@ void Game::Run()
 	auto window = renderer->GetWindow();
 	window->StartMessagePump([&] 
 		{
+			camera->Update();
 			Update();
 			Render();
 		});
@@ -28,7 +32,8 @@ Game::~Game()
 
 void Game::Render()
 {
+	FrameContext frameContext = { camera.get() };
 	renderer->Clear();
-	renderer->Render();
+	renderer->Render(frameContext);
 	renderer->Present();
 }
