@@ -144,8 +144,10 @@
   <ItemGroup>
     <ClCompile Include="DeviceResources.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTargetManager.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -155,8 +157,10 @@
     <ClInclude Include="DXUtility.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTargetManager.h" />
+    <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

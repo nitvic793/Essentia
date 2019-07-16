@@ -20,8 +20,8 @@ public:
 private:
 	DeviceResources();
 	Microsoft::WRL::ComPtr<ID3D12Device> device;
-	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
+	Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain;
 	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
 
 	void CreateDevice();
