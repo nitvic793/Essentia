@@ -68,6 +68,8 @@ LRESULT Window::WindowsMessageCallback(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 void Window::Initialize(HINSTANCE hInstance, int width, int height, const char* windowName, const char* windowTitle, bool fullscreen, int ShowWnd)
 {
+	this->width = width;
+	this->height = height;
 	this->windowName = windowName;
 	this->windowTitle = windowTitle;
 
@@ -157,6 +159,11 @@ Window* Window::GetInstance()
 bool Window::IsFullscreen()
 {
 	return fullscreen;
+}
+
+WindowSize Window::GetWindowSize()
+{
+	return WindowSize{ width, height };
 }
 
 Window::Window()

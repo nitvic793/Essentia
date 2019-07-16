@@ -25,7 +25,7 @@ PipelineStateID ResourceManager::CreatePSO(const D3D12_GRAPHICS_PIPELINE_STATE_D
 	auto id = currentPSOID;
 	currentPSOID++;
 	device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(pipelineStates[id].ReleaseAndGetAddressOf()));
-	return currentPSOID;
+	return id;
 }
 
 ResourceID ResourceManager::CreateResource(D3D12_RESOURCE_DESC desc, D3D12_CLEAR_VALUE clearVal, D3D12_RESOURCE_STATES initialResourceState, D3D12_HEAP_FLAGS heapFlags, CD3DX12_HEAP_PROPERTIES heapProperties)

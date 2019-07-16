@@ -52,12 +52,13 @@ void DeviceResources::CreateCommandQueue()
 	auto hr = device->CreateCommandQueue(&cqDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
 }
 
-void DeviceResources::CreateSwapChain(int width, int height, Window* window)
+void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 {
+	auto windowSize = window->GetWindowSize();
 	DXGI_MODE_DESC backBufferDesc = {};
-	backBufferDesc.Width = width;
-	backBufferDesc.Height = height;
-	backBufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	backBufferDesc.Width = windowSize.Width;
+	backBufferDesc.Height = windowSize.Height;
+	backBufferDesc.Format = format;
 	DXGI_SAMPLE_DESC sampleDesc = {}; 
 	sampleDesc.Count = 1;
 
@@ -83,7 +84,7 @@ DeviceResources::~DeviceResources()
 {
 }
 
-void DeviceResources::Initialize(int width, int height, Window* window)
+void DeviceResources::Initialize(Window* window, DXGI_FORMAT format)
 {
 	auto hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED); 
 	ID3D12Debug1* debugInterface;
@@ -92,7 +93,7 @@ void DeviceResources::Initialize(int width, int height, Window* window)
 
 	CreateDevice();
 	CreateCommandQueue();
-	CreateSwapChain(width, height, window);
+	CreateSwapChain(window, format);
 }
 
 void DeviceResources::Cleanup()

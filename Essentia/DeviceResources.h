@@ -11,7 +11,7 @@ class DeviceResources
 {
 public:
 	~DeviceResources();
-	void Initialize(int width, int height, Window* window);
+	void Initialize(Window* window, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 	void Cleanup();
 
 	ID3D12Device*		GetDevice();
@@ -26,7 +26,7 @@ private:
 
 	void CreateDevice();
 	void CreateCommandQueue();
-	void CreateSwapChain(int width, int height, Window* window);
+	void CreateSwapChain(Window* window, DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM);
 
 	friend class Renderer;
 };

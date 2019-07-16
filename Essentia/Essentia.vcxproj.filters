@@ -13,50 +13,50 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Core">
+      <UniqueIdentifier>{09ad0a34-a1a6-4532-a4b6-8de5128c770a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Core">
+      <UniqueIdentifier>{e5141ea9-3067-45e4-8611-c0b8bd413cbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{fac20cc9-887e-45c9-a0e7-3887c322283a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Common.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DeviceResources.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderTargetManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="DeviceResources.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
-    <ClCompile Include="ShaderManager.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Renderer.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderTargetManager.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
     <ClCompile Include="ResourceManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="ShaderManager.cpp">
+      <Filter>Source Files\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.cpp">
+      <Filter>Source Files\Core</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Window.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="d3dx12.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DeviceResources.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Declarations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DXUtility.h">
@@ -65,14 +65,40 @@
     <ClInclude Include="Game.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RenderTargetManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Declarations.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
-    <ClInclude Include="ShaderManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="DeviceResources.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Renderer.h">
+      <Filter>Header Files\Core</Filter>
     </ClInclude>
     <ClInclude Include="ResourceManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="RenderTargetManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ShaderManager.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Window.h">
+      <Filter>Header Files\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="InputLayout.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DefaultVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

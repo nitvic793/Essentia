@@ -6,8 +6,8 @@
 
 typedef uint32 RenderTargetID;
 typedef uint32 DepthStencilID;
-constexpr int CMaxRenderTargets = 32;
-constexpr int CMaxDepthStencils = 8;
+constexpr int CMaxRenderTargets = 64;
+constexpr int CMaxDepthStencils = 16;
 
 class RenderTargetManager
 {

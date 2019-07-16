@@ -2,6 +2,12 @@
 #include <windows.h>
 #include <functional>
 
+struct WindowSize
+{
+	int Width;
+	int Height;
+};
+
 class Window
 {
 public:
@@ -13,6 +19,7 @@ public:
 	void				StartMessagePump(std::function<void()> callback);
 	static Window*		GetInstance();
 	bool				IsFullscreen();
+	WindowSize			GetWindowSize();
 	~Window();
 private:
 	Window();

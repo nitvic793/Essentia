@@ -4,20 +4,25 @@
 #include <wrl.h>
 #include "d3dx12.h"
 #include <thread>
+#include "ShaderManager.h"
+#include "InputLayout.h"
 
 using namespace Microsoft::WRL;
 
 void Renderer::Initialize()
 {
+	renderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 	width = 1920;
 	height = 1080;
+	depthFormat = DXGI_FORMAT_D32_FLOAT;
+
 	window = std::unique_ptr<Window>(new Window());
 	deviceResources = std::unique_ptr<DeviceResources>(new DeviceResources());
 	renderTargetManager = std::unique_ptr<RenderTargetManager>(new RenderTargetManager());
 	resourceManager = std::unique_ptr<ResourceManager>(new ResourceManager());
 
 	window->Initialize(GetModuleHandle(0), width, height);
-	deviceResources->Initialize(width, height, window.get());
+	deviceResources->Initialize(window.get(), renderTargetFormat);
 
 	auto device = deviceResources->GetDevice();
 	renderTargetManager->Initialize(device);
@@ -48,6 +53,7 @@ void Renderer::Initialize()
 	CreateDepthStencil();
 	InitializeCommandList();
 	CreateRootSignatures();
+	CreatePSOs();
 }
 
 void Renderer::Clear()
@@ -79,6 +85,8 @@ void Renderer::Render()
 {
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
+	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
+	commandList->SetPipelineState(resourceManager->GetPSO(defaultPSO));
 }
 
 void Renderer::Present()
@@ -169,7 +177,7 @@ void Renderer::CreateRootSignatures()
 	//light dependent CBV
 	range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 	//G-Buffer inputs
-	range[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 0);
+	range[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 32, 0);
 	//per frame CBV
 	range[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 	//per bone 
@@ -202,11 +210,36 @@ void Renderer::CreateRootSignatures()
 
 void Renderer::CreatePSOs()
 {
+	auto vertexShaderBytecode = ShaderManager::LoadShader(L"DefaultVS.cso");
+	auto pixelShaderBytecode = ShaderManager::LoadShader(L"DefaultPS.cso");
+
+	DXGI_SAMPLE_DESC sampleDesc = {};
+	sampleDesc.Count = 1;
+
+	auto device = deviceResources->GetDevice();
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {}; 
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
+	psoDesc.pRootSignature = resourceManager->GetRootSignature(mainRootSignatureID); 
+	psoDesc.VS = vertexShaderBytecode; 
+	psoDesc.PS = pixelShaderBytecode; 
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	//psoDesc.DepthStencilState.DepthEnable = false;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; 
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.SampleDesc = sampleDesc; 
+	psoDesc.SampleMask = 0xffffffff; 
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); 
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); 
+	psoDesc.NumRenderTargets = 1; 
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	psoDesc.DSVFormat = depthFormat;
+
+	defaultPSO = resourceManager->CreatePSO(psoDesc);
 }
 
 void Renderer::CreateDepthStencil()
 {
-	auto depthFormat = DXGI_FORMAT_D32_FLOAT;
 	auto depthBufferId = resourceManager->CreateResource(
 		CD3DX12_RESOURCE_DESC::Tex2D(depthFormat, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.f, 0),
@@ -227,7 +260,6 @@ void Renderer::WaitForPreviousFrame()
 		hr = fences[backBufferIndex]->SetEventOnCompletion(fenceValues[backBufferIndex], fenceEvent);
 		if (FAILED(hr))
 		{
-			//Running = false;
 		}
 		WaitForSingleObject(fenceEvent, INFINITE);
 	}

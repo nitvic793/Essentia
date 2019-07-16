@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <None Include="Common.hlsli" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -156,12 +157,28 @@
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="DXUtility.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="InputLayout.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTargetManager.h" />
     <ClInclude Include="ShaderManager.h" />
+    <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="DefaultPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="DefaultVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

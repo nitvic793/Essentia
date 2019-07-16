@@ -29,9 +29,12 @@ private:
 	int32			height;
 	uint32			backBufferIndex;
 	RootSignatureID mainRootSignatureID;
+	PipelineStateID	defaultPSO;
 	DepthStencilID	depthStencilId;
 	D3D12_VIEWPORT	viewport;
 	D3D12_RECT		scissorRect;
+	DXGI_FORMAT		renderTargetFormat;
+	DXGI_FORMAT		depthFormat;
 
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;
