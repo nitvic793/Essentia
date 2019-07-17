@@ -8,6 +8,8 @@
 #include "InputLayout.h"
 
 using namespace Microsoft::WRL;
+using namespace DirectX;
+MeshView mesh;
 
 void Renderer::Initialize()
 {
@@ -51,23 +53,23 @@ void Renderer::Initialize()
 	scissorRect.bottom = height;
 
 	CreateDepthStencil();
-	InitializeCommandList();
+	InitializeCommandContext();
 	CreateRootSignatures();
 	CreatePSOs();
+
+	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
+	meshManager->Initialize(commandContext.get());
+	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), sizeof(PerObjectConstantBuffer));
 }
 
 void Renderer::Clear()
 {
 	WaitForPreviousFrame();
+	auto commandAllocator = commandContext->GetAllocator(backBufferIndex);
+	auto commandList = commandContext->GetDefaultCommandList();
 
-	auto hr = commandAllocators[backBufferIndex]->Reset();
-	if (FAILED(hr))
-	{
-	}
-	hr = commandList->Reset(commandAllocators[backBufferIndex].Get(), nullptr);
-	if (FAILED(hr))
-	{
-	}
+	commandContext->ResetAllocator(commandAllocator);
+	commandContext->ResetCommandList(commandList, commandAllocator);
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
@@ -83,27 +85,36 @@ void Renderer::Clear()
 
 void Renderer::Render(const FrameContext& frameContext)
 {
+	auto camera = frameContext.Camera;
+	auto world = DirectX::XMMatrixIdentity();
+	XMFLOAT4X4 model;
+	XMStoreFloat4x4(&model, XMMatrixTranspose(world));
+
+	perObject.World = model;
+	perObject.View = camera->GetViewTransposed();
+	perObject.Projection = camera->GetProjectionTransposed();
+	cbuffer.CopyData(&perObject, sizeof(perObject));
+
+	auto commandList = commandContext->GetDefaultCommandList();
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 	commandList->SetPipelineState(resourceManager->GetPSO(defaultPSO));
+	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
+	commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+//	commandList->SetGraphicsRootConstantBufferView(0, cbuffer.GetIndex(0));
+	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 }
 
 void Renderer::Present()
 {
-	auto commandQueue = deviceResources->GetCommandQueue();
+	auto commandList = commandContext->GetDefaultCommandList();
 	auto swapChain = deviceResources->GetSwapChain();
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
-	auto hr = commandList->Close();
-	ID3D12CommandList* ppCommandLists[] = { commandList.Get() };
-
-	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
-	hr = commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex]);
-	if (FAILED(hr))
-	{
-	}
-	hr = swapChain->Present(0, 0);
+	commandContext->SubmitCommands(commandList);
+	auto hr = swapChain->Present(0, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
@@ -117,32 +128,19 @@ Window* Renderer::GetWindow()
 
 void Renderer::CleanUp()
 {
-	auto commandQueue = deviceResources->GetCommandQueue();
-	for (int i = 0; i < CFrameBufferCount; ++i)
-	{
-		backBufferIndex = i;
-		WaitForPreviousFrame();
-		commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex]);
-	}
-	CloseHandle(fenceEvent);
+	commandContext->CleanUp();
 }
 
 void Renderer::EndInitialization()
 {
-	auto commandQueue = deviceResources->GetCommandQueue();
-	commandList->Close();
-	ID3D12CommandList* ppCommandLists[] = { commandList.Get() };
-	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);;
-	fenceValues[backBufferIndex]++;
-	auto hr = commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex]);
-	if (FAILED(hr))
-	{
-	}
+	meshManager->CreateMesh("../../Assets/Models/cube.obj", mesh);
+	auto commandList = commandContext->GetDefaultCommandList();
+	commandContext->SubmitCommands(commandList);
 }
 
 ID3D12GraphicsCommandList* Renderer::GetDefaultCommandList()
 {
-	return commandList.Get();
+	return commandContext->GetDefaultCommandList();
 }
 
 ID3D12Device* Renderer::GetDevice()
@@ -150,31 +148,15 @@ ID3D12Device* Renderer::GetDevice()
 	return device;
 }
 
-void Renderer::InitializeCommandList()
+MeshManager* Renderer::GetMeshManager()
 {
-	HRESULT hr;
-	for (int i = 0; i < CFrameBufferCount; i++)
-	{
-		hr = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(commandAllocators[i].ReleaseAndGetAddressOf()));
-		if (FAILED(hr))
-		{
-			throw std::runtime_error("Unable to create command allocators");
-		}
-	}
+	return meshManager.get();
+}
 
-	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocators[0].Get(), NULL, IID_PPV_ARGS(&commandList));
-
-	for (int i = 0; i < CFrameBufferCount; i++)
-	{
-		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fences[i].ReleaseAndGetAddressOf()));
-		if (FAILED(hr))
-		{
-			throw std::runtime_error("Unable to create fences.");
-		}
-		fenceValues[i] = 0;
-	}
-
-	fenceEvent = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+void Renderer::InitializeCommandContext()
+{
+	commandContext = std::unique_ptr<CommandContext>(new CommandContext());
+	commandContext->Initialize(deviceResources.get());
 }
 
 void Renderer::CreateRootSignatures()
@@ -260,16 +242,7 @@ void Renderer::CreateDepthStencil()
 
 void Renderer::WaitForPreviousFrame()
 {
-	HRESULT hr;
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	if (fences[backBufferIndex]->GetCompletedValue() < fenceValues[backBufferIndex])
-	{
-		hr = fences[backBufferIndex]->SetEventOnCompletion(fenceValues[backBufferIndex], fenceEvent);
-		if (FAILED(hr))
-		{
-		}
-		WaitForSingleObject(fenceEvent, INFINITE);
-	}
-	fenceValues[backBufferIndex]++;
+	commandContext->WaitForFrame();
 }

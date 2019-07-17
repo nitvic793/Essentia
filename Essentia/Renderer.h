@@ -6,6 +6,10 @@
 #include "RenderTargetManager.h"
 #include "ResourceManager.h"
 #include "Camera.h"
+#include "CommandContext.h"
+#include "Mesh.h"
+#include "ConstantBuffer.h"
+#include "DXUtility.h"
 
 #include <memory>
 
@@ -27,8 +31,9 @@ public:
 
 	ID3D12GraphicsCommandList*	GetDefaultCommandList();
 	ID3D12Device*				GetDevice();
+	MeshManager*				GetMeshManager();
 private:
-	void InitializeCommandList();
+	void InitializeCommandContext();
 	void CreateRootSignatures();
 	void CreatePSOs();
 	void CreateDepthStencil();
@@ -45,19 +50,18 @@ private:
 	DXGI_FORMAT		renderTargetFormat;
 	DXGI_FORMAT		depthFormat;
 	ID3D12Device*	device;
+	GPUConstantBuffer cbuffer;
+	PerObjectConstantBuffer perObject;
 
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;
 	std::unique_ptr<ResourceManager>		resourceManager;
 	std::unique_ptr<RenderTargetManager>	renderTargetManager;
+	std::unique_ptr<MeshManager>			meshManager;
 
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 
-	Microsoft::WRL::ComPtr<ID3D12CommandAllocator>					commandAllocators[CFrameBufferCount];
-	Microsoft::WRL::ComPtr<ID3D12Fence>								fences[CFrameBufferCount];
-	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>				commandList;
-	uint64															fenceValues[CFrameBufferCount];
-	HANDLE															fenceEvent;
+	std::unique_ptr<CommandContext>			commandContext;
 };
 

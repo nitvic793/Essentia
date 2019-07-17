@@ -5,8 +5,6 @@
 #include "Window.h"
 #include "DXUtility.h"
 
-constexpr int CFrameBufferCount = 3;
-
 class DeviceResources
 {
 public:

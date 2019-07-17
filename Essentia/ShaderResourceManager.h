@@ -9,7 +9,7 @@ public:
 
 
 private:
-	ConstantBuffer		perObjectBuffer;
+	GPUConstantBuffer		perObjectBuffer;
 	DescriptorHeap		cbvHeap;
 	DescriptorHeap		textureHeap;
 	ResourceManager*	resourceManager;

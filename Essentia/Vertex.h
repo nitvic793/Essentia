@@ -35,4 +35,5 @@ struct Vertex
 	DirectX::XMFLOAT2 UV;
 	DirectX::XMFLOAT3 Normal;
 	DirectX::XMFLOAT3 Tangent;
+	float		padding[5];
 };

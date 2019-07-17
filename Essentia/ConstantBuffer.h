@@ -6,5 +6,5 @@ struct PerObjectConstantBuffer
 {
 	DirectX::XMFLOAT4X4 World;
 	DirectX::XMFLOAT4X4 View;
-	DirectX::XMFLOAT4X4 Project;
+	DirectX::XMFLOAT4X4 Projection;
 };

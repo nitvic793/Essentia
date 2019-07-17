@@ -7,8 +7,9 @@ void Game::Setup()
 	keyboard = std::make_unique<DirectX::Keyboard>();
 	mouse = std::make_unique<DirectX::Mouse>();
 
+	MeshView mesh;
 	renderer->Initialize();
-	auto mesh = ModelLoader::Load("../../Assets/Models/sphere.obj");
+	auto meshMgr = renderer->GetMeshManager();
 	Initialize();
 	renderer->EndInitialization();
 
@@ -21,9 +22,14 @@ void Game::Run()
 	auto window = renderer->GetWindow();
 	window->StartMessagePump([&] 
 		{
+			auto kb = keyboard->GetState();
 			camera->Update();
 			Update();
 			Render();
+			if (kb.IsKeyDown(DirectX::Keyboard::Escape))
+			{
+				PostQuitMessage(0);
+			}
 		});
 }
 
