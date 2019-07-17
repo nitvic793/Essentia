@@ -1,4 +1,5 @@
 #include "Game.h"
+#include "ModelLoader.h"
 
 void Game::Setup()
 {
@@ -7,6 +8,7 @@ void Game::Setup()
 	mouse = std::make_unique<DirectX::Mouse>();
 
 	renderer->Initialize();
+	auto mesh = ModelLoader::Load("../../Assets/Models/sphere.obj");
 	Initialize();
 	renderer->EndInitialization();
 

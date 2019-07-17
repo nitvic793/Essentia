@@ -22,8 +22,8 @@ private:
 
 	RenderTargetID currentRtvIndex = 0;
 	DepthStencilID currentDsvIndex = 0;
-	CDescriptorHeapWrapper rtvHeap;
-	CDescriptorHeapWrapper dsvHeap;
+	DescriptorHeap rtvHeap;
+	DescriptorHeap dsvHeap;
 
 	ID3D12Device* device = nullptr;
 	std::vector<ID3D12Resource*> renderBuffers;

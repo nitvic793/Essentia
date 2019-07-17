@@ -21,13 +21,13 @@ void Renderer::Initialize()
 	renderTargetManager = std::unique_ptr<RenderTargetManager>(new RenderTargetManager());
 	resourceManager = std::unique_ptr<ResourceManager>(new ResourceManager());
 
-	window->Initialize(GetModuleHandle(0), width, height);
+	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
 
 	device = deviceResources->GetDevice();
 	renderTargetManager->Initialize(device);
 	resourceManager->Initialize(device);
-	
+
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	renderTargets.resize(CFrameBufferCount);
@@ -192,7 +192,7 @@ void Renderer::CreateRootSignatures()
 	range[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[5];
-	rootParameters[0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 	rootParameters[1].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[2].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_ALL);
 	rootParameters[3].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
@@ -224,21 +224,21 @@ void Renderer::CreatePSOs()
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
 
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {}; 
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
 	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
-	psoDesc.pRootSignature = resourceManager->GetRootSignature(mainRootSignatureID); 
-	psoDesc.VS = vertexShaderBytecode; 
-	psoDesc.PS = pixelShaderBytecode; 
+	psoDesc.pRootSignature = resourceManager->GetRootSignature(mainRootSignatureID);
+	psoDesc.VS = vertexShaderBytecode;
+	psoDesc.PS = pixelShaderBytecode;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	//psoDesc.DepthStencilState.DepthEnable = false;
-	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE; 
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-	psoDesc.SampleDesc = sampleDesc; 
-	psoDesc.SampleMask = 0xffffffff; 
-	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT); 
-	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT); 
-	psoDesc.NumRenderTargets = 1; 
+	psoDesc.SampleDesc = sampleDesc;
+	psoDesc.SampleMask = 0xffffffff;
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.NumRenderTargets = 1;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.DSVFormat = depthFormat;
 
@@ -247,9 +247,10 @@ void Renderer::CreatePSOs()
 
 void Renderer::CreateDepthStencil()
 {
+	auto clearVal = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.f, 0);
 	auto depthBufferId = resourceManager->CreateResource(
 		CD3DX12_RESOURCE_DESC::Tex2D(depthFormat, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
-		CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.f, 0),
+		&clearVal,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE
 	);
 

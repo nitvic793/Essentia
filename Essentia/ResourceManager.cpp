@@ -28,11 +28,11 @@ PipelineStateID ResourceManager::CreatePSO(const D3D12_GRAPHICS_PIPELINE_STATE_D
 	return id;
 }
 
-ResourceID ResourceManager::CreateResource(D3D12_RESOURCE_DESC desc, D3D12_CLEAR_VALUE clearVal, D3D12_RESOURCE_STATES initialResourceState, D3D12_HEAP_FLAGS heapFlags, CD3DX12_HEAP_PROPERTIES heapProperties)
+ResourceID ResourceManager::CreateResource(D3D12_RESOURCE_DESC desc, D3D12_CLEAR_VALUE* clearVal, D3D12_RESOURCE_STATES initialResourceState, D3D12_HEAP_FLAGS heapFlags, CD3DX12_HEAP_PROPERTIES heapProperties)
 {
 	auto id = currentResourceID;
 	currentResourceID++;
-	device->CreateCommittedResource(&heapProperties, heapFlags, &desc, initialResourceState, &clearVal, IID_PPV_ARGS(resources[id].ReleaseAndGetAddressOf()));
+	device->CreateCommittedResource(&heapProperties, heapFlags, &desc, initialResourceState, clearVal, IID_PPV_ARGS(resources[id].ReleaseAndGetAddressOf()));
 	resources[id]->SetName((std::wstring(L"Resource ") + std::to_wstring(id)).c_str());
 	return id;
 }

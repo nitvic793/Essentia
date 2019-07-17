@@ -3,13 +3,62 @@
 #include <wrl.h>
 #include <assert.h>
 #include <d3d12.h>
+#include "ResourceManager.h"
 
 #define SafeRelease(comObj) if(comObj) comObj->Release();
 
-class CDescriptorHeapWrapper
+constexpr uint64 AlignmentSize = 256;
+
+class ConstantBuffer
 {
 public:
-	CDescriptorHeapWrapper() { memset(this, 0, sizeof(*this)); }
+	ConstantBuffer(){};
+	void Initialize(ResourceManager* rm, const uint64 bufferSize, const uint64 cbSize)
+	{
+		this->bufferSize = bufferSize;
+		constBufferSize = (cbSize + AlignmentSize - 1) & ~(AlignmentSize - 1);
+		resourceID = rm->CreateResource(
+			CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
+			nullptr, 
+			D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_HEAP_FLAG_NONE, 
+			CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD)
+		);
+
+		auto resource = rm->GetResource(resourceID);
+		CD3DX12_RANGE readRange(0, 0);
+		resource->Map(0, &readRange, reinterpret_cast<void**>(&vAddressBegin));
+	}
+
+	void CopyData(void* data, uint64 size, uint32 index) const
+	{
+		char* ptr = reinterpret_cast<char*>(vAddressBegin) + (size_t)constBufferSize * index;
+		memcpy(ptr, data, size);
+	}
+
+	void CopyData(void* data, uint64 size) const
+	{
+		memcpy(vAddressBegin, data, size);
+	}
+
+	D3D12_GPU_VIRTUAL_ADDRESS GetIndex(uint32 index) const
+	{
+		char* ptr = reinterpret_cast<char*>(vAddressBegin) + (size_t)constBufferSize * index;
+		return (D3D12_GPU_VIRTUAL_ADDRESS)ptr;
+	}
+
+	~ConstantBuffer(){}
+
+private:
+	ResourceID resourceID;
+	uint64 constBufferSize;
+	uint64 bufferSize;
+	char* vAddressBegin;
+};
+
+class DescriptorHeap
+{
+public:
+	DescriptorHeap() { memset(this, 0, sizeof(*this)); }
 
 	HRESULT Create(
 		ID3D12Device* pDevice,

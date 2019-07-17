@@ -16,7 +16,7 @@ void DeviceResources::CreateDevice()
 	{
 		DXGI_ADAPTER_DESC1 desc;
 		adapter->GetDesc1(&desc);
-		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) 
 		{
 			// we dont want a software device
 			adapterIndex++;
@@ -63,21 +63,20 @@ void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 	sampleDesc.Count = 1;
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-	swapChainDesc.BufferCount = CFrameBufferCount; // number of buffers we have
+	swapChainDesc.BufferCount = CFrameBufferCount; 
 	swapChainDesc.BufferDesc = backBufferDesc;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; // this says the pipeline will render to this swap chain
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; // dxgi will discard the buffer (data) after we call present
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; 
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; 
 	swapChainDesc.OutputWindow = window->GetWindowHandle();
-	swapChainDesc.SampleDesc = sampleDesc; // multi-sampling description
-	swapChainDesc.Windowed = !window->IsFullscreen(); // set to true, then if in fullscreen must call SetFullScreenState with true for full screen to get uncapped fps
+	swapChainDesc.SampleDesc = sampleDesc; 
+	swapChainDesc.Windowed = !window->IsFullscreen(); 
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; 
 
 	dxgiFactory->CreateSwapChain(
 		commandQueue.Get(),
 		&swapChainDesc,
 		(IDXGISwapChain**)swapChain.ReleaseAndGetAddressOf()
 	);
-
-	//swapChain = static_cast<IDXGISwapChain3*>(tempSwapChain);
 }
 
 DeviceResources::~DeviceResources()

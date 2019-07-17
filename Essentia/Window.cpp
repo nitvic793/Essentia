@@ -68,8 +68,6 @@ LRESULT Window::WindowsMessageCallback(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 void Window::Initialize(HINSTANCE hInstance, int width, int height, const char* windowName, const char* windowTitle, bool fullscreen, int ShowWnd)
 {
-	this->width = width;
-	this->height = height;
 	this->windowName = windowName;
 	this->windowTitle = windowTitle;
 
@@ -83,6 +81,9 @@ void Window::Initialize(HINSTANCE hInstance, int width, int height, const char* 
 		width = mi.rcMonitor.right - mi.rcMonitor.left;
 		height = mi.rcMonitor.bottom - mi.rcMonitor.top;
 	}
+
+	this->width = width;
+	this->height = height;
 
 	WNDCLASSEX wndClass;
 	ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
