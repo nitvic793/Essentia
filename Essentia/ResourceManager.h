@@ -3,7 +3,7 @@
 #include "d3dx12.h"
 #include <vector>
 
-constexpr uint32 CMaxD3DResources = 256;
+constexpr uint32 CMaxD3DResources = 1024;
 constexpr uint32 CMaxPipelineStates = 96;
 constexpr uint32 CMaxRootSignatures = 24;
 
@@ -24,6 +24,7 @@ public:
 	ID3D12PipelineState*	GetPSO(PipelineStateID psoID);
 	ID3D12RootSignature*	GetRootSignature(RootSignatureID rsID);
 	ID3D12Resource*			GetResource(ResourceID resourceID);
+	ID3D12Resource**		RequestEmptyResource(ResourceID& outResourceID);
 private:
 	ResourceManager() {}
 	ID3D12Device* device = nullptr;

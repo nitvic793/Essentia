@@ -4,10 +4,13 @@
 #include <assert.h>
 #include <d3d12.h>
 #include "ResourceManager.h"
+#include <string>
 
 #define SafeRelease(comObj) if(comObj) comObj->Release();
 
 constexpr uint64 AlignmentSize = 256;
+
+std::wstring ToWString(const std::string& str);
 
 class GPUConstantBuffer
 {

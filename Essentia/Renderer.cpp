@@ -122,6 +122,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	
 	commandList->SetGraphicsRootConstantBufferView(RootSigCBVertex0, cbuffer.GetAddress());
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
+	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texID));
 	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 }
 
@@ -155,6 +156,8 @@ void Renderer::EndInitialization()
 	meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+
+	texID = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
 
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandContext->SubmitCommands(commandList);

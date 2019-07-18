@@ -2,6 +2,7 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include <windowsx.h>
+#include <wrl.h>
 
 using namespace DirectX;
 
@@ -68,6 +69,10 @@ LRESULT Window::WindowsMessageCallback(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 
 void Window::Initialize(HINSTANCE hInstance, int width, int height, const char* windowName, const char* windowTitle, bool fullscreen, int ShowWnd)
 {
+	HRESULT hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED);
+	if (FAILED(hr))
+	{ 
+	}
 	this->windowName = windowName;
 	this->windowTitle = windowTitle;
 

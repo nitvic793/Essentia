@@ -59,11 +59,12 @@ private:
 	DXGI_FORMAT		depthFormat;
 	ID3D12Device*	device;
 
-	//Temp -> will move to ShaderResourceManager
+	//Temp -> will move to FrameManager
 	GPUConstantBuffer cbuffer;
 	PerObjectConstantBuffer perObject;
 	LightBuffer			lightBuffer;
 	ConstantBufferView	lightBufferView;
+	GPUHeapID			texID;
 
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;

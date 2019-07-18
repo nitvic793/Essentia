@@ -103,7 +103,6 @@ DeviceResources::~DeviceResources()
 
 void DeviceResources::Initialize(Window* window, DXGI_FORMAT format)
 {
-	auto hr = CoInitializeEx(nullptr, COINITBASE_MULTITHREADED); 
 	ID3D12Debug1* debugInterface;
 	D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface));
 	debugInterface->EnableDebugLayer();

@@ -2,6 +2,11 @@
 #include "ShaderResourceManager.h"
 #include "WICTextureLoader.h"
 #include "DDSTextureLoader.h"
+#include "ResourceUploadBatch.h"
+#include <wrl.h>
+
+using namespace Microsoft::WRL;
+using namespace DirectX;
 /// Frame Manager
 
 void FrameManager::Initialize(ID3D12Device* device)
@@ -58,7 +63,7 @@ ConstantBufferView ShaderResourceManager::CreateCBV(uint32 sizeInBytes)
 {
 	auto device = deviceResources->GetDevice();
 	uint32 index = constantBufferCount;
-	auto size = (sizeInBytes + AlignmentSize - 1) & ~(AlignmentSize - 1);
+	uint32 size = (sizeInBytes + AlignmentSize - 1) & ~(AlignmentSize - 1);
 	constantBufferCount++;
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
@@ -83,7 +88,40 @@ GPUHeapOffsets ShaderResourceManager::CopyDescriptorsToGPUHeap(uint32 frameIndex
 {
 	GPUHeapOffsets offsets;
 	offsets.ConstantBufferOffset = frame->Allocate(frameIndex, cbvHeap[frameIndex], constantBufferCount);
-	//offsets.TexturesOffset = frame->Allocate(frameIndex, textureHeap[frameIndex], textureCount);
-
+	offsets.TexturesOffset = frame->Allocate(frameIndex, textureHeap[frameIndex], textureCount);
 	return offsets;
+}
+
+GPUHeapID ShaderResourceManager::CreateTexture(const std::string& filename, TextureType texType)
+{
+	auto device = deviceResources->GetDevice();
+	ResourceUploadBatch uploadBatch(device);
+	auto fname = ToWString(filename);
+	ResourceID resourceId;
+	ID3D12Resource** resource = resourceManager->RequestEmptyResource(resourceId);
+	ComPtr<ID3D12Resource> tex;
+	bool isCubeMap = false;
+
+	uploadBatch.Begin();
+	switch (texType)
+	{
+	case WIC:
+		CreateWICTextureFromFile(device, uploadBatch, fname.c_str(), resource, true);
+		break;
+	case DDS:
+		CreateDDSTextureFromFile(device, uploadBatch, fname.c_str(), resource, true, 0, nullptr, &isCubeMap);
+		break;
+	}
+
+	auto finish = uploadBatch.End(deviceResources->GetCommandQueue());
+	finish.wait();
+
+	auto texIndex = textureCount;
+	textureCount++;
+	for (int i = 0; i < CFrameBufferCount; ++i)
+	{
+		CreateShaderResourceView(device, *resource, textureHeap[i].handleCPU(texIndex), isCubeMap);
+	}
+	
+	return texIndex;
 }

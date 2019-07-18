@@ -51,3 +51,10 @@ ID3D12Resource* ResourceManager::GetResource(ResourceID resourceID)
 {
 	return resources[resourceID].Get();
 }
+
+ID3D12Resource** ResourceManager::RequestEmptyResource(ResourceID& outResourceID)
+{
+	outResourceID = currentResourceID;
+	currentResourceID++;
+	return resources[outResourceID].ReleaseAndGetAddressOf();
+}
