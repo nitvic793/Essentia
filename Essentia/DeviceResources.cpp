@@ -44,6 +44,24 @@ void DeviceResources::CreateDevice()
 		D3D_FEATURE_LEVEL_12_0,
 		IID_PPV_ARGS(device.ReleaseAndGetAddressOf())
 	);
+
+	{
+		Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3dInfoQueue;
+		if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&d3dInfoQueue))))
+		{
+			d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+			d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+			d3dInfoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
+
+			D3D12_MESSAGE_ID blockedIds[] = { D3D12_MESSAGE_ID_CLEARRENDERTARGETVIEW_MISMATCHINGCLEARVALUE,
+			  D3D12_MESSAGE_ID_CLEARDEPTHSTENCILVIEW_MISMATCHINGCLEARVALUE, D3D12_MESSAGE_ID_COPY_DESCRIPTORS_INVALID_RANGES };
+			D3D12_INFO_QUEUE_FILTER filter = {};
+			filter.DenyList.pIDList = blockedIds;
+			filter.DenyList.NumIDs = 3;
+			d3dInfoQueue->AddRetrievalFilterEntries(&filter);
+			d3dInfoQueue->AddStorageFilterEntries(&filter);
+		}
+	}
 }
 
 void DeviceResources::CreateCommandQueue()

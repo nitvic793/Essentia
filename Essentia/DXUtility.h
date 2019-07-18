@@ -29,9 +29,31 @@ public:
 		resource->Map(0, &readRange, reinterpret_cast<void**>(&vAddressBegin));
 	}
 
+	void Initialize(ResourceManager* rm, const uint64 bufferSize)
+	{
+		constBufferSize = AlignmentSize;
+		this->bufferSize = bufferSize;
+		resourceID = rm->CreateResource(
+			CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
+			nullptr,
+			D3D12_RESOURCE_STATE_GENERIC_READ, D3D12_HEAP_FLAG_NONE,
+			CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD)
+		);
+
+		resource = rm->GetResource(resourceID);
+		CD3DX12_RANGE readRange(0, 0);
+		resource->Map(0, &readRange, reinterpret_cast<void**>(&vAddressBegin));
+	}
+
 	void CopyData(void* data, uint64 size, uint32 index) const
 	{
 		char* ptr = reinterpret_cast<char*>(vAddressBegin) + (size_t)constBufferSize * index;
+		memcpy(ptr, data, size);
+	}
+
+	void CopyData(void* data, uint64 size, uint64 offset) const
+	{
+		char* ptr = reinterpret_cast<char*>(vAddressBegin) + offset;
 		memcpy(ptr, data, size);
 	}
 
@@ -96,20 +118,20 @@ public:
 	//	return offsetted;
 	//}
 
-	UINT64 MakeOffsetted(UINT64 ptr, UINT index)
+	UINT64 MakeOffsetted(UINT64 ptr, UINT index) const
 	{
 		UINT64 offsetted;
 		offsetted = ptr + static_cast<UINT64>(index * HandleIncrementSize);
 		return offsetted;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU(UINT index)
+	D3D12_CPU_DESCRIPTOR_HANDLE handleCPU(UINT index) const 
 	{
 		D3D12_CPU_DESCRIPTOR_HANDLE handle;
 		handle.ptr = MakeOffsetted(hCPUHeapStart.ptr, index);
 		return handle;
 	}
-	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU(UINT index)
+	D3D12_GPU_DESCRIPTOR_HANDLE handleGPU(UINT index) const
 	{
 		assert(HeapDesc.Flags & D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
 		D3D12_GPU_DESCRIPTOR_HANDLE handle;

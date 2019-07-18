@@ -14,7 +14,6 @@ void Game::Setup()
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
 	camera = std::make_unique<Camera>((float)windowSize.Width, (float)windowSize.Height);
-	camera->Position = DirectX::XMFLOAT3(0, 1.f, -5.f);
 }
 
 void Game::Run()

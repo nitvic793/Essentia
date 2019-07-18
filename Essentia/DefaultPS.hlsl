@@ -1,6 +1,12 @@
 #include "Common.hlsli"
 
+cbuffer LightBuffer : register(b0)
+{
+	DirectionalLight DirLight;
+}
+
 float4 main(PixelInput input) : SV_TARGET
 {
-	return float4(1.0f, 0.0f, 0.0f, 1.0f);
+	float3 light = CalculateDirectionalLight(input.Normal, DirLight);
+	return float4(light, 1.0f);
 }

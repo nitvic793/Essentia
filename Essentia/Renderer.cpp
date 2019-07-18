@@ -6,6 +6,7 @@
 #include <thread>
 #include "ShaderManager.h"
 #include "InputLayout.h"
+#include <array>
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -22,6 +23,9 @@ void Renderer::Initialize()
 	deviceResources = std::unique_ptr<DeviceResources>(new DeviceResources());
 	renderTargetManager = std::unique_ptr<RenderTargetManager>(new RenderTargetManager());
 	resourceManager = std::unique_ptr<ResourceManager>(new ResourceManager());
+	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
+	shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
+	frameManager = std::unique_ptr<FrameManager>(new FrameManager());
 
 	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
@@ -57,8 +61,9 @@ void Renderer::Initialize()
 	CreateRootSignatures();
 	CreatePSOs();
 
-	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
 	meshManager->Initialize(commandContext.get());
+	shaderResourceManager->Initialize(resourceManager.get(), deviceResources.get());
+	frameManager->Initialize(device);
 }
 
 void Renderer::Clear()
@@ -80,12 +85,14 @@ void Renderer::Clear()
 	commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
+	frameManager->Reset(backBufferIndex);
 }
 
 void Renderer::Render(const FrameContext& frameContext)
 {
 	auto camera = frameContext.Camera;
 	auto world = DirectX::XMMatrixIdentity();
+	world = XMMatrixTranslation(-1, 0, 0);
 	XMFLOAT4X4 model;
 	XMStoreFloat4x4(&model, XMMatrixTranspose(world));
 
@@ -94,15 +101,27 @@ void Renderer::Render(const FrameContext& frameContext)
 	perObject.Projection = camera->GetProjectionTransposed();
 	cbuffer.CopyData(&perObject, sizeof(perObject));
 
+	auto dir = XMVector3Normalize(XMVectorSet(-1, -1, 0, 0));
+	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
+	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
+	shaderResourceManager->CopyToCB(backBufferIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
+	auto offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get());
+
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
+	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 	commandList->SetPipelineState(resourceManager->GetPSO(defaultPSO));
-	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	
+	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(backBufferIndex) };
+	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
 	commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 	commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-	commandList->SetGraphicsRootConstantBufferView(0, cbuffer.GetAddress());
+	
+	commandList->SetGraphicsRootConstantBufferView(RootSigCBVertex0, cbuffer.GetAddress());
+	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 }
 
@@ -133,7 +152,10 @@ void Renderer::CleanUp()
 void Renderer::EndInitialization()
 {
 	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), 16);
-	meshManager->CreateMesh("../../Assets/Models/cube.obj", mesh);
+	meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
+	shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandContext->SubmitCommands(commandList);
 }
@@ -174,11 +196,11 @@ void Renderer::CreateRootSignatures()
 	range[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[5];
-	rootParameters[0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-	rootParameters[1].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters[2].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_ALL);
-	rootParameters[3].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
-	rootParameters[4].InitAsDescriptorTable(1, &range[4], D3D12_SHADER_VISIBILITY_ALL);
+	rootParameters[RootSigCBVertex0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
+	rootParameters[RootSigCBAll2].InitAsDescriptorTable(1, &range[4], D3D12_SHADER_VISIBILITY_ALL);
 
 	CD3DX12_ROOT_SIGNATURE_DESC descRootSignature;
 	descRootSignature.Init(5, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
