@@ -2,6 +2,9 @@
 
 #include "DXUtility.h"
 #include "ResourceManager.h"
+#include "DeviceResources.h"
+
+constexpr uint32 CFrameMaxDescriptorHeapCount = 512;
 
 class ShaderResourceManager
 {
@@ -9,22 +12,21 @@ public:
 
 
 private:
-	GPUConstantBuffer		perObjectBuffer;
+	GPUConstantBuffer	perObjectBuffer;
 	DescriptorHeap		cbvHeap;
 	DescriptorHeap		textureHeap;
 	ResourceManager*	resourceManager;
-
+	DeviceResources*	deviceResources;
 	friend class Renderer;
 };
 
 class FrameManager
 {
 public:
-	ID3D12DescriptorHeap* GetGPUDescriptorHeap() const
-	{
-		return gpuHeap.pDescriptorHeap.Get();
-	}
+	void					Initialize(ID3D12Device* device);
+	ID3D12DescriptorHeap*	GetGPUDescriptorHeap(uint32 frameIndex) const;
 private:
-	DescriptorHeap		gpuHeap;
+	ID3D12Device*		device;
+	DescriptorHeap		gpuHeap[CFrameBufferCount];
 };
 

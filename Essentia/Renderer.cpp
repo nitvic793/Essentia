@@ -59,7 +59,6 @@ void Renderer::Initialize()
 
 	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
 	meshManager->Initialize(commandContext.get());
-	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), sizeof(PerObjectConstantBuffer));
 }
 
 void Renderer::Clear()
@@ -103,7 +102,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 	commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-//	commandList->SetGraphicsRootConstantBufferView(0, cbuffer.GetIndex(0));
+	commandList->SetGraphicsRootConstantBufferView(0, cbuffer.GetAddress());
 	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 }
 
@@ -133,6 +132,7 @@ void Renderer::CleanUp()
 
 void Renderer::EndInitialization()
 {
+	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), 16);
 	meshManager->CreateMesh("../../Assets/Models/cube.obj", mesh);
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandContext->SubmitCommands(commandList);

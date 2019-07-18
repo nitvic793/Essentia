@@ -50,6 +50,8 @@ private:
 	DXGI_FORMAT		renderTargetFormat;
 	DXGI_FORMAT		depthFormat;
 	ID3D12Device*	device;
+
+	//Temp -> will move to ShaderResourceManager
 	GPUConstantBuffer cbuffer;
 	PerObjectConstantBuffer perObject;
 

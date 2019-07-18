@@ -7,7 +7,6 @@ void Game::Setup()
 	keyboard = std::make_unique<DirectX::Keyboard>();
 	mouse = std::make_unique<DirectX::Mouse>();
 
-	MeshView mesh;
 	renderer->Initialize();
 	auto meshMgr = renderer->GetMeshManager();
 	Initialize();
@@ -15,6 +14,7 @@ void Game::Setup()
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
 	camera = std::make_unique<Camera>((float)windowSize.Width, (float)windowSize.Height);
+	camera->Position = DirectX::XMFLOAT3(0, 1.f, -5.f);
 }
 
 void Game::Run()

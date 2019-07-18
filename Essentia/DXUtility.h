@@ -13,10 +13,10 @@ class GPUConstantBuffer
 {
 public:
 	GPUConstantBuffer(){};
-	void Initialize(ResourceManager* rm, const uint64 bufferSize, const uint64 cbSize)
+	void Initialize(ResourceManager* rm, const uint64 cbSize, const uint32 count)
 	{
-		this->bufferSize = bufferSize;
 		constBufferSize = (cbSize + AlignmentSize - 1) & ~(AlignmentSize - 1);
+		bufferSize = constBufferSize * count;
 		resourceID = rm->CreateResource(
 			CD3DX12_RESOURCE_DESC::Buffer(bufferSize),
 			nullptr, 
@@ -24,7 +24,7 @@ public:
 			CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD)
 		);
 
-		auto resource = rm->GetResource(resourceID);
+		resource = rm->GetResource(resourceID);
 		CD3DX12_RANGE readRange(0, 0);
 		resource->Map(0, &readRange, reinterpret_cast<void**>(&vAddressBegin));
 	}
@@ -40,15 +40,15 @@ public:
 		memcpy(vAddressBegin, data, size);
 	}
 
-	D3D12_GPU_VIRTUAL_ADDRESS GetIndex(uint32 index) const
+	D3D12_GPU_VIRTUAL_ADDRESS GetAddress(uint32 index = 0) const
 	{
-		char* ptr = reinterpret_cast<char*>(vAddressBegin) + (size_t)constBufferSize * index;
-		return (D3D12_GPU_VIRTUAL_ADDRESS)ptr;
+		return resource->GetGPUVirtualAddress() + (size_t)constBufferSize * index;
 	}
 
 	~GPUConstantBuffer(){}
 
 private:
+	ID3D12Resource* resource;
 	ResourceID resourceID;
 	uint64 constBufferSize;
 	uint64 bufferSize;
