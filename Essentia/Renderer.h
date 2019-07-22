@@ -12,10 +12,12 @@
 #include "DXUtility.h"
 #include "ShaderResourceManager.h"
 #include <memory>
+#include "Timer.h"
 
 struct FrameContext
 {
 	Camera* Camera;
+	Timer* timer;
 };
 
 enum RootParameterSlot {
@@ -64,7 +66,9 @@ private:
 	PerObjectConstantBuffer perObject;
 	LightBuffer			lightBuffer;
 	ConstantBufferView	lightBufferView;
+	ConstantBufferView  perObjectView;
 	GPUHeapID			texID;
+	GPUHeapOffsets		offsets;
 
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;

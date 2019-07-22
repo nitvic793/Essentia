@@ -103,6 +103,7 @@ void CommandContext::CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12Command
 
 void CommandContext::WaitForFrame(uint32 index)
 {
+	backBufferIndex = index;
 	if (fences[index]->GetCompletedValue() < fenceValues[index])
 	{
 		auto hr = fences[index]->SetEventOnCompletion(fenceValues[index], fenceEvent);

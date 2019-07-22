@@ -19,8 +19,10 @@ void Game::Setup()
 void Game::Run()
 {
 	auto window = renderer->GetWindow();
+	timer.Start();
 	window->StartMessagePump([&] 
 		{
+			timer.Tick();
 			auto kb = keyboard->GetState();
 			camera->Update();
 			Update();
@@ -39,7 +41,7 @@ Game::~Game()
 
 void Game::Render()
 {
-	FrameContext frameContext = { camera.get() };
+	FrameContext frameContext = { camera.get(), &timer };
 	renderer->Clear();
 	renderer->Render(frameContext);
 	renderer->Present();

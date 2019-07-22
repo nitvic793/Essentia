@@ -7,6 +7,7 @@
 #include "ShaderManager.h"
 #include "InputLayout.h"
 #include <array>
+#include "pix3.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -90,24 +91,29 @@ void Renderer::Clear()
 
 void Renderer::Render(const FrameContext& frameContext)
 {
+	auto commandList = commandContext->GetDefaultCommandList();
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
+
 	auto camera = frameContext.Camera;
 	auto world = DirectX::XMMatrixIdentity();
-	world = XMMatrixTranslation(-1, 0, 0);
+	world = XMMatrixTranslation((float)(sin(frameContext.timer->TotalTime) * 2.0), 0, 0);
 	XMFLOAT4X4 model;
 	XMStoreFloat4x4(&model, XMMatrixTranspose(world));
-
+	
 	perObject.World = model;
 	perObject.View = camera->GetViewTransposed();
 	perObject.Projection = camera->GetProjectionTransposed();
-	cbuffer.CopyData(&perObject, sizeof(perObject));
+	cbuffer.CopyData(&perObject, sizeof(perObject), backBufferIndex);
+	
+	shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, perObjectView.Offset);
 
-	auto dir = XMVector3Normalize(XMVectorSet(-1, -1, 0, 0));
+	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
 	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
 	shaderResourceManager->CopyToCB(backBufferIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
-	auto offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get());
+	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
-	auto commandList = commandContext->GetDefaultCommandList();
+	
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -120,10 +126,12 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 	commandList->IASetIndexBuffer(&mesh.IndexBufferView);
 	
-	commandList->SetGraphicsRootConstantBufferView(RootSigCBVertex0, cbuffer.GetAddress());
+	commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + perObjectView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texID));
 	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
+
+	PIXEndEvent(commandList);
 }
 
 void Renderer::Present()
@@ -154,10 +162,14 @@ void Renderer::EndInitialization()
 {
 	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), 16);
 	meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
-	shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 
 	texID = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
+	//for (int i = 0; i < CFrameBufferCount; ++i)
+	//{
+	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());
+	//}
 
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandContext->SubmitCommands(commandList);
@@ -199,7 +211,7 @@ void Renderer::CreateRootSignatures()
 	range[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[5];
-	rootParameters[RootSigCBVertex0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
 	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
@@ -269,5 +281,5 @@ void Renderer::WaitForPreviousFrame()
 {
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	commandContext->WaitForFrame();
+	commandContext->WaitForFrame(backBufferIndex);
 }

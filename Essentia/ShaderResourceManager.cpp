@@ -69,7 +69,7 @@ ConstantBufferView ShaderResourceManager::CreateCBV(uint32 sizeInBytes)
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
 		D3D12_CONSTANT_BUFFER_VIEW_DESC	descBuffer;
-		descBuffer.BufferLocation = cbuffer->GetAddress() + currentCBufferOffset;
+		descBuffer.BufferLocation = cbuffer[i].GetAddress() + currentCBufferOffset;
 		descBuffer.SizeInBytes = size;
 		device->CreateConstantBufferView(&descBuffer, cbvHeap[i].handleCPU(index));
 	}
