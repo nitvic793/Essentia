@@ -69,6 +69,7 @@ private:
 	ConstantBufferView  perObjectView;
 	GPUHeapID			texID;
 	GPUHeapOffsets		offsets;
+	Material			material;
 
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;

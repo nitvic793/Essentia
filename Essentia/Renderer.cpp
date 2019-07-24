@@ -91,12 +91,11 @@ void Renderer::Clear()
 
 void Renderer::Render(const FrameContext& frameContext)
 {
-	auto commandList = commandContext->GetDefaultCommandList();
-	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
-
 	auto camera = frameContext.Camera;
 	auto world = DirectX::XMMatrixIdentity();
-	world = XMMatrixTranslation((float)(sin(frameContext.timer->TotalTime) * 2.0), 0, 0);
+	auto translation = world;// XMMatrixTranslation((float)(sin(frameContext.timer->TotalTime)), 0, 0);
+	auto rotation = XMMatrixRotationRollPitchYaw(0, frameContext.timer->TotalTime, 0);
+	world = rotation * translation;
 	XMFLOAT4X4 model;
 	XMStoreFloat4x4(&model, XMMatrixTranspose(world));
 	
@@ -105,6 +104,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	perObject.Projection = camera->GetProjectionTransposed();
 	cbuffer.CopyData(&perObject, sizeof(perObject), backBufferIndex);
 	
+	//for(int i=0;i<CFrameBufferCount;++i)
 	shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, perObjectView.Offset);
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
@@ -113,7 +113,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	shaderResourceManager->CopyToCB(backBufferIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
-	
+	auto commandList = commandContext->GetDefaultCommandList();
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
@@ -128,7 +129,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + perObjectView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
-	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texID));
+	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
 	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 
 	PIXEndEvent(commandList);
@@ -166,6 +167,7 @@ void Renderer::EndInitialization()
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 
 	texID = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
+	material = shaderResourceManager->CreateMaterial(&texID, 1, defaultPSO);
 	//for (int i = 0; i < CFrameBufferCount; ++i)
 	//{
 	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());

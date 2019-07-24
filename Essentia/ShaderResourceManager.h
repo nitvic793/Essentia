@@ -1,40 +1,10 @@
 #pragma once
 
 #include "DXUtility.h"
-#include "ResourceManager.h"
-#include "DeviceResources.h"
+#include "Material.h"
 
-constexpr uint32 CFrameMaxDescriptorHeapCount = 512;
-constexpr uint32 CMaxTextureCount = 512;
-constexpr uint32 CMaxConstantBufferCount = 512;
-constexpr uint64 CMaxConstantBufferSize = 1024 * 4; //4KB
-
-typedef uint32 GPUHeapID;
-
-struct ConstantBufferView
-{
-	uint64		Offset;
-	GPUHeapID	Index;
-};
-
-struct DataPack
-{
-	void*	Data;
-	uint32	Size;
-};
-
-struct GPUHeapOffsets
-{
-	uint32 ConstantBufferOffset;
-	uint32 TexturesOffset;
-};
-
-enum TextureType
-{
-	WIC,
-	DDS
-};
-
+class DeviceResources;
+class ResourceManager;
 class FrameManager;
 
 class ShaderResourceManager
@@ -44,17 +14,20 @@ public:
 	ConstantBufferView	CreateCBV(uint32 sizeInBytes);
 	void				CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset = 0); //Copy data to constant buffer
 	GPUHeapOffsets		CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
-	GPUHeapID			CreateTexture(const std::string& filename, TextureType texType = WIC);
+	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC);
+	Material			CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID);
 private:
 	GPUConstantBuffer		cbuffer[CFrameBufferCount];
 	DescriptorHeap			cbvHeap[CFrameBufferCount];
 	DescriptorHeap			textureHeap[CFrameBufferCount];
+	DescriptorHeap			materialHeap;
 
 	ResourceManager*		resourceManager = nullptr;
 	DeviceResources*		deviceResources = nullptr;
 
 	uint32					constantBufferCount = 0;
 	uint32					textureCount = 0;
+	uint32					materialCount = 0;
 	uint64					currentCBufferOffset = 0;
 
 	friend class Renderer;

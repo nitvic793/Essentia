@@ -13,7 +13,7 @@ PixelInput main(VertexInput input)
 	matrix worldViewProjection = mul(mul(World, View), Projection);
 
 	output.Position = mul(float4(input.Position, 1.f), worldViewProjection);
-	output.Normal = input.Normal;
+	output.Normal = mul(input.Normal, (float3x3)World);
 	output.UV = input.UV;
 	output.Tangent = input.Tangent;
 

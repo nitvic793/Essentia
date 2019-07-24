@@ -1,15 +1,8 @@
 #pragma once
 
 #include "d3dx12.h"
+#include "Declarations.h"
 #include <vector>
-
-constexpr uint32 CMaxD3DResources = 1024;
-constexpr uint32 CMaxPipelineStates = 96;
-constexpr uint32 CMaxRootSignatures = 24;
-
-typedef uint32 PipelineStateID;
-typedef uint32 RootSignatureID;
-typedef uint32 ResourceID;
 
 class ResourceManager
 {

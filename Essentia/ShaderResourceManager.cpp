@@ -3,6 +3,8 @@
 #include "WICTextureLoader.h"
 #include "DDSTextureLoader.h"
 #include "ResourceUploadBatch.h"
+#include "DeviceResources.h"
+#include "ResourceManager.h"
 #include <wrl.h>
 
 using namespace Microsoft::WRL;
@@ -49,6 +51,7 @@ void ShaderResourceManager::Initialize(ResourceManager* resourceManager, DeviceR
 	this->resourceManager = resourceManager;
 	this->deviceResources = deviceResources;
 
+	materialHeap.Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxTextureCount);
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
 		textureHeap[i].Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxTextureCount);
@@ -89,10 +92,11 @@ GPUHeapOffsets ShaderResourceManager::CopyDescriptorsToGPUHeap(uint32 frameIndex
 	GPUHeapOffsets offsets;
 	offsets.ConstantBufferOffset = frame->Allocate(frameIndex, cbvHeap[frameIndex], constantBufferCount);
 	offsets.TexturesOffset = frame->Allocate(frameIndex, textureHeap[frameIndex], textureCount);
+	offsets.MaterialsOffset = frame->Allocate(frameIndex, materialHeap, materialCount);
 	return offsets;
 }
 
-GPUHeapID ShaderResourceManager::CreateTexture(const std::string& filename, TextureType texType)
+TextureID ShaderResourceManager::CreateTexture(const std::string& filename, TextureType texType)
 {
 	auto device = deviceResources->GetDevice();
 	ResourceUploadBatch uploadBatch(device);
@@ -124,4 +128,18 @@ GPUHeapID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	}
 	
 	return texIndex;
+}
+
+Material ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID)
+{
+	auto device = deviceResources->GetDevice();
+	//Copy Textures from texture heap to material heap so that material textures are ordered in descriptor table.
+	for (auto i = 0u; i < textureCount; ++i)
+	{
+		device->CopyDescriptorsSimple(1, materialHeap.handleCPU(materialCount + i), textureHeap[0].handleCPU(textures[i]),  D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+
+	auto material = Material{ materialCount, psoID, textureCount };
+	materialCount += textureCount;
+	return material;
 }

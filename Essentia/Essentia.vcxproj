@@ -182,6 +182,7 @@
     <ClInclude Include="DXUtility.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputLayout.h" />
+    <ClInclude Include="Material.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="ModelLoader.h" />

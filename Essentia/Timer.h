@@ -30,13 +30,13 @@ public:
 		QueryPerformanceCounter((LARGE_INTEGER*)& now);
 		currentTime = now;
 
-		DeltaTime = std::max(((currentTime - previousTime) * perfCounterSeconds), 0.0);
-		TotalTime = ((currentTime - startTime) * perfCounterSeconds);
+		DeltaTime = std::max((float)((currentTime - previousTime) * perfCounterSeconds), 0.f);
+		TotalTime = (float)((currentTime - startTime) * perfCounterSeconds);
 		previousTime = currentTime;
 	}
 
-	double DeltaTime;
-	double TotalTime;
+	float DeltaTime;
+	float TotalTime;
 
 private:
 	uint64 startTime;
