@@ -93,18 +93,18 @@ void Renderer::Render(const FrameContext& frameContext)
 {
 	auto camera = frameContext.Camera;
 	auto world = DirectX::XMMatrixIdentity();
-	auto translation = world;// XMMatrixTranslation((float)(sin(frameContext.timer->TotalTime)), 0, 0);
+	auto translation = XMMatrixTranslation((float)(sin(frameContext.timer->TotalTime * 2)), 0, 0);
 	auto rotation = XMMatrixRotationRollPitchYaw(0, frameContext.timer->TotalTime, 0);
 	world = rotation * translation;
 	XMFLOAT4X4 model;
 	XMStoreFloat4x4(&model, XMMatrixTranspose(world));
-	
+
 	perObject.World = model;
 	perObject.View = camera->GetViewTransposed();
 	perObject.Projection = camera->GetProjectionTransposed();
 	cbuffer.CopyData(&perObject, sizeof(perObject), backBufferIndex);
-	
-	//for(int i=0;i<CFrameBufferCount;++i)
+
+	//for (int i = 0; i < CFrameBufferCount; ++i)
 	shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, perObjectView.Offset);
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
@@ -121,12 +121,12 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 	commandList->SetPipelineState(resourceManager->GetPSO(defaultPSO));
-	
+
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(backBufferIndex) };
 	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
 	commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 	commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-	
+
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + perObjectView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));

@@ -98,7 +98,7 @@ void CommandContext::ResetCommandList(ID3D12GraphicsCommandList* commandList, ID
 void CommandContext::CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator** allocator)
 {
 	auto device = deviceResources->GetDevice();
-	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(allocator));
+	device->CreateCommandAllocator(type, IID_PPV_ARGS(allocator));
 }
 
 void CommandContext::WaitForFrame(uint32 index)
