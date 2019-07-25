@@ -35,15 +35,28 @@ public:
 		previousTime = currentTime;
 	}
 
+	static const Timer *const GetInstance() 
+	{
+		return Instance;
+	}
+
 	float DeltaTime;
 	float TotalTime;
 
 private:
-	uint64 startTime;
-	uint64 currentTime;
-	uint64 previousTime;
-	uint64 frameCounter;
+	Timer() 
+	{
+		Instance = this;
+	};
 
-	double perfCounterSeconds;
+	uint64 startTime = 0;
+	uint64 currentTime = 0;
+	uint64 previousTime = 0;
+	uint64 frameCounter = 0;
+
+	double perfCounterSeconds = 0;
+
+	static Timer* Instance;
+	friend class Game;
 };
 

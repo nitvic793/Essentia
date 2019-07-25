@@ -22,7 +22,7 @@ struct MeshView
 	uint32 IndexCount;
 };
 
-union Mesh
+union MeshHandle
 {
 	uint32 Id;
 };
@@ -30,8 +30,9 @@ union Mesh
 class MeshManager
 {
 public:
-	Mesh CreateMesh(const std::string& filename, MeshView& meshView);
-	void Initialize(CommandContext* commandContext);
+	MeshHandle		CreateMesh(const std::string& filename, MeshView& meshView);
+	void			Initialize(CommandContext* commandContext);
+	const MeshView& GetMeshView(MeshHandle handle);
 private:
 	MeshManager() {};
 	CommandContext*			context = nullptr;

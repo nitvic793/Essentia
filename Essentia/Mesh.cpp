@@ -4,7 +4,7 @@
 
 using namespace Microsoft::WRL;
 
-Mesh MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
+MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 {
 	auto meshData = ModelLoader::Load(filename);
 	MeshBuffer buffer;
@@ -13,7 +13,7 @@ Mesh MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 	ComPtr<ID3D12CommandAllocator> allocator;
 	context->CreateAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.ReleaseAndGetAddressOf());
 	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
-	Mesh mesh;
+	MeshHandle mesh;
 
 	ComPtr<ID3D12Resource> vBufferUploadHeap;
 	ComPtr<ID3D12Resource> iBufferUploadHeap;
@@ -98,4 +98,9 @@ Mesh MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 void MeshManager::Initialize(CommandContext* commandContext)
 {
 	context = commandContext;
+}
+
+const MeshView& MeshManager::GetMeshView(MeshHandle handle)
+{
+	return views[handle.Id];
 }

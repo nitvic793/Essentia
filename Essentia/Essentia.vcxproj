@@ -160,7 +160,9 @@
     <ClCompile Include="CommandContext.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
     <ClCompile Include="DXUtility.cpp" />
+    <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="OGLMath.cpp" />
@@ -169,17 +171,22 @@
     <ClCompile Include="RenderTargetManager.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="ShaderResourceManager.cpp" />
+    <ClCompile Include="System.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BaseComponents.h" />
+    <ClInclude Include="EntityBase.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CommandContext.h" />
+    <ClInclude Include="Component.h" />
     <ClInclude Include="ConstantBuffer.h" />
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="Declarations.h" />
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="DXUtility.h" />
+    <ClInclude Include="Entity.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputLayout.h" />
     <ClInclude Include="Material.h" />
@@ -193,6 +200,8 @@
     <ClInclude Include="RenderTargetManager.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ShaderResourceManager.h" />
+    <ClInclude Include="StringHash.h" />
+    <ClInclude Include="System.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
@@ -220,6 +229,7 @@
     <Import Project="..\packages\directxtk12_desktop_2015.2019.5.31.1\build\native\directxtk12_desktop_2015.targets" Condition="Exists('..\packages\directxtk12_desktop_2015.2019.5.31.1\build\native\directxtk12_desktop_2015.targets')" />
     <Import Project="..\packages\WinPixEventRuntime.1.0.190604001\build\WinPixEventRuntime.targets" Condition="Exists('..\packages\WinPixEventRuntime.1.0.190604001\build\WinPixEventRuntime.targets')" />
     <Import Project="..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets" Condition="Exists('..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets')" />
+    <Import Project="..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets" Condition="Exists('..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -228,5 +238,6 @@
     <Error Condition="!Exists('..\packages\directxtk12_desktop_2015.2019.5.31.1\build\native\directxtk12_desktop_2015.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2015.2019.5.31.1\build\native\directxtk12_desktop_2015.targets'))" />
     <Error Condition="!Exists('..\packages\WinPixEventRuntime.1.0.190604001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinPixEventRuntime.1.0.190604001\build\WinPixEventRuntime.targets'))" />
     <Error Condition="!Exists('..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets'))" />
+    <Error Condition="!Exists('..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets'))" />
   </Target>
 </Project>
