@@ -2,6 +2,7 @@
 #include "Mesh.h"
 #include "ModelLoader.h"
 
+using namespace DirectX;
 using namespace Microsoft::WRL;
 
 MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
@@ -87,7 +88,11 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	meshView.IndexBufferView.SizeInBytes = iBufferSize;
 
 	context->SubmitCommands(commandList.Get());
+	
+	BoundingOrientedBox meshBounds;
+	BoundingOrientedBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)meshData.Vertices.data(), sizeof(Vertex));
 
+	bounds.push_back(meshBounds);
 	meshes.push_back(meshData);
 	buffers.push_back(buffer);
 	views.push_back(meshView);

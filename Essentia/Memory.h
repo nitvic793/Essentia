@@ -71,6 +71,13 @@ private:
 	size_t totalSize = 0;
 };
 
+//namespace Mem
+//{
+//	void* Alloc(size_t sizeInBytes)
+//	{
+//		return StackAllocator::Instance->Alloc(sizeInBytes);
+//	}
+//}
 
 template<typename T>
 struct Deleter

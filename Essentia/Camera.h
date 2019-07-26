@@ -1,6 +1,7 @@
 #pragma once
 
 #include <DirectXMath.h>
+#include <DirectXCollision.h>
 
 const DirectX::XMFLOAT3 DefaultUp(0.f, 1.f, 0.f);
 
@@ -21,6 +22,7 @@ public:
 
 	DirectX::XMFLOAT4X4			Projection;
 	DirectX::XMFLOAT4X4			View;
+	DirectX::BoundingFrustum	Frustum;
 
 private:
 	DirectX::XMMATRIX XM_CALLCONV GetViewMatrix();

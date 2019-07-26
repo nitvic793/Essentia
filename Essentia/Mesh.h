@@ -2,6 +2,7 @@
 #include "Vertex.h"
 #include "CommandContext.h"
 #include <wrl.h>
+#include <DirectXCollision.h>
 
 struct MeshData
 {
@@ -35,9 +36,10 @@ public:
 	const MeshView& GetMeshView(MeshHandle handle);
 private:
 	MeshManager() {};
-	CommandContext*			context = nullptr;
-	std::vector<MeshData>	meshes; 
-	std::vector<MeshBuffer> buffers;
-	std::vector<MeshView>	views;
+	CommandContext*								context = nullptr;
+	std::vector<MeshData>						meshes; 
+	std::vector<MeshBuffer>						buffers;
+	std::vector<MeshView>						views;
+	std::vector<DirectX::BoundingOrientedBox>	bounds;
 	friend class Renderer;
 };

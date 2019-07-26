@@ -15,7 +15,8 @@ public:
 	void				CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset = 0); //Copy data to constant buffer
 	GPUHeapOffsets		CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
 	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC);
-	Material			CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID);
+	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial);
+	const Material&		GetMaterial(MaterialHandle handle);
 private:
 	GPUConstantBuffer		cbuffer[CFrameBufferCount];
 	DescriptorHeap			cbvHeap[CFrameBufferCount];
@@ -29,7 +30,7 @@ private:
 	uint32					textureCount = 0;
 	uint32					materialCount = 0;
 	uint64					currentCBufferOffset = 0;
-
+	std::vector<Material>	materials;
 	friend class Renderer;
 };
 

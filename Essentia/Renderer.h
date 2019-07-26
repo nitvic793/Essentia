@@ -18,6 +18,7 @@ struct FrameContext
 {
 	Camera* Camera;
 	Timer* timer;
+	std::vector<DirectX::XMFLOAT4X4> WorldMatrices;
 };
 
 enum RootParameterSlot {

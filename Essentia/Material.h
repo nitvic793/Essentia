@@ -7,3 +7,8 @@ struct Material
 	PipelineStateID PipelineID;
 	uint32			TextureCount;
 };
+
+struct MaterialHandle
+{
+	uint32 Index;
+};

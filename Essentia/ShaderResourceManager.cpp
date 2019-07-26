@@ -50,7 +50,7 @@ void ShaderResourceManager::Initialize(ResourceManager* resourceManager, DeviceR
 {
 	this->resourceManager = resourceManager;
 	this->deviceResources = deviceResources;
-
+	materials.reserve(CMaxTextureCount);
 	materialHeap.Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxTextureCount);
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -130,16 +130,23 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	return texIndex;
 }
 
-Material ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID)
+MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial)
 {
 	auto device = deviceResources->GetDevice();
+	MaterialHandle handle = { (uint32)materials.size() };
 	//Copy Textures from texture heap to material heap so that material textures are ordered in descriptor table.
 	for (auto i = 0u; i < textureCount; ++i)
 	{
 		device->CopyDescriptorsSimple(1, materialHeap.handleCPU(materialCount + i), textureHeap[0].handleCPU(textures[i]),  D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
-	auto material = Material{ materialCount, psoID, textureCount };
+	outMaterial = Material{ materialCount, psoID, textureCount };
+	materials.push_back(outMaterial);
 	materialCount += textureCount;
-	return material;
+	return handle;
+}
+
+const Material& ShaderResourceManager::GetMaterial(MaterialHandle handle)
+{
+	return materials[handle.Index];
 }

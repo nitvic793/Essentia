@@ -23,10 +23,12 @@ class ComponentPoolBase
 {
 public:
 	virtual ComponentTypeID GetType() = 0;
-	virtual void AddComponent(EntityHandle entity) = 0;
-	virtual void RemoveComponent(EntityHandle entity) = 0;
-	virtual IComponent* GetComponent(EntityHandle entity) = 0;
-	virtual IComponent* GetAllComponents(uint32& count) = 0;
+	virtual void			AddComponent(EntityHandle entity) = 0;
+	virtual void			RemoveComponent(EntityHandle entity) = 0;
+	virtual IComponent*		GetComponent(EntityHandle entity) = 0;
+	virtual IComponent*		GetAllComponents(uint32& count) = 0;
+	virtual EntityHandle*	GetEntities(uint32& count) = 0;
+	virtual EntityHandle	GetEntity(uint32 index) = 0;
 	virtual ~ComponentPoolBase() {}
 };
 
@@ -44,8 +46,9 @@ public:
 	{
 		if (componentMap.find(entity.ID) == componentMap.end())
 		{
+			T val = {};
 			entities.push_back(entity.ID);
-			components.push_back(T());
+			components.push_back(val);
 			componentMap[entity.ID] = (uint32)components.size() - 1;
 		}
 	}
@@ -79,7 +82,20 @@ public:
 	virtual IComponent* GetAllComponents(uint32& count) override
 	{
 		count = (uint32)components.size();
-		return components.data();
+		return (IComponent*)components.data();
+	}
+
+	virtual EntityHandle* GetEntities(uint32& count) override
+	{
+		count = (uint32)entities.size();
+		return (EntityHandle*)entities.data();
+	}
+
+	virtual EntityHandle GetEntity(uint32 index) override
+	{
+		EntityHandle h;
+		h.ID = entities[index];
+		return h;
 	}
 
 	virtual ComponentTypeID GetType() override
@@ -101,7 +117,7 @@ public:
 	ComponentPool<T>* GetOrCreatePool();
 
 	template<typename T>
-	void AddComponent(EntityHandle entity);
+	void AddComponent(EntityHandle entity, const T& value = T());
 
 	template<typename T>
 	void RemoveComponent(EntityHandle entity);
@@ -111,6 +127,12 @@ public:
 
 	template<typename T>
 	T* GetAllComponents(uint32& count);
+
+	template<typename T>
+	EntityHandle* GetEntities(uint32& count);
+
+	template<typename T>
+	EntityHandle GetEntity(uint32 index);
 private:
 	std::unordered_map<ComponentTypeID, std::unique_ptr<ComponentPoolBase>> pools;
 };
@@ -126,10 +148,12 @@ inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
 }
 
 template<typename T>
-inline void ComponentManager::AddComponent(EntityHandle entity)
+inline void ComponentManager::AddComponent(EntityHandle entity, const T& value)
 {
 	auto pool = GetOrCreatePool<T>();
 	pool->AddComponent(entity);
+	T* component = (T*)pool->GetComponent(entity);
+	memcpy(component, &value, sizeof(T));
 }
 
 template<typename T>
@@ -148,4 +172,16 @@ template<typename T>
 inline T* ComponentManager::GetAllComponents(uint32& count)
 {
 	return (T*)pools[T::Type]->GetAllComponents(count);
+}
+
+template<typename T>
+inline EntityHandle* ComponentManager::GetEntities(uint32& count)
+{
+	return pools[T::Type]->GetEntities(count);
+}
+
+template<typename T>
+inline EntityHandle ComponentManager::GetEntity(uint32 index)
+{
+	return pools[T::Type]->GetEntity(index);
 }

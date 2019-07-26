@@ -2,10 +2,30 @@
 #include "EntityBase.h"
 #include "Mesh.h"
 #include "Material.h"
+#include "Declarations.h"
 
-struct Renderable
+struct PositionComponent
 {
-	GComponent(Renderable)
-	MeshView Mesh;
-	Material Material;
+	GComponent(PositionComponent)
+	DirectX::XMFLOAT3 Position;
+};
+
+struct RotationComponent
+{
+	GComponent(RotationComponent)
+	DirectX::XMFLOAT3 Rotation;
+};
+
+struct ScaleComponent
+{
+	GComponent(ScaleComponent)
+	DirectX::XMFLOAT3 Scale;
+};
+
+struct DrawableComponent
+{
+	GComponent(DrawableComponent)
+	MeshView			Mesh;
+	Material			Material;
+	ConstantBufferView	CBView;
 };

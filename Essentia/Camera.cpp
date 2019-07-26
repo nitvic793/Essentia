@@ -10,6 +10,7 @@ Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAn
 	
 	UpdateProjection(width, height, nearZ, farZ, fovInAngles);
 	UpdateView();
+	BoundingFrustum::CreateFromMatrix(Frustum, XMLoadFloat4x4(&Projection));
 }
 
 void Camera::Update(float deltaTime, float totalTime)

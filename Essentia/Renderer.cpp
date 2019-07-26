@@ -92,20 +92,16 @@ void Renderer::Clear()
 void Renderer::Render(const FrameContext& frameContext)
 {
 	auto camera = frameContext.Camera;
-	auto world = DirectX::XMMatrixIdentity();
-	auto translation = XMMatrixTranslation((float)(sin(frameContext.timer->TotalTime * 2)), 0, 0);
-	auto rotation = XMMatrixRotationRollPitchYaw(0, frameContext.timer->TotalTime, 0);
-	world = rotation * translation;
-	XMFLOAT4X4 model;
-	XMStoreFloat4x4(&model, XMMatrixTranspose(world));
-
-	perObject.World = model;
 	perObject.View = camera->GetViewTransposed();
 	perObject.Projection = camera->GetProjectionTransposed();
-	cbuffer.CopyData(&perObject, sizeof(perObject), backBufferIndex);
 
-	//for (int i = 0; i < CFrameBufferCount; ++i)
-	shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, perObjectView.Offset);
+	auto worlds = frameContext.WorldMatrices;
+
+	for (size_t i = 0; i < worlds.size(); ++i)
+	{
+		perObject.World = worlds[i];
+		shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, perObjectView.Offset);
+	}
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
@@ -167,7 +163,7 @@ void Renderer::EndInitialization()
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 
 	texID = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
-	material = shaderResourceManager->CreateMaterial(&texID, 1, defaultPSO);
+	shaderResourceManager->CreateMaterial(&texID, 1, defaultPSO, material);
 	//for (int i = 0; i < CFrameBufferCount; ++i)
 	//{
 	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());

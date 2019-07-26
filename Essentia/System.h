@@ -13,9 +13,13 @@ public:
 	virtual ~ISystem() {};
 protected:
 	template<typename T>
-	T* GetComponents(uint32& outCount);
-private:
+	T*				GetComponents(uint32& outCount);
+	TransformRef	GetTransform(EntityHandle entity);
+	template<typename T>
+	EntityHandle*	GetEntities(uint32& count);
 	EntityManager* entityManager;
+private:
+	
 	friend class SystemManager;
 };
 
@@ -23,6 +27,12 @@ template<typename T>
 inline T* ISystem::GetComponents(uint32& outCount)
 {
 	return entityManager->GetComponents<T>(outCount);
+}
+
+template<typename T>
+inline EntityHandle* ISystem::GetEntities(uint32& count)
+{
+	return entityManager->GetEntities<T>(count);
 }
 
 class SystemManager
