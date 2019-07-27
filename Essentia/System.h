@@ -1,6 +1,8 @@
 #pragma once
 #include "Timer.h"
 #include "Entity.h"
+#include "Keyboard.h"
+#include "Mouse.h"
 
 class EntityManager;
 
@@ -13,11 +15,15 @@ public:
 	virtual ~ISystem() {};
 protected:
 	template<typename T>
-	T*				GetComponents(uint32& outCount);
-	TransformRef	GetTransform(EntityHandle entity);
+	T*							GetComponents(uint32& outCount);
+
 	template<typename T>
-	EntityHandle*	GetEntities(uint32& count);
-	EntityManager* entityManager;
+	EntityHandle*				GetEntities(uint32& count);
+
+	TransformRef				GetTransform(EntityHandle entity);
+	EntityManager*				entityManager;
+	DirectX::Keyboard::State	keyboard;
+	DirectX::Mouse::State		mouse;
 private:
 	
 	friend class SystemManager;

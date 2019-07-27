@@ -8,6 +8,7 @@
 #include "InputLayout.h"
 #include <array>
 #include "pix3.h"
+#include "Engine.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -27,6 +28,11 @@ void Renderer::Initialize()
 	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
 	shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
 	frameManager = std::unique_ptr<FrameManager>(new FrameManager());
+
+	auto ec = EngineContext::Context;
+	ec->MeshManager = meshManager.get();
+	ec->ResourceManager = resourceManager.get();
+	ec->ShaderResourceManager = shaderResourceManager.get();
 
 	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
@@ -87,6 +93,7 @@ void Renderer::Clear()
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	frameManager->Reset(backBufferIndex);
+	renderBucket.Clear();
 }
 
 void Renderer::Render(const FrameContext& frameContext)
@@ -96,11 +103,15 @@ void Renderer::Render(const FrameContext& frameContext)
 	perObject.Projection = camera->GetProjectionTransposed();
 
 	auto worlds = frameContext.WorldMatrices;
+	auto drawables = frameContext.Drawables;
+	auto drawCount = frameContext.DrawableCount;
 
+	//Copy world matrix to constant buffer
 	for (size_t i = 0; i < worlds.size(); ++i)
 	{
 		perObject.World = worlds[i];
-		shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, perObjectView.Offset);
+		shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
+		renderBucket.Insert(drawables[i]);
 	}
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
@@ -110,23 +121,41 @@ void Renderer::Render(const FrameContext& frameContext)
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
 	auto commandList = commandContext->GetDefaultCommandList();
-	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
+	
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
-	commandList->SetPipelineState(resourceManager->GetPSO(defaultPSO));
-
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(backBufferIndex) };
-	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
-	commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
-	commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data()); 
 
-	commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + perObjectView.Index));
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
+
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
-	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
-	commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
+	for (auto pipeline : renderBucket.Pipelines)
+	{
+		auto psoBucket = pipeline.second;
+		auto pso = psoBucket.PipelineStateObject;
+		commandList->SetPipelineState(pso);
+
+		for (auto mat : psoBucket.Instances)
+		{
+			auto material = mat.second.Material;
+			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
+			for (auto meshes : mat.second.Instances)
+			{
+				auto mesh = meshes.second.Mesh;
+				commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
+				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+				for (auto cbIndex : meshes.second.CbIndices)
+				{
+					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + cbIndex));
+					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
+				}
+			}
+		}
+	}
 
 	PIXEndEvent(commandList);
 }
@@ -158,12 +187,12 @@ void Renderer::CleanUp()
 void Renderer::EndInitialization()
 {
 	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), 16);
-	meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
+	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 
 	texID = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
-	shaderResourceManager->CreateMaterial(&texID, 1, defaultPSO, material);
+	auto matId = shaderResourceManager->CreateMaterial(&texID, 1, defaultPSO, material);
 	//for (int i = 0; i < CFrameBufferCount; ++i)
 	//{
 	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());

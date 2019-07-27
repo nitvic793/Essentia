@@ -14,7 +14,7 @@ public:
 	ConstantBufferView	CreateCBV(uint32 sizeInBytes);
 	void				CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset = 0); //Copy data to constant buffer
 	GPUHeapOffsets		CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
-	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC);
+	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
 	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial);
 	const Material&		GetMaterial(MaterialHandle handle);
 private:

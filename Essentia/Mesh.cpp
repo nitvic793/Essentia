@@ -87,6 +87,8 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	meshView.IndexBufferView.Format = DXGI_FORMAT_R32_UINT;
 	meshView.IndexBufferView.SizeInBytes = iBufferSize;
 
+	meshView.IndexCount = (uint32)meshData.Indices.size();
+
 	context->SubmitCommands(commandList.Get());
 	
 	BoundingOrientedBox meshBounds;
@@ -96,7 +98,7 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	meshes.push_back(meshData);
 	buffers.push_back(buffer);
 	views.push_back(meshView);
-	meshView.IndexCount = (uint32)meshData.Indices.size();
+	
 	return mesh;
 }
 

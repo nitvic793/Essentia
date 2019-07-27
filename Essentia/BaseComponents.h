@@ -3,6 +3,8 @@
 #include "Mesh.h"
 #include "Material.h"
 #include "Declarations.h"
+#include "Engine.h"
+#include "ConstantBuffer.h"
 
 struct PositionComponent
 {
@@ -25,7 +27,16 @@ struct ScaleComponent
 struct DrawableComponent
 {
 	GComponent(DrawableComponent)
-	MeshView			Mesh;
-	Material			Material;
+	MeshHandle			Mesh;
+	MaterialHandle		Material;
 	ConstantBufferView	CBView;
+
+	static DrawableComponent Create(MeshHandle mesh, MaterialHandle material)
+	{
+		DrawableComponent component;
+		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		component.Mesh = mesh;
+		component.Material = material;
+		return component;
+	}
 };

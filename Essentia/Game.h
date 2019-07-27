@@ -8,6 +8,7 @@
 #include "Memory.h"
 #include "Entity.h"
 #include "System.h"
+#include "Engine.h"
 
 class Game
 {
@@ -30,5 +31,6 @@ protected:
 	EntityManager						entityManager;
 	SystemManager						systemManager;
 private:
+	EngineContext						engineContext;
 };
 

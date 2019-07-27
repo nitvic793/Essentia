@@ -96,7 +96,7 @@ GPUHeapOffsets ShaderResourceManager::CopyDescriptorsToGPUHeap(uint32 frameIndex
 	return offsets;
 }
 
-TextureID ShaderResourceManager::CreateTexture(const std::string& filename, TextureType texType)
+TextureID ShaderResourceManager::CreateTexture(const std::string& filename, TextureType texType, bool generateMips)
 {
 	auto device = deviceResources->GetDevice();
 	ResourceUploadBatch uploadBatch(device);
@@ -110,10 +110,10 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	switch (texType)
 	{
 	case WIC:
-		CreateWICTextureFromFile(device, uploadBatch, fname.c_str(), resource, true);
+		CreateWICTextureFromFile(device, uploadBatch, fname.c_str(), resource, generateMips);
 		break;
 	case DDS:
-		CreateDDSTextureFromFile(device, uploadBatch, fname.c_str(), resource, true, 0, nullptr, &isCubeMap);
+		CreateDDSTextureFromFile(device, uploadBatch, fname.c_str(), resource, generateMips, 0, nullptr, &isCubeMap);
 		break;
 	}
 

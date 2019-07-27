@@ -161,6 +161,7 @@
     <ClCompile Include="CommandContext.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
     <ClCompile Include="DXUtility.cpp" />
+    <ClCompile Include="Engine.cpp" />
     <ClCompile Include="Entity.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Memory.cpp" />
@@ -179,6 +180,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseComponents.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="EngineContext.h" />
     <ClInclude Include="EntityBase.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CommandContext.h" />
@@ -197,6 +200,7 @@
     <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="OGLMath.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="RenderBucket.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTargetManager.h" />

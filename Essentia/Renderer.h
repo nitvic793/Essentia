@@ -13,12 +13,16 @@
 #include "ShaderResourceManager.h"
 #include <memory>
 #include "Timer.h"
+#include "BaseComponents.h"
+#include "RenderBucket.h"
 
 struct FrameContext
 {
-	Camera* Camera;
-	Timer* timer;
-	std::vector<DirectX::XMFLOAT4X4> WorldMatrices;
+	Camera*								Camera;
+	Timer*								timer;
+	std::vector<DirectX::XMFLOAT4X4>	WorldMatrices;
+	DrawableComponent*					Drawables;
+	uint32								DrawableCount;
 };
 
 enum RootParameterSlot {
@@ -61,6 +65,7 @@ private:
 	DXGI_FORMAT		renderTargetFormat;
 	DXGI_FORMAT		depthFormat;
 	ID3D12Device*	device;
+	RenderBucket	renderBucket;
 
 	//Temp -> will move to FrameManager
 	GPUConstantBuffer cbuffer;

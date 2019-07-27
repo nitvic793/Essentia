@@ -28,15 +28,27 @@ public:
 	virtual void Initialize()
 	{
 		entity = entityManager->CreateEntity();
+		entity2 = entityManager->CreateEntity();
+		MaterialHandle mat = { 0 };
+		MeshHandle mesh = { 0 };
+		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
+		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(mesh, mat));
 	}
+
 	virtual void Update(float deltaTime, float totalTime) override
 	{
 		auto transform = GetTransform(entity);
-		transform.Rotation->y = sin(totalTime * 2);
+		transform.Rotation->y = totalTime;
 		transform.Position->x = sin(totalTime);
+
+		transform = GetTransform(entity2);
+		transform.Rotation->x = totalTime;
+		transform.Position->x = cos(totalTime);
 	}
+
 private:
 	EntityHandle entity;
+	EntityHandle entity2;
 };
 
 
@@ -46,8 +58,11 @@ void Game::Setup()
 	keyboard = std::make_unique<DirectX::Keyboard>();
 	mouse = std::make_unique<DirectX::Mouse>();
 
+	auto ec = EngineContext::Context;
+	ec->EntityManager = &entityManager;
+	ec->RendererInstance = renderer.get();
+	
 	renderer->Initialize();
-	auto meshMgr = renderer->GetMeshManager();
 	Initialize();
 	renderer->EndInitialization();
 
@@ -68,13 +83,14 @@ void Game::Run()
 	window->StartMessagePump([&] 
 		{
 			timer.Tick();
-			auto kb = keyboard->GetState();
+			auto kbState = keyboard->GetState();
+			auto mouseState = mouse->GetState();
 			camera->Update();
 			systemManager.Update();
 			Update();
 			Render();
 
-			if (kb.IsKeyDown(DirectX::Keyboard::Escape))
+			if (kbState.IsKeyDown(DirectX::Keyboard::Escape))
 			{
 				PostQuitMessage(0);
 			}
@@ -90,10 +106,13 @@ Game::~Game()
 void Game::Render()
 {
 	uint32 count;
-	auto entities = entityManager.GetEntities<PositionComponent>(count);
+	auto entities = entityManager.GetEntities<DrawableComponent>(count);
 	FrameContext frameContext = { camera.get(), &timer };
+
 	frameContext.WorldMatrices.reserve(count);
 	entityManager.GetTransposedWorldMatrices(entities, count, frameContext.WorldMatrices);
+	frameContext.Drawables = entityManager.GetComponents<DrawableComponent>(frameContext.DrawableCount);
+
 	renderer->Clear();
 	renderer->Render(frameContext);
 	renderer->Present();
