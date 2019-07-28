@@ -1,5 +1,8 @@
 #include "Game.h"
 #include "ModelLoader.h"
+#include <DirectXMath.h>
+
+using namespace DirectX;
 
 class TransformUpdateSystem : public ISystem
 {
@@ -34,6 +37,8 @@ public:
 		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cone.obj");
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
+		auto transform = GetTransform(entity2);
+		transform.Position->z = 4;
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override
@@ -43,8 +48,8 @@ public:
 		transform.Position->x = sin(totalTime/2);
 
 		transform = GetTransform(entity2);
-		transform.Rotation->x = totalTime;
-		transform.Position->x = cos(totalTime);
+		transform.Rotation->y = totalTime;
+		transform.Position->y = cos(totalTime);
 	}
 
 private:
@@ -55,34 +60,56 @@ private:
 class FreeCameraSystem : public ISystem
 {
 public:
+	void Initialize()
+	{
+
+	}
+
 	virtual void Update(float deltaTime, float totalTime) override
 	{
-		float horizontal = 0.f;
-		float vertical = 0.f;
+		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
+		auto dir = XMLoadFloat3(&camera->Direction);
+		auto pos = XMLoadFloat3(&camera->Position);
 		if (keyboard.IsKeyDown(DirectX::Keyboard::A))
 		{
-			horizontal = -1.f;
+			auto leftDir = XMVector3Cross(dir, up);
+			pos = pos + leftDir * deltaTime * Speed;
 		}
 
 		if (keyboard.IsKeyDown(DirectX::Keyboard::D))
 		{
-			horizontal = 1.f;
+			auto rightDir = XMVector3Cross(-dir, up);
+			pos = pos + rightDir * deltaTime * Speed;
 		}
 
 		if (keyboard.IsKeyDown(DirectX::Keyboard::W))
 		{
-			vertical = 1.f;
+			pos = pos + dir * deltaTime * Speed;
 		}
 
 		if (keyboard.IsKeyDown(DirectX::Keyboard::S))
 		{
-			vertical = -1.f;
+			pos = pos - dir * deltaTime * Speed;
 		}
 
-		camera->Position.x += horizontal * Speed * deltaTime;
-		camera->Position.z += vertical * Speed * deltaTime;
+		float xDiff = 0;
+		float yDiff = 0;
+
+		if (mouse.leftButton)
+		{
+			xDiff = (float)(mouse.x - prevPos.x) * 0.005f;
+			yDiff = (float)(mouse.y - prevPos.y) * 0.005f;
+		}
+
+		XMStoreFloat3(&camera->Position, pos);
+
+		camera->Rotation.x += yDiff;
+		camera->Rotation.y += xDiff;
+		prevPos.x = (float)mouse.x;
+		prevPos.y = (float)mouse.y;
 	}
 
+	DirectX::XMFLOAT2 prevPos = {};
 	float Speed = 10.f;
 };
 
