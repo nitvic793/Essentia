@@ -154,6 +154,7 @@
   <ItemGroup>
     <None Include="Common.hlsli" />
     <None Include="cpp.hint" />
+    <None Include="Lighting.hlsli" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

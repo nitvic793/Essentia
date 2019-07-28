@@ -117,6 +117,11 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
 	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
+	lightBuffer.PointLight.Color = XMFLOAT3(0.9f, 0.1f, 0.1f);
+	lightBuffer.PointLight.Position = XMFLOAT3(2.9f, 0.1f, 0.1f);
+	lightBuffer.PointLight.Range = 5.f;
+	lightBuffer.CameraPosition = camera->Position;
+
 	shaderResourceManager->CopyToCB(backBufferIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 

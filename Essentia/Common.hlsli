@@ -12,22 +12,9 @@ struct PixelInput
 	float4 Position	: SV_POSITION;
 	float2 UV		: TEXCOORD;
 	float3 Normal	: NORMAL;
-	float3 Tangent	: TANGENT0;
+	float3 Tangent	: TANGENT;
+	float3 WorldPos	: POSITION;
 };
-
-struct DirectionalLight
-{
-	float3 Direction;
-	float3 Color;
-};
-
-float3 CalculateDirectionalLight(float3 normal, DirectionalLight light)
-{
-	float3 dirToLight = normalize(-light.Direction);
-	float NdotL = dot(normal, dirToLight);
-	NdotL = saturate(NdotL);
-	return light.Color * NdotL + float3(0.1,0.1,0.1);
-}
 
 float3 CalculateNormalFromSample(float3 normalSample, float2 uv, float3 normal, float3 tangent)
 {

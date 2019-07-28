@@ -18,11 +18,14 @@ struct DirectionalLight
 struct PointLight
 {
 	DirectX::XMFLOAT3	Position;
+	float				Padding;
 	DirectX::XMFLOAT3	Color;
 	float				Range;
 };
 
 struct LightBuffer
 {
-	DirectionalLight DirLight;
+	DirectionalLight	DirLight;
+	PointLight			PointLight;
+	DirectX::XMFLOAT3	CameraPosition;
 };
