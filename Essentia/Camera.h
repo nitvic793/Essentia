@@ -18,6 +18,7 @@ public:
 	DirectX::XMFLOAT4X4			GetProjectionTransposed();
 
 	DirectX::XMFLOAT3			Position;
+	DirectX::XMFLOAT3			Rotation;
 	DirectX::XMFLOAT3			Direction;
 
 	DirectX::XMFLOAT4X4			Projection;

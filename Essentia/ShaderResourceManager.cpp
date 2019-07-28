@@ -130,6 +130,19 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	return texIndex;
 }
 
+TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool isCubeMap)
+{
+	auto device = deviceResources->GetDevice();
+	auto texIndex = textureCount;
+	textureCount++;
+	for (int i = 0; i < CFrameBufferCount; ++i)
+	{
+		CreateShaderResourceView(device, resource, textureHeap[i].handleCPU(texIndex), isCubeMap);
+	}
+
+	return texIndex;
+}
+
 MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial)
 {
 	auto device = deviceResources->GetDevice();

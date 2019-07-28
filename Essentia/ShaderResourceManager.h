@@ -15,6 +15,7 @@ public:
 	void				CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset = 0); //Copy data to constant buffer
 	GPUHeapOffsets		CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
 	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
+	TextureID			CreateTexture(ID3D12Resource* resource, bool isCubeMap = false);
 	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial);
 	const Material&		GetMaterial(MaterialHandle handle);
 private:

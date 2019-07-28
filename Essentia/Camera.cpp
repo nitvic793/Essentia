@@ -7,7 +7,7 @@ Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAn
 {
 	Position = XMFLOAT3(0, 0, -5);
 	Direction = XMFLOAT3(0, 0, 1);
-	
+	Rotation = {};
 	UpdateProjection(width, height, nearZ, farZ, fovInAngles);
 	UpdateView();
 	BoundingFrustum::CreateFromMatrix(Frustum, XMLoadFloat4x4(&Projection));
@@ -20,6 +20,10 @@ void Camera::Update(float deltaTime, float totalTime)
 
 void Camera::UpdateView()
 {
+	auto rotation = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&Rotation));
+	auto direction = XMVectorSet(0, 0, 1, 0);
+	direction = XMVector3Rotate(direction, rotation);
+	XMStoreFloat3(&Direction, direction);
 	auto view = GetViewMatrix();
 	XMStoreFloat4x4(&View, view);
 }

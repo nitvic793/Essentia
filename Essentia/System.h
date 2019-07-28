@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "Keyboard.h"
 #include "Mouse.h"
+#include "Camera.h"
 
 class EntityManager;
 
@@ -21,9 +22,11 @@ protected:
 	EntityHandle*				GetEntities(uint32& count);
 
 	TransformRef				GetTransform(EntityHandle entity);
+
 	EntityManager*				entityManager;
 	DirectX::Keyboard::State	keyboard;
 	DirectX::Mouse::State		mouse;
+	Camera*						camera;
 private:
 	
 	friend class SystemManager;
@@ -50,7 +53,7 @@ public:
 	void RegisterSystem();
 
 	void Initialize();
-	void Update();
+	void Update(const DirectX::Keyboard::State& kbState, const DirectX::Mouse::State& mouseState, Camera* camera);
 	void Destroy();
 private:
 	std::vector<std::unique_ptr<ISystem>> systems;

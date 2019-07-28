@@ -90,7 +90,7 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	meshView.IndexCount = (uint32)meshData.Indices.size();
 
 	context->SubmitCommands(commandList.Get());
-	
+	context->WaitForFrame();
 	BoundingOrientedBox meshBounds;
 	BoundingOrientedBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)meshData.Vertices.data(), sizeof(Vertex));
 

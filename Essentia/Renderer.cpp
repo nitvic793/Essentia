@@ -48,7 +48,7 @@ void Renderer::Initialize()
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
 		auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
-		renderTargets[i] = renderTargetManager->CreateRenderTargetView(renderTargetBuffers[i].Get());
+		renderTargets[i] = renderTargetManager->CreateRenderTargetView(renderTargetBuffers[i].Get(), renderTargetFormat);
 	}
 
 	viewport.TopLeftX = 0;
@@ -190,9 +190,10 @@ void Renderer::EndInitialization()
 	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
-
-	texID = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
-	auto matId = shaderResourceManager->CreateMaterial(&texID, 1, defaultPSO, material);
+	TextureID textures[2];
+	textures[0] = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
+	textures[1] = shaderResourceManager->CreateTexture("../../Assets/Textures/rockNormals.jpg");
+	auto matId = shaderResourceManager->CreateMaterial(textures, 2, defaultPSO, material);
 	//for (int i = 0; i < CFrameBufferCount; ++i)
 	//{
 	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());

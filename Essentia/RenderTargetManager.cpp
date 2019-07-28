@@ -9,7 +9,7 @@ void RenderTargetManager::Initialize(ID3D12Device* device)
 	renderBuffers.reserve(CMaxRenderTargets);
 }
 
-RenderTargetID RenderTargetManager::CreateRenderTargetView(ID3D12Resource* renderBuffer)
+RenderTargetID RenderTargetManager::CreateRenderTargetView(ID3D12Resource* renderBuffer, DXGI_FORMAT format)
 {
 	RenderTargetID id = currentRtvIndex;
 	currentRtvIndex++;
@@ -18,7 +18,8 @@ RenderTargetID RenderTargetManager::CreateRenderTargetView(ID3D12Resource* rende
 	desc.Texture2D.MipSlice = 0;
 	desc.Texture2D.PlaneSlice = 0;
 	desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
-
+	desc.Format = format;
+	
 	renderBuffers.push_back(renderBuffer);
 	renderBuffer->SetName(L"Render Target");
 	device->CreateRenderTargetView(renderBuffer, &desc, rtvHeap.handleCPU(id));
