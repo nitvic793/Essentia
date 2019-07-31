@@ -3,22 +3,50 @@
 #include <unordered_map>
 
 using namespace DirectX;
-//
-//bool operator
-//
-//bool operator==(const Vertex& v1, const Vertex& v2) const {
-//	return v1.Position == v2.Position && color == other.color && texCoord == other.texCoord;
-//}
-//
-//namespace std {
-//	template<> struct hash<Vertex> {
-//		size_t operator()(Vertex const& vertex) const {
-//			return ((hash<glm::vec3>()(vertex.pos) ^
-//				(hash<glm::vec3>()(vertex.color) << 1)) >> 1) ^
-//				(hash<glm::vec2>()(vertex.texCoord) << 1);
-//		}
-//	};
-//}
+
+bool operator==(const XMFLOAT3& l, const XMFLOAT3& r)
+{
+	return l.x == r.x && l.y == r.y && l.z == r.z;
+}
+
+bool operator==(const XMFLOAT2& l, const XMFLOAT2& r)
+{
+	return l.x == r.x && l.y == r.y;
+}
+
+bool operator==(const Vertex& v1, const Vertex& v2) {
+	return v1.Position == v2.Position && v1.Normal == v2.Normal && v1.UV == v2.UV;
+}
+
+namespace std {
+
+	template <> struct hash<XMFLOAT3>
+	{
+		size_t operator()(const XMFLOAT3& x) const
+		{
+			return ((hash<float>()(x.x) ^
+				(hash<float>()(x.y) << 1)) >> 1) ^
+				(hash<float>()(x.z) << 1);
+		}
+	};
+
+	template <> struct hash<XMFLOAT2>
+	{
+		size_t operator()(const XMFLOAT2& x) const
+		{
+			return (hash<float>()(x.x) ^
+				(hash<float>()(x.y) << 1));
+		}
+	};
+
+	template<> struct hash<Vertex> {
+		size_t operator()(Vertex const& vertex) const {
+			return ((hash<XMFLOAT3>()(vertex.Position) ^
+				(hash<XMFLOAT3>()(vertex.Normal) << 1)) >> 1) ^
+				(hash<XMFLOAT2>()(vertex.UV) << 1);
+		}
+	};
+}
 
 void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT indexCount)
 {
@@ -83,7 +111,7 @@ void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT
 	delete[] tan1;
 }
 
-void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::vector<Vertex>& vertices, std::vector<uint32>& indices, std::unordered_map</*Vertex*/int, uint32>& uniqueVertices)
+void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::vector<Vertex>& vertices, std::vector<uint32>& indices, std::unordered_map<Vertex, uint32>& uniqueVertices)
 {
 	for (UINT i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -141,7 +169,7 @@ MeshData ModelLoader::Load(const std::string& filename)
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
-	std::unordered_map</*Vertex*/int, uint32> uniqueVertices = {};
+	std::unordered_map<Vertex, uint32> uniqueVertices = {};
 
 	for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
 	{

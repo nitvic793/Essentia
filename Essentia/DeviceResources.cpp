@@ -45,6 +45,8 @@ void DeviceResources::CreateDevice()
 		IID_PPV_ARGS(device.ReleaseAndGetAddressOf())
 	);
 
+	device->SetStablePowerState(FALSE);
+
 	{
 		Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3dInfoQueue;
 		if (SUCCEEDED(device->QueryInterface(IID_PPV_ARGS(&d3dInfoQueue))))
@@ -84,7 +86,7 @@ void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 	swapChainDesc.BufferCount = CFrameBufferCount; 
 	swapChainDesc.BufferDesc = backBufferDesc;
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; 
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD; 
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.OutputWindow = window->GetWindowHandle();
 	swapChainDesc.SampleDesc = sampleDesc; 
 	swapChainDesc.Windowed = !window->IsFullscreen(); 

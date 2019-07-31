@@ -8,6 +8,7 @@ struct DirectionalLight
 struct PointLight
 {
 	float3	Position;
+	float	Intensity;
 	float3	Color;
 	float	Range;
 };
@@ -33,5 +34,5 @@ float3 CalculatePointLight(float3 normal, float3 cameraPos, float3 worldPos, Poi
 	float attenuation = Attenuate(light.Position, light.Range, worldPos);
 	float lightAmount = dot(normal, toLight) * attenuation;
 	lightAmount = saturate(lightAmount);
-	return lightAmount * light.Color;
+	return lightAmount * light.Color * light.Intensity;
 }

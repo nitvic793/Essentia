@@ -76,6 +76,7 @@ void Renderer::Initialize()
 void Renderer::Clear()
 {
 	WaitForPreviousFrame();
+	auto imageIndex = backBufferIndex;
 	auto commandAllocator = commandContext->GetAllocator(backBufferIndex);
 	auto commandList = commandContext->GetDefaultCommandList();
 
@@ -92,7 +93,7 @@ void Renderer::Clear()
 	commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
-	frameManager->Reset(backBufferIndex);
+	frameManager->Reset(imageIndex);
 	renderBucket.Clear();
 }
 
@@ -105,12 +106,13 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto worlds = frameContext.WorldMatrices;
 	auto drawables = frameContext.Drawables;
 	auto drawCount = frameContext.DrawableCount;
+	auto imageIndex = backBufferIndex;
 
 	//Copy world matrix to constant buffer
 	for (size_t i = 0; i < worlds.size(); ++i)
 	{
 		perObject.World = worlds[i];
-		shaderResourceManager->CopyToCB(backBufferIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
+		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
 		renderBucket.Insert(drawables[i]);
 	}
 
@@ -120,24 +122,25 @@ void Renderer::Render(const FrameContext& frameContext)
 	lightBuffer.PointLight.Color = XMFLOAT3(0.9f, 0.1f, 0.1f);
 	lightBuffer.PointLight.Position = XMFLOAT3(2.9f, 0.1f, 0.1f);
 	lightBuffer.PointLight.Range = 5.f;
+	lightBuffer.PointLight.Intensity = 2.f;
 	lightBuffer.CameraPosition = camera->Position;
 
-	shaderResourceManager->CopyToCB(backBufferIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
-	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(backBufferIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
+	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
+	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
 	auto commandList = commandContext->GetDefaultCommandList();
-	
+
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
-	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(backBufferIndex) };
-	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data()); 
+	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
+	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 
-	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
+	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	for (auto pipeline : renderBucket.Pipelines)
 	{
 		auto psoBucket = pipeline.second;
@@ -147,7 +150,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		for (auto mat : psoBucket.Instances)
 		{
 			auto material = mat.second.Material;
-			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
+			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
 			for (auto meshes : mat.second.Instances)
 			{
 				auto mesh = meshes.second.Mesh;
@@ -155,7 +158,7 @@ void Renderer::Render(const FrameContext& frameContext)
 				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
 				for (auto cbIndex : meshes.second.CbIndices)
 				{
-					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + cbIndex));
+					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
 					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 				}
 			}
@@ -172,7 +175,7 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(0, 0);
+	auto hr = swapChain->Present(1, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
@@ -283,7 +286,6 @@ void Renderer::CreatePSOs()
 	psoDesc.VS = vertexShaderBytecode;
 	psoDesc.PS = pixelShaderBytecode;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	//psoDesc.DepthStencilState.DepthEnable = false;
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	psoDesc.SampleDesc = sampleDesc;

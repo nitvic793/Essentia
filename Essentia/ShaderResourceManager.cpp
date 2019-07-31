@@ -21,7 +21,7 @@ void FrameManager::Initialize(ID3D12Device* device)
 	}
 }
 
-ID3D12DescriptorHeap*  FrameManager::GetGPUDescriptorHeap(uint32 frameIndex) const
+ID3D12DescriptorHeap* FrameManager::GetGPUDescriptorHeap(uint32 frameIndex) const
 {
 	return gpuHeap[frameIndex].pDescriptorHeap.Get();
 }
@@ -62,7 +62,7 @@ void ShaderResourceManager::Initialize(ResourceManager* resourceManager, DeviceR
 	currentCBufferOffset = 0;
 }
 
-ConstantBufferView ShaderResourceManager::CreateCBV(uint32 sizeInBytes) 
+ConstantBufferView ShaderResourceManager::CreateCBV(uint32 sizeInBytes)
 {
 	auto device = deviceResources->GetDevice();
 	uint32 index = constantBufferCount;
@@ -84,6 +84,7 @@ ConstantBufferView ShaderResourceManager::CreateCBV(uint32 sizeInBytes)
 
 void ShaderResourceManager::CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset)
 {
+	//for (int i = 0; i < 3; ++i)
 	cbuffer[frameIndex].CopyData(data.Data, data.Size, offset);
 }
 
@@ -126,7 +127,7 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	{
 		CreateShaderResourceView(device, *resource, textureHeap[i].handleCPU(texIndex), isCubeMap);
 	}
-	
+
 	return texIndex;
 }
 
@@ -150,7 +151,7 @@ MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32
 	//Copy Textures from texture heap to material heap so that material textures are ordered in descriptor table.
 	for (auto i = 0u; i < textureCount; ++i)
 	{
-		device->CopyDescriptorsSimple(1, materialHeap.handleCPU(materialCount + i), textureHeap[0].handleCPU(textures[i]),  D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, materialHeap.handleCPU(materialCount + i), textureHeap[0].handleCPU(textures[i]), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	outMaterial = Material{ materialCount, psoID, textureCount };

@@ -34,7 +34,7 @@ public:
 		entity2 = entityManager->CreateEntity();
 		MaterialHandle mat = { 0 };
 		MeshHandle mesh = { 1 };
-		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cone.obj");
+		MeshHandle cone = Es::CreateMesh("../../Assets/Models/helix.obj");
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
 		auto transform = GetTransform(entity2);
@@ -45,11 +45,11 @@ public:
 	{
 		auto transform = GetTransform(entity);
 		transform.Rotation->y = totalTime/2;
-		transform.Position->x = sin(totalTime/2);
+		transform.Position->x = sin(totalTime * 2) * 3;
 
 		transform = GetTransform(entity2);
-		transform.Rotation->y = totalTime;
-		transform.Position->y = cos(totalTime);
+		//transform.Rotation->y = totalTime;
+		//transform.Position->y = cos(totalTime);
 	}
 
 private:
