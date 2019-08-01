@@ -3,13 +3,19 @@
 #include "Mouse.h"
 #include <windowsx.h>
 #include <wrl.h>
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx12.h"
 
 using namespace DirectX;
 
 Window* Window::Instance = nullptr;
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 LRESULT CALLBACK WindowsProcessMessage(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	if (ImGui_ImplWin32_WndProcHandler(hWnd, msg, wParam, lParam)) return true;
 	return Window::Instance->WindowsMessageCallback(hWnd, msg, wParam, lParam);
 }
 

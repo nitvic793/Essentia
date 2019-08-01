@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "ModelLoader.h"
 #include <DirectXMath.h>
+#include "imgui.h"
 
 using namespace DirectX;
 
@@ -46,7 +47,7 @@ public:
 		auto transform = GetTransform(entity);
 		transform.Rotation->y = totalTime/2;
 		transform.Position->x = sin(totalTime * 2) * 3;
-
+		 
 		transform = GetTransform(entity2);
 		//transform.Rotation->y = totalTime;
 		//transform.Position->y = cos(totalTime);
@@ -67,6 +68,7 @@ public:
 
 	virtual void Update(float deltaTime, float totalTime) override
 	{
+		ImGuiIO& io = ImGui::GetIO();
 		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
 		auto dir = XMLoadFloat3(&camera->Direction);
 		auto pos = XMLoadFloat3(&camera->Position);
@@ -95,7 +97,7 @@ public:
 		float xDiff = 0;
 		float yDiff = 0;
 
-		if (mouse.leftButton)
+		if (mouse.leftButton && !io.NavActive) //Don't move if imgui is active
 		{
 			xDiff = (float)(mouse.x - prevPos.x) * 0.005f;
 			yDiff = (float)(mouse.y - prevPos.y) * 0.005f;

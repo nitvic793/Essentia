@@ -9,6 +9,9 @@
 #include <array>
 #include "pix3.h"
 #include "Engine.h"
+#include "imgui.h"
+#include "imgui_impl_win32.h"
+#include "imgui_impl_dx12.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -28,11 +31,6 @@ void Renderer::Initialize()
 	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
 	shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
 	frameManager = std::unique_ptr<FrameManager>(new FrameManager());
-
-	auto ec = EngineContext::Context;
-	ec->MeshManager = meshManager.get();
-	ec->ResourceManager = resourceManager.get();
-	ec->ShaderResourceManager = shaderResourceManager.get();
 
 	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
@@ -71,6 +69,35 @@ void Renderer::Initialize()
 	meshManager->Initialize(commandContext.get());
 	shaderResourceManager->Initialize(resourceManager.get(), deviceResources.get());
 	frameManager->Initialize(device);
+
+	imguiHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO(); (void)io;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+	ImGui::StyleColorsDark();
+	ImGui_ImplWin32_Init(window->GetWindowHandle());
+	ImGui_ImplDX12_Init(device, CFrameBufferCount,
+		DXGI_FORMAT_R8G8B8A8_UNORM,
+		imguiHeap.hCPUHeapStart,
+		imguiHeap.hGPUHeapStart);
+
+	auto ec = EngineContext::Context;
+	ec->MeshManager = meshManager.get();
+	ec->ResourceManager = resourceManager.get();
+	ec->ShaderResourceManager = shaderResourceManager.get();
+	ec->CommandContext = commandContext.get();
+	ec->DeviceResources = deviceResources.get();
+
+	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
+	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
+	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
+	lightBuffer.PointLight.Color = XMFLOAT3(0.9f, 0.1f, 0.1f);
+	lightBuffer.PointLight.Position = XMFLOAT3(2.9f, 0.1f, 0.1f);
+	lightBuffer.PointLight.Range = 5.f;
+	lightBuffer.PointLight.Intensity = 2.f;
 }
 
 void Renderer::Clear()
@@ -90,12 +117,13 @@ void Renderer::Clear()
 	auto dsv = renderTargetManager->GetDSVHandle(depthStencilId);
 
 	const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	frameManager->Reset(imageIndex);
 	renderBucket.Clear();
 }
+
+bool show = true;
 
 void Renderer::Render(const FrameContext& frameContext)
 {
@@ -116,24 +144,20 @@ void Renderer::Render(const FrameContext& frameContext)
 		renderBucket.Insert(drawables[i]);
 	}
 
-	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
-	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
-	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
-	lightBuffer.PointLight.Color = XMFLOAT3(0.9f, 0.1f, 0.1f);
-	lightBuffer.PointLight.Position = XMFLOAT3(2.9f, 0.1f, 0.1f);
-	lightBuffer.PointLight.Range = 5.f;
-	lightBuffer.PointLight.Intensity = 2.f;
 	lightBuffer.CameraPosition = camera->Position;
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
+	auto rtId = renderTargets[backBufferIndex];
+	auto rtv = renderTargetManager->GetRTVHandle(rtId);
+	auto dsv = renderTargetManager->GetDSVHandle(depthStencilId);
 	auto commandList = commandContext->GetDefaultCommandList();
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
+	commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
 	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
@@ -165,6 +189,41 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 
+	heaps[0] = imguiHeap.pDescriptorHeap.Get();
+	commandList->SetDescriptorHeaps(1, heaps.data());
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+
+	if (show)
+		ImGui::ShowDemoWindow(&show);
+	
+	{
+		static float f = 0.0f;
+		static int counter = 0;
+
+		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Checkbox("Demo Window", &show);      // Edit bools storing our window open/close state
+		ImGui::Checkbox("Another Window", &show);
+
+		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::ColorEdit3("Dir Light Color", (float*)&lightBuffer.DirLight.Color.x); // Edit 3 floats representing a color
+		ImGui::DragFloat3("Point Light Pos", (float*)&lightBuffer.PointLight.Position.x);
+
+		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+			counter++;
+		ImGui::SameLine();
+		ImGui::Text("counter = %d", counter);
+
+		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+	}
+
+
+	ImGui::Render();
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 	PIXEndEvent(commandList);
 }
 
@@ -175,7 +234,7 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(1, 0);
+	auto hr = swapChain->Present(0, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
@@ -190,6 +249,9 @@ Window* Renderer::GetWindow()
 void Renderer::CleanUp()
 {
 	commandContext->CleanUp();
+	ImGui_ImplDX12_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
 }
 
 void Renderer::EndInitialization()

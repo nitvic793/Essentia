@@ -15,15 +15,8 @@
 #include "Timer.h"
 #include "BaseComponents.h"
 #include "RenderBucket.h"
-
-struct FrameContext
-{
-	Camera*								Camera;
-	Timer*								timer;
-	std::vector<DirectX::XMFLOAT4X4>	WorldMatrices;
-	DrawableComponent*					Drawables;
-	uint32								DrawableCount;
-};
+#include "FrameContext.h"
+#include "RenderStage.h"
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
@@ -77,6 +70,7 @@ private:
 	GPUHeapOffsets		offsets;
 	Material			material;
 
+	DescriptorHeap imguiHeap;
 	std::unique_ptr<Window>					window;
 	std::unique_ptr<DeviceResources>		deviceResources;
 	std::unique_ptr<ResourceManager>		resourceManager;

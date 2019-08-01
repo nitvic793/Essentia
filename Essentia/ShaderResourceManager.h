@@ -18,10 +18,13 @@ public:
 	TextureID			CreateTexture(ID3D12Resource* resource, bool isCubeMap = false);
 	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial);
 	const Material&		GetMaterial(MaterialHandle handle);
+	TextureID			RequestUninitializedTexture();
+	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
+	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
 private:
 	GPUConstantBuffer		cbuffer[CFrameBufferCount];
 	DescriptorHeap			cbvHeap[CFrameBufferCount];
-	DescriptorHeap			textureHeap[CFrameBufferCount];
+	DescriptorHeap			textureHeap;
 	DescriptorHeap			materialHeap;
 
 	ResourceManager*		resourceManager = nullptr;

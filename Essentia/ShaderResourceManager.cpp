@@ -52,9 +52,9 @@ void ShaderResourceManager::Initialize(ResourceManager* resourceManager, DeviceR
 	this->deviceResources = deviceResources;
 	materials.reserve(CMaxTextureCount);
 	materialHeap.Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxTextureCount);
+	textureHeap.Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxTextureCount);
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
-		textureHeap[i].Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxTextureCount);
 		cbvHeap[i].Create(deviceResources->GetDevice(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CMaxConstantBufferCount);
 		cbuffer[i].Initialize(resourceManager, CMaxConstantBufferSize);
 	}
@@ -92,7 +92,7 @@ GPUHeapOffsets ShaderResourceManager::CopyDescriptorsToGPUHeap(uint32 frameIndex
 {
 	GPUHeapOffsets offsets;
 	offsets.ConstantBufferOffset = frame->Allocate(frameIndex, cbvHeap[frameIndex], constantBufferCount);
-	offsets.TexturesOffset = frame->Allocate(frameIndex, textureHeap[frameIndex], textureCount);
+	offsets.TexturesOffset = frame->Allocate(frameIndex, textureHeap, textureCount);
 	offsets.MaterialsOffset = frame->Allocate(frameIndex, materialHeap, materialCount);
 	return offsets;
 }
@@ -123,11 +123,7 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 
 	auto texIndex = textureCount;
 	textureCount++;
-	for (int i = 0; i < CFrameBufferCount; ++i)
-	{
-		CreateShaderResourceView(device, *resource, textureHeap[i].handleCPU(texIndex), isCubeMap);
-	}
-
+	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	return texIndex;
 }
 
@@ -136,11 +132,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	auto device = deviceResources->GetDevice();
 	auto texIndex = textureCount;
 	textureCount++;
-	for (int i = 0; i < CFrameBufferCount; ++i)
-	{
-		CreateShaderResourceView(device, resource, textureHeap[i].handleCPU(texIndex), isCubeMap);
-	}
-
+	CreateShaderResourceView(device, resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	return texIndex;
 }
 
@@ -151,7 +143,7 @@ MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32
 	//Copy Textures from texture heap to material heap so that material textures are ordered in descriptor table.
 	for (auto i = 0u; i < textureCount; ++i)
 	{
-		device->CopyDescriptorsSimple(1, materialHeap.handleCPU(materialCount + i), textureHeap[0].handleCPU(textures[i]), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		device->CopyDescriptorsSimple(1, materialHeap.handleCPU(materialCount + i), textureHeap.handleCPU(textures[i]), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 
 	outMaterial = Material{ materialCount, psoID, textureCount };
@@ -163,4 +155,21 @@ MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32
 const Material& ShaderResourceManager::GetMaterial(MaterialHandle handle)
 {
 	return materials[handle.Index];
+}
+
+TextureID ShaderResourceManager::RequestUninitializedTexture()
+{
+	TextureID texIndex = textureCount;
+	textureCount++;
+	return texIndex;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureGPUHandle(TextureID texID)
+{
+	return textureHeap.handleGPU(texID);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureCPUHandle(TextureID texID)
+{
+	return textureHeap.handleCPU(texID);
 }

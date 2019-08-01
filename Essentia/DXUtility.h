@@ -99,7 +99,7 @@ public:
 			__uuidof(ID3D12DescriptorHeap),
 			(void**)& pDescriptorHeap);
 		if (FAILED(hr)) return hr;
-
+		pDescriptorHeap->SetName(ToWString(std::to_string(NumDescriptors) + " Heap").c_str());
 		hCPUHeapStart = pDescriptorHeap->GetCPUDescriptorHandleForHeapStart();
 		if (bShaderVisible)
 		{
