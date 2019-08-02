@@ -17,6 +17,7 @@
 #include "RenderBucket.h"
 #include "FrameContext.h"
 #include "RenderStage.h"
+#include "MainPassRenderStage.h"
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
@@ -70,18 +71,19 @@ private:
 	GPUHeapOffsets		offsets;
 	Material			material;
 
-	DescriptorHeap imguiHeap;
-	std::unique_ptr<Window>					window;
-	std::unique_ptr<DeviceResources>		deviceResources;
-	std::unique_ptr<ResourceManager>		resourceManager;
-	std::unique_ptr<RenderTargetManager>	renderTargetManager;
-	std::unique_ptr<MeshManager>			meshManager;
-	std::unique_ptr<ShaderResourceManager>	shaderResourceManager;
-	std::unique_ptr<FrameManager>			frameManager;
+	std::vector<std::unique_ptr<IRenderStage>>	renderStages;
+	DescriptorHeap								imguiHeap;
+	std::unique_ptr<Window>						window;
+	std::unique_ptr<DeviceResources>			deviceResources;
+	std::unique_ptr<ResourceManager>			resourceManager;
+	std::unique_ptr<RenderTargetManager>		renderTargetManager;
+	std::unique_ptr<MeshManager>				meshManager;
+	std::unique_ptr<ShaderResourceManager>		shaderResourceManager;
+	std::unique_ptr<FrameManager>				frameManager;
 
-	std::vector<RenderTargetID>				renderTargets;
-	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
+	std::vector<RenderTargetID>					renderTargets;
+	Microsoft::WRL::ComPtr<ID3D12Resource>		renderTargetBuffers[CFrameBufferCount];
 
-	std::unique_ptr<CommandContext>			commandContext;
+	std::unique_ptr<CommandContext>				commandContext;
 };
 

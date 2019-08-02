@@ -3,6 +3,8 @@
 #include "Camera.h"
 #include "BaseComponents.h"
 
+class Timer;
+
 struct FrameContext
 {
 	Camera* Camera;

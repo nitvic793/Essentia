@@ -171,6 +171,7 @@
     <ClCompile Include="imgui_impl_dx12.cpp" />
     <ClCompile Include="imgui_impl_win32.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="MainPassRenderStage.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
@@ -210,6 +211,7 @@
     <ClInclude Include="imstb_textedit.h" />
     <ClInclude Include="imstb_truetype.h" />
     <ClInclude Include="InputLayout.h" />
+    <ClInclude Include="MainPassRenderStage.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Memory.h" />
     <ClInclude Include="Mesh.h" />

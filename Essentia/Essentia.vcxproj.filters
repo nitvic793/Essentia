@@ -133,6 +133,9 @@
     <ClCompile Include="imgui_impl_win32.cpp">
       <Filter>Imgui</Filter>
     </ClCompile>
+    <ClCompile Include="MainPassRenderStage.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -263,6 +266,9 @@
     </ClInclude>
     <ClInclude Include="imgui_impl_win32.h">
       <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="MainPassRenderStage.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

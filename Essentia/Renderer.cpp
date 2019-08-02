@@ -90,6 +90,9 @@ void Renderer::Initialize()
 	ec->ShaderResourceManager = shaderResourceManager.get();
 	ec->CommandContext = commandContext.get();
 	ec->DeviceResources = deviceResources.get();
+	ec->RenderTargetManager = renderTargetManager.get();
+
+	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new MainPassRenderStage()));
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
@@ -98,6 +101,11 @@ void Renderer::Initialize()
 	lightBuffer.PointLight.Position = XMFLOAT3(2.9f, 0.1f, 0.1f);
 	lightBuffer.PointLight.Range = 5.f;
 	lightBuffer.PointLight.Intensity = 2.f;
+
+	for (auto& stage : renderStages)
+	{
+		stage->Initialize();
+	}
 }
 
 void Renderer::Clear()
@@ -123,7 +131,7 @@ void Renderer::Clear()
 	renderBucket.Clear();
 }
 
-bool show = true;
+bool show = false;
 
 void Renderer::Render(const FrameContext& frameContext)
 {
@@ -205,8 +213,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
 		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show);      // Edit bools storing our window open/close state
-		ImGui::Checkbox("Another Window", &show);
+		ImGui::Checkbox("Demo Window", &show);					// Edit bools storing our window open/close state
 
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::ColorEdit3("Dir Light Color", (float*)&lightBuffer.DirLight.Color.x); // Edit 3 floats representing a color
