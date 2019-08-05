@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Mesh.h"
 #include "ModelLoader.h"
+#include "Engine.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
@@ -8,6 +9,11 @@ using namespace Microsoft::WRL;
 MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 {
 	auto meshData = ModelLoader::Load(filename);
+	return CreateMesh(meshData, meshView);
+}
+
+MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
+{
 	MeshBuffer buffer;
 	auto device = context->GetDevice();
 	ComPtr<ID3D12GraphicsCommandList> commandList;
@@ -25,25 +31,25 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 
 	device->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-		D3D12_HEAP_FLAG_NONE, 
+		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
-		D3D12_RESOURCE_STATE_COPY_DEST, 
-		nullptr, 
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
 		IID_PPV_ARGS(&buffer.VertexBuffer));
 
 	buffer.VertexBuffer->SetName(L"Vertex Buffer Resource Heap");
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 
-		D3D12_HEAP_FLAG_NONE, 
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize), 
-		D3D12_RESOURCE_STATE_GENERIC_READ, 
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&vBufferUploadHeap));
 	vBufferUploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
 
 	D3D12_SUBRESOURCE_DATA vertexData = {};
-	vertexData.pData = reinterpret_cast<BYTE*>(meshData.Vertices.data());
+	vertexData.pData = reinterpret_cast<const BYTE*>(meshData.Vertices.data());
 	vertexData.RowPitch = vBufferSize;
 	vertexData.SlicePitch = vBufferSize;
 
@@ -53,28 +59,28 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	uint32 iBufferSize = sizeof(uint32) * (uint32)meshData.Indices.size();
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT), 
-		D3D12_HEAP_FLAG_NONE, 
-		&CD3DX12_RESOURCE_DESC::Buffer(iBufferSize), 
-		D3D12_RESOURCE_STATE_COPY_DEST, 
-		nullptr, 
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(iBufferSize),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
 		IID_PPV_ARGS(&buffer.IndexBuffer));
 
 	buffer.IndexBuffer->SetName(L"Index Buffer Resource Heap");
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE, // no flags
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize), 
-		D3D12_RESOURCE_STATE_GENERIC_READ, 
+		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&iBufferUploadHeap));
 	iBufferUploadHeap->SetName(L"Index Buffer Upload Resource Heap");
 
 	D3D12_SUBRESOURCE_DATA indexData = {};
-	indexData.pData = reinterpret_cast<BYTE*>(meshData.Indices.data());
-	indexData.RowPitch = iBufferSize; 
-	indexData.SlicePitch = iBufferSize; 
+	indexData.pData = reinterpret_cast<const BYTE*>(meshData.Indices.data());
+	indexData.RowPitch = iBufferSize;
+	indexData.SlicePitch = iBufferSize;
 
 	UpdateSubresources(commandList.Get(), buffer.IndexBuffer.Get(), iBufferUploadHeap.Get(), 0, 0, 1, &indexData);
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(buffer.IndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
@@ -98,7 +104,7 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	meshes.push_back(meshData);
 	buffers.push_back(buffer);
 	views.push_back(meshView);
-	
+
 	return mesh;
 }
 
@@ -110,4 +116,21 @@ void MeshManager::Initialize(CommandContext* commandContext)
 const MeshView& MeshManager::GetMeshView(MeshHandle handle)
 {
 	return views[handle.Id];
+}
+
+ModelHandle ModelManager::CreateModel(const char* filename)
+{
+	auto meshes = ModelLoader::LoadModel(filename);
+	Model model = {};
+	ModelHandle modelHandle;
+	modelHandle.Id = (uint32)models.size();
+
+	for (auto& mesh : meshes)
+	{
+		auto handle = Es::CreateMesh(mesh);
+		model.Meshes.push_back(handle);
+	}
+
+	models.push_back(model);
+	return modelHandle;
 }

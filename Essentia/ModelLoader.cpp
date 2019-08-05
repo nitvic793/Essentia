@@ -111,7 +111,7 @@ void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT
 	delete[] tan1;
 }
 
-void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::vector<Vertex>& vertices, std::vector<uint32>& indices, std::unordered_map<Vertex, uint32>& uniqueVertices)
+void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Vertex>& vertices, std::vector<uint32>& indices, std::unordered_map<Vertex, uint32>& uniqueVertices)
 {
 	for (UINT i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -173,7 +173,7 @@ MeshData ModelLoader::Load(const std::string& filename)
 
 	for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
 	{
-		ProcessMesh(i, pScene->mMeshes[i], pScene, meshEntries, vertices, indices, uniqueVertices);
+		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices, uniqueVertices);
 	}
 
 	CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
@@ -181,4 +181,32 @@ MeshData ModelLoader::Load(const std::string& filename)
 	mesh.Vertices = std::move(vertices);
 	mesh.Indices = std::move(indices);
 	return mesh;
+}
+
+std::vector<MeshData>  ModelLoader::LoadModel(const std::string& filename)
+{
+	static Assimp::Importer importer;
+
+	const aiScene* pScene = importer.ReadFile(filename,
+		aiProcess_Triangulate |
+		aiProcess_ConvertToLeftHanded | aiProcess_ValidateDataStructure | aiProcess_JoinIdenticalVertices);
+
+	if (pScene == NULL)
+		return std::vector<MeshData>();
+
+	std::vector<Vertex> vertices;
+	std::vector<uint32> indices;
+	std::unordered_map<Vertex, uint32> uniqueVertices = {};
+	std::vector<MeshData> meshes(pScene->mNumMeshes);
+	for (uint32 i = 0; i < pScene->mNumMeshes; i++)
+	{
+		MeshData mesh = {};
+		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices, uniqueVertices);
+		CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
+		mesh.Vertices = std::move(vertices);
+		mesh.Indices = std::move(indices);
+		meshes[i] = mesh;
+	}
+
+	return meshes;
 }

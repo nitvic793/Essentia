@@ -16,5 +16,6 @@ class ModelLoader
 {
 public:
 	static MeshData Load(const std::string& filename);
+	static std::vector<MeshData> LoadModel(const std::string& filename);
 };
 

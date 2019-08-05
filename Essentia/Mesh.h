@@ -32,6 +32,7 @@ class MeshManager
 {
 public:
 	MeshHandle		CreateMesh(const std::string& filename, MeshView& meshView);
+	MeshHandle		CreateMesh(const MeshData& meshData, MeshView& meshView);
 	void			Initialize(CommandContext* commandContext);
 	const MeshView& GetMeshView(MeshHandle handle);
 private:
@@ -43,3 +44,22 @@ private:
 	std::vector<DirectX::BoundingOrientedBox>	bounds;
 	friend class Renderer;
 };
+
+union ModelHandle
+{
+	uint32 Id;
+};
+
+struct Model
+{
+	std::vector<MeshHandle> Meshes;
+};
+
+class ModelManager
+{
+public:
+	ModelHandle CreateModel(const char* filename);
+private:
+	std::vector<Model> models;
+};
+

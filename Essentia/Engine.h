@@ -8,6 +8,7 @@ namespace Es
 	TextureID				CreateTexture(const std::string& filename, TextureType type, bool generateMips = true);
 	MaterialHandle			CreateMaterial(TextureID* textures, uint32 count, PipelineStateID psoID);
 	MeshHandle				CreateMesh(const std::string& filename);
+	MeshHandle				CreateMesh(const MeshData& meshData);
 	PipelineStateID			CreatePSO(const std::string& vertexShader, const std::string& pixelShader);
 	ConstantBufferView		CreateConstantBufferView(size_t sizeInBytes);
 	ResourceID				CreateGPUResource(
