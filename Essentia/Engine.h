@@ -9,6 +9,7 @@ namespace Es
 	MaterialHandle			CreateMaterial(TextureID* textures, uint32 count, PipelineStateID psoID);
 	MeshHandle				CreateMesh(const std::string& filename);
 	MeshHandle				CreateMesh(const MeshData& meshData);
+	ModelHandle				CreateModel(const char* filename);
 	PipelineStateID			CreatePSO(const std::string& vertexShader, const std::string& pixelShader);
 	ConstantBufferView		CreateConstantBufferView(size_t sizeInBytes);
 	ResourceID				CreateGPUResource(

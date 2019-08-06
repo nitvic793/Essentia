@@ -134,3 +134,8 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 	models.push_back(model);
 	return modelHandle;
 }
+
+const Model& ModelManager::GetModel(ModelHandle model)
+{
+	return models[model.Id];
+}

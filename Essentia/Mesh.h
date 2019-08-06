@@ -58,7 +58,8 @@ struct Model
 class ModelManager
 {
 public:
-	ModelHandle CreateModel(const char* filename);
+	ModelHandle		CreateModel(const char* filename);
+	const Model&	GetModel(ModelHandle model);
 private:
 	std::vector<Model> models;
 };

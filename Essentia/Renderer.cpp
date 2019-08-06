@@ -91,6 +91,7 @@ void Renderer::Initialize()
 	ec->CommandContext = commandContext.get();
 	ec->DeviceResources = deviceResources.get();
 	ec->RenderTargetManager = renderTargetManager.get();
+	ec->ModelManager = &modelManager;
 
 	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new MainPassRenderStage()));
 
@@ -178,7 +179,6 @@ void Renderer::Render(const FrameContext& frameContext)
 		auto psoBucket = pipeline.second;
 		auto pso = psoBucket.PipelineStateObject;
 		commandList->SetPipelineState(pso);
-
 		for (auto mat : psoBucket.Instances)
 		{
 			auto material = mat.second.Material;
@@ -188,13 +188,19 @@ void Renderer::Render(const FrameContext& frameContext)
 				auto mesh = meshes.second.Mesh;
 				commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-				for (auto cbIndex : meshes.second.CbIndices)
+				for (uint32 cbIndex : meshes.second.CbIndices)
 				{
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
 					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 				}
 			}
 		}
+	}
+
+	auto model = modelManager.GetModel({ 0 });
+	for (auto mesh : model.Meshes)
+	{
+		DrawMesh(mesh);
 	}
 
 	heaps[0] = imguiHeap.pDescriptorHeap.Get();
@@ -271,6 +277,7 @@ void Renderer::EndInitialization()
 	textures[0] = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
 	textures[1] = shaderResourceManager->CreateTexture("../../Assets/Textures/rockNormals.jpg");
 	auto matId = shaderResourceManager->CreateMaterial(textures, 2, defaultPSO, material);
+	modelManager.CreateModel("../../Assets/Models/Sponza.fbx");
 	//for (int i = 0; i < CFrameBufferCount; ++i)
 	//{
 	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());
@@ -278,6 +285,21 @@ void Renderer::EndInitialization()
 
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandContext->SubmitCommands(commandList);
+}
+
+void Renderer::DrawMesh(const MeshView& meshView)
+{
+	auto commandList = commandContext->GetDefaultCommandList();
+	commandList->IASetVertexBuffers(0, 1, &meshView.VertexBufferView);
+	commandList->IASetIndexBuffer(&meshView.IndexBufferView);
+	commandList->DrawIndexedInstanced(meshView.IndexCount, 1, 0, 0, 0);
+}
+
+void Renderer::DrawMesh(MeshHandle mesh)
+{
+	auto commandList = commandContext->GetDefaultCommandList();
+	auto meshView = meshManager->GetMeshView(mesh);
+	DrawMesh(meshView);
 }
 
 ID3D12GraphicsCommandList* Renderer::GetDefaultCommandList()

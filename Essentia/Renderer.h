@@ -37,6 +37,8 @@ public:
 	Window* GetWindow();
 	void	CleanUp();
 	void	EndInitialization();
+	void	DrawMesh(const MeshView& meshView);
+	void    DrawMesh(MeshHandle mesh);
 
 	ID3D12GraphicsCommandList*	GetDefaultCommandList();
 	ID3D12Device*				GetDevice();
@@ -71,6 +73,7 @@ private:
 	GPUHeapOffsets		offsets;
 	Material			material;
 
+	ModelManager								modelManager;
 	std::vector<std::unique_ptr<IRenderStage>>	renderStages;
 	DescriptorHeap								imguiHeap;
 	std::unique_ptr<Window>						window;

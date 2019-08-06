@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ModelLoader.h"
 #include <unordered_map>
+#include "DirectXMesh.h"
 
 using namespace DirectX;
 
@@ -121,8 +122,9 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 		vertex.Position.y = mesh->mVertices[i].y;
 		vertex.Position.z = mesh->mVertices[i].z;
 
-		vertex.Normal = XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-
+		if (mesh->HasNormals())
+			vertex.Normal = XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
+	
 		if (mesh->mTextureCoords[0])
 		{
 			vertex.UV.x = (float)mesh->mTextureCoords[0][i].x;
@@ -138,6 +140,23 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 
 		for (UINT j = 0; j < face.mNumIndices; j++)
 			indices.push_back(face.mIndices[j]);
+	}
+
+	if (!mesh->HasNormals())
+	{
+		std::vector<XMFLOAT3> pos;
+		std::vector<XMFLOAT3> normals;
+		for (auto& v : vertices)
+		{
+			pos.push_back(v.Position);
+			normals.push_back(v.Normal);
+		}
+
+		DirectX::ComputeNormals(indices.data(), mesh->mNumFaces, pos.data(), pos.size(), 0, normals.data());
+		for (int i = 0; i < vertices.size(); ++i)
+		{
+			vertices[i].Normal = normals[i];
+		}
 	}
 }
 

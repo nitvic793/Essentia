@@ -14,6 +14,7 @@ class ShaderResourceManager;
 class DeviceResources;
 class CommandContext;
 class RenderTargetManager;
+class ModelManager;
 
 struct EngineContext
 {
@@ -26,7 +27,7 @@ struct EngineContext
 	CommandContext*			CommandContext = nullptr;
 	DeviceResources*		DeviceResources = nullptr;
 	RenderTargetManager*	RenderTargetManager = nullptr;
-
+	ModelManager*			ModelManager = nullptr;
 	EngineContext()
 	{
 		Context = this;

@@ -35,7 +35,8 @@ public:
 		entity2 = entityManager->CreateEntity();
 		MaterialHandle mat = { 0 };
 		MeshHandle mesh = { 1 };
-		MeshHandle cone = Es::CreateMesh("../../Assets/Models/helix.obj");
+		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cone.obj");
+		//auto m = Es::CreateModel("../../Assets/Models/sponza.fbx");
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
 		auto transform = GetTransform(entity2);

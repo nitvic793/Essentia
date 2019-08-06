@@ -38,6 +38,12 @@ MeshHandle Es::CreateMesh(const MeshData& meshData)
 	return ec->MeshManager->CreateMesh(meshData, mesh);
 }
 
+ModelHandle Es::CreateModel(const char* filename)
+{
+	auto ec = EngineContext::Context;
+	return ec->ModelManager->CreateModel(filename);
+}
+
 PipelineStateID Es::CreatePSO(const std::string& vertexShader, const std::string& pixelShader)
 {
 	assert(false);
