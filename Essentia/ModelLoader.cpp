@@ -120,6 +120,7 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 		for (int i = 0; i < vertices.size(); ++i)
 		{
 			vertices[i].Normal = normals[i];
+			vertices[i].Tangent = tangents[i];
 		}
 	}
 

@@ -221,14 +221,16 @@ void Renderer::Render(const FrameContext& frameContext)
 		static float f = 0.0f;
 		static int counter = 0;
 
-		ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+		ImGui::Begin("Essentia");                          // Create a window called "Hello, world!" and append into it.
 
-		ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+		ImGui::Text("Basic Editor");               // Display some text (you can use a format strings too)
 		ImGui::Checkbox("Demo Window", &show);					// Edit bools storing our window open/close state
 
-		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+
 		ImGui::ColorEdit3("Dir Light Color", (float*)& lightBuffer.DirLight.Color.x); // Edit 3 floats representing a color
-		ImGui::DragFloat3("Point Light Pos", (float*)& lightBuffer.PointLight.Position.x);
+		ImGui::DragFloat3("Dir Light Direction", (float*)& lightBuffer.DirLight.Direction, 0.1f, -1.f, 1.f);
+		ImGui::SliderFloat("Point Light Range", &lightBuffer.PointLight.Range, 0.0f, 100.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+		ImGui::DragFloat3("Point Light Pos", (float*)& lightBuffer.PointLight.Position.x, 0.1f);
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
