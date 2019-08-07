@@ -154,6 +154,7 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 
 		Material out;
 		materialHandle = shaderResourceManager->CreateMaterial(textures, totalTextures, Default::DefaultMaterialPSO, out, matName.c_str());
+		model.Materials.push_back(materialHandle);
 	}
 
 	models.push_back(model);

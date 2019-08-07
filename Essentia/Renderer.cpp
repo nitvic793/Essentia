@@ -199,8 +199,12 @@ void Renderer::Render(const FrameContext& frameContext)
 	}
 
 	auto model = modelManager.GetModel({ 0 });
-	for (auto mesh : model.Meshes)
+	for (uint32 i = 0; i < model.Meshes.size(); ++i)
 	{
+		auto mesh = model.Meshes[i];
+		auto materialHandle = model.Materials[i];
+		auto material = shaderResourceManager->GetMaterial(materialHandle);
+		commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
 		DrawMesh(mesh);
 	}
 
@@ -212,7 +216,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	if (show)
 		ImGui::ShowDemoWindow(&show);
-	
+
 	{
 		static float f = 0.0f;
 		static int counter = 0;
@@ -223,8 +227,8 @@ void Renderer::Render(const FrameContext& frameContext)
 		ImGui::Checkbox("Demo Window", &show);					// Edit bools storing our window open/close state
 
 		ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::ColorEdit3("Dir Light Color", (float*)&lightBuffer.DirLight.Color.x); // Edit 3 floats representing a color
-		ImGui::DragFloat3("Point Light Pos", (float*)&lightBuffer.PointLight.Position.x);
+		ImGui::ColorEdit3("Dir Light Color", (float*)& lightBuffer.DirLight.Color.x); // Edit 3 floats representing a color
+		ImGui::DragFloat3("Point Light Pos", (float*)& lightBuffer.PointLight.Position.x);
 
 		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
 			counter++;
