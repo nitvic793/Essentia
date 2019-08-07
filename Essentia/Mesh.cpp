@@ -118,17 +118,42 @@ const MeshView& MeshManager::GetMeshView(MeshHandle handle)
 	return views[handle.Id];
 }
 
+void ModelManager::Initialize(ShaderResourceManager* srManager)
+{
+	shaderResourceManager = srManager;
+}
+
 ModelHandle ModelManager::CreateModel(const char* filename)
 {
-	auto meshes = ModelLoader::LoadModel(filename);
+	auto modelData = ModelLoader::LoadModel(filename);
 	Model model = {};
 	ModelHandle modelHandle;
 	modelHandle.Id = (uint32)models.size();
 
-	for (auto& mesh : meshes)
+	for (auto& mesh : modelData.Meshes)
 	{
 		auto handle = Es::CreateMesh(mesh);
 		model.Meshes.push_back(handle);
+	}
+
+	constexpr int totalTextures = 2;
+	TextureID textures[totalTextures];
+	std::string assetDirectory = "../../Assets/Textures/";
+	for (auto& material : modelData.Materials)
+	{
+		MaterialHandle materialHandle;
+		auto diffuseTex = assetDirectory + material.Diffuse;
+		auto normalsTex = assetDirectory + material.Normal;
+		textures[DiffuseID] = material.Diffuse.empty() ? Default::DefaultDiffuse : shaderResourceManager->CreateTexture(diffuseTex);
+		textures[NormalsID] = material.Normal.empty() ? Default::DefaultNormals : shaderResourceManager->CreateTexture(normalsTex);
+		std::string matName = "";
+		for (int i = 0; i < totalTextures; ++i)
+		{
+			matName += std::to_string(textures[i]);
+		}
+
+		Material out;
+		materialHandle = shaderResourceManager->CreateMaterial(textures, totalTextures, Default::DefaultMaterialPSO, out, matName.c_str());
 	}
 
 	models.push_back(model);

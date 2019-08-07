@@ -2,6 +2,13 @@
 
 #include "EngineContext.h"
 
+enum LightType
+{
+	Directional = 0,
+	Point,
+	Spot
+};
+
 namespace Es
 {
 	EntityHandle			CreateEntity(const Transform& transform = DefaultTransform);

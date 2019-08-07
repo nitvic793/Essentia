@@ -12,3 +12,11 @@ struct MaterialHandle
 {
 	uint32 Index;
 };
+
+enum MaterialTextureType
+{
+	DiffuseID = 0,
+	NormalsID = 1,
+	RoughnessID = 2,
+	MetalnessID = 3
+};

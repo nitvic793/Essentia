@@ -5,50 +5,6 @@
 
 using namespace DirectX;
 
-bool operator==(const XMFLOAT3& l, const XMFLOAT3& r)
-{
-	return l.x == r.x && l.y == r.y && l.z == r.z;
-}
-
-bool operator==(const XMFLOAT2& l, const XMFLOAT2& r)
-{
-	return l.x == r.x && l.y == r.y;
-}
-
-bool operator==(const Vertex& v1, const Vertex& v2) {
-	return v1.Position == v2.Position && v1.Normal == v2.Normal && v1.UV == v2.UV;
-}
-
-namespace std {
-
-	template <> struct hash<XMFLOAT3>
-	{
-		size_t operator()(const XMFLOAT3& x) const
-		{
-			return ((hash<float>()(x.x) ^
-				(hash<float>()(x.y) << 1)) >> 1) ^
-				(hash<float>()(x.z) << 1);
-		}
-	};
-
-	template <> struct hash<XMFLOAT2>
-	{
-		size_t operator()(const XMFLOAT2& x) const
-		{
-			return (hash<float>()(x.x) ^
-				(hash<float>()(x.y) << 1));
-		}
-	};
-
-	template<> struct hash<Vertex> {
-		size_t operator()(Vertex const& vertex) const {
-			return ((hash<XMFLOAT3>()(vertex.Position) ^
-				(hash<XMFLOAT3>()(vertex.Normal) << 1)) >> 1) ^
-				(hash<XMFLOAT2>()(vertex.UV) << 1);
-		}
-	};
-}
-
 void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT indexCount)
 {
 	XMFLOAT3* tan1 = new XMFLOAT3[vertexCount * 2];
@@ -112,7 +68,7 @@ void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT
 	delete[] tan1;
 }
 
-void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Vertex>& vertices, std::vector<uint32>& indices, std::unordered_map<Vertex, uint32>& uniqueVertices)
+void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Vertex>& vertices, std::vector<uint32>& indices)
 {
 	for (UINT i = 0; i < mesh->mNumVertices; i++)
 	{
@@ -124,7 +80,7 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 
 		if (mesh->HasNormals())
 			vertex.Normal = XMFLOAT3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-	
+
 		if (mesh->mTextureCoords[0])
 		{
 			vertex.UV.x = (float)mesh->mTextureCoords[0][i].x;
@@ -142,22 +98,31 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 			indices.push_back(face.mIndices[j]);
 	}
 
-	if (!mesh->HasNormals())
+	if (!mesh->HasNormals() || !mesh->HasTangentsAndBitangents())
 	{
 		std::vector<XMFLOAT3> pos;
 		std::vector<XMFLOAT3> normals;
+		std::vector<XMFLOAT3> tangents;
+		std::vector<XMFLOAT2> uv;
 		for (auto& v : vertices)
 		{
 			pos.push_back(v.Position);
 			normals.push_back(v.Normal);
+			tangents.push_back(v.Tangent);
+			uv.push_back(v.UV);
 		}
 
-		DirectX::ComputeNormals(indices.data(), mesh->mNumFaces, pos.data(), pos.size(), 0, normals.data());
+		if (!mesh->HasNormals())
+			DirectX::ComputeNormals(indices.data(), mesh->mNumFaces, pos.data(), pos.size(), CNORM_DEFAULT, normals.data());
+
+		if (!mesh->HasTangentsAndBitangents())
+			DirectX::ComputeTangentFrame(indices.data(), mesh->mNumFaces, pos.data(), normals.data(), uv.data(), pos.size(), tangents.data(), nullptr);
 		for (int i = 0; i < vertices.size(); ++i)
 		{
 			vertices[i].Normal = normals[i];
 		}
 	}
+
 }
 
 
@@ -188,21 +153,22 @@ MeshData ModelLoader::Load(const std::string& filename)
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
-	std::unordered_map<Vertex, uint32> uniqueVertices = {};
 
 	for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
 	{
-		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices, uniqueVertices);
+		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
 	}
 
-	CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
+	//CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
 
 	mesh.Vertices = std::move(vertices);
 	mesh.Indices = std::move(indices);
 	return mesh;
 }
 
-std::vector<MeshData>  ModelLoader::LoadModel(const std::string& filename)
+
+
+ModelData  ModelLoader::LoadModel(const std::string& filename)
 {
 	static Assimp::Importer importer;
 
@@ -211,21 +177,47 @@ std::vector<MeshData>  ModelLoader::LoadModel(const std::string& filename)
 		aiProcess_ConvertToLeftHanded | aiProcess_ValidateDataStructure | aiProcess_JoinIdenticalVertices);
 
 	if (pScene == NULL)
-		return std::vector<MeshData>();
+		return ModelData{};
 
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
-	std::unordered_map<Vertex, uint32> uniqueVertices = {};
 	std::vector<MeshData> meshes(pScene->mNumMeshes);
+	std::vector<MeshMaterial> materials(pScene->mNumMeshes);
 	for (uint32 i = 0; i < pScene->mNumMeshes; i++)
 	{
 		MeshData mesh = {};
-		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices, uniqueVertices);
-		CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
+		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
+		//CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
 		mesh.Vertices = std::move(vertices);
 		mesh.Indices = std::move(indices);
 		meshes[i] = mesh;
 	}
 
-	return meshes;
+
+	if (pScene->HasMaterials())
+	{
+		for (uint32 i = 0; i < pScene->mNumMeshes; i++)
+		{
+			auto matId = pScene->mMeshes[i]->mMaterialIndex;
+			auto mat = pScene->mMaterials[matId];
+			auto c = mat->mNumProperties;
+			aiString diffuseTexture;
+			aiString normalTexture;
+			MeshMaterial mMat;
+			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &diffuseTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Diffuse = diffuseTexture.C_Str();
+			}
+
+			if (mat->GetTexture(aiTextureType_NORMALS, 0, &normalTexture) == aiReturn_SUCCESS || mat->GetTexture(aiTextureType_HEIGHT, 0, &normalTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Normal = normalTexture.C_Str();
+			}
+
+			materials[i] = mMat;
+		}
+
+	}
+
+	return ModelData{ meshes, materials };
 }

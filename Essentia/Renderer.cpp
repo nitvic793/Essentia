@@ -69,6 +69,7 @@ void Renderer::Initialize()
 	meshManager->Initialize(commandContext.get());
 	shaderResourceManager->Initialize(resourceManager.get(), deviceResources.get());
 	frameManager->Initialize(device);
+	modelManager.Initialize(shaderResourceManager.get());
 
 	imguiHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
 	IMGUI_CHECKVERSION();

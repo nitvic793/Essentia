@@ -41,13 +41,15 @@ public:
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
 		auto transform = GetTransform(entity2);
 		transform.Position->z = 4;
+		auto scale = XMFLOAT3(0.05f, 0.05f, 0.05f);
+		memcpy(transform.Scale, &scale, sizeof(scale));
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override
 	{
 		auto transform = GetTransform(entity);
 		transform.Rotation->y = totalTime/2;
-		transform.Position->x = sin(totalTime * 2) * 3;
+		transform.Position->x = sin(totalTime);
 		 
 		transform = GetTransform(entity2);
 		//transform.Rotation->y = totalTime;

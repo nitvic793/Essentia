@@ -99,6 +99,12 @@ GPUHeapOffsets ShaderResourceManager::CopyDescriptorsToGPUHeap(uint32 frameIndex
 
 TextureID ShaderResourceManager::CreateTexture(const std::string& filename, TextureType texType, bool generateMips)
 {
+	auto stringId = String::ID(filename.c_str());
+	if (textureMap.find(stringId) != textureMap.end())
+	{
+		return textureMap[stringId];
+	}
+
 	auto device = deviceResources->GetDevice();
 	ResourceUploadBatch uploadBatch(device);
 	auto fname = ToWString(filename);
@@ -124,20 +130,52 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	auto texIndex = textureCount;
 	textureCount++;
 	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
+	textureMap[stringId] = texIndex;
 	return texIndex;
 }
 
-TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool isCubeMap)
+TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool isCubeMap, const char* name)
 {
+	StringID stringId;
+	if (name == nullptr)
+	{
+		stringId = String::ID(std::to_string(textureCount).c_str());
+	}
+	else
+	{
+		stringId = String::ID(name);
+	}
+
+	if (textureMap.find(stringId) != textureMap.end())
+	{
+		return textureMap[stringId];
+	}
+
 	auto device = deviceResources->GetDevice();
 	auto texIndex = textureCount;
 	textureCount++;
 	CreateShaderResourceView(device, resource, textureHeap.handleCPU(texIndex), isCubeMap);
+	textureMap[stringId] = texIndex;
 	return texIndex;
 }
 
-MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial)
+MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name)
 {
+	StringID stringId;
+	if (name == nullptr)
+	{
+		stringId = String::ID(std::to_string(materialCount).c_str());
+	}
+	else
+	{
+		stringId = String::ID(name);
+	}
+
+	if (materialMap.find(stringId) != materialMap.end())
+	{
+		return materialMap[stringId];
+	}
+
 	auto device = deviceResources->GetDevice();
 	MaterialHandle handle = { (uint32)materials.size() };
 	//Copy Textures from texture heap to material heap so that material textures are ordered in descriptor table.
@@ -149,6 +187,7 @@ MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32
 	outMaterial = Material{ materialCount, psoID, textureCount };
 	materials.push_back(outMaterial);
 	materialCount += textureCount;
+	materialMap[stringId] = handle;
 	return handle;
 }
 

@@ -75,3 +75,13 @@ constexpr uint32_t crc32(std::string_view str)
 		crc = (crc >> 8) ^ crc_table[(crc ^ c) & 0xff];
 	return crc ^ 0xffffffff;
 }
+
+typedef uint32_t StringID;
+
+namespace String
+{
+	constexpr StringID ID(const char* str)
+	{
+		return crc32(str);
+	}
+}

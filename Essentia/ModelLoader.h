@@ -12,10 +12,22 @@ struct MeshEntry
 	int BaseIndex;
 };
 
+struct MeshMaterial
+{
+	std::string Diffuse;
+	std::string Normal;
+};
+
+struct ModelData
+{
+	std::vector<MeshData>		Meshes;
+	std::vector<MeshMaterial>	Materials;
+};
+
 class ModelLoader
 {
 public:
 	static MeshData Load(const std::string& filename);
-	static std::vector<MeshData> LoadModel(const std::string& filename);
+	static ModelData LoadModel(const std::string& filename);
 };
 

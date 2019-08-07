@@ -3,6 +3,7 @@
 #include "CommandContext.h"
 #include <wrl.h>
 #include <DirectXCollision.h>
+#include "ShaderResourceManager.h"
 
 struct MeshData
 {
@@ -52,15 +53,18 @@ union ModelHandle
 
 struct Model
 {
-	std::vector<MeshHandle> Meshes;
+	std::vector<MeshHandle>		Meshes;
+	std::vector<MaterialHandle> Materials;
 };
 
 class ModelManager
 {
 public:
+	void			Initialize(ShaderResourceManager* srManager);
 	ModelHandle		CreateModel(const char* filename);
 	const Model&	GetModel(ModelHandle model);
 private:
 	std::vector<Model> models;
+	ShaderResourceManager* shaderResourceManager;
 };
 
