@@ -25,7 +25,7 @@ float3 CalculateDirectionalLight(float3 normal, DirectionalLight light)
 	float3 dirToLight = normalize(-light.Direction);
 	float NdotL = dot(normal, dirToLight);
 	NdotL = saturate(NdotL);
-	return light.Color * NdotL + float3(0.1, 0.1, 0.1);
+	return light.Color * NdotL + float3(0.01, 0.01, 0.01);
 }
 
 float3 CalculatePointLight(float3 normal, float3 cameraPos, float3 worldPos, PointLight light)

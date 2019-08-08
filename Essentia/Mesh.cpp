@@ -144,8 +144,8 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 		MaterialHandle materialHandle;
 		auto diffuseTex = assetDirectory + material.Diffuse;
 		auto normalsTex = assetDirectory + material.Normal;
-		textures[DiffuseID] = material.Diffuse.empty() ? Default::DefaultDiffuse : shaderResourceManager->CreateTexture(diffuseTex);
-		textures[NormalsID] = material.Normal.empty() ? Default::DefaultNormals : shaderResourceManager->CreateTexture(normalsTex);
+		textures[DiffuseID] = material.Diffuse.empty() ? Default::DefaultDiffuse : shaderResourceManager->CreateTexture(diffuseTex, WIC, true);
+		textures[NormalsID] = material.Normal.empty() ? Default::DefaultNormals : shaderResourceManager->CreateTexture(normalsTex, WIC, true);
 		std::string matName = "";
 		for (int i = 0; i < totalTextures; ++i)
 		{
