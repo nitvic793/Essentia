@@ -2,7 +2,7 @@
 #include "Declarations.h"
 #include <utility>
 
-constexpr uint32 CMaxStackHeapSize = 1024 * 1024 * 8; //8MB
+constexpr uint32 CMaxStackHeapSize = 1024 * 1024 * 32; //32MB
 
 class IAllocator
 {
@@ -71,13 +71,11 @@ private:
 	size_t totalSize = 0;
 };
 
-//namespace Mem
-//{
-//	void* Alloc(size_t sizeInBytes)
-//	{
-//		return StackAllocator::Instance->Alloc(sizeInBytes);
-//	}
-//}
+namespace Mem
+{
+	void*	Alloc(size_t sizeInBytes);
+	void	Free(void* buffer);
+}
 
 template<typename T>
 struct Deleter

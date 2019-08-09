@@ -13,7 +13,7 @@
 class Game
 {
 public:
-	Game() : allocator(CMaxStackHeapSize) {};
+	Game()  { StackAllocator allocator(CMaxStackHeapSize); };
 	void Setup();
 	void Run();
 	~Game();
@@ -27,7 +27,6 @@ protected:
 	std::unique_ptr<DirectX::Keyboard>	keyboard;
 	std::unique_ptr<DirectX::Mouse>		mouse;
 	std::unique_ptr<Camera>				camera;
-	StackAllocator						allocator;
 	EntityManager						entityManager;
 	SystemManager						systemManager;
 private:

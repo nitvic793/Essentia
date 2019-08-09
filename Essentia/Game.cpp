@@ -49,7 +49,7 @@ public:
 	{
 		auto transform = GetTransform(entity);
 		transform.Rotation->y = totalTime/2;
-		transform.Position->x = sin(totalTime);
+		transform.Position->x = sin(totalTime * 2);
 		 
 		transform = GetTransform(entity2);
 		//transform.Rotation->y = totalTime;
