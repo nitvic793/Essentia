@@ -18,6 +18,7 @@
 #include "FrameContext.h"
 #include "RenderStage.h"
 #include "MainPassRenderStage.h"
+#include <GraphicsMemory.h>
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
@@ -49,6 +50,7 @@ private:
 	void CreatePSOs();
 	void CreateDepthStencil();
 	void WaitForPreviousFrame();
+	void UpdateLightBuffer();
 
 	int32			width;
 	int32			height;
@@ -83,7 +85,7 @@ private:
 	std::unique_ptr<MeshManager>				meshManager;
 	std::unique_ptr<ShaderResourceManager>		shaderResourceManager;
 	std::unique_ptr<FrameManager>				frameManager;
-
+	std::unique_ptr<DirectX::GraphicsMemory>	gpuMemory;
 	std::vector<RenderTargetID>					renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>		renderTargetBuffers[CFrameBufferCount];
 

@@ -63,7 +63,7 @@ public:
 	virtual IComponent* GetComponent(EntityHandle entity) override
 	{
 		auto index = componentMap[entity.ID];
-		return (IComponent*)& components[index];
+		return (IComponent*)&components[index];
 	}
 
 	virtual IComponent* GetAllComponents(uint32& count) override

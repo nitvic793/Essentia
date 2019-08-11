@@ -12,6 +12,8 @@
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+#include "Entity.h"
+#include "ImguiRenderStage.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -38,6 +40,7 @@ void Renderer::Initialize()
 	device = deviceResources->GetDevice();
 	renderTargetManager->Initialize(device);
 	resourceManager->Initialize(device);
+	gpuMemory = std::make_unique<GraphicsMemory>(device);
 
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
@@ -71,20 +74,6 @@ void Renderer::Initialize()
 	frameManager->Initialize(device);
 	modelManager.Initialize(shaderResourceManager.get());
 
-	imguiHeap.Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1, true);
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO(); (void)io;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
-
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(window->GetWindowHandle());
-	ImGui_ImplDX12_Init(device, CFrameBufferCount,
-		DXGI_FORMAT_R8G8B8A8_UNORM,
-		imguiHeap.hCPUHeapStart,
-		imguiHeap.hGPUHeapStart);
-
 	auto ec = EngineContext::Context;
 	ec->MeshManager = meshManager.get();
 	ec->ResourceManager = resourceManager.get();
@@ -95,6 +84,7 @@ void Renderer::Initialize()
 	ec->ModelManager = &modelManager;
 
 	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new MainPassRenderStage()));
+	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new ImguiRenderStage()));
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
@@ -131,15 +121,21 @@ void Renderer::Clear()
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	frameManager->Reset(imageIndex);
 	renderBucket.Clear();
-}
 
-bool show = false;
+	for (size_t i = 0; i < renderStages.size(); ++i)
+	{
+		renderStages[i]->Clear();
+	}
+}
 
 void Renderer::Render(const FrameContext& frameContext)
 {
 	auto camera = frameContext.Camera;
 	perObject.View = camera->GetViewTransposed();
 	perObject.Projection = camera->GetProjectionTransposed();
+
+	UpdateLightBuffer();
+	lightBuffer.CameraPosition = camera->Position;
 
 	auto worlds = frameContext.WorldMatrices;
 	auto drawables = frameContext.Drawables;
@@ -150,11 +146,10 @@ void Renderer::Render(const FrameContext& frameContext)
 	for (size_t i = 0; i < worlds.size(); ++i)
 	{
 		perObject.World = worlds[i];
+		auto resource = gpuMemory->AllocateConstant(perObject);
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
-		renderBucket.Insert(drawables[i]);
+		renderBucket.Insert(drawables[i], resource.GpuAddress());
 	}
-
-	lightBuffer.CameraPosition = camera->Position;
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
@@ -189,9 +184,15 @@ void Renderer::Render(const FrameContext& frameContext)
 				auto mesh = meshes.second.Mesh;
 				commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-				for (uint32 cbIndex : meshes.second.CbIndices)
+				/*for (uint32 cbIndex : meshes.second.CbIndices)
 				{
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
+					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
+				}*/
+
+				for (uint64 address : meshes.second.vAddresses)
+				{
+					commandList->SetGraphicsRootConstantBufferView(RootSigCBVertex0, address);
 					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 				}
 			}
@@ -208,42 +209,11 @@ void Renderer::Render(const FrameContext& frameContext)
 		DrawMesh(mesh);
 	}
 
-	heaps[0] = imguiHeap.pDescriptorHeap.Get();
-	commandList->SetDescriptorHeaps(1, heaps.data());
-	ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
-
-	if (show)
-		ImGui::ShowDemoWindow(&show);
-
+	for (auto& renderStage : renderStages)
 	{
-		static float f = 0.0f;
-		static int counter = 0;
-
-		ImGui::Begin("Essentia");                          // Create a window called "Hello, world!" and append into it.
-
-		ImGui::Text("Basic Editor");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show);					// Edit bools storing our window open/close state
-
-
-		ImGui::ColorEdit3("Dir Light Color", (float*)& lightBuffer.DirLight.Color.x); // Edit 3 floats representing a color
-		ImGui::DragFloat3("Dir Light Direction", (float*)& lightBuffer.DirLight.Direction, 0.1f, -1.f, 1.f);
-		ImGui::SliderFloat("Point Light Range", &lightBuffer.PointLight.Range, 0.0f, 100.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-		ImGui::DragFloat3("Point Light Pos", (float*)& lightBuffer.PointLight.Position.x, 0.1f);
-
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
-		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-		ImGui::End();
+		renderStage->Render(imageIndex, frameContext);
 	}
 
-
-	ImGui::Render();
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
 	PIXEndEvent(commandList);
 }
 
@@ -254,11 +224,13 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(0, 0);
+	auto hr = swapChain->Present(1, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
 	}
+
+	gpuMemory->Commit(deviceResources->GetCommandQueue());
 }
 
 Window* Renderer::GetWindow()
@@ -269,9 +241,10 @@ Window* Renderer::GetWindow()
 void Renderer::CleanUp()
 {
 	commandContext->CleanUp();
-	ImGui_ImplDX12_Shutdown();
-	ImGui_ImplWin32_Shutdown();
-	ImGui::DestroyContext();
+	for (auto& renderStage : renderStages)
+	{
+		renderStage->CleanUp();
+	}
 }
 
 void Renderer::EndInitialization()
@@ -345,7 +318,8 @@ void Renderer::CreateRootSignatures()
 	range[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[5];
-	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
+	//rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[RootSigCBVertex0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
@@ -415,4 +389,19 @@ void Renderer::WaitForPreviousFrame()
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	commandContext->WaitForFrame(backBufferIndex);
+}
+
+void Renderer::UpdateLightBuffer()
+{
+	auto ec = EngineContext::Context;
+	uint32 dirLightCount = 0;
+	uint32 pointLightCount = 0;
+	auto dirLights = ec->EntityManager->GetComponents<DirectionalLightComponent>(dirLightCount);
+	auto pointLights = ec->EntityManager->GetComponents<PointLightComponent>(pointLightCount);
+	lightBuffer.DirLight = dirLights[0].GetLight();
+
+	auto entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
+	lightBuffer.PointLight = pointLights[0].GetLight();
+	lightBuffer.PointLight.Position = *ec->EntityManager->GetTransform(entities[0]).Position;
+
 }

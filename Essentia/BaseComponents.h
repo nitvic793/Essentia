@@ -60,6 +60,11 @@ struct DirectionalLightComponent : public ILight
 		light.Intensity = intensity;
 		return light;
 	}
+
+	DirectionalLight GetLight()
+	{
+		return { Direction, Color };
+	}
 };
 
 struct PointLightComponent : public ILight
@@ -77,5 +82,10 @@ struct PointLightComponent : public ILight
 		light.Range = range;
 		light.Intensity = intensity;
 		return light;
+	}
+
+	PointLight GetLight()
+	{
+		return { {}, Intensity, Color, Range };
 	}
 };

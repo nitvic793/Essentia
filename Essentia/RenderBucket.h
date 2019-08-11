@@ -9,26 +9,27 @@
 struct MeshBucket
 {
 	MeshView			Mesh;
-	std::vector<uint32> CbIndices;
+	std::vector<uint32> CbIndices = {};
+	std::vector<D3D12_GPU_VIRTUAL_ADDRESS> vAddresses = {};
 };
 
 struct MaterialBucket
 {
 	Material Material;
-	std::unordered_map<uint32, MeshBucket> Instances;
+	std::unordered_map<uint32, MeshBucket> Instances = {};
 };
 
 struct PipelineBucket
 {
 	ID3D12PipelineState* PipelineStateObject;
-	std::unordered_map<uint32, MaterialBucket> Instances;
+	std::unordered_map<uint32, MaterialBucket> Instances = {};
 };
 
 struct RenderBucket
 {
 	std::unordered_map<PipelineStateID, PipelineBucket> Pipelines;
 
-	void Insert(const DrawableComponent& component)
+	void Insert(const DrawableComponent& component, D3D12_GPU_VIRTUAL_ADDRESS vAddress)
 	{
 		auto matHandle = component.Material;
 		auto meshHandle = component.Mesh;
@@ -57,7 +58,7 @@ struct RenderBucket
 
 		auto& meshBucket = matBucket.Instances[meshHandle.Id];
 		meshBucket.CbIndices.push_back(cbIndex);
-
+		meshBucket.vAddresses.push_back(vAddress);
 	}
 
 	void Clear()

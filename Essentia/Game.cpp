@@ -33,13 +33,24 @@ public:
 	{
 		entity = entityManager->CreateEntity();
 		entity2 = entityManager->CreateEntity();
+		lights[0] = entityManager->CreateEntity();
+		lights[1] = entityManager->CreateEntity();
+
+		XMFLOAT3 direction;
+		auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
+		XMStoreFloat3(&direction, dir);
+		entityManager->AddComponent<DirectionalLightComponent>(lights[0], DirectionalLightComponent::Create(direction, XMFLOAT3(0.9f, 0.9f, 0.9f)));
+
+		entityManager->AddComponent<PointLightComponent>(lights[1], PointLightComponent::Create(XMFLOAT3(0.9f,0.1f,0.1f)));
+		auto transform = GetTransform(lights[1]);
+		transform.Position->y = 3;
 		MaterialHandle mat = { 0 };
 		MeshHandle mesh = { 1 };
 		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cone.obj");
-		//auto m = Es::CreateModel("../../Assets/Models/sponza.fbx");
+
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
-		auto transform = GetTransform(entity2);
+		transform = GetTransform(entity2);
 		transform.Position->z = 4;
 		auto scale = XMFLOAT3(0.05f, 0.05f, 0.05f);
 		memcpy(transform.Scale, &scale, sizeof(scale));
@@ -59,6 +70,7 @@ public:
 private:
 	EntityHandle entity;
 	EntityHandle entity2;
+	EntityHandle lights[2];
 };
 
 class FreeCameraSystem : public ISystem
@@ -66,12 +78,15 @@ class FreeCameraSystem : public ISystem
 public:
 	void Initialize()
 	{
-
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override
 	{
+		bool debugNav = false;
+#ifdef _DEBUG
 		ImGuiIO& io = ImGui::GetIO();
+		debugNav = io.NavActive;
+#endif
 		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
 		auto dir = XMLoadFloat3(&camera->Direction);
 		auto pos = XMLoadFloat3(&camera->Position);
@@ -100,7 +115,7 @@ public:
 		float xDiff = 0;
 		float yDiff = 0;
 
-		if (mouse.leftButton && !io.NavActive) //Don't move if imgui is active
+		if (mouse.leftButton && !debugNav) //Don't move if imgui is active
 		{
 			xDiff = (float)(mouse.x - prevPos.x) * 0.005f;
 			yDiff = (float)(mouse.y - prevPos.y) * 0.005f;

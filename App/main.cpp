@@ -5,6 +5,7 @@
 #define NOMINMAX
 
 #include "../Essentia/Game.h"
+#include <dxgidebug.h>
 
 int main()
 {
@@ -25,9 +26,19 @@ int main()
 		}
 	}
 
-	Game game;
-	game.Setup();
-	game.Run();
+	Game *game = new Game();
+	game->Setup();
+	game->Run();
+	delete game;
+
+#ifdef _DEBUG
+	IDXGIDebug1* pDebug = nullptr;
+	if (SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&pDebug))))
+	{
+		pDebug->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_FLAGS(DXGI_DEBUG_RLO_SUMMARY | DXGI_DEBUG_RLO_IGNORE_INTERNAL));
+		pDebug->Release();
+	}
+#endif
 
 	return 0;
 }
