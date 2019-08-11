@@ -41,30 +41,38 @@ struct DrawableComponent
 	}
 };
 
-struct LightComponent
+struct ILight {};
+
+struct DirectionalLightComponent : public ILight
 {
-	GComponent(LightComponent)
+	GComponent(DirectionalLightComponent)
 
 	DirectX::XMFLOAT3	Color;
 	float				Intensity;
 	DirectX::XMFLOAT3	Direction;
-	LightType			LightType;
-	float				Range;
+	float				Padding;
 
-	static LightComponent CreateDirectional(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& color = DirectX::XMFLOAT3(1, 1, 1), float intensity = 1.f)
+	static DirectionalLightComponent Create(const DirectX::XMFLOAT3& direction, const DirectX::XMFLOAT3& color = DirectX::XMFLOAT3(1, 1, 1), float intensity = 1.f)
 	{
-		LightComponent light;
-		light.LightType = LightType::Directional;
+		DirectionalLightComponent light;
 		light.Color = color;
 		light.Direction = direction;
 		light.Intensity = intensity;
 		return light;
 	}
+};
 
-	static LightComponent CreatePoint(const DirectX::XMFLOAT3& color = DirectX::XMFLOAT3(1, 1, 1), float intensity = 1.f, float range = 5.f)
+struct PointLightComponent : public ILight
+{
+	GComponent(PointLightComponent)
+	DirectX::XMFLOAT3	Color;
+	float				Intensity;
+	float				Range;
+	float				Padding[3];
+
+	static PointLightComponent Create(const DirectX::XMFLOAT3& color = DirectX::XMFLOAT3(1, 1, 1), float intensity = 1.f, float range = 5.f)
 	{
-		LightComponent light;
-		light.LightType = LightType::Point;
+		PointLightComponent light;
 		light.Color = color;
 		light.Range = range;
 		light.Intensity = intensity;

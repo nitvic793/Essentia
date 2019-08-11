@@ -6,19 +6,6 @@
 #include <unordered_map>
 #include "EntityBase.h"
 
-
-struct TestComponent : public IComponent
-{
-	float test;
-	GComponent(TestComponent)
-};
-
-struct SpeedComponent : public IComponent
-{
-	GComponent(SpeedComponent)
-		float Speed;
-};
-
 class ComponentPoolBase
 {
 public:
