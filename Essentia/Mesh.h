@@ -36,6 +36,8 @@ public:
 	MeshHandle		CreateMesh(const MeshData& meshData, MeshView& meshView);
 	void			Initialize(CommandContext* commandContext);
 	const MeshView& GetMeshView(MeshHandle handle);
+	const MeshView& GetMeshView(const char* filename); //WARNING: Lazy loads the mesh
+	MeshHandle		GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
 private:
 	MeshManager() {};
 	CommandContext*								context = nullptr;
@@ -43,6 +45,7 @@ private:
 	std::vector<MeshBuffer>						buffers;
 	std::vector<MeshView>						views;
 	std::vector<DirectX::BoundingOrientedBox>	bounds;
+	std::unordered_map<StringID, uint32_t>		meshMap;
 	friend class Renderer;
 };
 

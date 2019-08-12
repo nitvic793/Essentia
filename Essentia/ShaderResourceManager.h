@@ -12,7 +12,6 @@ namespace Default
 	constexpr PipelineStateID	DefaultMaterialPSO = 0;
 }
 
-
 class DeviceResources;
 class ResourceManager;
 class FrameManager;
@@ -27,7 +26,10 @@ public:
 	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
 	TextureID			CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr);
 	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
+	
 	const Material&		GetMaterial(MaterialHandle handle);
+	MaterialHandle		GetMaterialHandle(StringID material);
+	TextureID			GetTexture(StringID texture);
 	TextureID			RequestUninitializedTexture();
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);

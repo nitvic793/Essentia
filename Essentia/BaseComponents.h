@@ -89,3 +89,24 @@ struct PointLightComponent : public ILight
 		return { {}, Intensity, Color, Range };
 	}
 };
+
+struct SkyboxComponent
+{
+	GComponent(SkyboxComponent)
+	TextureID			CubeMap;
+	ConstantBufferView	CBView;
+
+	static SkyboxComponent Create(const char* skyboxFileName, TextureType type = DDS)
+	{
+		SkyboxComponent component;
+		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		component.CubeMap = Es::CreateTexture(skyboxFileName, type);
+		return component;
+	}
+};
+
+//TODO: Make camera part of Component System 
+struct CameraComponent
+{
+
+};

@@ -22,7 +22,7 @@ float4 main(PixelInput input) : SV_TARGET
 	float3 color = texColor.rgb;
 
 	float3 output = light * color;
-	output = pow(abs(output), 1.f / 2.2f); 
+	output = lerp(output, pow(abs(output), 1.f / 2.2f), 0.4f); 
 
 	return float4(output, 1.0f);
 }

@@ -44,6 +44,13 @@ public:
 	ID3D12GraphicsCommandList*	GetDefaultCommandList();
 	ID3D12Device*				GetDevice();
 	MeshManager*				GetMeshManager();
+	RenderTargetID				GetCurrentRenderTarget() const;
+	DepthStencilID				GetCurrentDepthStencil() const;
+	ID3D12RootSignature*		GetDefaultRootSignature() const;
+	DXGI_FORMAT					GetRenderTargetFormat() const;
+	DXGI_FORMAT					GetDepthStencilFormat() const;
+	const GPUHeapOffsets&		GetHeapOffsets() const;
+	FrameManager*				GetFrameManager() const;
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();

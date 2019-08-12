@@ -7,9 +7,9 @@ class Timer;
 
 struct FrameContext
 {
-	Camera* Camera;
-	Timer* timer;
+	Camera*								Camera;
+	Timer*								Timer;
 	std::vector<DirectX::XMFLOAT4X4>	WorldMatrices;
-	DrawableComponent* Drawables;
+	DrawableComponent*					Drawables;
 	uint32								DrawableCount;
 };

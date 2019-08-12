@@ -158,7 +158,8 @@ inline T* ComponentManager::GetComponent(EntityHandle entity)
 template<typename T>
 inline T* ComponentManager::GetAllComponents(uint32& count)
 {
-	return (T*)pools[T::Type]->GetAllComponents(count);
+	auto pool = GetOrCreatePool<T>();
+	return (T*)pool->GetAllComponents(count);
 }
 
 template<typename T>

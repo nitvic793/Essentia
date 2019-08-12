@@ -35,7 +35,8 @@ public:
 		entity2 = entityManager->CreateEntity();
 		lights[0] = entityManager->CreateEntity();
 		lights[1] = entityManager->CreateEntity();
-
+		skybox = entityManager->CreateEntity();
+		entityManager->AddComponent<SkyboxComponent>(skybox, SkyboxComponent::Create("../../Assets/Textures/SunnyCubeMap.dds"));
 		XMFLOAT3 direction;
 		auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 		XMStoreFloat3(&direction, dir);
@@ -45,7 +46,7 @@ public:
 		auto transform = GetTransform(lights[1]);
 		transform.Position->y = 3;
 		MaterialHandle mat = { 0 };
-		MeshHandle mesh = { 1 };
+		MeshHandle mesh = { 2 };
 		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cone.obj");
 
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
@@ -71,6 +72,7 @@ private:
 	EntityHandle entity;
 	EntityHandle entity2;
 	EntityHandle lights[2];
+	EntityHandle skybox;
 };
 
 class FreeCameraSystem : public ISystem

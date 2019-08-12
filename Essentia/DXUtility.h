@@ -6,6 +6,19 @@
 #include "ResourceManager.h"
 #include <string>
 
+#ifndef _DEBUG
+#define Assert(condition, message) 0
+#else
+#define Assert(condition, message)\
+   (!(condition)) ?\
+      (std::cerr << "Assertion failed: (" << #condition << "), "\
+      << "function " << __FUNCTION__\
+      << ", file " << __FILE__\
+      << ", line " << __LINE__ << "."\
+      << std::endl << message << std::endl, abort(), 0) : 1
+#endif
+
+
 #define SafeRelease(comObj) if(comObj) comObj->Release();
 
 constexpr uint64 AlignmentSize = 256;

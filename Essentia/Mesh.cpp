@@ -9,7 +9,9 @@ using namespace Microsoft::WRL;
 MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 {
 	auto meshData = ModelLoader::Load(filename);
-	return CreateMesh(meshData, meshView);
+	auto handle = CreateMesh(meshData, meshView);
+	meshMap[String::ID(filename.c_str())] = handle.Id;
+	return handle;
 }
 
 MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
@@ -116,6 +118,30 @@ void MeshManager::Initialize(CommandContext* commandContext)
 const MeshView& MeshManager::GetMeshView(MeshHandle handle)
 {
 	return views[handle.Id];
+}
+
+const MeshView& MeshManager::GetMeshView(const char* filename)
+{
+	auto strId = String::ID(filename);
+	MeshView view;
+	if (meshMap.find(strId) == meshMap.end())
+	{
+		CreateMesh(filename, view);
+	}
+
+	return GetMeshView({ meshMap[strId] });
+}
+
+MeshHandle MeshManager::GetMeshHandle(const char* filename)
+{
+	auto strId = String::ID(filename);
+	MeshView view;
+	if (meshMap.find(strId) == meshMap.end())
+	{
+		return CreateMesh(filename, view);
+	}
+
+	return { meshMap[strId] };
 }
 
 void ModelManager::Initialize(ShaderResourceManager* srManager)

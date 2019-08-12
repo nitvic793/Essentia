@@ -196,6 +196,16 @@ const Material& ShaderResourceManager::GetMaterial(MaterialHandle handle)
 	return materials[handle.Index];
 }
 
+MaterialHandle ShaderResourceManager::GetMaterialHandle(StringID material)
+{
+	return materialMap[material];
+}
+
+TextureID ShaderResourceManager::GetTexture(StringID texture)
+{
+	return textureMap[texture];
+}
+
 TextureID ShaderResourceManager::RequestUninitializedTexture()
 {
 	TextureID texIndex = textureCount;

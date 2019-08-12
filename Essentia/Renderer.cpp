@@ -14,6 +14,7 @@
 #include "imgui_impl_dx12.h"
 #include "Entity.h"
 #include "ImguiRenderStage.h"
+#include "SkyBoxRenderStage.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -84,6 +85,7 @@ void Renderer::Initialize()
 	ec->ModelManager = &modelManager;
 
 	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new MainPassRenderStage()));
+	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new SkyBoxRenderStage()));
 	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new ImguiRenderStage()));
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
@@ -184,17 +186,17 @@ void Renderer::Render(const FrameContext& frameContext)
 				auto mesh = meshes.second.Mesh;
 				commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
 				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-				/*for (uint32 cbIndex : meshes.second.CbIndices)
+				for (uint32 cbIndex : meshes.second.CbIndices)
 				{
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
 					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
-				}*/
+				}
 
-				for (uint64 address : meshes.second.vAddresses)
+				/*for (uint64 address : meshes.second.vAddresses)
 				{
 					commandList->SetGraphicsRootConstantBufferView(RootSigCBVertex0, address);
 					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
-				}
+				}*/
 			}
 		}
 	}
@@ -297,6 +299,41 @@ MeshManager* Renderer::GetMeshManager()
 	return meshManager.get();
 }
 
+RenderTargetID Renderer::GetCurrentRenderTarget() const
+{
+	return renderTargets[backBufferIndex];
+}
+
+DepthStencilID Renderer::GetCurrentDepthStencil() const
+{
+	return depthStencilId;
+}
+
+ID3D12RootSignature* Renderer::GetDefaultRootSignature() const
+{
+	return resourceManager->GetRootSignature(mainRootSignatureID);
+}
+
+DXGI_FORMAT Renderer::GetRenderTargetFormat() const
+{
+	return renderTargetFormat;
+}
+
+DXGI_FORMAT Renderer::GetDepthStencilFormat() const
+{
+	return depthFormat;
+}
+
+const GPUHeapOffsets& Renderer::GetHeapOffsets() const
+{
+	return offsets;
+}
+
+FrameManager* Renderer::GetFrameManager() const
+{
+	return frameManager.get();
+}
+
 void Renderer::InitializeCommandContext()
 {
 	commandContext = std::unique_ptr<CommandContext>(new CommandContext());
@@ -318,8 +355,8 @@ void Renderer::CreateRootSignatures()
 	range[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[5];
-	//rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
-	rootParameters[RootSigCBVertex0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
+	//rootParameters[RootSigCBVertex0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
@@ -352,8 +389,8 @@ void Renderer::CreatePSOs()
 	sampleDesc.Count = 1;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
-	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::GetDefaultLayout().data();
+	psoDesc.InputLayout.NumElements = (uint32)InputLayout::GetDefaultLayout().size();
 	psoDesc.pRootSignature = resourceManager->GetRootSignature(mainRootSignatureID);
 	psoDesc.VS = vertexShaderBytecode;
 	psoDesc.PS = pixelShaderBytecode;
@@ -403,5 +440,4 @@ void Renderer::UpdateLightBuffer()
 	auto entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
 	lightBuffer.PointLight = pointLights[0].GetLight();
 	lightBuffer.PointLight.Position = *ec->EntityManager->GetTransform(entities[0]).Position;
-
 }
