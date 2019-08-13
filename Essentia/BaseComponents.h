@@ -24,7 +24,9 @@ struct ScaleComponent
 	DirectX::XMFLOAT3 Scale;
 };
 
-struct DrawableComponent
+struct IDrawable {};
+
+struct DrawableComponent : public IDrawable
 {
 	GComponent(DrawableComponent)
 	MeshHandle			Mesh;
@@ -40,6 +42,13 @@ struct DrawableComponent
 		return component;
 	}
 };
+
+// To support models with inbuilt textures/materials
+struct DrawableModelComponent : public IDrawable
+{
+	GComponent(DrawableModelComponent)
+	ModelHandle Model;
+}
 
 struct ILight {};
 
