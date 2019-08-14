@@ -48,7 +48,7 @@ struct DrawableModelComponent : public IDrawable
 {
 	GComponent(DrawableModelComponent)
 	ModelHandle Model;
-}
+};
 
 struct ILight {};
 

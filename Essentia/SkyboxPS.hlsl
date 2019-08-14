@@ -12,7 +12,7 @@ struct VertexToPixelSky
 float4 main(VertexToPixelSky input) : SV_TARGET
 {
 	float3 finalColor = Sky.Sample(BasicSampler, input.UVW).rgb;
-	finalColor = finalColor / (finalColor + float3(1.f, 1.f, 1.f));
+	//finalColor = finalColor / (finalColor + float3(1.f, 1.f, 1.f));
 	float3 gammaCorrect = lerp(finalColor, pow(finalColor, 1.0 / 2.2), 0.8f);
 	return float4(finalColor, 0.f);
 }
