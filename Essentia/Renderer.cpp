@@ -143,14 +143,27 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto drawables = frameContext.Drawables;
 	auto drawCount = frameContext.DrawableCount;
 	auto imageIndex = backBufferIndex;
+	uint32 drawableModelCount;
+	auto drawableModels = frameContext.EntityManager->GetComponents<DrawableModelComponent>(drawableModelCount);
+	auto entities = frameContext.EntityManager->GetEntities<DrawableModelComponent>(drawableModelCount);
+	std::vector<XMFLOAT4X4> modelWorlds;
+	modelWorlds.reserve(drawableModelCount);
+	frameContext.EntityManager->GetTransposedWorldMatrices(entities, drawableModelCount, modelWorlds);
 
 	//Copy world matrix to constant buffer
-	for (size_t i = 0; i < worlds.size(); ++i)
+	for (size_t i = 0; i < drawCount; ++i)
 	{
 		perObject.World = worlds[i];
-		auto resource = gpuMemory->AllocateConstant(perObject);
+		//auto resource = gpuMemory->AllocateConstant(perObject);
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
-		renderBucket.Insert(drawables[i], resource.GpuAddress());
+		renderBucket.Insert(drawables[i], 0);
+	}
+
+	for (size_t i = 0; i < drawableModelCount; ++i)
+	{
+		perObject.World = modelWorlds[i];
+		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawableModels[i].CBView.Offset);
+		//renderBucket.Insert(drawableModels[i]);
 	}
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
@@ -191,24 +204,23 @@ void Renderer::Render(const FrameContext& frameContext)
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
 					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
 				}
-
-				/*for (uint64 address : meshes.second.vAddresses)
-				{
-					commandList->SetGraphicsRootConstantBufferView(RootSigCBVertex0, address);
-					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
-				}*/
 			}
 		}
 	}
 
-	auto model = modelManager.GetModel({ 0 });
-	for (uint32 i = 0; i < model.Meshes.size(); ++i)
+	for (size_t i = 0; i < drawableModelCount; ++i)
 	{
-		auto mesh = model.Meshes[i];
-		auto materialHandle = model.Materials[i];
-		auto material = shaderResourceManager->GetMaterial(materialHandle);
-		commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
-		DrawMesh(mesh);
+		auto& model = modelManager.GetModel(drawableModels[i].Model);
+		auto size = model.Meshes.size();
+		for (uint32 meshIndex = 0; meshIndex < size; ++meshIndex)
+		{
+			auto mesh = model.Meshes[meshIndex];
+			auto materialHandle = model.Materials[meshIndex];
+			auto material = shaderResourceManager->GetMaterial(materialHandle);
+			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
+			commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + drawableModels[i].CBView.Index));
+			DrawMesh(mesh);
+		}
 	}
 
 	for (auto& renderStage : renderStages)
@@ -226,13 +238,13 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(1, 0);
+	auto hr = swapChain->Present(0, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
 	}
 
-	gpuMemory->Commit(deviceResources->GetCommandQueue());
+	//gpuMemory->Commit(deviceResources->GetCommandQueue());
 }
 
 Window* Renderer::GetWindow()
@@ -280,7 +292,7 @@ void Renderer::DrawMesh(const MeshView& meshView)
 void Renderer::DrawMesh(MeshHandle mesh)
 {
 	auto commandList = commandContext->GetDefaultCommandList();
-	auto meshView = meshManager->GetMeshView(mesh);
+	auto& meshView = meshManager->GetMeshView(mesh);
 	DrawMesh(meshView);
 }
 
@@ -389,8 +401,8 @@ void Renderer::CreatePSOs()
 	sampleDesc.Count = 1;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-	psoDesc.InputLayout.pInputElementDescs = InputLayout::GetDefaultLayout().data();
-	psoDesc.InputLayout.NumElements = (uint32)InputLayout::GetDefaultLayout().size();
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
 	psoDesc.pRootSignature = resourceManager->GetRootSignature(mainRootSignatureID);
 	psoDesc.VS = vertexShaderBytecode;
 	psoDesc.PS = pixelShaderBytecode;

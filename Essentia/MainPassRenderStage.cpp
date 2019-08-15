@@ -9,6 +9,7 @@ void MainPassRenderStage::Initialize()
 
 void MainPassRenderStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
 {
+
 }
 
 void MainPassRenderStage::Clear()

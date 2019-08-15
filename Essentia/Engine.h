@@ -29,5 +29,6 @@ namespace Es
 
 	const Material&			GetMaterial(MaterialHandle handle);
 	const MeshView&			GetMeshView(MeshHandle handle);
+	const Model&			GetModel(ModelHandle handle);
 	ID3D12PipelineState*	GetPSO(PipelineStateID psoID);
 }

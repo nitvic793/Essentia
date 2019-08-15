@@ -74,6 +74,12 @@ const MeshView& Es::GetMeshView(MeshHandle handle)
 	return ec->MeshManager->GetMeshView(handle);
 }
 
+const Model& Es::GetModel(ModelHandle handle)
+{
+	auto ec = EngineContext::Context;
+	return ec->ModelManager->GetModel(handle);
+}
+
 ID3D12PipelineState* Es::GetPSO(PipelineStateID psoID)
 {
 	auto ec = EngineContext::Context;

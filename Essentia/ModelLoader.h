@@ -16,6 +16,8 @@ struct MeshMaterial
 {
 	std::string Diffuse;
 	std::string Normal;
+	std::string Roughness;
+	std::string Metalness;
 };
 
 struct ModelData

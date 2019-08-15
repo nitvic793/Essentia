@@ -6,6 +6,59 @@
 #include "BaseComponents.h"
 #include "Engine.h"
 
+template<typename Key, typename Val>
+class CustomMap
+{
+
+};
+
+constexpr uint32 CMinVectorSize = 32;
+
+template<typename T>
+class Vector
+{
+public:
+	Vector(uint32 count = CMinVectorSize) 
+	{
+		capacity = count;
+		buffer = Mem::Alloc(sizeof(T) * capacity);
+	}
+
+	void Push(const T& value)
+	{
+		currentIndex++;
+		buffer[currentIndex] = value;
+	}
+
+	const T& Pop()
+	{
+		auto val = buffer[currentIndex];
+		currentIndex--;
+		return val;
+	}
+
+	const T& operator[](uint32 index)
+	{
+		return buffer[index];
+	}
+
+	size_t Size()
+	{
+		return currentIndex + 1;
+	}
+
+	~Vector()
+	{
+		Mem::Free(buffer);
+	}
+
+private:
+	T* buffer;
+	int32 currentIndex = -1;
+	int32 capacity;
+
+};
+
 struct MeshBucket
 {
 	MeshView			Mesh;
@@ -42,23 +95,64 @@ struct RenderBucket
 		if (Pipelines.find(material.PipelineID) == Pipelines.end())
 		{
 			Pipelines[material.PipelineID] = { pso };
+			Pipelines[material.PipelineID].Instances.reserve(512);
 		}
 
 		PipelineBucket& bucket = Pipelines[material.PipelineID];
 		if (bucket.Instances.find(matHandle.Index) == bucket.Instances.end())
 		{
 			bucket.Instances[matHandle.Index] = { material };
+			bucket.Instances[matHandle.Index].Instances.reserve(128);
 		}
 
 		MaterialBucket& matBucket = bucket.Instances[matHandle.Index];
 		if (matBucket.Instances.find(meshHandle.Id) == matBucket.Instances.end())
 		{
 			matBucket.Instances[meshHandle.Id] = { meshView };
+			matBucket.Instances[meshHandle.Id].CbIndices.reserve(128);
 		}
 
 		auto& meshBucket = matBucket.Instances[meshHandle.Id];
 		meshBucket.CbIndices.push_back(cbIndex);
 		meshBucket.vAddresses.push_back(vAddress);
+	}
+
+	void Insert(const DrawableModelComponent& component)
+	{
+		auto modelHandle = component.Model;
+		auto& model = Es::GetModel(modelHandle);
+		auto cbIndex = component.CBView.Index;
+
+		auto count = model.Meshes.size();
+		for (size_t i = 0; i < count; ++i)
+		{
+			auto meshHandle = model.Meshes[i];
+			auto matHandle = model.Materials[i];
+			auto meshView = Es::GetMeshView(model.Meshes[i]);
+			auto material = Es::GetMaterial(model.Materials[i]);
+			ID3D12PipelineState* pso = Es::GetPSO(material.PipelineID);
+
+			if (Pipelines.find(material.PipelineID) == Pipelines.end())
+			{
+				Pipelines[material.PipelineID] = { pso };
+			}
+
+			PipelineBucket& bucket = Pipelines[material.PipelineID];
+			if (bucket.Instances.find(matHandle.Index) == bucket.Instances.end())
+			{
+				bucket.Instances[matHandle.Index] = { material };
+			}
+
+			MaterialBucket& matBucket = bucket.Instances[matHandle.Index];
+			if (matBucket.Instances.find(meshHandle.Id) == matBucket.Instances.end())
+			{
+				matBucket.Instances[meshHandle.Id] = { meshView };
+			}
+
+			auto& meshBucket = matBucket.Instances[meshHandle.Id];
+			meshBucket.CbIndices.push_back(cbIndex);
+			//meshBucket.vAddresses.push_back(vAddress);
+		}
 	}
 
 	void Clear()

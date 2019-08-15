@@ -19,6 +19,7 @@ float4 main(PixelInput input) : SV_TARGET
 
 	float3 light = CalculateDirectionalLight(normal, DirLight) + CalculatePointLight(normal, CameraPosition, input.WorldPos, PointLights);
 	float4 texColor = AlbedoTexture.Sample(BasicSampler, input.UV);
+	clip(texColor.a - 0.2f);
 	float3 color = texColor.rgb;
 
 	float3 output = light * color;

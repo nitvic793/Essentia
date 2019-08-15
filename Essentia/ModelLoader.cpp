@@ -204,6 +204,8 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 			auto c = mat->mNumProperties;
 			aiString diffuseTexture;
 			aiString normalTexture;
+			aiString roughnessTexture;
+			aiString metalnessTexture;
 			MeshMaterial mMat;
 			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &diffuseTexture) == aiReturn_SUCCESS)
 			{
@@ -215,6 +217,17 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 				mMat.Normal = normalTexture.C_Str();
 			}
 
+			if (mat->GetTexture(aiTextureType_SPECULAR, 0, &roughnessTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Roughness = roughnessTexture.C_Str();
+			}
+
+			if (mat->GetTexture(aiTextureType_AMBIENT, 0, &metalnessTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Metalness = metalnessTexture.C_Str();
+			}
+
+		
 			materials[i] = mMat;
 		}
 

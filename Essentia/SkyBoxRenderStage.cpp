@@ -29,8 +29,8 @@ void SkyBoxRenderStage::Initialize()
 
 	descPipelineState.VS = ShaderManager::LoadShader(L"SkyboxVS.cso");
 	descPipelineState.PS = ShaderManager::LoadShader(L"SkyboxPS.cso");
-	descPipelineState.InputLayout.pInputElementDescs = InputLayout::GetDefaultLayout().data();
-	descPipelineState.InputLayout.NumElements = (uint32)InputLayout::GetDefaultLayout().size();
+	descPipelineState.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	descPipelineState.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
 	descPipelineState.pRootSignature = renderer->GetDefaultRootSignature();
 	descPipelineState.DepthStencilState = depthStencilState;
 	descPipelineState.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);

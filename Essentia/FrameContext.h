@@ -12,4 +12,5 @@ struct FrameContext
 	std::vector<DirectX::XMFLOAT4X4>	WorldMatrices;
 	DrawableComponent*					Drawables;
 	uint32								DrawableCount;
+	EntityManager*						EntityManager;
 };

@@ -47,7 +47,16 @@ struct DrawableComponent : public IDrawable
 struct DrawableModelComponent : public IDrawable
 {
 	GComponent(DrawableModelComponent)
-	ModelHandle Model;
+	ModelHandle			Model;
+	ConstantBufferView	CBView;
+
+	static DrawableModelComponent Create(ModelHandle model)
+	{
+		DrawableModelComponent component;
+		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		component.Model = model;
+		return component;
+	}
 };
 
 struct ILight {};

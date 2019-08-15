@@ -33,6 +33,7 @@ public:
 	{
 		entity = entityManager->CreateEntity();
 		entity2 = entityManager->CreateEntity();
+		auto e = entityManager->CreateEntity();
 		lights[0] = entityManager->CreateEntity();
 		lights[1] = entityManager->CreateEntity();
 		skybox = entityManager->CreateEntity();
@@ -51,7 +52,8 @@ public:
 
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
-		transform = GetTransform(entity2);
+		entityManager->AddComponent<DrawableModelComponent>(e, DrawableModelComponent::Create({ 0 }));
+		transform = GetTransform(e);
 		transform.Position->z = 4;
 		auto scale = XMFLOAT3(0.05f, 0.05f, 0.05f);
 		memcpy(transform.Scale, &scale, sizeof(scale));
@@ -132,7 +134,7 @@ public:
 	}
 
 	DirectX::XMFLOAT2 prevPos = {};
-	float Speed = 10.f;
+	float Speed = 20.f;
 };
 
 
@@ -197,6 +199,7 @@ void Game::Render()
 	frameContext.WorldMatrices.reserve(count);
 	entityManager.GetTransposedWorldMatrices(entities, count, frameContext.WorldMatrices);
 	frameContext.Drawables = entityManager.GetComponents<DrawableComponent>(frameContext.DrawableCount);
+	frameContext.EntityManager = &entityManager;
 
 	renderer->Clear();
 	renderer->Render(frameContext);
