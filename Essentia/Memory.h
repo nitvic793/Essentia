@@ -8,51 +8,60 @@ class IAllocator
 {
 public:
 	virtual void* Alloc(size_t size) = 0;
+	virtual void Free(byte* buffer) = 0;
+};
+
+class SystemHeapAllocator : public IAllocator
+{
+public:
+	static const SystemHeapAllocator& Get()
+	{
+		static SystemHeapAllocator allocator = SystemHeapAllocator();
+		return allocator;
+	}
+
+	virtual void* Alloc(size_t size) override;
+	virtual void Free(byte* buffer) override;
 };
 
 class StackAllocator : public IAllocator
 {
 public:
 	static StackAllocator* Instance;
-	explicit StackAllocator(size_t sizeInBytes)
+	explicit StackAllocator(size_t sizeInBytes, IAllocator* allocator = nullptr)
 	{
+		if (!allocator)
+		{
+			allocator = (IAllocator*)&SystemHeapAllocator::Get();
+		}
+		parent = allocator;
 		Instance = this;
-		buffer = new byte[sizeInBytes];
+		buffer = (byte*)allocator->Alloc(sizeInBytes);
 		current = buffer;
 		totalSize = sizeInBytes;
+		marker = buffer;
 	}
 
-	virtual void* Alloc(size_t size)
+	virtual void* Alloc(size_t size) override
 	{
 		byte* alloc = current;
 		current += size;
 		return alloc;
 	}
 
-	template<typename T, typename ...Args>
-	T* Alloc(Args&&... args)
-	{
-		auto alloc = Alloc(sizeof(T));
-		return new(alloc) T(std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	T* Alloc(size_t count)
-	{
-		auto alloc = Alloc(sizeof(T) * count);
-		return (T*)alloc;
-	}
-
-	void Free(byte* buff)
+	virtual void Free(byte* buff) override
 	{
 		current = buff;
 	}
 
-	template<typename T>
-	void Free(T* buff)
+	void Push()
 	{
-		buff->~T();
-		Free((byte*)buff);
+		marker = current;
+	}
+
+	void Pop()
+	{
+		current = marker;
 	}
 
 	void Clear()
@@ -62,35 +71,131 @@ public:
 
 	~StackAllocator()
 	{
-		delete[] buffer;
+		parent->Free(buffer);
+	}
+
+	static StackAllocator* GetInstance()
+	{
+		return Instance;
 	}
 
 private:
 	byte* buffer = nullptr;
 	byte* current = nullptr;
+	byte* marker = nullptr;
 	size_t totalSize = 0;
+	IAllocator* parent = nullptr;
 };
 
 namespace Mem
 {
-	void*	Alloc(size_t sizeInBytes);
+	void* Alloc(size_t sizeInBytes);
 	void	Free(void* buffer);
+
+	template<typename T, typename ...Args>
+	T* Alloc(Args&& ... args)
+	{
+		auto alloc = Alloc(sizeof(T));
+		return new(alloc) T(std::forward<Args>(args)...);
+	}
+
+	template<typename T>
+	T* AllocArray(size_t count)
+	{
+		auto alloc = Alloc(sizeof(T) * count);
+		return (T*)alloc;
+	}
+
+	template<typename T>
+	void Free(T* buff)
+	{
+		buff->~T();
+		Free((byte*)buff);
+	}
 }
 
+
 template<typename T>
-struct Deleter
+class ScopedPtr
 {
-	void operator()(T* buffer)
+public:
+	explicit ScopedPtr(T* p)
 	{
-		StackAllocator::Instance->Free(buffer);
+		ptr = p;
 	}
+
+	ScopedPtr(ScopedPtr&& p)
+	{
+		*this = p;
+		p.ptr = nullptr;
+	}
+
+	ScopedPtr& operator=(const ScopedPtr& rhs) 
+	{
+		ptr = rhs.ptr;
+		return *this;
+	}
+
+	ScopedPtr& operator=(ScopedPtr&& rhs) 
+	{
+		*this = rhs;
+		rhs.ptr = nullptr;
+		return *this;
+	}
+
+	ScopedPtr() {}
+
+	T& operator * () { return *ptr; }
+	T* operator -> () { return ptr; }
+	T* operator -> () const { return ptr; }
+	T* Get() { return ptr; }
+	T* Get() const { return ptr; }
+	//For compatibility
+	T* get() { return ptr; }
+	T* get() const { return ptr; }
+
+	~ScopedPtr()
+	{
+		if (ptr)
+		{
+			ptr->~T();
+			ptr = nullptr;
+		}
+	}
+private:
+	T* ptr = nullptr;
 };
 
 template<typename T>
-using UniquePtr = std::unique_ptr<T, Deleter<T>>;
-
-template<class T, typename ...Args> 
-UniquePtr<T> MakeUnique(Args&&... args)
+static ScopedPtr<T> MakeScoped()
 {
-	return std::unique_ptr<T, Deleter<T>>(StackAllocator::Instance->Alloc<T>(std::forward<Args>(args)...));
+	auto allocator = StackAllocator::GetInstance();
+	return MakeScoped<T>(allocator);
+}
+
+template<typename T>
+static ScopedPtr<T> MakeScoped(IAllocator* allocator)
+{
+	auto alloc = allocator->Alloc(sizeof(T));
+	T* p = new(alloc) T();
+	ScopedPtr<T> ptr(p);
+	return ptr;
+}
+
+template<typename T, typename ...Args>
+static ScopedPtr<T> MakeScopedArgs(Args&& ... args)
+{
+	auto allocator = StackAllocator::GetInstance();
+	auto alloc = allocator->Alloc(sizeof(T));
+	ScopedPtr<T> ptr(new(alloc) T(std::forward<Args>(args)...));
+	return ptr;
+//	return MakeScopedArgsAlloc(std::forward<Args>(args)..., allocator);
+}
+
+template<typename T, typename ...Args>
+static ScopedPtr<T> MakeScopedArgsAlloc(Args&&... args, IAllocator* allocator)
+{
+	auto alloc = allocator->Alloc(sizeof(T));
+	ScopedPtr<T> ptr(new(alloc) T(std::forward<Args>(args)...));
+	return ptr;
 }

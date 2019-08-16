@@ -28,12 +28,12 @@ void Renderer::Initialize()
 	depthFormat = DXGI_FORMAT_D32_FLOAT;
 
 	window = std::unique_ptr<Window>(new Window());
-	deviceResources = std::unique_ptr<DeviceResources>(new DeviceResources());
-	renderTargetManager = std::unique_ptr<RenderTargetManager>(new RenderTargetManager());
-	resourceManager = std::unique_ptr<ResourceManager>(new ResourceManager());
-	meshManager = std::unique_ptr<MeshManager>(new MeshManager());
-	shaderResourceManager = std::unique_ptr<ShaderResourceManager>(new ShaderResourceManager());
-	frameManager = std::unique_ptr<FrameManager>(new FrameManager());
+	deviceResources = ScopedPtr<DeviceResources>(Allocate<DeviceResources>());
+	renderTargetManager = ScopedPtr<RenderTargetManager>(Allocate<RenderTargetManager>());
+	resourceManager = ScopedPtr<ResourceManager>(Allocate<ResourceManager>());
+	meshManager = ScopedPtr<MeshManager>(Allocate<MeshManager>());
+	shaderResourceManager = ScopedPtr<ShaderResourceManager>(Allocate<ShaderResourceManager>());
+	frameManager = ScopedPtr<FrameManager>(Allocate<FrameManager>());
 
 	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
@@ -41,7 +41,7 @@ void Renderer::Initialize()
 	device = deviceResources->GetDevice();
 	renderTargetManager->Initialize(device);
 	resourceManager->Initialize(device);
-	gpuMemory = std::make_unique<GraphicsMemory>(device);
+	gpuMemory = MakeScopedArgs<GraphicsMemory>(device);
 
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
@@ -84,9 +84,9 @@ void Renderer::Initialize()
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
 
-	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new MainPassRenderStage()));
-	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new SkyBoxRenderStage()));
-	renderStages.push_back(std::unique_ptr<IRenderStage>((IRenderStage*)new ImguiRenderStage()));
+	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
+	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
+	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);

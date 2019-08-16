@@ -59,6 +59,9 @@ private:
 	void WaitForPreviousFrame();
 	void UpdateLightBuffer();
 
+	template<typename T>
+	T* Allocate();
+
 	int32			width;
 	int32			height;
 	uint32			backBufferIndex;
@@ -82,20 +85,26 @@ private:
 	GPUHeapOffsets		offsets;
 	Material			material;
 
-	ModelManager								modelManager;
-	std::vector<std::unique_ptr<IRenderStage>>	renderStages;
-	DescriptorHeap								imguiHeap;
+	ModelManager							modelManager;
+	std::vector<ScopedPtr<IRenderStage>>	renderStages;
+	DescriptorHeap							imguiHeap;
 	std::unique_ptr<Window>						window;
-	std::unique_ptr<DeviceResources>			deviceResources;
-	std::unique_ptr<ResourceManager>			resourceManager;
-	std::unique_ptr<RenderTargetManager>		renderTargetManager;
-	std::unique_ptr<MeshManager>				meshManager;
-	std::unique_ptr<ShaderResourceManager>		shaderResourceManager;
-	std::unique_ptr<FrameManager>				frameManager;
-	std::unique_ptr<DirectX::GraphicsMemory>	gpuMemory;
-	std::vector<RenderTargetID>					renderTargets;
-	Microsoft::WRL::ComPtr<ID3D12Resource>		renderTargetBuffers[CFrameBufferCount];
+	ScopedPtr<DeviceResources>				deviceResources;
+	ScopedPtr<ResourceManager>				resourceManager;
+	ScopedPtr<RenderTargetManager>			renderTargetManager;
+	ScopedPtr<MeshManager>					meshManager;
+	ScopedPtr<ShaderResourceManager>		shaderResourceManager;
+	ScopedPtr<FrameManager>					frameManager;
+	ScopedPtr<DirectX::GraphicsMemory>		gpuMemory;
+	std::vector<RenderTargetID>				renderTargets;
+	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 
 	std::unique_ptr<CommandContext>				commandContext;
 };
 
+template<typename T>
+inline T* Renderer::Allocate()
+{
+	void* buffer = Mem::Alloc(sizeof(T));
+	return new(buffer) T();
+}

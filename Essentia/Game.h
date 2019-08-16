@@ -13,7 +13,7 @@
 class Game
 {
 public:
-	Game()  { StackAllocator allocator(CMaxStackHeapSize); };
+	Game() {};
 	void Setup();
 	void Run();
 	~Game();
@@ -22,14 +22,14 @@ protected:
 	virtual void	Update() {};
 	void			Render();
 
-	Timer								timer;
-	std::unique_ptr<Renderer>           renderer;
-	std::unique_ptr<DirectX::Keyboard>	keyboard;
-	std::unique_ptr<DirectX::Mouse>		mouse;
-	std::unique_ptr<Camera>				camera;
-	EntityManager						entityManager;
-	SystemManager						systemManager;
+	Timer							timer;
+	ScopedPtr<Renderer>				renderer;
+	ScopedPtr<DirectX::Keyboard>	keyboard;
+	ScopedPtr<DirectX::Mouse>		mouse;
+	ScopedPtr<Camera>				camera;
+	EntityManager					entityManager;
+	SystemManager					systemManager;
 private:
-	EngineContext						engineContext;
+	EngineContext					engineContext;
 };
 

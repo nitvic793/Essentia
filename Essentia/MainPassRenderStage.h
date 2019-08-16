@@ -1,6 +1,5 @@
 #pragma once
 #include "RenderStage.h"
-#include "Engine.h"
 
 class MainPassRenderStage :
 	public IRenderStage

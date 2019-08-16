@@ -6,58 +6,7 @@
 #include "BaseComponents.h"
 #include "Engine.h"
 
-template<typename Key, typename Val>
-class CustomMap
-{
 
-};
-
-constexpr uint32 CMinVectorSize = 32;
-
-template<typename T>
-class Vector
-{
-public:
-	Vector(uint32 count = CMinVectorSize) 
-	{
-		capacity = count;
-		buffer = Mem::Alloc(sizeof(T) * capacity);
-	}
-
-	void Push(const T& value)
-	{
-		currentIndex++;
-		buffer[currentIndex] = value;
-	}
-
-	const T& Pop()
-	{
-		auto val = buffer[currentIndex];
-		currentIndex--;
-		return val;
-	}
-
-	const T& operator[](uint32 index)
-	{
-		return buffer[index];
-	}
-
-	size_t Size()
-	{
-		return currentIndex + 1;
-	}
-
-	~Vector()
-	{
-		Mem::Free(buffer);
-	}
-
-private:
-	T* buffer;
-	int32 currentIndex = -1;
-	int32 capacity;
-
-};
 
 struct MeshBucket
 {
@@ -80,7 +29,8 @@ struct PipelineBucket
 
 struct RenderBucket
 {
-	std::unordered_map<PipelineStateID, PipelineBucket> Pipelines;
+	RenderBucket() {};
+	std::unordered_map<PipelineStateID, PipelineBucket> Pipelines = {};
 
 	void Insert(const DrawableComponent& component, D3D12_GPU_VIRTUAL_ADDRESS vAddress)
 	{

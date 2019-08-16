@@ -126,5 +126,4 @@ struct SkyboxComponent
 //TODO: Make camera part of Component System 
 struct CameraComponent
 {
-
 };

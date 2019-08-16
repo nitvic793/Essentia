@@ -11,5 +11,15 @@ void* Mem::Alloc(size_t sizeInBytes)
 
 void Mem::Free(void* buffer)
 {
-	StackAllocator::Instance->Free(buffer);
+	StackAllocator::Instance->Free((byte*)buffer);
+}
+
+void* SystemHeapAllocator::Alloc(size_t size)
+{
+	return (void*)new byte[size];
+}
+
+void SystemHeapAllocator::Free(byte* buffer)
+{
+	delete[] buffer;
 }

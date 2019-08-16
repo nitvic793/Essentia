@@ -140,13 +140,13 @@ public:
 
 void Game::Setup()
 {
-	renderer = std::make_unique<Renderer>();
-	keyboard = std::make_unique<DirectX::Keyboard>();
-	mouse = std::make_unique<DirectX::Mouse>();
+	renderer = MakeScoped<Renderer>();
+	keyboard = MakeScoped<DirectX::Keyboard>();
+	mouse = MakeScoped<DirectX::Mouse>();
 
 	auto ec = EngineContext::Context;
 	ec->EntityManager = &entityManager;
-	ec->RendererInstance = renderer.get();
+	ec->RendererInstance = renderer.Get();
 	
 	systemManager.Setup(&entityManager);
 	systemManager.RegisterSystem<TransformUpdateSystem>();
@@ -159,7 +159,7 @@ void Game::Setup()
 	renderer->EndInitialization();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
-	camera = std::make_unique<Camera>((float)windowSize.Width, (float)windowSize.Height);
+	camera = MakeScopedArgs<Camera>((float)windowSize.Width, (float)windowSize.Height);
 	auto id = entityManager.CreateEntity();
 }
 
@@ -172,7 +172,7 @@ void Game::Run()
 			timer.Tick();
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
-			systemManager.Update(kbState, mouseState, camera.get());
+			systemManager.Update(kbState, mouseState, camera.Get());
 			Update();
 			camera->Update();
 			Render();
@@ -194,7 +194,7 @@ void Game::Render()
 {
 	uint32 count;
 	auto entities = entityManager.GetEntities<DrawableComponent>(count);
-	FrameContext frameContext = { camera.get(), &timer };
+	FrameContext frameContext = { camera.Get(), &timer };
 
 	frameContext.WorldMatrices.reserve(count);
 	entityManager.GetTransposedWorldMatrices(entities, count, frameContext.WorldMatrices);
