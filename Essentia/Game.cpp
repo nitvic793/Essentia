@@ -57,6 +57,9 @@ public:
 		transform.Position->z = 4;
 		auto scale = XMFLOAT3(0.05f, 0.05f, 0.05f);
 		memcpy(transform.Scale, &scale, sizeof(scale));
+
+		transform = GetTransform(entity2);
+		transform.Position->z = 5;
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override

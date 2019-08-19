@@ -22,15 +22,34 @@ public:
 		SetSize(count, allocator);
 	}
 
+	Vector(Vector&& v)
+	{
+		buffer = v.buffer;
+		currentIndex = v.currentIndex;
+		capacity = v.capacity;
+		memset(&v, 0, sizeof(v)); //Reset v
+	}
+
+	Vector(const Vector& v) = delete;
+
+	Vector& operator=(Vector&& v)
+	{
+		buffer = v.buffer;
+		currentIndex = v.currentIndex;
+		capacity = v.capacity;
+		memset(&v, 0, sizeof(v)); //Reset v
+		return *this;
+	}
+
 	void SetSize(uint32 count = CMinVectorSize, IAllocator* allocator = nullptr)
 	{
 		if (!allocator)
 		{
-			allocator = Mem::GetDefaultAllocator();
+			this->allocator = Mem::GetDefaultAllocator();
 		}
 
 		capacity = count;
-		buffer = (T*)allocator->Alloc(sizeof(T) * capacity);
+		buffer = (T*)this->allocator->Alloc(sizeof(T) * capacity);
 	}
 
 	void Push(T&& value)
@@ -42,6 +61,7 @@ public:
 
 	const T& Pop()
 	{
+		assert(currentIndex >= 0);
 		auto val = buffer[currentIndex];
 		currentIndex--;
 		return val;
@@ -57,6 +77,11 @@ public:
 		return currentIndex + 1;
 	}
 
+	constexpr size_t size()
+	{
+		return currentIndex + 1;
+	}
+
 	T* GetData()
 	{
 		return buffer;
@@ -64,12 +89,34 @@ public:
 
 	~Vector()
 	{
-		Mem::Free(buffer);
+		for (auto& val : *this)
+		{
+			val.~T();
+		}
+
+		if (allocator && buffer)
+		{
+			allocator->Free((byte*)buffer);
+		}
+		else if (buffer) 
+		{
+			Mem::Free((void*)buffer);
+		}
+	}
+
+	T* begin()
+	{
+		return buffer;
+	}
+
+	T* end()
+	{
+		return buffer + (currentIndex + 1);
 	}
 
 private:
 	T* buffer = nullptr;
 	int32 currentIndex = -1;
 	int32 capacity = 0;
-
+	IAllocator* allocator = nullptr;
 };

@@ -83,10 +83,12 @@ void Renderer::Initialize()
 	ec->DeviceResources = deviceResources.get();
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
-	
-	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
-	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
-	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
+
+	renderStages.SetSize(32);
+
+	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
+	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
+	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);

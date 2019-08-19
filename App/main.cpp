@@ -26,11 +26,13 @@ int main()
 		}
 	}
 
-	LinearAllocator allocator(CMaxStackHeapSize);
-	Game *game = new Game();
-	game->Setup();
-	game->Run();
-	delete game;
+	{
+		LinearAllocator allocator(CMaxStackHeapSize);
+		Game* game = new Game();
+		game->Setup();
+		game->Run();
+		delete game;
+	}
 
 #ifdef _DEBUG
 	IDXGIDebug1* pDebug = nullptr;

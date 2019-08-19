@@ -9,6 +9,7 @@ class IAllocator
 public:
 	virtual void* Alloc(size_t size) = 0;
 	virtual void Free(byte* buffer) = 0;
+	virtual void Reset() {};
 	virtual ~IAllocator() {}
 };
 
@@ -52,6 +53,12 @@ public:
 
 	virtual void Free(byte* buff) override
 	{
+		//current = buff;
+	}
+
+	virtual void Reset() override
+	{
+		current = buffer;
 	}
 
 	~LinearAllocator()
@@ -110,7 +117,7 @@ public:
 		current = marker;
 	}
 
-	void Clear()
+	virtual void Reset() override
 	{
 		current = buffer;
 	}
@@ -154,7 +161,6 @@ namespace Mem
 		Free((void*)buff);
 	}
 }
-
 
 template<typename T>
 class ScopedPtr

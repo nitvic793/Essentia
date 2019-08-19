@@ -87,7 +87,7 @@ private:
 	Material			material;
 
 	ModelManager							modelManager;
-	std::vector<ScopedPtr<IRenderStage>>	renderStages;
+	Vector<ScopedPtr<IRenderStage>>			renderStages;
 	DescriptorHeap							imguiHeap;
 	ScopedPtr<Window>						window;
 	ScopedPtr<DeviceResources>				deviceResources;
