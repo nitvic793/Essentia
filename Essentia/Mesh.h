@@ -54,6 +54,7 @@ union ModelHandle
 	uint32 Id;
 };
 
+// TODO: Load all submeshes in a model in one buffer and then index into the buffer while drawing
 struct Model
 {
 	std::vector<MeshHandle>		Meshes;
