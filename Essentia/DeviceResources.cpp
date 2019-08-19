@@ -16,7 +16,7 @@ void DeviceResources::CreateDevice()
 	{
 		DXGI_ADAPTER_DESC1 desc;
 		adapter->GetDesc1(&desc);
-		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) 
+		if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 		{
 			// we dont want a software device
 			adapterIndex++;
@@ -74,33 +74,36 @@ void DeviceResources::CreateCommandQueue()
 
 void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 {
+	this->window = window;
 	auto windowSize = window->GetWindowSize();
 	DXGI_MODE_DESC backBufferDesc = {};
 	backBufferDesc.Width = windowSize.Width;
 	backBufferDesc.Height = windowSize.Height;
 	backBufferDesc.Format = format;
-	DXGI_SAMPLE_DESC sampleDesc = {}; 
+	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
 
 	DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
-	swapChainDesc.BufferCount = CFrameBufferCount; 
+	swapChainDesc.BufferCount = CFrameBufferCount;
 	swapChainDesc.BufferDesc = backBufferDesc;
-	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; 
+	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.OutputWindow = window->GetWindowHandle();
-	swapChainDesc.SampleDesc = sampleDesc; 
-	swapChainDesc.Windowed = !window->IsFullscreen(); 
-	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH; 
-
+	swapChainDesc.SampleDesc = sampleDesc;
+	swapChainDesc.Windowed = !window->IsFullscreen();
+	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
+	
 	dxgiFactory->CreateSwapChain(
 		commandQueue.Get(),
 		&swapChainDesc,
-		(IDXGISwapChain**)swapChain.ReleaseAndGetAddressOf()
+		(IDXGISwapChain * *)swapChain.ReleaseAndGetAddressOf()
 	);
 }
 
 DeviceResources::~DeviceResources()
 {
+	if (window->IsFullscreen())
+		swapChain->SetFullscreenState(FALSE, nullptr);
 }
 
 void DeviceResources::Initialize(Window* window, DXGI_FORMAT format)

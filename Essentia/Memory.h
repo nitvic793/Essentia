@@ -9,6 +9,7 @@ class IAllocator
 public:
 	virtual void* Alloc(size_t size) = 0;
 	virtual void Free(byte* buffer) = 0;
+	virtual ~IAllocator() {}
 };
 
 class SystemHeapAllocator : public IAllocator
@@ -24,11 +25,11 @@ public:
 	virtual void Free(byte* buffer) override;
 };
 
-class StackAllocator : public IAllocator
+class LinearAllocator : public IAllocator
 {
 public:
-	static StackAllocator* Instance;
-	explicit StackAllocator(size_t sizeInBytes, IAllocator* allocator = nullptr)
+	static LinearAllocator* Instance;
+	explicit LinearAllocator(size_t sizeInBytes, IAllocator* allocator = nullptr)
 	{
 		if (!allocator)
 		{
@@ -39,11 +40,56 @@ public:
 		buffer = (byte*)allocator->Alloc(sizeInBytes);
 		current = buffer;
 		totalSize = sizeInBytes;
+	}
+
+	virtual void* Alloc(size_t size) override
+	{
+		assert((current + size) < (buffer + totalSize));
+		byte* alloc = current;
+		current += size;
+		return alloc;
+	}
+
+	virtual void Free(byte* buff) override
+	{
+	}
+
+	~LinearAllocator()
+	{
+		parent->Free(buffer);
+	}
+
+	static LinearAllocator* GetInstance()
+	{
+		return Instance;
+	}
+
+private:
+	byte*		buffer = nullptr;
+	byte*		current = nullptr;
+	size_t		totalSize = 0;
+	IAllocator* parent = nullptr;
+};
+
+class StackAllocator : public IAllocator
+{
+public:
+	explicit StackAllocator(size_t sizeInBytes, IAllocator* allocator = nullptr)
+	{
+		if (!allocator)
+		{
+			allocator = LinearAllocator::GetInstance();
+		}
+		parent = allocator;
+		buffer = (byte*)allocator->Alloc(sizeInBytes);
+		current = buffer;
+		totalSize = sizeInBytes;
 		marker = buffer;
 	}
 
 	virtual void* Alloc(size_t size) override
 	{
+		assert((current + size) < (buffer + totalSize));
 		byte* alloc = current;
 		current += size;
 		return alloc;
@@ -69,28 +115,23 @@ public:
 		current = buffer;
 	}
 
-	~StackAllocator()
-	{
-		parent->Free(buffer);
-	}
-
-	static StackAllocator* GetInstance()
-	{
-		return Instance;
-	}
-
 private:
-	byte* buffer = nullptr;
-	byte* current = nullptr;
-	byte* marker = nullptr;
-	size_t totalSize = 0;
+	byte*		buffer = nullptr;
+	byte*		current = nullptr;
+	byte*		marker = nullptr;
+	size_t		totalSize = 0;
 	IAllocator* parent = nullptr;
 };
 
 namespace Mem
 {
-	void* Alloc(size_t sizeInBytes);
+	void*	Alloc(size_t sizeInBytes);
 	void	Free(void* buffer);
+
+	static IAllocator* GetDefaultAllocator()
+	{
+		return LinearAllocator::GetInstance();
+	}
 
 	template<typename T, typename ...Args>
 	T* Alloc(Args&& ... args)
@@ -110,7 +151,7 @@ namespace Mem
 	void Free(T* buff)
 	{
 		buff->~T();
-		Free((byte*)buff);
+		Free((void*)buff);
 	}
 }
 
@@ -124,21 +165,17 @@ public:
 		ptr = p;
 	}
 
-	ScopedPtr(ScopedPtr&& p)
+	ScopedPtr(ScopedPtr&& p):
+		ptr(p.ptr)
 	{
-		*this = p;
 		p.ptr = nullptr;
 	}
 
-	ScopedPtr& operator=(const ScopedPtr& rhs) 
+	ScopedPtr& operator=(const ScopedPtr& rhs) = delete;
+
+	ScopedPtr& operator=(ScopedPtr&& rhs)
 	{
 		ptr = rhs.ptr;
-		return *this;
-	}
-
-	ScopedPtr& operator=(ScopedPtr&& rhs) 
-	{
-		*this = rhs;
 		rhs.ptr = nullptr;
 		return *this;
 	}
@@ -169,7 +206,7 @@ private:
 template<typename T>
 static ScopedPtr<T> MakeScoped()
 {
-	auto allocator = StackAllocator::GetInstance();
+	auto allocator = LinearAllocator::GetInstance();
 	return MakeScoped<T>(allocator);
 }
 
@@ -185,7 +222,7 @@ static ScopedPtr<T> MakeScoped(IAllocator* allocator)
 template<typename T, typename ...Args>
 static ScopedPtr<T> MakeScopedArgs(Args&& ... args)
 {
-	auto allocator = StackAllocator::GetInstance();
+	auto allocator = LinearAllocator::GetInstance();
 	auto alloc = allocator->Alloc(sizeof(T));
 	ScopedPtr<T> ptr(new(alloc) T(std::forward<Args>(args)...));
 	return ptr;

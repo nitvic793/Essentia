@@ -82,16 +82,16 @@ void Window::Initialize(HINSTANCE hInstance, int width, int height, const char* 
 	this->windowName = windowName;
 	this->windowTitle = windowTitle;
 
-	if (fullscreen)
-	{
-		HMONITOR hmon = MonitorFromWindow(windowHandle,
-			MONITOR_DEFAULTTONEAREST);
-		MONITORINFO mi = { sizeof(mi) };
-		GetMonitorInfo(hmon, &mi);
+	//if (fullscreen)
+	//{
+	//	HMONITOR hmon = MonitorFromWindow(windowHandle,
+	//		MONITOR_DEFAULTTONEAREST);
+	//	MONITORINFO mi = { sizeof(mi) };
+	//	GetMonitorInfo(hmon, &mi);
 
-		width = mi.rcMonitor.right - mi.rcMonitor.left;
-		height = mi.rcMonitor.bottom - mi.rcMonitor.top;
-	}
+	//	width = mi.rcMonitor.right - mi.rcMonitor.left;
+	//	height = mi.rcMonitor.bottom - mi.rcMonitor.top;
+	//}
 
 	this->width = width;
 	this->height = height;

@@ -26,7 +26,7 @@ int main()
 		}
 	}
 
-	StackAllocator allocator(CMaxStackHeapSize);
+	LinearAllocator allocator(CMaxStackHeapSize);
 	Game *game = new Game();
 	game->Setup();
 	game->Run();

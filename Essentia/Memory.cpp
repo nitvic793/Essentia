@@ -2,16 +2,16 @@
 #include "Memory.h"
 
 
-StackAllocator* StackAllocator::Instance = nullptr;
+LinearAllocator* LinearAllocator::Instance = nullptr;
 
 void* Mem::Alloc(size_t sizeInBytes)
 {
-	return StackAllocator::Instance->Alloc(sizeInBytes);
+	return LinearAllocator::Instance->Alloc(sizeInBytes);
 }
 
 void Mem::Free(void* buffer)
 {
-	StackAllocator::Instance->Free((byte*)buffer);
+	LinearAllocator::Instance->Free((byte*)buffer);
 }
 
 void* SystemHeapAllocator::Alloc(size_t size)

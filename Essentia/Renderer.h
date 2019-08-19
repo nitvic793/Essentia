@@ -19,6 +19,7 @@
 #include "RenderStage.h"
 #include "MainPassRenderStage.h"
 #include <GraphicsMemory.h>
+#include "Utility.h"
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
@@ -88,7 +89,7 @@ private:
 	ModelManager							modelManager;
 	std::vector<ScopedPtr<IRenderStage>>	renderStages;
 	DescriptorHeap							imguiHeap;
-	std::unique_ptr<Window>						window;
+	ScopedPtr<Window>						window;
 	ScopedPtr<DeviceResources>				deviceResources;
 	ScopedPtr<ResourceManager>				resourceManager;
 	ScopedPtr<RenderTargetManager>			renderTargetManager;
@@ -99,7 +100,7 @@ private:
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 
-	std::unique_ptr<CommandContext>				commandContext;
+	ScopedPtr<CommandContext>				commandContext;
 };
 
 template<typename T>

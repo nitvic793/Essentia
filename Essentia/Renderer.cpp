@@ -27,7 +27,7 @@ void Renderer::Initialize()
 	height = 1080;
 	depthFormat = DXGI_FORMAT_D32_FLOAT;
 
-	window = std::unique_ptr<Window>(new Window());
+	window = ScopedPtr<Window>(Allocate<Window>());
 	deviceResources = ScopedPtr<DeviceResources>(Allocate<DeviceResources>());
 	renderTargetManager = ScopedPtr<RenderTargetManager>(Allocate<RenderTargetManager>());
 	resourceManager = ScopedPtr<ResourceManager>(Allocate<ResourceManager>());
@@ -83,7 +83,7 @@ void Renderer::Initialize()
 	ec->DeviceResources = deviceResources.get();
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
-
+	
 	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
 	renderStages.push_back(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
@@ -348,7 +348,7 @@ FrameManager* Renderer::GetFrameManager() const
 
 void Renderer::InitializeCommandContext()
 {
-	commandContext = std::unique_ptr<CommandContext>(new CommandContext());
+	commandContext = MakeScoped<CommandContext>();
 	commandContext->Initialize(deviceResources.get());
 }
 
