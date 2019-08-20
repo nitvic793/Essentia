@@ -5,13 +5,6 @@
 #include <assimp/postprocess.h>     // Post processing flags
 #include "Mesh.h"
 
-struct MeshEntry
-{
-	int NumIndices;
-	int BaseVertex;
-	int BaseIndex;
-};
-
 struct MeshMaterial
 {
 	std::string Diffuse;
@@ -22,7 +15,7 @@ struct MeshMaterial
 
 struct ModelData
 {
-	std::vector<MeshData>		Meshes;
+	MeshData					MeshData;
 	std::vector<MeshMaterial>	Materials;
 };
 

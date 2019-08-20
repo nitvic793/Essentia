@@ -5,10 +5,18 @@
 #include <DirectXCollision.h>
 #include "ShaderResourceManager.h"
 
+struct MeshEntry
+{
+	int NumIndices;
+	int BaseVertex;
+	int BaseIndex;
+};
+
 struct MeshData
 {
-	std::vector<Vertex> Vertices;
-	std::vector<uint32> Indices;
+	std::vector<Vertex>		Vertices;
+	std::vector<uint32>		Indices;
+	std::vector<MeshEntry>	MeshEntries;
 };
 
 struct MeshBuffer
@@ -22,6 +30,7 @@ struct MeshView
 	D3D12_VERTEX_BUFFER_VIEW VertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW IndexBufferView;
 	uint32 IndexCount;
+	std::vector<MeshEntry>	MeshEntries;
 };
 
 union MeshHandle
@@ -54,10 +63,9 @@ union ModelHandle
 	uint32 Id;
 };
 
-// TODO: Load all submeshes in a model in one buffer and then index into the buffer while drawing
 struct Model
 {
-	std::vector<MeshHandle>		Meshes;
+	MeshHandle					Mesh;
 	std::vector<MaterialHandle> Materials;
 };
 

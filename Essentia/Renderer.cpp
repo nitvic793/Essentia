@@ -84,7 +84,7 @@ void Renderer::Initialize()
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
 
-	renderStages.SetSize(32);
+	renderStages.Reserve(32);
 
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
@@ -204,7 +204,10 @@ void Renderer::Render(const FrameContext& frameContext)
 				for (uint32 cbIndex : meshes.second.CbIndices)
 				{
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
-					commandList->DrawIndexedInstanced(mesh.IndexCount, 1, 0, 0, 0);
+					for (auto& m : mesh.MeshEntries)
+					{
+						commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
+					}
 				}
 			}
 		}
@@ -213,16 +216,21 @@ void Renderer::Render(const FrameContext& frameContext)
 	for (size_t i = 0; i < drawableModelCount; ++i)
 	{
 		auto& model = modelManager.GetModel(drawableModels[i].Model);
-		auto size = model.Meshes.size();
-		for (uint32 meshIndex = 0; meshIndex < size; ++meshIndex)
+		commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + drawableModels[i].CBView.Index));
+		auto meshHandle = model.Mesh;
+		auto mesh = meshManager->GetMeshView(meshHandle);
+		int matIndex = 0;
+		commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
+		commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+		for (auto& m : mesh.MeshEntries)
 		{
-			auto mesh = model.Meshes[meshIndex];
-			auto materialHandle = model.Materials[meshIndex];
+			auto materialHandle = model.Materials[matIndex];
 			auto material = shaderResourceManager->GetMaterial(materialHandle);
 			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
-			commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + drawableModels[i].CBView.Index));
-			DrawMesh(mesh);
+			commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
+			matIndex++;
 		}
+
 	}
 
 	for (auto& renderStage : renderStages)

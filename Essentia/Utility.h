@@ -19,7 +19,7 @@ public:
 
 	Vector(uint32 count, IAllocator* allocator = nullptr)
 	{
-		SetSize(count, allocator);
+		Reserve(count, allocator);
 	}
 
 	Vector(Vector&& v)
@@ -41,7 +41,7 @@ public:
 		return *this;
 	}
 
-	void SetSize(uint32 count = CMinVectorSize, IAllocator* allocator = nullptr)
+	void Reserve(uint32 count = CMinVectorSize, IAllocator* allocator = nullptr)
 	{
 		if (!allocator)
 		{
@@ -50,6 +50,16 @@ public:
 
 		capacity = count;
 		buffer = (T*)this->allocator->Alloc(sizeof(T) * capacity);
+	}
+
+	void SetSize(uint32 count = CMinVectorSize, IAllocator* allocator = nullptr)
+	{
+		Reserve(count, allocator);
+		currentIndex = count - 1;
+		for (auto& val : *this)
+		{
+			val = T();
+		}
 	}
 
 	void Push(T&& value)
@@ -67,7 +77,12 @@ public:
 		return val;
 	}
 
-	const T& operator[](size_t index)
+	//const T&& operator[](size_t index) throw
+	//{
+	//	return buffer[index];
+	//}
+
+	T& operator[](size_t index) noexcept
 	{
 		return buffer[index];
 	}

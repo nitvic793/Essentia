@@ -160,10 +160,9 @@ MeshData ModelLoader::Load(const std::string& filename)
 		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
 	}
 
-	//CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
-
 	mesh.Vertices = std::move(vertices);
 	mesh.Indices = std::move(indices);
+	mesh.MeshEntries = meshEntries;
 	return mesh;
 }
 
@@ -180,20 +179,37 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 	if (pScene == NULL)
 		return ModelData{};
 
+	uint32 NumVertices = 0;
+	uint32 NumIndices = 0;
+
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
-	std::vector<MeshData> meshes(pScene->mNumMeshes);
+	MeshData mesh;
 	std::vector<MeshMaterial> materials(pScene->mNumMeshes);
-	for (uint32 i = 0; i < pScene->mNumMeshes; i++)
+
+	std::vector<MeshEntry> meshEntries(pScene->mNumMeshes);
+	for (uint32 i = 0; i < meshEntries.size(); i++)
 	{
-		MeshData mesh = {};
-		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
-		//CalculateTangents(vertices.data(), (UINT)vertices.size(), indices.data(), (UINT)indices.size());
-		mesh.Vertices = std::move(vertices);
-		mesh.Indices = std::move(indices);
-		meshes[i] = mesh;
+		meshEntries[i].NumIndices = pScene->mMeshes[i]->mNumFaces * 3;
+		meshEntries[i].BaseVertex = NumVertices;
+		meshEntries[i].BaseIndex = NumIndices;
+
+		NumVertices += pScene->mMeshes[i]->mNumVertices;
+		NumIndices += meshEntries[i].NumIndices;
 	}
 
+	for (uint32 i = 0; i < pScene->mNumMeshes; i++)
+	{
+		std::vector<Vertex> vertices;
+		std::vector<uint32> indices;
+		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
+		mesh.Vertices.insert(mesh.Vertices.end(), vertices.begin(), vertices.end());
+		mesh.Indices.insert(mesh.Indices.end(), indices.begin(), indices.end());
+	}
+
+	//mesh.Vertices = std::move(vertices);
+	//mesh.Indices = std::move(indices);
+	mesh.MeshEntries = meshEntries;
 
 	if (pScene->HasMaterials())
 	{
@@ -233,5 +249,5 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 
 	}
 
-	return ModelData{ meshes, materials };
+	return ModelData{ mesh, materials };
 }

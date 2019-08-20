@@ -73,36 +73,36 @@ struct RenderBucket
 		auto& model = Es::GetModel(modelHandle);
 		auto cbIndex = component.CBView.Index;
 
-		auto count = model.Meshes.size();
-		for (size_t i = 0; i < count; ++i)
-		{
-			auto meshHandle = model.Meshes[i];
-			auto matHandle = model.Materials[i];
-			auto meshView = Es::GetMeshView(model.Meshes[i]);
-			auto material = Es::GetMaterial(model.Materials[i]);
-			ID3D12PipelineState* pso = Es::GetPSO(material.PipelineID);
+		//auto count = model.Meshes.size();
+		//for (size_t i = 0; i < count; ++i)
+		//{
+		//	auto meshHandle = model.Meshes[i];
+		//	auto matHandle = model.Materials[i];
+		//	auto meshView = Es::GetMeshView(model.Meshes[i]);
+		//	auto material = Es::GetMaterial(model.Materials[i]);
+		//	ID3D12PipelineState* pso = Es::GetPSO(material.PipelineID);
 
-			if (Pipelines.find(material.PipelineID) == Pipelines.end())
-			{
-				Pipelines[material.PipelineID] = { pso };
-			}
+		//	if (Pipelines.find(material.PipelineID) == Pipelines.end())
+		//	{
+		//		Pipelines[material.PipelineID] = { pso };
+		//	}
 
-			PipelineBucket& bucket = Pipelines[material.PipelineID];
-			if (bucket.Instances.find(matHandle.Index) == bucket.Instances.end())
-			{
-				bucket.Instances[matHandle.Index] = { material };
-			}
+		//	PipelineBucket& bucket = Pipelines[material.PipelineID];
+		//	if (bucket.Instances.find(matHandle.Index) == bucket.Instances.end())
+		//	{
+		//		bucket.Instances[matHandle.Index] = { material };
+		//	}
 
-			MaterialBucket& matBucket = bucket.Instances[matHandle.Index];
-			if (matBucket.Instances.find(meshHandle.Id) == matBucket.Instances.end())
-			{
-				matBucket.Instances[meshHandle.Id] = { meshView };
-			}
+		//	MaterialBucket& matBucket = bucket.Instances[matHandle.Index];
+		//	if (matBucket.Instances.find(meshHandle.Id) == matBucket.Instances.end())
+		//	{
+		//		matBucket.Instances[meshHandle.Id] = { meshView };
+		//	}
 
-			auto& meshBucket = matBucket.Instances[meshHandle.Id];
-			meshBucket.CbIndices.push_back(cbIndex);
-			//meshBucket.vAddresses.push_back(vAddress);
-		}
+		//	auto& meshBucket = matBucket.Instances[meshHandle.Id];
+		//	meshBucket.CbIndices.push_back(cbIndex);
+		//	//meshBucket.vAddresses.push_back(vAddress);
+		//}
 	}
 
 	void Clear()

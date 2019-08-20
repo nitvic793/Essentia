@@ -102,6 +102,7 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	BoundingOrientedBox meshBounds;
 	BoundingOrientedBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)meshData.Vertices.data(), sizeof(Vertex));
 
+	meshView.MeshEntries = meshData.MeshEntries;
 	bounds.push_back(meshBounds);
 	meshes.push_back(meshData);
 	buffers.push_back(buffer);
@@ -156,11 +157,7 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 	ModelHandle modelHandle;
 	modelHandle.Id = (uint32)models.size();
 
-	for (auto& mesh : modelData.Meshes)
-	{
-		auto handle = Es::CreateMesh(mesh);
-		model.Meshes.push_back(handle);
-	}
+	model.Mesh = Es::CreateMesh(modelData.MeshData);
 
 	constexpr int totalTextures = 2;
 	TextureID textures[totalTextures];

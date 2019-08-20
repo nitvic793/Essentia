@@ -122,6 +122,11 @@ public:
 		current = buffer;
 	}
 
+	~StackAllocator()
+	{
+		parent->Free(buffer);
+	}
+
 private:
 	byte*		buffer = nullptr;
 	byte*		current = nullptr;
