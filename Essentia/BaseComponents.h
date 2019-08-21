@@ -81,7 +81,7 @@ struct DirectionalLightComponent : public ILight
 
 	DirectionalLight GetLight()
 	{
-		return { Direction, Color };
+		return { Direction, 0, Color, Intensity };
 	}
 };
 

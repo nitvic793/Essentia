@@ -23,6 +23,11 @@ LRESULT Window::WindowsMessageCallback(HWND hWnd, UINT msg, WPARAM wParam, LPARA
 {
 	switch (msg)
 	{
+	case WM_SIZE:
+		width = LOWORD(lParam);
+		height = HIWORD(lParam);
+		OnResize();
+		return 0;
 	case WM_ACTIVATEAPP:
 		Keyboard::ProcessMessage(msg, wParam, lParam);
 		Mouse::ProcessMessage(msg, wParam, lParam);
@@ -178,9 +183,22 @@ WindowSize Window::GetWindowSize()
 	return WindowSize{ width, height };
 }
 
+void Window::RegisterOnResizeCallback(std::function<void()> callback)
+{
+	onResizeCallbacks.push_back(callback);
+}
+
 Window::Window()
 {
 	Instance = this;
+}
+
+void Window::OnResize()
+{
+	for (auto& resizeCallback : onResizeCallbacks)
+	{
+		resizeCallback();
+	}
 }
 
 Window::~Window()

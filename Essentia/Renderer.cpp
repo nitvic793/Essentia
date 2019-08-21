@@ -47,12 +47,6 @@ void Renderer::Initialize()
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	renderTargets.resize(CFrameBufferCount);
 
-	for (int i = 0; i < CFrameBufferCount; ++i)
-	{
-		auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
-		renderTargets[i] = renderTargetManager->CreateRenderTargetView(renderTargetBuffers[i].Get(), renderTargetFormat);
-	}
-
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.Width = (float)width;
@@ -83,6 +77,12 @@ void Renderer::Initialize()
 	ec->DeviceResources = deviceResources.get();
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
+
+	for (int i = 0; i < CFrameBufferCount; ++i)
+	{
+		auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
+		renderTargets[i] = renderTargetManager->CreateRenderTargetView(renderTargetBuffers[i].Get(), renderTargetFormat);
+	}
 
 	renderStages.Reserve(32);
 
@@ -248,7 +248,7 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(0, 0);
+	auto hr = swapChain->Present(1, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
@@ -370,7 +370,7 @@ void Renderer::CreateRootSignatures()
 	//light dependent CBV
 	range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 	//G-Buffer inputs
-	range[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 32, 0);
+	range[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 0);
 	//per frame CBV
 	range[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 	//per bone 

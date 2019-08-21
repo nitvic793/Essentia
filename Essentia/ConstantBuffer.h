@@ -11,8 +11,11 @@ struct PerObjectConstantBuffer
 
 struct DirectionalLight
 {
-	alignas(16) DirectX::XMFLOAT3 Direction;
-	alignas(16) DirectX::XMFLOAT3 Color;
+	DirectX::XMFLOAT3	Direction;
+	float				Padding;
+	DirectX::XMFLOAT3	Color;
+	float				Intensity;
+	
 };
 
 struct PointLight
