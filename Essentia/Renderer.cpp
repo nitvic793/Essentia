@@ -187,6 +187,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
+	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
+
 	for (auto pipeline : renderBucket.Pipelines)
 	{
 		auto psoBucket = pipeline.second;
@@ -248,7 +250,7 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(1, 0);
+	auto hr = swapChain->Present(0, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
@@ -273,15 +275,21 @@ void Renderer::CleanUp()
 
 void Renderer::EndInitialization()
 {
-	cbuffer.Initialize(resourceManager.get(), sizeof(PerObjectConstantBuffer), 16);
 	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
-	TextureID textures[2];
-	textures[0] = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
-	textures[1] = shaderResourceManager->CreateTexture("../../Assets/Textures/rockNormals.jpg");
-	auto matId = shaderResourceManager->CreateMaterial(textures, 2, defaultPSO, material);
+	TextureID textures[MaterialTextureCount];
+	textures[DiffuseID] = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
+	textures[NormalsID] = shaderResourceManager->CreateTexture("../../Assets/Textures/rockNormals.jpg");
+	textures[RoughnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
+	textures[MetalnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
+	auto matId = shaderResourceManager->CreateMaterial(textures, 4, defaultPSO, material);
 	modelManager.CreateModel("../../Assets/Models/Sponza.fbx");
+
+	irradianceTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envDiffuseHDR.dds", DDS, false);
+	brdfLutTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envBrdf.dds", DDS, false);
+	prefilterTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envSpecularHDR.dds", DDS, false);
+
 	//for (int i = 0; i < CFrameBufferCount; ++i)
 	//{
 	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());
@@ -364,28 +372,30 @@ void Renderer::InitializeCommandContext()
 
 void Renderer::CreateRootSignatures()
 {
-	CD3DX12_DESCRIPTOR_RANGE range[5];
+	CD3DX12_DESCRIPTOR_RANGE range[6];
 	//view dependent CBV
-	range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+	range[RootSigCBVertex0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 	//light dependent CBV
-	range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
+	range[RootSigCBPixel0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 	//G-Buffer inputs
-	range[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 0);
+	range[RootSigSRVPixel1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 0);
 	//per frame CBV
-	range[3].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
+	range[RootSigCBAll1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 	//per bone 
-	range[4].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
+	range[RootSigCBAll2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
+	//IBL Textures
+	range[RootSigIBL].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 16);
 
-	CD3DX12_ROOT_PARAMETER rootParameters[5];
-	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[0], D3D12_SHADER_VISIBILITY_VERTEX);
-	//rootParameters[RootSigCBVertex0].InitAsConstantBufferView(0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[3], D3D12_SHADER_VISIBILITY_ALL);
-	rootParameters[RootSigCBAll2].InitAsDescriptorTable(1, &range[4], D3D12_SHADER_VISIBILITY_ALL);
+	CD3DX12_ROOT_PARAMETER rootParameters[6];
+	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[RootSigCBVertex0], D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[RootSigCBPixel0], D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[RootSigSRVPixel1], D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[RootSigCBAll1], D3D12_SHADER_VISIBILITY_ALL);
+	rootParameters[RootSigCBAll2].InitAsDescriptorTable(1, &range[RootSigCBAll2], D3D12_SHADER_VISIBILITY_ALL);
+	rootParameters[RootSigIBL].InitAsDescriptorTable(1, &range[RootSigIBL], D3D12_SHADER_VISIBILITY_PIXEL);
 
 	CD3DX12_ROOT_SIGNATURE_DESC descRootSignature;
-	descRootSignature.Init(5, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
+	descRootSignature.Init(6, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS);
 

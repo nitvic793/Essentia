@@ -159,24 +159,27 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 
 	model.Mesh = Es::CreateMesh(modelData.MeshData);
 
-	constexpr int totalTextures = 2;
-	TextureID textures[totalTextures];
+	TextureID textures[MaterialTextureCount];
 	std::string assetDirectory = "../../Assets/Textures/";
 	for (auto& material : modelData.Materials)
 	{
 		MaterialHandle materialHandle;
 		auto diffuseTex = assetDirectory + material.Diffuse;
 		auto normalsTex = assetDirectory + material.Normal;
+		auto metalnessTex = assetDirectory + material.Metalness;
+		auto roughnessTex = assetDirectory + material.Roughness;
 		textures[DiffuseID] = material.Diffuse.empty() ? Default::DefaultDiffuse : shaderResourceManager->CreateTexture(diffuseTex.replace(diffuseTex.size() - 3, 3, "DDS"), DDS, true);
 		textures[NormalsID] = material.Normal.empty() ? Default::DefaultNormals : shaderResourceManager->CreateTexture(normalsTex.replace(normalsTex.size() - 3, 3, "DDS"), DDS, true);
+		textures[RoughnessID] = material.Roughness.empty() ? Default::DefaultRoughness : shaderResourceManager->CreateTexture(roughnessTex.replace(roughnessTex.size() - 3, 3, "DDS"), DDS, true);
+		textures[MetalnessID] = material.Metalness.empty() ? Default::DefaultMetalness : shaderResourceManager->CreateTexture(metalnessTex.replace(metalnessTex.size() - 3, 3, "DDS"), DDS, true);
 		std::string matName = "";
-		for (int i = 0; i < totalTextures; ++i)
+		for (int i = 0; i < MaterialTextureCount; ++i)
 		{
 			matName += std::to_string(textures[i]);
 		}
 
 		Material out;
-		materialHandle = shaderResourceManager->CreateMaterial(textures, totalTextures, Default::DefaultMaterialPSO, out, matName.c_str());
+		materialHandle = shaderResourceManager->CreateMaterial(textures, MaterialTextureCount, Default::DefaultMaterialPSO, out, matName.c_str());
 		model.Materials.push_back(materialHandle);
 	}
 

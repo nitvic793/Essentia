@@ -18,5 +18,6 @@ enum MaterialTextureType
 	DiffuseID = 0,
 	NormalsID = 1,
 	RoughnessID = 2,
-	MetalnessID = 3
+	MetalnessID = 3,
+	MaterialTextureCount = 4
 };

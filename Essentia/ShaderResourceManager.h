@@ -7,8 +7,10 @@
 
 namespace Default
 {
-	constexpr TextureID			DefaultDiffuse = 0;
-	constexpr TextureID			DefaultNormals = 1;
+	constexpr TextureID			DefaultDiffuse = 1;
+	constexpr TextureID			DefaultNormals = 2;
+	constexpr TextureID			DefaultRoughness = 3;
+	constexpr TextureID			DefaultMetalness = 4;
 	constexpr PipelineStateID	DefaultMaterialPSO = 0;
 }
 

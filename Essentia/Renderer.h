@@ -26,7 +26,8 @@ enum RootParameterSlot {
 	RootSigCBPixel0,
 	RootSigSRVPixel1,
 	RootSigCBAll1,
-	RootSigCBAll2
+	RootSigCBAll2,
+	RootSigIBL
 };
 
 class Renderer
@@ -77,7 +78,6 @@ private:
 	RenderBucket	renderBucket;
 
 	//Temp -> will move to FrameManager
-	GPUConstantBuffer cbuffer;
 	PerObjectConstantBuffer perObject;
 	LightBuffer			lightBuffer;
 	ConstantBufferView	lightBufferView;
@@ -85,6 +85,10 @@ private:
 	GPUHeapID			texID;
 	GPUHeapOffsets		offsets;
 	Material			material;
+
+	TextureID			irradianceTexture;
+	TextureID			brdfLutTexture;
+	TextureID			prefilterTexture;
 
 	ModelManager							modelManager;
 	Vector<ScopedPtr<IRenderStage>>			renderStages;
