@@ -37,7 +37,7 @@ public:
 		lights[0] = entityManager->CreateEntity();
 		lights[1] = entityManager->CreateEntity();
 		skybox = entityManager->CreateEntity();
-		entityManager->AddComponent<SkyboxComponent>(skybox, SkyboxComponent::Create("../../Assets/Textures/SunnyCubeMap.dds"));
+		entityManager->AddComponent<SkyboxComponent>(skybox, SkyboxComponent::Create("../../Assets/IBL/envEnvHDR.dds"));
 		XMFLOAT3 direction;
 		auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 		XMStoreFloat3(&direction, dir);

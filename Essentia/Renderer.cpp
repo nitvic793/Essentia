@@ -278,11 +278,17 @@ void Renderer::EndInitialization()
 	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+
+	shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
+	shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
+	shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
+	shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
+
 	TextureID textures[MaterialTextureCount];
-	textures[DiffuseID] = shaderResourceManager->CreateTexture("../../Assets/Textures/rock.jpg");
-	textures[NormalsID] = shaderResourceManager->CreateTexture("../../Assets/Textures/rockNormals.jpg");
-	textures[RoughnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
-	textures[MetalnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
+	textures[DiffuseID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
+	textures[NormalsID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
+	textures[RoughnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_roughness.png");
+	textures[MetalnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_metal.png");
 	auto matId = shaderResourceManager->CreateMaterial(textures, 4, defaultPSO, material);
 	modelManager.CreateModel("../../Assets/Models/Sponza.fbx");
 
@@ -400,7 +406,7 @@ void Renderer::CreateRootSignatures()
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS);
 
 	CD3DX12_STATIC_SAMPLER_DESC StaticSamplers[2];
-	StaticSamplers[0].Init(0, D3D12_FILTER_ANISOTROPIC);
+	StaticSamplers[0].Init(0, D3D12_FILTER_ANISOTROPIC,D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, 0.f, 4);
 	StaticSamplers[1].Init(1, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,

@@ -118,7 +118,7 @@ struct SkyboxComponent
 	{
 		SkyboxComponent component;
 		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
-		component.CubeMap = Es::CreateTexture(skyboxFileName, type);
+		component.CubeMap = Es::CreateTexture(skyboxFileName, type, false);
 		return component;
 	}
 };
