@@ -279,6 +279,7 @@ void Renderer::EndInitialization()
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 
+	//Load Default Textures
 	shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
 	shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
 	shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
