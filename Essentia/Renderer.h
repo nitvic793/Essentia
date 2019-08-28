@@ -42,6 +42,7 @@ public:
 	void	EndInitialization();
 	void	DrawMesh(const MeshView& meshView);
 	void    DrawMesh(MeshHandle mesh);
+	void	SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID depthStencilId, bool singleHandleToRTsDescriptorRange = false);
 
 	ID3D12GraphicsCommandList*	GetDefaultCommandList();
 	ID3D12Device*				GetDevice();
@@ -53,6 +54,8 @@ public:
 	DXGI_FORMAT					GetDepthStencilFormat() const;
 	const GPUHeapOffsets&		GetHeapOffsets() const;
 	FrameManager*				GetFrameManager() const;
+	const D3D12_VIEWPORT&		GetViewport() const;
+	const D3D12_RECT&			GetScissorRect() const;
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();
@@ -103,6 +106,7 @@ private:
 	ScopedPtr<DirectX::GraphicsMemory>		gpuMemory;
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
+	TextureID								renderTargetTextures[CFrameBufferCount];
 
 	ScopedPtr<CommandContext>				commandContext;
 };

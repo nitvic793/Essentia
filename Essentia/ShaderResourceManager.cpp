@@ -6,6 +6,13 @@
 #include "DeviceResources.h"
 #include "ResourceManager.h"
 #include <wrl.h>
+#include "DirectXHelpers.h"
+
+TextureID Default::DefaultDiffuse = 0;
+TextureID Default::DefaultMetalness = 0;
+TextureID Default::DefaultNormals = 0;
+TextureID Default::DefaultRoughness = 0;
+TextureID Default::DefaultMaterialPSO = 0;
 
 using namespace Microsoft::WRL;
 using namespace DirectX;

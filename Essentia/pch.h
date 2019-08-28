@@ -22,6 +22,5 @@
 #include <list>
 #include <deque>
 #include <memory>
-#include "DirectXHelpers.h"
 #include "DXUtility.h"
 #include <stdexcept>

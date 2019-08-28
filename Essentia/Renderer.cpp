@@ -84,6 +84,11 @@ void Renderer::Initialize()
 		renderTargets[i] = renderTargetManager->CreateRenderTargetView(renderTargetBuffers[i].Get(), renderTargetFormat);
 	}
 
+	for (size_t i = 0; i < CFrameBufferCount; ++i)
+	{
+		renderTargetTextures[i] = shaderResourceManager->CreateTexture(renderTargetBuffers[i].Get());
+	}
+
 	renderStages.Reserve(32);
 
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
@@ -156,7 +161,6 @@ void Renderer::Render(const FrameContext& frameContext)
 	for (size_t i = 0; i < drawCount; ++i)
 	{
 		perObject.World = worlds[i];
-		//auto resource = gpuMemory->AllocateConstant(perObject);
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
 		renderBucket.Insert(drawables[i], 0);
 	}
@@ -165,25 +169,24 @@ void Renderer::Render(const FrameContext& frameContext)
 	{
 		perObject.World = modelWorlds[i];
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawableModels[i].CBView.Offset);
-		//renderBucket.Insert(drawableModels[i]);
 	}
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
-	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
+	//offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
 	auto rtId = renderTargets[backBufferIndex];
-	auto rtv = renderTargetManager->GetRTVHandle(rtId);
-	auto dsv = renderTargetManager->GetDSVHandle(depthStencilId);
 	auto commandList = commandContext->GetDefaultCommandList();
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->OMSetRenderTargets(1, &rtv, FALSE, &dsv);
+
+	this->SetRenderTargets(&rtId, 1, depthStencilId);
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
+
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
 	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
-
+	
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
@@ -255,8 +258,6 @@ void Renderer::Present()
 	{
 		hr = device->GetDeviceRemovedReason();
 	}
-
-	//gpuMemory->Commit(deviceResources->GetCommandQueue());
 }
 
 Window* Renderer::GetWindow()
@@ -275,15 +276,15 @@ void Renderer::CleanUp()
 
 void Renderer::EndInitialization()
 {
+	//Load Default Textures
+	Default::DefaultDiffuse = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
+	Default::DefaultNormals = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
+	Default::DefaultRoughness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
+	Default::DefaultMetalness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
+
 	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
-
-	//Load Default Textures
-	shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
-	shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
-	shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
-	shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
 
 	TextureID textures[MaterialTextureCount];
 	textures[DiffuseID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
@@ -297,10 +298,10 @@ void Renderer::EndInitialization()
 	brdfLutTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envBrdf.dds", DDS, false);
 	prefilterTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envSpecularHDR.dds", DDS, false);
 
-	//for (int i = 0; i < CFrameBufferCount; ++i)
-	//{
-	//	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());
-	//}
+	for (int i = 0; i < CFrameBufferCount; ++i)
+	{
+		offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(i, frameManager.get());
+	}
 
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandContext->SubmitCommands(commandList);
@@ -319,6 +320,19 @@ void Renderer::DrawMesh(MeshHandle mesh)
 	auto commandList = commandContext->GetDefaultCommandList();
 	auto& meshView = meshManager->GetMeshView(mesh);
 	DrawMesh(meshView);
+}
+
+void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID depthStencilId, bool singleHandleToRTsDescriptorRange)
+{
+	Vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(rtCount);
+	for (size_t i = 0; i < rtCount; ++i)
+	{
+		handles.Push(renderTargetManager->GetRTVHandle(renderTargets[i]));
+	}
+
+	auto dsvHandle = renderTargetManager->GetDSVHandle(depthStencilId);
+	auto commandList = GetDefaultCommandList();
+	commandList->OMSetRenderTargets(rtCount, handles.GetData(), singleHandleToRTsDescriptorRange, &dsvHandle);
 }
 
 ID3D12GraphicsCommandList* Renderer::GetDefaultCommandList()
@@ -369,6 +383,16 @@ const GPUHeapOffsets& Renderer::GetHeapOffsets() const
 FrameManager* Renderer::GetFrameManager() const
 {
 	return frameManager.get();
+}
+
+const D3D12_VIEWPORT& Renderer::GetViewport() const
+{
+	return viewport;
+}
+
+const D3D12_RECT& Renderer::GetScissorRect() const
+{
+	return scissorRect;
 }
 
 void Renderer::InitializeCommandContext()

@@ -43,6 +43,7 @@ public:
 
 	void Reserve(uint32 count = CMinVectorSize, IAllocator* allocator = nullptr)
 	{
+		this->allocator = allocator;
 		if (!allocator)
 		{
 			this->allocator = Mem::GetDefaultAllocator();

@@ -53,7 +53,7 @@ public:
 
 	virtual void Free(byte* buff) override
 	{
-		//current = buff;
+		current = buff;
 	}
 
 	virtual void Reset() override
@@ -96,7 +96,7 @@ public:
 
 	virtual void* Alloc(size_t size) override
 	{
-		assert((current + size) < (buffer + totalSize));
+		assert((current + size) <= (buffer + totalSize));
 		byte* alloc = current;
 		current += size;
 		return alloc;

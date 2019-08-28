@@ -5,14 +5,14 @@
 #include "StringHash.h"
 #include <unordered_map>
 
-namespace Default
+struct Default
 {
-	constexpr TextureID			DefaultDiffuse = 1;
-	constexpr TextureID			DefaultNormals = 2;
-	constexpr TextureID			DefaultRoughness = 3;
-	constexpr TextureID			DefaultMetalness = 4;
-	constexpr PipelineStateID	DefaultMaterialPSO = 0;
-}
+	static TextureID			DefaultDiffuse;
+	static TextureID			DefaultNormals;
+	static TextureID			DefaultRoughness;
+	static TextureID			DefaultMetalness;
+	static PipelineStateID	DefaultMaterialPSO;
+};
 
 class DeviceResources;
 class ResourceManager;
