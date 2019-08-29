@@ -43,6 +43,12 @@
     <Filter Include="Imgui">
       <UniqueIdentifier>{73b0fd93-af66-4604-b709-1a4bd2fd1c3b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\RenderStages">
+      <UniqueIdentifier>{87bef71d-90f7-4322-81b1-146c1494c062}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\RenderStages">
+      <UniqueIdentifier>{546ceb4b-7865-45cd-8924-febb45eff5f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -133,14 +139,17 @@
     <ClCompile Include="imgui_impl_win32.cpp">
       <Filter>Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="MainPassRenderStage.cpp">
+    <ClCompile Include="SkyBoxRenderStage.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
     <ClCompile Include="ImguiRenderStage.cpp">
-      <Filter>Source Files\Renderer</Filter>
+      <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBoxRenderStage.cpp">
-      <Filter>Source Files\Renderer</Filter>
+    <ClCompile Include="MainPassRenderStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
+    <ClCompile Include="OutlineRenderStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -273,12 +282,6 @@
     <ClInclude Include="imgui_impl_win32.h">
       <Filter>Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="MainPassRenderStage.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
-    <ClInclude Include="ImguiRenderStage.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="SkyBoxRenderStage.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -287,6 +290,15 @@
     </ClInclude>
     <ClInclude Include="BaseSystems.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiRenderStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="MainPassRenderStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="OutlineRenderStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -300,6 +312,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="SkyboxVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="OutlinePS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="OutlineVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

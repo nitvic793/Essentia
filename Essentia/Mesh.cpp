@@ -145,6 +145,11 @@ MeshHandle MeshManager::GetMeshHandle(const char* filename)
 	return { meshMap[strId] };
 }
 
+const DirectX::BoundingOrientedBox& MeshManager::GetBoundingBox(MeshHandle handle)
+{
+	return bounds[handle.Id];
+}
+
 void ModelManager::Initialize(ShaderResourceManager* srManager)
 {
 	shaderResourceManager = srManager;

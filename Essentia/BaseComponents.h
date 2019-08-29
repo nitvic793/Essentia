@@ -123,6 +123,12 @@ struct SkyboxComponent
 	}
 };
 
+// Add this component to any entity which is to be selected
+struct SelectedComponent
+{
+	GComponent(SelectedComponent)
+};
+
 //TODO: Make camera part of Component System 
 struct CameraComponent
 {

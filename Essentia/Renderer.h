@@ -48,6 +48,7 @@ public:
 	ID3D12Device*				GetDevice();
 	MeshManager*				GetMeshManager();
 	RenderTargetID				GetCurrentRenderTarget() const;
+	TextureID					GetCurrentRenderTargetTexture() const;
 	DepthStencilID				GetCurrentDepthStencil() const;
 	ID3D12RootSignature*		GetDefaultRootSignature() const;
 	DXGI_FORMAT					GetRenderTargetFormat() const;
@@ -95,6 +96,7 @@ private:
 
 	ModelManager							modelManager;
 	Vector<ScopedPtr<IRenderStage>>			renderStages;
+	Vector<ScopedPtr<IPostProcessStage>>	postProcessStages;
 	DescriptorHeap							imguiHeap;
 	ScopedPtr<Window>						window;
 	ScopedPtr<DeviceResources>				deviceResources;

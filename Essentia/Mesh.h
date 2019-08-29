@@ -27,10 +27,10 @@ struct MeshBuffer
 
 struct MeshView
 {
-	D3D12_VERTEX_BUFFER_VIEW VertexBufferView;
-	D3D12_INDEX_BUFFER_VIEW IndexBufferView;
-	uint32 IndexCount;
-	std::vector<MeshEntry>	MeshEntries;
+	D3D12_VERTEX_BUFFER_VIEW	VertexBufferView;
+	D3D12_INDEX_BUFFER_VIEW		IndexBufferView;
+	uint32						IndexCount;
+	std::vector<MeshEntry>		MeshEntries;
 };
 
 union MeshHandle
@@ -41,12 +41,13 @@ union MeshHandle
 class MeshManager
 {
 public:
-	MeshHandle		CreateMesh(const std::string& filename, MeshView& meshView);
-	MeshHandle		CreateMesh(const MeshData& meshData, MeshView& meshView);
-	void			Initialize(CommandContext* commandContext);
-	const MeshView& GetMeshView(MeshHandle handle);
-	const MeshView& GetMeshView(const char* filename); //WARNING: Lazy loads the mesh
-	MeshHandle		GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
+	MeshHandle									CreateMesh(const std::string& filename, MeshView& meshView);
+	MeshHandle									CreateMesh(const MeshData& meshData, MeshView& meshView);
+	void										Initialize(CommandContext* commandContext);
+	const MeshView&								GetMeshView(MeshHandle handle);
+	const MeshView&								GetMeshView(const char* filename); //WARNING: Lazy loads the mesh
+	MeshHandle									GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
+	const DirectX::BoundingOrientedBox&			GetBoundingBox(MeshHandle handle);
 private:
 	MeshManager() {};
 	CommandContext*								context = nullptr;

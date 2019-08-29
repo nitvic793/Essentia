@@ -235,7 +235,6 @@ void Renderer::Render(const FrameContext& frameContext)
 			commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
 			matIndex++;
 		}
-
 	}
 
 	for (auto& renderStage : renderStages)
@@ -353,6 +352,11 @@ MeshManager* Renderer::GetMeshManager()
 RenderTargetID Renderer::GetCurrentRenderTarget() const
 {
 	return renderTargets[backBufferIndex];
+}
+
+TextureID Renderer::GetCurrentRenderTargetTexture() const
+{
+	return renderTargetTextures[backBufferIndex];
 }
 
 DepthStencilID Renderer::GetCurrentDepthStencil() const
