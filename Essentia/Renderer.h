@@ -57,6 +57,8 @@ public:
 	FrameManager*				GetFrameManager() const;
 	const D3D12_VIEWPORT&		GetViewport() const;
 	const D3D12_RECT&			GetScissorRect() const;
+	
+	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();

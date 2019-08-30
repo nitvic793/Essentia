@@ -55,6 +55,8 @@ public:
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
 		entityManager->AddComponent<DrawableModelComponent>(e, DrawableModelComponent::Create({ 0 }));
+
+		entityManager->AddComponent<SelectedComponent>(entity);
 		transform = GetTransform(e);
 		transform.Position->z = 4;
 		auto scale = XMFLOAT3(0.05f, 0.05f, 0.05f);

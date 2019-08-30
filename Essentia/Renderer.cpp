@@ -15,6 +15,7 @@
 #include "Entity.h"
 #include "ImguiRenderStage.h"
 #include "SkyBoxRenderStage.h"
+#include "OutlineRenderStage.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -92,6 +93,7 @@ void Renderer::Initialize()
 	renderStages.Reserve(32);
 
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
+	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
@@ -397,6 +399,11 @@ const D3D12_VIEWPORT& Renderer::GetViewport() const
 const D3D12_RECT& Renderer::GetScissorRect() const
 {
 	return scissorRect;
+}
+
+void Renderer::SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view)
+{
+	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + view.Index));
 }
 
 void Renderer::InitializeCommandContext()

@@ -7,5 +7,7 @@ class OutlineRenderStage :
 public:
 	virtual void Initialize() override;
 	virtual void Render(const uint32 frameIndex, const FrameContext& frameContext) override;
+private:
+	PipelineStateID outlinePSO;
 };
 

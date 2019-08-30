@@ -165,7 +165,8 @@ inline T* ComponentManager::GetAllComponents(uint32& count)
 template<typename T>
 inline EntityHandle* ComponentManager::GetEntities(uint32& count)
 {
-	return pools[T::Type]->GetEntities(count);
+	auto pool = GetOrCreatePool<T>();
+	return pool->GetEntities(count);
 }
 
 template<typename T>
