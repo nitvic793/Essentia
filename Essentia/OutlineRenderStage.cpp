@@ -16,9 +16,7 @@ void OutlineRenderStage::Initialize()
 
 	auto rasterizer = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	rasterizer.CullMode = D3D12_CULL_MODE_FRONT;
-
-	auto depthState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	//depthState.DepthEnable = false;
+	rasterizer.DepthClipEnable = false;
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
@@ -33,8 +31,9 @@ void OutlineRenderStage::Initialize()
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = rasterizer;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+
 	psoDesc.NumRenderTargets = 1;
-	psoDesc.DepthStencilState = depthState;
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.DSVFormat = ec->RendererInstance->GetDepthStencilFormat();
 
 	outlinePSO = ec->ResourceManager->CreatePSO(psoDesc);

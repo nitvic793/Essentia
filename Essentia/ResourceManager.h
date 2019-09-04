@@ -18,6 +18,7 @@ public:
 	ID3D12RootSignature*	GetRootSignature(RootSignatureID rsID);
 	ID3D12Resource*			GetResource(ResourceID resourceID);
 	ID3D12Resource**		RequestEmptyResource(ResourceID& outResourceID);
+	void					Release(ResourceID resourceID);
 private:
 	ResourceManager() {}
 	ID3D12Device* device = nullptr;

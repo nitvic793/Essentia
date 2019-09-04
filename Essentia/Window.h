@@ -3,7 +3,7 @@
 #include <functional>
 #include <string>
 
-struct WindowSize
+struct ScreenSize
 {
 	int Width;
 	int Height;
@@ -18,9 +18,9 @@ public:
 	void				Initialize(HINSTANCE hInstance, int width, int height, const char* windowName = "Essentia", const char* windowTitle = "Essentia", bool fullscreen = false, int ShowWnd = 1);
 	HWND				GetWindowHandle();
 	void				StartMessagePump(std::function<void()> callback);
-	static Window* GetInstance();
+	static Window*		GetInstance();
 	bool				IsFullscreen();
-	WindowSize			GetWindowSize();
+	ScreenSize			GetWindowSize();
 	void				RegisterOnResizeCallback(std::function<void()> callback);
 	~Window();
 private:

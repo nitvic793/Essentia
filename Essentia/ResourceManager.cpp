@@ -58,3 +58,8 @@ ID3D12Resource** ResourceManager::RequestEmptyResource(ResourceID& outResourceID
 	currentResourceID++;
 	return resources[outResourceID].ReleaseAndGetAddressOf();
 }
+
+void ResourceManager::Release(ResourceID resourceID)
+{
+	resources[resourceID].Reset();
+}

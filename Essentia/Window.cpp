@@ -178,9 +178,9 @@ bool Window::IsFullscreen()
 	return fullscreen;
 }
 
-WindowSize Window::GetWindowSize()
+ScreenSize Window::GetWindowSize()
 {
-	return WindowSize{ width, height };
+	return ScreenSize{ width, height };
 }
 
 void Window::RegisterOnResizeCallback(std::function<void()> callback)

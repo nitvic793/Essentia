@@ -57,8 +57,10 @@ public:
 	FrameManager*				GetFrameManager() const;
 	const D3D12_VIEWPORT&		GetViewport() const;
 	const D3D12_RECT&			GetScissorRect() const;
-	
+	ScreenSize					GetScreenSize() const;
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
+	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
+	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();
@@ -82,6 +84,7 @@ private:
 	DXGI_FORMAT		depthFormat;
 	ID3D12Device*	device;
 	RenderBucket	renderBucket;
+	ResourceID		depthBufferResourceId;
 
 	//Temp -> will move to FrameManager
 	PerObjectConstantBuffer perObject;
@@ -111,7 +114,6 @@ private:
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 	TextureID								renderTargetTextures[CFrameBufferCount];
-
 	ScopedPtr<CommandContext>				commandContext;
 };
 

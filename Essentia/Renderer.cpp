@@ -16,6 +16,7 @@
 #include "ImguiRenderStage.h"
 #include "SkyBoxRenderStage.h"
 #include "OutlineRenderStage.h"
+#include "PostProcessDepthOfFieldStage.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -97,6 +98,9 @@ void Renderer::Initialize()
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
 	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
+	postProcessStages.Reserve(32);
+	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
+
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
 	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
@@ -109,6 +113,34 @@ void Renderer::Initialize()
 	{
 		stage->Initialize();
 	}
+
+	for (auto& stage : postProcessStages)
+	{
+		stage->Initialize();
+	}
+
+	window->RegisterOnResizeCallback([&]() 
+	{
+		if (!commandContext.Get()) return;
+		for (int i = 0; i < CFrameBufferCount; ++i)
+		{
+			commandContext->WaitForFrame(i);
+		}
+		for (int i = 0; i < CFrameBufferCount; ++i)
+		{
+			renderTargetBuffers[i].ReleaseAndGetAddressOf();
+		}
+
+		resourceManager->Release(depthBufferResourceId);
+		
+		deviceResources->GetSwapChain()->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
+		for (int i = 0; i < CFrameBufferCount; ++i)
+		{
+			auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
+			 renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
+		}
+
+	});
 }
 
 void Renderer::Clear()
@@ -188,7 +220,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
 	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
-	
+
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
@@ -243,6 +275,15 @@ void Renderer::Render(const FrameContext& frameContext)
 	{
 		renderStage->Render(imageIndex, frameContext);
 	}
+
+	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	for (auto& postProcessStage : postProcessStages)
+	{
+		postProcessStage->RenderPostProcess(renderTargetTextures[backBufferIndex]);
+	}
+
+	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	PIXEndEvent(commandList);
 }
@@ -401,9 +442,25 @@ const D3D12_RECT& Renderer::GetScissorRect() const
 	return scissorRect;
 }
 
+ScreenSize Renderer::GetScreenSize() const
+{
+	return ScreenSize{ width, height };
+}
+
 void Renderer::SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view)
 {
 	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + view.Index));
+}
+
+void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
+{
+	auto resource = resourceManager->GetResource(resourceId);
+	TransitionBarrier(commandList, resource, from, to);
+}
+
+void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
+{
+	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to));
 }
 
 void Renderer::InitializeCommandContext()
@@ -442,7 +499,7 @@ void Renderer::CreateRootSignatures()
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS);
 
 	CD3DX12_STATIC_SAMPLER_DESC StaticSamplers[2];
-	StaticSamplers[0].Init(0, D3D12_FILTER_ANISOTROPIC,D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, 0.f, 4);
+	StaticSamplers[0].Init(0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, 0.f, 4);
 	StaticSamplers[1].Init(1, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
@@ -485,13 +542,13 @@ void Renderer::CreatePSOs()
 void Renderer::CreateDepthStencil()
 {
 	auto clearVal = CD3DX12_CLEAR_VALUE(DXGI_FORMAT_D32_FLOAT, 1.f, 0);
-	auto depthBufferId = resourceManager->CreateResource(
+	depthBufferResourceId = resourceManager->CreateResource(
 		CD3DX12_RESOURCE_DESC::Tex2D(depthFormat, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		&clearVal,
 		D3D12_RESOURCE_STATE_DEPTH_WRITE
 	);
 
-	auto depthBuffer = resourceManager->GetResource(depthBufferId);
+	auto depthBuffer = resourceManager->GetResource(depthBufferResourceId);
 	depthStencilId = renderTargetManager->CreateDepthStencilView(depthBuffer, depthFormat);
 }
 

@@ -138,6 +138,7 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	textureCount++;
 	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	textureMap[stringId] = texIndex;
+	textureResources.push_back(*resource);
 	return texIndex;
 }
 
@@ -163,6 +164,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	textureCount++;
 	CreateShaderResourceView(device, resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	textureMap[stringId] = texIndex;
+	textureResources.push_back(resource);
 	return texIndex;
 }
 
@@ -218,6 +220,11 @@ TextureID ShaderResourceManager::RequestUninitializedTexture()
 	TextureID texIndex = textureCount;
 	textureCount++;
 	return texIndex;
+}
+
+ID3D12Resource* ShaderResourceManager::GetResource(TextureID textureId)
+{
+	return textureResources[textureId];
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureGPUHandle(TextureID texID)

@@ -33,6 +33,8 @@ public:
 	MaterialHandle		GetMaterialHandle(StringID material);
 	TextureID			GetTexture(StringID texture);
 	TextureID			RequestUninitializedTexture();
+	ID3D12Resource*		GetResource(TextureID textureId);
+
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
 private:
@@ -52,6 +54,7 @@ private:
 
 	std::unordered_map<StringID, MaterialHandle>	materialMap;
 	std::unordered_map<StringID, TextureID>			textureMap;
+	std::vector<ID3D12Resource*>					textureResources;
 	friend class Renderer;
 };
 

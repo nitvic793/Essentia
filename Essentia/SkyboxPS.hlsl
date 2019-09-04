@@ -1,6 +1,6 @@
 
-TextureCube Sky				: register(t0);
-SamplerState BasicSampler	: register(s0);
+TextureCube		Sky				: register(t0);
+SamplerState	BasicSampler	: register(s0);
 
 struct VertexToPixelSky
 {
@@ -8,7 +8,6 @@ struct VertexToPixelSky
 	float3 UVW			: TEXCOORD;
 };
 
-// Entry point for this pixel shader
 float4 main(VertexToPixelSky input) : SV_TARGET
 {
 	float3 finalColor = Sky.Sample(BasicSampler, input.UVW).rgb;

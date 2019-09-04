@@ -39,7 +39,7 @@ public:
 		lights[0] = entityManager->CreateEntity();
 		lights[1] = entityManager->CreateEntity();
 		skybox = entityManager->CreateEntity();
-		entityManager->AddComponent<SkyboxComponent>(skybox, SkyboxComponent::Create("../../Assets/IBL/envEnvHDR.dds"));
+		entityManager->AddComponent<SkyboxComponent>(skybox, SkyboxComponent::Create("../../Assets/Textures/SunnyCubeMap.dds"));
 		XMFLOAT3 direction;
 		auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 		XMStoreFloat3(&direction, dir);
@@ -50,7 +50,7 @@ public:
 		transform.Position->y = 3;
 		MaterialHandle mat = { 0 };
 		MeshHandle mesh = { 2 };
-		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cone.obj");
+		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cube.obj");
 
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));

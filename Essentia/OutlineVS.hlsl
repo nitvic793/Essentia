@@ -18,6 +18,5 @@ PixelInput main(VertexInput input)
 	output.Tangent = normalize(mul(input.Tangent, (float3x3)World));;
 	output.WorldPos = mul(float4(input.Position, 1.0f), World).xyz;
 
-
 	return output;
 }

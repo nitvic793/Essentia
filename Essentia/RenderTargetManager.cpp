@@ -26,6 +26,16 @@ RenderTargetID RenderTargetManager::CreateRenderTargetView(ID3D12Resource* rende
 	return id;
 }
 
+void RenderTargetManager::ReCreateRenderTargetView(RenderTargetID renderTargetID, ID3D12Resource* resource, DXGI_FORMAT format)
+{
+	D3D12_RENDER_TARGET_VIEW_DESC desc = {};
+	desc.Texture2D.MipSlice = 0;
+	desc.Texture2D.PlaneSlice = 0;
+	desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	desc.Format = format;
+	device->CreateRenderTargetView(resource, &desc, rtvHeap.handleCPU(renderTargetID));
+}
+
 DepthStencilID RenderTargetManager::CreateDepthStencilView(ID3D12Resource* depthBuffer, DXGI_FORMAT format)
 {
 	DepthStencilID id = currentDsvIndex;
@@ -39,6 +49,17 @@ DepthStencilID RenderTargetManager::CreateDepthStencilView(ID3D12Resource* depth
 
 	device->CreateDepthStencilView(depthBuffer, &desc, dsvHeap.handleCPU(id));
 	return id;
+}
+
+void RenderTargetManager::ReCreateDepthStencilView(DepthStencilID dsId, ID3D12Resource* depthBuffer, DXGI_FORMAT format)
+{
+	D3D12_DEPTH_STENCIL_VIEW_DESC desc = {};
+	desc.Texture2D.MipSlice = 0;
+	desc.Format = format;
+	desc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
+	desc.Flags = D3D12_DSV_FLAG_NONE;
+
+	device->CreateDepthStencilView(depthBuffer, &desc, dsvHeap.handleCPU(dsId));
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetManager::GetRTVHandle(RenderTargetID rtvID)
