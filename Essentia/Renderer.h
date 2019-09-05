@@ -42,7 +42,7 @@ public:
 	void	EndInitialization();
 	void	DrawMesh(const MeshView& meshView);
 	void    DrawMesh(MeshHandle mesh);
-	void	SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID depthStencilId, bool singleHandleToRTsDescriptorRange = false);
+	void	SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID* depthStencilId, bool singleHandleToRTsDescriptorRange = false);
 
 	ID3D12GraphicsCommandList*	GetDefaultCommandList();
 	ID3D12Device*				GetDevice();
@@ -58,9 +58,12 @@ public:
 	const D3D12_VIEWPORT&		GetViewport() const;
 	const D3D12_RECT&			GetScissorRect() const;
 	ScreenSize					GetScreenSize() const;
+	void						DrawScreenQuad(ID3D12GraphicsCommandList* commandList);
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
+	void						SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
+	void						SetDefaultRenderTarget();
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();

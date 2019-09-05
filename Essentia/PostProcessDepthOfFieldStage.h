@@ -13,6 +13,9 @@ private:
 	PipelineStateID quadPso;
 
 	RenderTargetID  lowResRenderTarget;
-	TextureID lowResTexture;
+	TextureID		lowResTexture;
+	ResourceID		lowResTextureResource;
+
+	ConstantBufferView blurParamsCBV;
 };
 

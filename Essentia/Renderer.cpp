@@ -213,9 +213,8 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	this->SetRenderTargets(&rtId, 1, &depthStencilId);
 
-	this->SetRenderTargets(&rtId, 1, depthStencilId);
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
@@ -223,6 +222,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 
+	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
 
@@ -271,11 +271,6 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 
-	for (auto& renderStage : renderStages)
-	{
-		renderStage->Render(imageIndex, frameContext);
-	}
-
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	for (auto& postProcessStage : postProcessStages)
@@ -284,6 +279,13 @@ void Renderer::Render(const FrameContext& frameContext)
 	}
 
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	SetDefaultRenderTarget();
+
+	for (auto& renderStage : renderStages)
+	{
+		renderStage->Render(imageIndex, frameContext);
+	}
 
 	PIXEndEvent(commandList);
 }
@@ -364,7 +366,7 @@ void Renderer::DrawMesh(MeshHandle mesh)
 	DrawMesh(meshView);
 }
 
-void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID depthStencilId, bool singleHandleToRTsDescriptorRange)
+void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID* depthStencilId, bool singleHandleToRTsDescriptorRange)
 {
 	Vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(rtCount);
 	for (size_t i = 0; i < rtCount; ++i)
@@ -372,9 +374,9 @@ void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, Dept
 		handles.Push(renderTargetManager->GetRTVHandle(renderTargets[i]));
 	}
 
-	auto dsvHandle = renderTargetManager->GetDSVHandle(depthStencilId);
+	auto* dsvHandle = depthStencilId == nullptr ? (D3D12_CPU_DESCRIPTOR_HANDLE*)nullptr : &renderTargetManager->GetDSVHandle(*depthStencilId);
 	auto commandList = GetDefaultCommandList();
-	commandList->OMSetRenderTargets(rtCount, handles.GetData(), singleHandleToRTsDescriptorRange, &dsvHandle);
+	commandList->OMSetRenderTargets(rtCount, handles.GetData(), singleHandleToRTsDescriptorRange, dsvHandle);
 }
 
 ID3D12GraphicsCommandList* Renderer::GetDefaultCommandList()
@@ -447,9 +449,30 @@ ScreenSize Renderer::GetScreenSize() const
 	return ScreenSize{ width, height };
 }
 
+void Renderer::DrawScreenQuad(ID3D12GraphicsCommandList* commandList)
+{
+	D3D12_INDEX_BUFFER_VIEW ibv;
+	ibv.Format = DXGI_FORMAT_R32_UINT;
+	ibv.BufferLocation = 0;
+	ibv.SizeInBytes = 0;
+
+	D3D12_VERTEX_BUFFER_VIEW vbv;
+	vbv.BufferLocation = 0;
+	vbv.SizeInBytes = 0;
+	vbv.StrideInBytes = 0;
+	commandList->IASetVertexBuffers(0, 0, &vbv);
+	commandList->IASetIndexBuffer(&ibv);
+	commandList->DrawInstanced(4, 1, 0, 0);
+}
+
 void Renderer::SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view)
 {
 	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + view.Index));
+}
+
+void Renderer::SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture)
+{
+	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texture));
 }
 
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
@@ -461,6 +484,16 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, Resourc
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to));
+}
+
+void Renderer::SetDefaultRenderTarget()
+{
+	auto rtId = renderTargets[backBufferIndex];
+	auto commandList = commandContext->GetDefaultCommandList();
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+	this->SetRenderTargets(&rtId, 1, &depthStencilId);
 }
 
 void Renderer::InitializeCommandContext()
