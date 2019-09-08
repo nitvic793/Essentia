@@ -275,7 +275,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	for (auto& postProcessStage : postProcessStages)
 	{
-		postProcessStage->RenderPostProcess(renderTargetTextures[backBufferIndex]);
+		postProcessStage->RenderPostProcess(backBufferIndex, renderTargetTextures[backBufferIndex]);
 	}
 
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -481,9 +481,28 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, Resourc
 	TransitionBarrier(commandList, resource, from, to);
 }
 
+void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionDesc* transitions, uint32 count)
+{
+	Vector<CD3DX12_RESOURCE_BARRIER> barriers;
+	barriers.Reserve(count);
+
+	for (size_t i = 0; i < count; ++i)
+	{
+		auto resource = resourceManager->GetResource(transitions[i].Resource);
+		barriers.Push(CD3DX12_RESOURCE_BARRIER::Transition(resource, transitions[i].From, transitions[i].To));
+	}
+
+	commandList->ResourceBarrier(count, barriers.GetData());
+}
+
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to));
+}
+
+ID3D12Resource* Renderer::GetCurrentRenderTargetResource()
+{
+	return renderTargetBuffers[backBufferIndex].Get();
 }
 
 void Renderer::SetDefaultRenderTarget()
@@ -494,6 +513,11 @@ void Renderer::SetDefaultRenderTarget()
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	this->SetRenderTargets(&rtId, 1, &depthStencilId);
+}
+
+RenderTargetID Renderer::GetDefaultRenderTarget()
+{
+	return renderTargets[backBufferIndex];
 }
 
 void Renderer::InitializeCommandContext()

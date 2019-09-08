@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CommandContext.cpp" />
+    <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="PostProcessDepthOfFieldStage.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
     <ClCompile Include="DXUtility.cpp" />
@@ -194,6 +195,7 @@
   <ItemGroup>
     <ClInclude Include="BaseComponents.h" />
     <ClInclude Include="BaseSystems.h" />
+    <ClInclude Include="PostProcess.h" />
     <ClInclude Include="PostProcessDepthOfFieldStage.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineContext.h" />

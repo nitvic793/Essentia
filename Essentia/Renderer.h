@@ -30,6 +30,13 @@ enum RootParameterSlot {
 	RootSigIBL
 };
 
+struct TransitionDesc
+{
+	ResourceID Resource;
+	D3D12_RESOURCE_STATES From;
+	D3D12_RESOURCE_STATES To;
+};
+
 class Renderer
 {
 public:
@@ -62,8 +69,11 @@ public:
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
 	void						SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
+	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionDesc* transitions, uint32 count);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
+	ID3D12Resource*				GetCurrentRenderTargetResource();
 	void						SetDefaultRenderTarget();
+	RenderTargetID				GetDefaultRenderTarget();
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();

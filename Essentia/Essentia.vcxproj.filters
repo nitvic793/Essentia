@@ -154,6 +154,9 @@
     <ClCompile Include="PostProcessDepthOfFieldStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
+    <ClCompile Include="PostProcess.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -305,6 +308,9 @@
     </ClInclude>
     <ClInclude Include="PostProcessDepthOfFieldStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcess.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

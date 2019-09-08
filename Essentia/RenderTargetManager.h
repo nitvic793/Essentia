@@ -4,11 +4,6 @@
 #include <d3d12.h>
 #include <vector>
 
-typedef uint32 RenderTargetID;
-typedef uint32 DepthStencilID;
-constexpr int CMaxRenderTargets = 64;
-constexpr int CMaxDepthStencils = 16;
-
 class RenderTargetManager
 {
 public:

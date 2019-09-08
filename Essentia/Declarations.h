@@ -19,6 +19,10 @@ typedef uint32 PipelineStateID;
 typedef uint32 RootSignatureID;
 typedef uint32 ResourceID;
 
+typedef uint32 RenderTargetID;
+typedef uint32 DepthStencilID;
+
+
 //Engine Constants
 constexpr uint32 CFrameBufferCount = 3;
 constexpr uint32 CFrameMaxDescriptorHeapCount = 2048;
@@ -30,6 +34,9 @@ constexpr uint32 CMaxD3DResources = 1024;
 constexpr uint32 CMaxPipelineStates = 96;
 constexpr uint32 CMaxRootSignatures = 24;
 
+constexpr int CMaxRenderTargets = 64;
+constexpr int CMaxDepthStencils = 16;
+
 struct ConstantBufferView
 {
 	uint64		Offset;
@@ -38,7 +45,7 @@ struct ConstantBufferView
 
 struct DataPack
 {
-	void* Data;
+	void*	Data;
 	uint32	Size;
 };
 
