@@ -105,6 +105,7 @@ public:
 
 	~Vector()
 	{
+		if (!buffer) return;
 		for (auto& val : *this)
 		{
 			val.~T();
@@ -114,7 +115,7 @@ public:
 		{
 			allocator->Free((byte*)buffer);
 		}
-		else if (buffer) 
+		else if (buffer)
 		{
 			Mem::Free((void*)buffer);
 		}

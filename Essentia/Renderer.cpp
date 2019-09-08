@@ -91,12 +91,18 @@ void Renderer::Initialize()
 		renderTargetTextures[i] = shaderResourceManager->CreateTexture(renderTargetBuffers[i].Get());
 	}
 
-	renderStages.Reserve(32);
+	for (size_t i = 0; i < eRenderTypeCount; ++i)
+	{
+		Vector<ScopedPtr<IRenderStage>> stages(16);
+		renderStages.insert(std::pair<RenderStageType, Vector<ScopedPtr<IRenderStage>>>((RenderStageType)i, std::move(stages)));
+	}
 
-	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
-	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
-	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
-	renderStages.Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
+	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
+	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
+
+
+	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
+	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
 	postProcessStages.Reserve(32);
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
@@ -109,9 +115,10 @@ void Renderer::Initialize()
 	lightBuffer.PointLight.Range = 5.f;
 	lightBuffer.PointLight.Intensity = 2.f;
 
-	for (auto& stage : renderStages)
+	for (auto& stageSegement : renderStages)
 	{
-		stage->Initialize();
+		for (auto& stage : stageSegement.second)
+			stage->Initialize();
 	}
 
 	for (auto& stage : postProcessStages)
@@ -119,28 +126,28 @@ void Renderer::Initialize()
 		stage->Initialize();
 	}
 
-	window->RegisterOnResizeCallback([&]() 
-	{
-		if (!commandContext.Get()) return;
-		for (int i = 0; i < CFrameBufferCount; ++i)
+	window->RegisterOnResizeCallback([&]()
 		{
-			commandContext->WaitForFrame(i);
-		}
-		for (int i = 0; i < CFrameBufferCount; ++i)
-		{
-			renderTargetBuffers[i].ReleaseAndGetAddressOf();
-		}
+			if (!commandContext.Get()) return;
+			for (int i = 0; i < CFrameBufferCount; ++i)
+			{
+				commandContext->WaitForFrame(i);
+			}
+			for (int i = 0; i < CFrameBufferCount; ++i)
+			{
+				renderTargetBuffers[i].ReleaseAndGetAddressOf();
+			}
 
-		resourceManager->Release(depthBufferResourceId);
-		
-		deviceResources->GetSwapChain()->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
-		for (int i = 0; i < CFrameBufferCount; ++i)
-		{
-			auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
-			 renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
-		}
+			resourceManager->Release(depthBufferResourceId);
 
-	});
+			deviceResources->GetSwapChain()->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
+			for (int i = 0; i < CFrameBufferCount; ++i)
+			{
+				auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
+				renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
+			}
+
+		});
 }
 
 void Renderer::Clear()
@@ -165,9 +172,12 @@ void Renderer::Clear()
 	frameManager->Reset(imageIndex);
 	renderBucket.Clear();
 
-	for (size_t i = 0; i < renderStages.size(); ++i)
+	for (auto& renderStage : renderStages)
 	{
-		renderStages[i]->Clear();
+		for (auto& stage : renderStage.second)
+		{
+			stage->Clear();
+		}
 	}
 }
 
@@ -271,6 +281,11 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 
+	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
+	{
+		stage->Render(backBufferIndex, frameContext);
+	}
+
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	for (auto& postProcessStage : postProcessStages)
@@ -282,7 +297,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	SetDefaultRenderTarget();
 
-	for (auto& renderStage : renderStages)
+	for (auto& renderStage : renderStages[eRenderStageGUI]) //GUI Render pass
 	{
 		renderStage->Render(imageIndex, frameContext);
 	}
@@ -314,7 +329,8 @@ void Renderer::CleanUp()
 	commandContext->CleanUp();
 	for (auto& renderStage : renderStages)
 	{
-		renderStage->CleanUp();
+		for (auto& stage : renderStage.second)
+			stage->CleanUp();
 	}
 }
 

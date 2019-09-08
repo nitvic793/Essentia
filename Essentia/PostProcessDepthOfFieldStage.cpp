@@ -21,7 +21,7 @@ void PostProcessDepthOfFieldStage::Initialize()
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
-	downscaleFactor = 1;
+	downscaleFactor = 2;
 	auto texFormat = renderer->GetRenderTargetFormat();
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
@@ -146,8 +146,8 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 
 	viewport.Width = (FLOAT)screenSize.Width;
 	viewport.Height = (FLOAT)screenSize.Height;
-	scissorRect.right = screenSize.Width;
-	scissorRect.bottom = screenSize.Height;
+	scissorRect.right = screenSize.Width/2;
+	scissorRect.bottom = screenSize.Height/2;
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);

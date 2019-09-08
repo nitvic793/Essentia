@@ -20,6 +20,7 @@
 #include "MainPassRenderStage.h"
 #include <GraphicsMemory.h>
 #include "Utility.h"
+#include <map>
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
@@ -113,7 +114,8 @@ private:
 	TextureID			prefilterTexture;
 
 	ModelManager							modelManager;
-	Vector<ScopedPtr<IRenderStage>>			renderStages;
+	std::map<RenderStageType, Vector<ScopedPtr<IRenderStage>>> renderStages;
+	//Vector<ScopedPtr<IRenderStage>>			renderStages;
 	Vector<ScopedPtr<IPostProcessStage>>	postProcessStages;
 	DescriptorHeap							imguiHeap;
 	ScopedPtr<Window>						window;
