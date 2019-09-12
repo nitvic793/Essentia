@@ -129,6 +129,7 @@ private:
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 	TextureID								renderTargetTextures[CFrameBufferCount];
+	TextureID								depthStencilTexture;
 	ScopedPtr<CommandContext>				commandContext;
 };
 

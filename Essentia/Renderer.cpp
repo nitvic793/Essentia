@@ -61,7 +61,6 @@ void Renderer::Initialize()
 	scissorRect.right = width;
 	scissorRect.bottom = height;
 
-	CreateDepthStencil();
 	InitializeCommandContext();
 	CreateRootSignatures();
 	CreatePSOs();
@@ -79,6 +78,8 @@ void Renderer::Initialize()
 	ec->DeviceResources = deviceResources.get();
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
+
+	CreateDepthStencil();
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -623,6 +624,8 @@ void Renderer::CreateDepthStencil()
 
 	auto depthBuffer = resourceManager->GetResource(depthBufferResourceId);
 	depthStencilId = renderTargetManager->CreateDepthStencilView(depthBuffer, depthFormat);
+
+	depthStencilTexture = shaderResourceManager->CreateTexture(depthBuffer, false, nullptr, DXGI_FORMAT_R32_FLOAT);
 }
 
 void Renderer::WaitForPreviousFrame()

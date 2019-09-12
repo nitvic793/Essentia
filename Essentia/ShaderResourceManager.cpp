@@ -142,7 +142,7 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	return texIndex;
 }
 
-TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool isCubeMap, const char* name)
+TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool isCubeMap, const char* name, DXGI_FORMAT format)
 {
 	StringID stringId;
 	if (name == nullptr)
@@ -162,7 +162,26 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	auto device = deviceResources->GetDevice();
 	auto texIndex = textureCount;
 	textureCount++;
-	CreateShaderResourceView(device, resource, textureHeap.handleCPU(texIndex), isCubeMap);
+
+	if (format == DXGI_FORMAT_UNKNOWN)
+	{
+		CreateShaderResourceView(device, resource, textureHeap.handleCPU(texIndex), isCubeMap);
+	}
+	else
+	{
+		auto viewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		if (isCubeMap) viewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC descSRV = {};
+		ZeroMemory(&descSRV, sizeof(descSRV));
+		descSRV.Texture2D.MipLevels = 1;
+		descSRV.Texture2D.MostDetailedMip = 0;
+		descSRV.Format = format;
+		descSRV.ViewDimension = viewDimension;
+		descSRV.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		device->CreateShaderResourceView(resource, &descSRV, textureHeap.handleCPU(texIndex));
+	}
+
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(resource);
 	return texIndex;
