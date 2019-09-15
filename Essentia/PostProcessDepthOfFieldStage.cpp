@@ -3,7 +3,7 @@
 #include "InputLayout.h"
 #include "Renderer.h"
 #include "PostProcess.h"
-
+#include "PipelineStates.h"
 //Do AO?
 
 struct BlurParams
@@ -21,7 +21,6 @@ void PostProcessDepthOfFieldStage::Initialize()
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
-	downscaleFactor = 2;
 	auto texFormat = renderer->GetRenderTargetFormat();
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
@@ -29,7 +28,7 @@ void PostProcessDepthOfFieldStage::Initialize()
 	psoDesc.InputLayout.NumElements = 0;
 	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();
 	psoDesc.VS = ShaderManager::LoadShader(L"QuadVS.cso");
-	psoDesc.PS = ShaderManager::LoadShader(L"QuadPS.cso");
+	psoDesc.PS = ShaderManager::LoadShader(L"BlurPS.cso");
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.DepthStencilState.DepthEnable = false;
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
@@ -41,77 +40,52 @@ void PostProcessDepthOfFieldStage::Initialize()
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.NumRenderTargets = 1;
 
-	quadPso = ec->ResourceManager->CreatePSO(psoDesc);
-
-	psoDesc.PS = ShaderManager::LoadShader(L"BlurPS.cso");
 	blurPso = ec->ResourceManager->CreatePSO(psoDesc);
-
-	auto screenSize = renderer->GetScreenSize();
-
-	//Quarter res
-	screenSize.Height /= downscaleFactor;
-	screenSize.Width /= downscaleFactor;
-
-	lowResTarget = CreatePostProcessRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
 
 	blurHorizontalCBV = ec->ShaderResourceManager->CreateCBV(sizeof(BlurParams));
 	blurVerticalCBV = ec->ShaderResourceManager->CreateCBV(sizeof(BlurParams));
-	blurIntermidateTarget = CreatePostProcessRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
-	blurFinalTarget = CreatePostProcessRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
+	auto halfRes = GPostProcess.GetPostSceneTextures().HalfResSize;
+	blurIntermidateTarget = CreatePostProcessRenderTarget(ec, halfRes.Width, halfRes.Height, texFormat);
+	blurFinalTarget = CreatePostProcessRenderTarget(ec, halfRes.Width, halfRes.Height, texFormat);
+
+	GPostProcess.RegisterPostProcess("DepthOfField", this);
+	GPostProcess.RegisterPostProcess("Test", this);
 }
 
 TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex, TextureID inputTexture)
 {
-
 	auto ec = EngineContext::Context;
 	auto renderer = ec->RendererInstance;
 	auto commandList = renderer->GetDefaultCommandList();
-	renderer->TransitionBarrier(commandList, lowResTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-
-	auto rtv = ec->RenderTargetManager->GetRTVHandle(lowResTarget.RenderTarget);
 	float color[] = { 0,0,0,1 };
+	auto lowResTextures = GPostProcess.GetPostSceneTextures();
+	auto screenSize = lowResTextures.HalfResSize;
+	auto lowResTarget = GPostProcess.GetPostSceneTextures().HalfResTexture;
 
-	auto screenSize = renderer->GetScreenSize();
+	TransitionDesc transitions[] = {
+		{  blurIntermidateTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
+	};
 
-	//Quarter res
-	screenSize.Height /= downscaleFactor;
-	screenSize.Width /= downscaleFactor;
+	renderer->TransitionBarrier(commandList, transitions, 1);
+
+	BlurParams params = { 0, (float)screenSize.Width, (float)screenSize.Height };
+	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &params, sizeof(params) }, blurHorizontalCBV.Offset);
+	params.Direction = 1;
+	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &params, sizeof(params) }, blurVerticalCBV.Offset);
 
 	D3D12_VIEWPORT viewport = {};
-
 	viewport.Width = (FLOAT)screenSize.Width;
 	viewport.Height = (FLOAT)screenSize.Height;
 
 	D3D12_RECT scissorRect = {};
-
 	scissorRect.left = 0;
 	scissorRect.top = 0;
 	scissorRect.right = screenSize.Width;
 	scissorRect.bottom = screenSize.Height;
 
-	commandList->SetGraphicsRootSignature(renderer->GetDefaultRootSignature());
-	commandList->ClearRenderTargetView(rtv, color, 0, nullptr);
-	renderer->SetRenderTargets(&lowResTarget.RenderTarget, 1, nullptr);
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-
-	commandList->SetPipelineState(ec->ResourceManager->GetPSO(quadPso));
-
-	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, renderer->GetCurrentRenderTargetTexture());
-	renderer->DrawScreenQuad(commandList);
-
-	BlurParams params = { 0, (float)screenSize.Width, (float)screenSize.Height };
-
-	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &params, sizeof(params) }, blurHorizontalCBV.Offset);
-	params.Direction = 1;
-	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &params, sizeof(params) }, blurVerticalCBV.Offset);
-
-	TransitionDesc transitions[] = {
-		{ lowResTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE },
-		{  blurIntermidateTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
-	};
-
-	renderer->TransitionBarrier(commandList, transitions, 2);
+	commandList->SetGraphicsRootSignature(renderer->GetDefaultRootSignature());
 
 	auto blurRtv = ec->RenderTargetManager->GetRTVHandle(blurIntermidateTarget.RenderTarget);
 	commandList->ClearRenderTargetView(blurRtv, color, 0, nullptr);
@@ -136,7 +110,6 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, blurVerticalCBV);
 	renderer->DrawScreenQuad(commandList);
 
-
 	renderer->TransitionBarrier(commandList, blurFinalTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	renderer->TransitionBarrier(commandList, renderer->GetCurrentRenderTargetResource(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	screenSize = renderer->GetScreenSize();
@@ -146,15 +119,15 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 
 	viewport.Width = (FLOAT)screenSize.Width;
 	viewport.Height = (FLOAT)screenSize.Height;
-	scissorRect.right = screenSize.Width/2;
-	scissorRect.bottom = screenSize.Height/2;
+	scissorRect.right = screenSize.Width;
+	scissorRect.bottom = screenSize.Height;
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	commandList->SetPipelineState(ec->ResourceManager->GetPSO(quadPso));
+	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.QuadPSO));
 	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, blurFinalTarget.Texture);
 	renderer->DrawScreenQuad(commandList);
 
 	renderer->TransitionBarrier(commandList, renderer->GetCurrentRenderTargetResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	return renderer->GetCurrentRenderTargetTexture();
+	return blurFinalTarget.Texture;
 }

@@ -5,6 +5,7 @@
 #include "imgui_impl_dx12.h"
 #include "Renderer.h"
 #include "Entity.h"
+#include "PostProcess.h"
 
 void ImguiRenderStage::Initialize()
 {
@@ -43,19 +44,18 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	if (show)
-		ImGui::ShowDemoWindow(&show);
+	/*if (show)
+		ImGui::ShowDemoWindow(&show);*/
 
 	{
 		static float f = 0.0f;
 		static int counter = 0;
-
+		static bool vsync = false;
 		ImGui::Begin("Essentia");                          // Create a window called "Hello, world!" and append into it.
 
 		ImGui::Text("Basic Editor");               // Display some text (you can use a format strings too)
-		ImGui::Checkbox("Demo Window", &show);					// Edit bools storing our window open/close state
-
-
+		ImGui::Checkbox("Post Process Window", &show);					// Edit bools storing our window open/close state
+		ImGui::Checkbox("Vsync", &vsync);
 		ImGui::ColorEdit3("Dir Light Color", (float*)& dirLights[0].Color.x); // Edit 3 floats representing a color
 		ImGui::DragFloat3("Dir Light Direction", (float*)& dirLights[0].Direction, 0.1f, -1.f, 1.f);
 		ImGui::SliderFloat("Dir Light Intensity", (float*)& dirLights[0].Intensity, 0.0f, 100.f, "%.3f", 2.1f);
@@ -68,6 +68,17 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::Text("counter = %d", counter);
 
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+		ImGui::End();
+
+		EngineContext::Context->RendererInstance->SetVSync(vsync);
+	}
+
+	if (show)
+	{
+		static bool dof = true;
+		ImGui::Begin("Post Process", &show);
+		ImGui::Checkbox("Depth Of Field", &dof);
+		GPostProcess.SetEnabled("DepthOfField", dof);
 		ImGui::End();
 	}
 

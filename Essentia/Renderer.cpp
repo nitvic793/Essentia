@@ -17,6 +17,7 @@
 #include "SkyBoxRenderStage.h"
 #include "OutlineRenderStage.h"
 #include "PostProcessDepthOfFieldStage.h"
+#include "PipelineStates.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -43,7 +44,6 @@ void Renderer::Initialize()
 	device = deviceResources->GetDevice();
 	renderTargetManager->Initialize(device);
 	resourceManager->Initialize(device);
-	gpuMemory = MakeScopedArgs<GraphicsMemory>(device);
 
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
@@ -80,6 +80,9 @@ void Renderer::Initialize()
 	ec->ModelManager = &modelManager;
 
 	CreateDepthStencil();
+
+	GPipelineStates.Initialize();
+	GPostProcess.Intitialize();
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -288,21 +291,25 @@ void Renderer::Render(const FrameContext& frameContext)
 	}
 
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	PIXEndEvent(commandList);
 
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Post Process");
+	GPostProcess.GenerateLowResTextures();
 	for (auto& postProcessStage : postProcessStages)
 	{
-		postProcessStage->RenderPostProcess(backBufferIndex, renderTargetTextures[backBufferIndex]);
+		if (postProcessStage->Enabled)
+			postProcessStage->RenderPostProcess(backBufferIndex, renderTargetTextures[backBufferIndex]);
 	}
 
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	PIXEndEvent(commandList);
 
 	SetDefaultRenderTarget();
-
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"GUI");
 	for (auto& renderStage : renderStages[eRenderStageGUI]) //GUI Render pass
 	{
 		renderStage->Render(imageIndex, frameContext);
 	}
-
 	PIXEndEvent(commandList);
 }
 
@@ -313,7 +320,7 @@ void Renderer::Present()
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
-	auto hr = swapChain->Present(0, 0);
+	auto hr = swapChain->Present(vsync ? 1 : 0, 0);
 	if (FAILED(hr))
 	{
 		hr = device->GetDeviceRemovedReason();
@@ -426,6 +433,11 @@ DepthStencilID Renderer::GetCurrentDepthStencil() const
 	return depthStencilId;
 }
 
+TextureID Renderer::GetCurrentDepthStencilTexture() const
+{
+	return depthStencilTexture;
+}
+
 ID3D12RootSignature* Renderer::GetDefaultRootSignature() const
 {
 	return resourceManager->GetRootSignature(mainRootSignatureID);
@@ -535,6 +547,11 @@ void Renderer::SetDefaultRenderTarget()
 RenderTargetID Renderer::GetDefaultRenderTarget()
 {
 	return renderTargets[backBufferIndex];
+}
+
+void Renderer::SetVSync(bool enabled)
+{
+	vsync = enabled;
 }
 
 void Renderer::InitializeCommandContext()

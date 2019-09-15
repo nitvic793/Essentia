@@ -20,6 +20,15 @@ TextureCube skyIrradianceTexture	: register(t16);
 Texture2D	brdfLUTTexture			: register(t17);
 TextureCube skyPrefilterTexture		: register(t18);
 
+float3 ToneMapFilmicALU(float3 color)
+{
+	color = max(0, color - 0.004f);
+	color = (color * (6.2f * color + 0.5f)) / (color * (6.2f * color + 1.7f) + 0.06f);
+
+	// result has 1/2.2 baked in
+	return pow(color, 2.2f);
+}
+
 float3 PrefilteredColor(float3 viewDir, float3 normal, float roughness)
 {
 	const float MAX_REF_LOD = 8.0f; // (mip level - 1) Mip Levels = 9
@@ -69,7 +78,7 @@ float4 main(PixelInput input) : SV_TARGET
 
 	float3 output = finalColor;
 	//output = output / (float3(1,1,1) + output);
-	output = lerp(output, pow(abs(output), 1.f / 2.2f), 0.4f); 
+	//output = lerp(output, pow(abs(output), 1.f / 2.2f), 0.4f); 
 
-	return float4(output, 1.0f);
+	return float4(ToneMapFilmicALU(output), 1.0f);
 }

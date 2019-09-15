@@ -157,6 +157,9 @@
     <ClCompile Include="PostProcess.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PipelineStates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -314,6 +317,9 @@
     </ClInclude>
     <ClInclude Include="Serialization.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PipelineStates.h">
+      <Filter>Header Files\Renderer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,9 @@
 #pragma once
 
+#include <map>
+#include <memory>
+
+
 #include "Declarations.h"
 #include "Window.h"
 #include "DeviceResources.h"
@@ -11,16 +15,15 @@
 #include "ConstantBuffer.h"
 #include "DXUtility.h"
 #include "ShaderResourceManager.h"
-#include <memory>
 #include "Timer.h"
 #include "BaseComponents.h"
 #include "RenderBucket.h"
 #include "FrameContext.h"
 #include "RenderStage.h"
 #include "MainPassRenderStage.h"
-#include <GraphicsMemory.h>
 #include "Utility.h"
-#include <map>
+#include "PostProcess.h"
+
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
@@ -58,6 +61,7 @@ public:
 	RenderTargetID				GetCurrentRenderTarget() const;
 	TextureID					GetCurrentRenderTargetTexture() const;
 	DepthStencilID				GetCurrentDepthStencil() const;
+	TextureID					GetCurrentDepthStencilTexture() const;
 	ID3D12RootSignature*		GetDefaultRootSignature() const;
 	DXGI_FORMAT					GetRenderTargetFormat() const;
 	DXGI_FORMAT					GetDepthStencilFormat() const;
@@ -75,6 +79,7 @@ public:
 	ID3D12Resource*				GetCurrentRenderTargetResource();
 	void						SetDefaultRenderTarget();
 	RenderTargetID				GetDefaultRenderTarget();
+	void						SetVSync(bool enabled);
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();
@@ -108,6 +113,7 @@ private:
 	GPUHeapID			texID;
 	GPUHeapOffsets		offsets;
 	Material			material;
+	bool				vsync = false;
 
 	TextureID			irradianceTexture;
 	TextureID			brdfLutTexture;
@@ -115,7 +121,6 @@ private:
 
 	ModelManager							modelManager;
 	std::map<RenderStageType, Vector<ScopedPtr<IRenderStage>>> renderStages;
-	//Vector<ScopedPtr<IRenderStage>>			renderStages;
 	Vector<ScopedPtr<IPostProcessStage>>	postProcessStages;
 	DescriptorHeap							imguiHeap;
 	ScopedPtr<Window>						window;
@@ -125,7 +130,6 @@ private:
 	ScopedPtr<MeshManager>					meshManager;
 	ScopedPtr<ShaderResourceManager>		shaderResourceManager;
 	ScopedPtr<FrameManager>					frameManager;
-	ScopedPtr<DirectX::GraphicsMemory>		gpuMemory;
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 	TextureID								renderTargetTextures[CFrameBufferCount];

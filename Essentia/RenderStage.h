@@ -22,12 +22,3 @@ public:
 	virtual ~IRenderStage() {};
 private:
 };
-
-//TODO : Pass the processed screen texture to the next stage
-class IPostProcessStage
-{
-public:
-	virtual void		Initialize() {};
-	virtual TextureID	RenderPostProcess(uint32 backbufferIndex, TextureID inputTexture) = 0; //Assume input texture size is always full size of the window
-};
-

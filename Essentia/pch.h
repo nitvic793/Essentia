@@ -11,7 +11,6 @@
 #include <D3Dcompiler.h>
 #include <DirectXMath.h>
 #include "d3dx12.h"
-#include "Declarations.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -22,5 +21,4 @@
 #include <list>
 #include <deque>
 #include <memory>
-#include "DXUtility.h"
 #include <stdexcept>
