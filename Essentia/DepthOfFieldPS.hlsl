@@ -41,7 +41,8 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float depth = DepthTexture.Sample(BasicSampler, input.uv).r;
 
 	float linearZ = LinearZ(depth);
-	float radius = (FocusPlaneZ - linearZ) * Scale;
+	float scale = 1.f - Scale;
+	float radius = (FocusPlaneZ - linearZ) * (scale * scale);
 	radius = clamp(radius * 2.0, -1.0, 1.0);
 	float3 result = lerp(sharp.rgb, blur, abs(radius));
 	return float4(result, 1.f);

@@ -46,7 +46,7 @@ void PostProcessDepthOfFieldStage::Initialize()
 	blurIntermidateTarget = CreatePostProcessRenderTarget(ec, halfRes.Width, halfRes.Height, texFormat);
 	blurFinalTarget = CreatePostProcessRenderTarget(ec, halfRes.Width, halfRes.Height, texFormat);
 	dofTarget = CreatePostProcessRenderTarget(ec, fullRes.Width, fullRes.Height, texFormat);
-	DofParams = { 0, 0, 5.f, 0.5f };
+	DofParams = { 0, 0, 5.f, 0.90f };
 	GPostProcess.RegisterPostProcess("DepthOfField", this);
 }
 

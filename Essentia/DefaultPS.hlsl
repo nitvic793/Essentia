@@ -79,6 +79,6 @@ float4 main(PixelInput input) : SV_TARGET
 	float3 output = finalColor;
 	//output = output / (float3(1,1,1) + output);
 	//output = lerp(output, pow(abs(output), 1.f / 2.2f), 0.4f); 
-
-	return float4(ToneMapFilmicALU(output), 1.0f);
+	output = ToneMapFilmicALU(output);
+	return float4(output, 1.0f);
 }

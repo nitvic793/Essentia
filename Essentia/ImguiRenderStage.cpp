@@ -76,7 +76,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::Begin("Post Process", &show);
 		ImGui::Checkbox("Depth Of Field", &dof);
 		ImGui::DragFloat("Focus Plane", &dofStage->DofParams.FocusPlaneZ);
-		ImGui::DragFloat("Scale", &dofStage->DofParams.Scale);
+		ImGui::DragFloat("Scale", &dofStage->DofParams.Scale, 0.01f, 0.f, 1.f, "%.3f",0.5f);
 		GPostProcess.SetEnabled("DepthOfField", dof);
 		ImGui::End();
 	}
