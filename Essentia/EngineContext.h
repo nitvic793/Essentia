@@ -1,11 +1,5 @@
 #pragma once
 
-#include "Declarations.h"
-#include "Mesh.h"
-#include "Material.h"
-#include "EntityBase.h"
-#include "Transform.h"
-
 class EntityManager;
 class Renderer;
 class MeshManager;
@@ -15,6 +9,7 @@ class DeviceResources;
 class CommandContext;
 class RenderTargetManager;
 class ModelManager;
+class FrameManager;
 
 struct EngineContext
 {
@@ -28,6 +23,7 @@ struct EngineContext
 	DeviceResources*		DeviceResources = nullptr;
 	RenderTargetManager*	RenderTargetManager = nullptr;
 	ModelManager*			ModelManager = nullptr;
+	FrameManager*			FrameManager = nullptr;
 	EngineContext()
 	{
 		Context = this;

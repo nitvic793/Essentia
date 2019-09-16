@@ -2,6 +2,12 @@
 
 #include "EngineContext.h"
 
+#include "Declarations.h"
+#include "Mesh.h"
+#include "Material.h"
+#include "EntityBase.h"
+#include "Transform.h"
+
 enum LightType
 {
 	Directional = 0,

@@ -78,6 +78,7 @@ void Renderer::Initialize()
 	ec->DeviceResources = deviceResources.get();
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
+	ec->FrameManager = frameManager.get();
 
 	CreateDepthStencil();
 
@@ -220,7 +221,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	}
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
-	//offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
+	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
 	auto rtId = renderTargets[backBufferIndex];
 	auto commandList = commandContext->GetDefaultCommandList();
@@ -290,18 +291,23 @@ void Renderer::Render(const FrameContext& frameContext)
 		stage->Render(backBufferIndex, frameContext);
 	}
 
+	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	PIXEndEvent(commandList);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Post Process");
 	GPostProcess.GenerateLowResTextures();
+	auto inputTexture = renderTargetTextures[backBufferIndex];
 	for (auto& postProcessStage : postProcessStages)
 	{
 		if (postProcessStage->Enabled)
-			postProcessStage->RenderPostProcess(backBufferIndex, renderTargetTextures[backBufferIndex]);
+		{
+			inputTexture = postProcessStage->RenderPostProcess(backBufferIndex, inputTexture, frameContext);
+		}
 	}
 
 	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	PIXEndEvent(commandList);
 
 	SetDefaultRenderTarget();
@@ -504,6 +510,12 @@ void Renderer::SetShaderResourceView(ID3D12GraphicsCommandList* commandList, Roo
 	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texture));
 }
 
+void Renderer::SetShaderResourceViews(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID* textures, uint32 textureCount)
+{
+	auto handle = shaderResourceManager->AllocateTextures(textures, textureCount, backBufferIndex, frameManager.get());
+	commandList->SetGraphicsRootDescriptorTable(slot, handle);
+}
+
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
 	auto resource = resourceManager->GetResource(resourceId);
@@ -527,6 +539,22 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const T
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to));
+}
+
+void Renderer::SetTargetSize(ID3D12GraphicsCommandList* commandList, ScreenSize screenSize)
+{
+	D3D12_VIEWPORT viewport = {};
+	viewport.Width = (FLOAT)screenSize.Width;
+	viewport.Height = (FLOAT)screenSize.Height;
+
+	D3D12_RECT scissorRect = {};
+	scissorRect.left = 0;
+	scissorRect.top = 0;
+	scissorRect.right = screenSize.Width;
+	scissorRect.bottom = screenSize.Height;
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
 }
 
 ID3D12Resource* Renderer::GetCurrentRenderTargetResource()

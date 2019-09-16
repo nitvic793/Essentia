@@ -29,6 +29,9 @@ public:
 	TextureID			CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN);
 	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
 	
+	void				CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
+	D3D12_GPU_DESCRIPTOR_HANDLE	AllocateTextures(TextureID* textures, uint32 textureCount, uint32 frameIndex, FrameManager* frameManager);
+
 	const Material&		GetMaterial(MaterialHandle handle);
 	MaterialHandle		GetMaterialHandle(StringID material);
 	TextureID			GetTexture(StringID texture);

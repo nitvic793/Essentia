@@ -7,6 +7,7 @@
 #include "ResourceManager.h"
 #include <wrl.h>
 #include "DirectXHelpers.h"
+#include "EngineContext.h"
 
 TextureID Default::DefaultDiffuse = 0;
 TextureID Default::DefaultMetalness = 0;
@@ -217,6 +218,28 @@ MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32
 	materialCount += textureCount;
 	materialMap[stringId] = handle;
 	return handle;
+}
+
+void ShaderResourceManager::CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap)
+{
+	auto device = deviceResources->GetDevice();
+	for (uint32 i = 0; i < textureCount; ++i)
+	{
+		device->CopyDescriptorsSimple(1, textureHeap.handleCPU(textures[i]), heap.handleCPU(i), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	}
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::AllocateTextures(TextureID* textures, uint32 textureCount, uint32 frameIndex, FrameManager* frameManager)
+{
+	assert(textureCount >= 1);
+	auto device = deviceResources->GetDevice();
+	uint32 firstIndex = frameManager->Allocate(frameIndex, textureHeap, 1, textures[0]);;
+	for (uint32 i = 1; i < textureCount; ++i)
+	{
+		frameManager->Allocate(frameIndex, textureHeap, 1, textures[i]);
+	}
+
+	return frameManager->GetHandle(frameIndex, firstIndex);
 }
 
 const Material& ShaderResourceManager::GetMaterial(MaterialHandle handle)

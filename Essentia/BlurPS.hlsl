@@ -7,7 +7,7 @@ struct VertexToPixel
 
 cbuffer BlurParams
 {
-	int		Direction; // 0 - Horizontal, 1 - Vertical
+	float2	Direction; // 0 - Horizontal, 1 - Vertical
 	float	Width;
 	float	Height;
 };
@@ -18,16 +18,13 @@ static const float weight[] = {
   0.0540540541, 0.0162162162
 };
 
-Texture2D		InputTexture : register(t0);
-SamplerState	BasicSampler : register(s0);
+Texture2D			InputTexture : register(t0);
+Texture2D<float>	DepthTexture : register(t1);
+SamplerState		BasicSampler : register(s0);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float2 dir;
-	if (Direction == 0)
-		dir = float2(1.f, 0.f);
-	else
-		dir = float2(0.f, 1.f);
+	float2 dir = Direction;
 
 	float3 texColor = InputTexture.Sample(BasicSampler, input.uv).rgb;
 	float3 color = float3(0.f, 0.f, 0.f);

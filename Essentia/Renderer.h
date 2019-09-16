@@ -3,7 +3,6 @@
 #include <map>
 #include <memory>
 
-
 #include "Declarations.h"
 #include "Window.h"
 #include "DeviceResources.h"
@@ -25,14 +24,6 @@
 #include "PostProcess.h"
 
 
-enum RootParameterSlot {
-	RootSigCBVertex0 = 0,
-	RootSigCBPixel0,
-	RootSigSRVPixel1,
-	RootSigCBAll1,
-	RootSigCBAll2,
-	RootSigIBL
-};
 
 struct TransitionDesc
 {
@@ -73,9 +64,11 @@ public:
 	void						DrawScreenQuad(ID3D12GraphicsCommandList* commandList);
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
 	void						SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture);
+	void						SetShaderResourceViews(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID* textures, uint32 textureCount);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionDesc* transitions, uint32 count);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
+	void						SetTargetSize(ID3D12GraphicsCommandList* commandList, ScreenSize screenSize);
 	ID3D12Resource*				GetCurrentRenderTargetResource();
 	void						SetDefaultRenderTarget();
 	RenderTargetID				GetDefaultRenderTarget();
@@ -130,10 +123,12 @@ private:
 	ScopedPtr<MeshManager>					meshManager;
 	ScopedPtr<ShaderResourceManager>		shaderResourceManager;
 	ScopedPtr<FrameManager>					frameManager;
+
 	std::vector<RenderTargetID>				renderTargets;
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 	TextureID								renderTargetTextures[CFrameBufferCount];
 	TextureID								depthStencilTexture;
+
 	ScopedPtr<CommandContext>				commandContext;
 };
 

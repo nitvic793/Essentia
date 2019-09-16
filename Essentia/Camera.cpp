@@ -3,7 +3,9 @@
 
 using namespace DirectX;
 
-Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAngles)
+Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAngles):
+	NearZ(nearZ),
+	FarZ(farZ)
 {
 	Position = XMFLOAT3(0, 0, -5);
 	Direction = XMFLOAT3(0, 0, 1);
@@ -42,6 +44,15 @@ const XMFLOAT4X4& Camera::GetView()
 const DirectX::XMFLOAT4X4& Camera::GetProjection()
 {
 	return Projection;
+}
+
+DirectX::XMFLOAT4X4 Camera::GetInverseProjectionTransposed()
+{
+	XMFLOAT4X4 invProjMatrix;
+	auto proj = XMLoadFloat4x4(&Projection);
+	auto invProj = XMMatrixInverse(nullptr, proj);
+	XMStoreFloat4x4(&invProjMatrix, invProj);
+	return invProjMatrix;
 }
 
 XMFLOAT4X4 Camera::GetViewTransposed()

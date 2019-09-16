@@ -2,6 +2,7 @@
 #include "Declarations.h"
 #include "EngineContext.h"
 #include <unordered_map>
+#include "FrameContext.h"
 
 struct PostProcessRenderTarget
 {
@@ -17,11 +18,12 @@ class IPostProcessStage
 {
 public:
 	virtual void		Initialize() {};
-	virtual TextureID	RenderPostProcess(uint32 backbufferIndex, TextureID inputTexture) = 0; //Assume input texture size is always full size of the window
+	virtual TextureID	RenderPostProcess(uint32 backbufferIndex, TextureID inputTexture, const FrameContext& frameContext) = 0; //Assume input texture size is always full size of the window
 	void				SetEnabled(bool enabled);
 	bool				Enabled = true;
+protected:
+	void RenderToSceneTarget(TextureID inputTexture);
 private:
-
 };
 
 
@@ -43,6 +45,7 @@ public:
 	PostSceneTextures	GetPostSceneTextures();
 	void				RegisterPostProcess(std::string_view postProcessString, IPostProcessStage* stage);
 	void				SetEnabled(std::string_view postProcess, bool enabled);
+	IPostProcessStage*	GetPostProcessStage(std::string_view name);
 	PostSceneTextures	PostTextures;
 private:
 	void				RenderToTexture(ID3D12GraphicsCommandList* commandList, PostProcessRenderTarget target, ScreenSize screenSize, Renderer* renderer);

@@ -91,6 +91,11 @@ void PostProcess::SetEnabled(std::string_view postProcess, bool enabled)
 	postProcessStages[postProcess]->SetEnabled(enabled);
 }
 
+IPostProcessStage* PostProcess::GetPostProcessStage(std::string_view name)
+{
+	return postProcessStages[name];
+}
+
 void PostProcess::RenderToTexture(ID3D12GraphicsCommandList* commandList, PostProcessRenderTarget target, ScreenSize screenSize, Renderer* renderer)
 {
 	auto ec = EngineContext::Context;
@@ -124,4 +129,34 @@ void PostProcess::RenderToTexture(ID3D12GraphicsCommandList* commandList, PostPr
 void IPostProcessStage::SetEnabled(bool enabled)
 {
 	Enabled = enabled;
+}
+
+void IPostProcessStage::RenderToSceneTarget(TextureID inputTexture)
+{
+	auto ec = EngineContext::Context;
+	auto renderer = ec->RendererInstance;
+	auto commandList = renderer->GetDefaultCommandList();
+	auto rtTexture = renderer->GetCurrentRenderTargetTexture();
+	auto rtResource = ec->ShaderResourceManager->GetResource(rtTexture);
+
+	D3D12_VIEWPORT viewport = {};
+	D3D12_RECT scissorRect = {};
+	renderer->TransitionBarrier(commandList, rtResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	auto screenSize = renderer->GetScreenSize();
+
+	auto rt = renderer->GetDefaultRenderTarget();
+	renderer->SetRenderTargets(&rt, 1, nullptr);
+
+	viewport.Width = (FLOAT)screenSize.Width;
+	viewport.Height = (FLOAT)screenSize.Height;
+	scissorRect.right = screenSize.Width;
+	scissorRect.bottom = screenSize.Height;
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.QuadPSO));
+	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, inputTexture);
+	renderer->DrawScreenQuad(commandList);
+
+	renderer->TransitionBarrier(commandList, rtResource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }

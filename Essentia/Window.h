@@ -2,12 +2,7 @@
 #include <windows.h>
 #include <functional>
 #include <string>
-
-struct ScreenSize
-{
-	int Width;
-	int Height;
-};
+#include "Declarations.h"
 
 class Window
 {

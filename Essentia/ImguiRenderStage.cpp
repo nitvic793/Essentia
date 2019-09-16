@@ -6,6 +6,7 @@
 #include "Renderer.h"
 #include "Entity.h"
 #include "PostProcess.h"
+#include "PostProcessDepthOfFieldStage.h"
 
 void ImguiRenderStage::Initialize()
 {
@@ -62,11 +63,6 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::SliderFloat("Point Light Range", &pointLights[0].Range, 0.0f, 100.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
 		ImGui::DragFloat3("Point Light Pos", (float*)& transform.Position->x, 0.1f);
 
-		if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-			counter++;
-		ImGui::SameLine();
-		ImGui::Text("counter = %d", counter);
-
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::End();
 
@@ -75,9 +71,12 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 
 	if (show)
 	{
+		auto dofStage = (PostProcessDepthOfFieldStage*)(GPostProcess.GetPostProcessStage("DepthOfField"));
 		static bool dof = true;
 		ImGui::Begin("Post Process", &show);
 		ImGui::Checkbox("Depth Of Field", &dof);
+		ImGui::DragFloat("Focus Plane", &dofStage->DofParams.FocusPlaneZ);
+		ImGui::DragFloat("Scale", &dofStage->DofParams.Scale);
 		GPostProcess.SetEnabled("DepthOfField", dof);
 		ImGui::End();
 	}
