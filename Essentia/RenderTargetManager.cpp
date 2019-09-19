@@ -21,7 +21,7 @@ RenderTargetID RenderTargetManager::CreateRenderTargetView(ID3D12Resource* rende
 	desc.Format = format;
 	
 	renderBuffers.push_back(renderBuffer);
-	renderBuffer->SetName(L"Render Target");
+	renderBuffer->SetName(ToWString(std::to_string(id) + "Render Target").c_str());
 	device->CreateRenderTargetView(renderBuffer, &desc, rtvHeap.handleCPU(id));
 	return id;
 }

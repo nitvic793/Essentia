@@ -101,6 +101,11 @@ void CommandContext::CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12Command
 	device->CreateCommandAllocator(type, IID_PPV_ARGS(allocator));
 }
 
+uint64& CommandContext::Fence(int index)
+{
+	return fenceValues[index];
+}
+
 void CommandContext::WaitForFrame(uint32 index)
 {
 	backBufferIndex = index;

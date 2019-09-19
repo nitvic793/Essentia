@@ -136,22 +136,24 @@ void Renderer::Initialize()
 			if (!commandContext.Get()) return;
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
-				commandContext->WaitForFrame(i);
-			}
-			for (int i = 0; i < CFrameBufferCount; ++i)
-			{
-				renderTargetBuffers[i].ReleaseAndGetAddressOf();
+				renderTargetBuffers[i].Reset();
+				commandContext->Fence(i) = commandContext->Fence(backBufferIndex);
 			}
 
 			resourceManager->Release(depthBufferResourceId);
+			for (int i = 0; i < CFrameBufferCount; ++i)
+			{
+				commandContext->WaitForFrame(i);
+			}
 
 			deviceResources->GetSwapChain()->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
-				auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].ReleaseAndGetAddressOf()));
+				auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].GetAddressOf()));
 				renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
 			}
 
+			renderTargetManager->ReCreateDepthStencilView(depthStencilId, resourceManager->GetResource(depthBufferResourceId));
 		});
 }
 
