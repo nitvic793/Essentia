@@ -1,12 +1,28 @@
-﻿using CppAst;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CppAst;
 
-namespace Reflector
+namespace Parser
 {
+    class FieldType
+    {
+        string TypeName;
+    }
+
+    class ClassType
+    {
+        public Dictionary<string, string> Fields = new Dictionary<string, string>();
+    }
+
+    class TranslationUnit
+    {
+        public Dictionary<string, ClassType> ReflectedClasses = new Dictionary<string, ClassType>();
+    }
+
     class Program
     {
         static bool NeedsReflection(CppClass Class)
@@ -21,37 +37,80 @@ namespace Reflector
 
         static void Main(string[] args)
         {
+            var directory = @"E:\Projects\Sandbox\Sandbox"; Directory.GetCurrentDirectory();
+            var files = Directory.EnumerateFiles(directory, "*.h", SearchOption.AllDirectories).ToList();
             var options = new CppAst.CppParserOptions
             {
                 ParseMacros = true,
                 Defines = { "Parser" }
             };
 
-            var ast = CppParser.ParseFile("Test.h", options);
-            foreach (var Class in ast.Classes)
+            Dictionary<string, TranslationUnit> translationUnits = new Dictionary<string, TranslationUnit>();
+
+
+
+            bool outRequired = false;
+            foreach (var file in files)
             {
-                if (NeedsReflection(Class))
+                Console.WriteLine("Running Reflector... " + file);
+
+                var ast = CppParser.ParseFile(file, options);
+                foreach (var Class in ast.Classes)
                 {
-                    Console.WriteLine(Class.Name);
-                    foreach (var type in Class.Fields)
+                    var tUnit = Class.Span.Start.File;
+                    tUnit = tUnit.Replace("/", @"\");
+                    if (NeedsReflection(Class))
                     {
-                        if (NeedsReflection(type))
+                        if (!translationUnits.ContainsKey(tUnit))
                         {
-                            Console.WriteLine(type.Name);
-                            if (type.Type.TypeKind == CppTypeKind.StructOrClass)
+                            translationUnits.Add(tUnit, new TranslationUnit());
+                        }
+                        else
+                        {
+                            continue;
+                        }
+
+                        outRequired = true;
+                        if (!translationUnits[tUnit].ReflectedClasses.ContainsKey(Class.Name))
+                        {
+                            translationUnits[tUnit].ReflectedClasses.Add(Class.Name, new ClassType { Fields = new Dictionary<string, string>() });
+                        }
+                        else continue;
+
+                        Console.WriteLine(Class.Name);
+                        foreach (var type in Class.Fields)
+                        {
+                            if (NeedsReflection(type))
                             {
-                                var cls = (CppClass)type.Type;
-                                Console.WriteLine(cls.Name);
-                            }
-                            else if (type.Type.TypeKind == CppTypeKind.Primitive)
-                            {
-                                var cls = (CppPrimitiveType)type.Type;
-                                Console.WriteLine(cls.Kind.ToString());
+                                Console.WriteLine(type.Name);
+                                if (type.Type.TypeKind == CppTypeKind.StructOrClass)
+                                {
+                                    var cls = (CppClass)type.Type;
+                                    Console.WriteLine(cls.Name);
+                                    if (!translationUnits[tUnit].ReflectedClasses[Class.Name].Fields.ContainsKey(type.Name))
+                                        translationUnits[tUnit].ReflectedClasses[Class.Name].Fields.Add(type.Name, cls.Name);
+                                }
+                                else if (type.Type.TypeKind == CppTypeKind.Primitive)
+                                {
+                                    var cls = (CppPrimitiveType)type.Type;
+                                    Console.WriteLine(cls.Kind.ToString());
+                                    if (!translationUnits[tUnit].ReflectedClasses[Class.Name].Fields.ContainsKey(type.Name))
+                                        translationUnits[tUnit].ReflectedClasses[Class.Name].Fields.Add(type.Name, cls.Kind.ToString());
+                                }
                             }
                         }
                     }
                 }
             }
+
+
+            if (outRequired)
+            {
+                var outfile = Directory.GetCurrentDirectory() + @"\";
+                Console.WriteLine(outfile + "Meta.generated.cpp");
+                File.WriteAllText(outfile + "Meta.Generated.cpp", "//This is a generated file " + translationUnits.First().Value.ReflectedClasses.Keys.First());
+            }
+
         }
     }
 }
