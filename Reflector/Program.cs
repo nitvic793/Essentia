@@ -106,9 +106,10 @@ namespace Parser
 
             if (outRequired)
             {
-                var outfile = Directory.GetCurrentDirectory() + @"\";
-                Console.WriteLine(outfile + "Meta.generated.cpp");
-                File.WriteAllText(outfile + "Meta.Generated.cpp", "//This is a generated file " + translationUnits.First().Value.ReflectedClasses.Keys.First());
+                foreach(var translationUnit in translationUnits)
+                {
+                    var path = Path.GetDirectoryName(translationUnit.Key);
+                }
             }
 
         }

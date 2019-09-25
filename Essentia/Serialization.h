@@ -3,6 +3,7 @@
 #include "BaseComponents.h"
 #include "Entity.h"
 #include <cereal/cereal.hpp>
+#include <visit_struct/visit_struct.hpp>
 
 //
 namespace Es::serial
