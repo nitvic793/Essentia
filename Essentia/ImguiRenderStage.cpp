@@ -53,7 +53,6 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		static int counter = 0;
 		static bool vsync = false;
 		ImGui::Begin("Essentia");                          // Create a window called "Hello, world!" and append into it.
-
 		ImGui::Text("Basic Editor");               // Display some text (you can use a format strings too)
 		ImGui::Checkbox("Post Process Window", &show);					// Edit bools storing our window open/close state
 		ImGui::Checkbox("Vsync", &vsync);

@@ -50,7 +50,7 @@ TransformHandle TransformManager::CreateTransform(EntityHandle entity, Transform
 
 void TransformManager::SetLocal(EntityHandle entity, const Transform& transform)
 {
-	TransformHandle handle = { (int)entity.Handle.Index };
+	TransformHandle handle = { (int)entity.Handle.Index }; //Entity Index directly maps to Transform Index
 	transforms.Local[handle.Index] = GetTransformMatrix(transform);
 	UpdateTransform(handle);
 }

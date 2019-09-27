@@ -49,15 +49,27 @@
     <Filter Include="Source Files\Renderer\RenderStages">
       <UniqueIdentifier>{546ceb4b-7865-45cd-8924-febb45eff5f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\PostProcess">
+      <UniqueIdentifier>{531cbda8-d361-4a9b-a993-5f2a19e56e7c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Sky">
+      <UniqueIdentifier>{d413c7cb-b1a2-4c16-9da9-a11e1e4d509a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\PBR">
+      <UniqueIdentifier>{c0446e69-de92-46bb-81ef-d0bf20193fe2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Misc">
+      <UniqueIdentifier>{474c88cd-99a3-4ea4-90df-d1d8a6510a32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="Common.hlsli">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="cpp.hint" />
+    <None Include="Common.hlsli">
+      <Filter>Shaders\PBR</Filter>
+    </None>
     <None Include="Lighting.hlsli">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\PBR</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -323,35 +335,35 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="DefaultVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DefaultPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="SkyboxPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="SkyboxVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="OutlinePS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="OutlineVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="QuadVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="QuadPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="BlurPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
     <FxCompile Include="DepthOfFieldPS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="QuadPS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="QuadVS.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxPS.hlsl">
+      <Filter>Shaders\Sky</Filter>
+    </FxCompile>
+    <FxCompile Include="SkyboxVS.hlsl">
+      <Filter>Shaders\Sky</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultPS.hlsl">
+      <Filter>Shaders\PBR</Filter>
+    </FxCompile>
+    <FxCompile Include="DefaultVS.hlsl">
+      <Filter>Shaders\PBR</Filter>
+    </FxCompile>
+    <FxCompile Include="OutlinePS.hlsl">
+      <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="OutlineVS.hlsl">
+      <Filter>Shaders\Misc</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -188,6 +188,20 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	return texIndex;
 }
 
+TextureID ShaderResourceManager::CreateTexture2D(TextureProperties properties, ResourceID* outResourceId, const char* name, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState)
+{
+	auto ec = EngineContext::Context;
+	auto resourceId = ec->ResourceManager->CreateResource(
+		CD3DX12_RESOURCE_DESC::Tex2D(properties.Format, properties.Width, properties.Height, 1, 0, 1, 0, flags),
+		nullptr, initialState);
+	auto texResource = ec->ResourceManager->GetResource(resourceId);
+	if (outResourceId != nullptr)
+	{
+		*outResourceId = resourceId;
+	}
+	return CreateTexture(texResource);
+}
+
 MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name)
 {
 	StringID stringId;

@@ -18,6 +18,13 @@ class DeviceResources;
 class ResourceManager;
 class FrameManager;
 
+struct TextureProperties
+{
+	uint32		Width;
+	uint32		Height;
+	DXGI_FORMAT Format;
+};
+
 class ShaderResourceManager
 {
 public:
@@ -27,6 +34,11 @@ public:
 	GPUHeapOffsets		CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
 	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
 	TextureID			CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN);
+	TextureID			CreateTexture2D(TextureProperties properties, 
+										ResourceID* outResourceId = nullptr,
+										const char* name = nullptr, 
+										D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, 
+										D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
 	
 	void				CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
