@@ -32,6 +32,7 @@ struct DrawableComponent : public IDrawable
 	MeshHandle			Mesh;
 	MaterialHandle		Material;
 	ConstantBufferView	CBView;
+	DirectX::XMFLOAT4X4 PrevWorld;
 
 	static DrawableComponent Create(MeshHandle mesh, MaterialHandle material)
 	{

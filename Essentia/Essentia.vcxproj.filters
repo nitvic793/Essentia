@@ -61,6 +61,9 @@
     <Filter Include="Shaders\Misc">
       <UniqueIdentifier>{474c88cd-99a3-4ea4-90df-d1d8a6510a32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\AA">
+      <UniqueIdentifier>{8946cb6b-92a2-40b4-911c-c2d1fb8d4268}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -364,6 +367,12 @@
     </FxCompile>
     <FxCompile Include="OutlineVS.hlsl">
       <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="VelocityBufferVS.hlsl">
+      <Filter>Shaders\AA</Filter>
+    </FxCompile>
+    <FxCompile Include="VelocityBufferPS.hlsl">
+      <Filter>Shaders\AA</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

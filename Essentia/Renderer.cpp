@@ -104,8 +104,6 @@ void Renderer::Initialize()
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
-
-
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
@@ -211,6 +209,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	//Copy world matrix to constant buffer
 	for (size_t i = 0; i < drawCount; ++i)
 	{
+		perObject.PrevWorld = drawables[i].PrevWorld;
 		perObject.World = worlds[i];
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
 		renderBucket.Insert(drawables[i], 0);
