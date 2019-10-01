@@ -38,7 +38,7 @@ void SkyBoxRenderStage::Initialize()
 	descPipelineState.SampleMask = UINT_MAX;
 	descPipelineState.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	descPipelineState.NumRenderTargets = 1;
-	descPipelineState.RTVFormats[0] = renderer->GetRenderTargetFormat();
+	descPipelineState.RTVFormats[0] = renderer->GetHDRRenderTargetFormat();
 	descPipelineState.SampleDesc.Count = 1;
 	descPipelineState.DSVFormat = renderer->GetDepthStencilFormat();
 

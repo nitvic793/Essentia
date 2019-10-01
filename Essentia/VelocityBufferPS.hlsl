@@ -9,5 +9,8 @@ struct PixelInput
 // Also do intermediate rendering in HDR.
 float4 main(PixelInput input) : SV_TARGET
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	float2 vecA = (input.Position.xy / input.Position.w) * 0.5f + 0.5;
+	float2 vecB = (input.PrevPosition.xy / input.PrevPosition.w) * 0.5f + 0.5;
+	float2 outVelocity = vecA - vecB;
+	return float4(outVelocity, 0.f, 0.f);
 }

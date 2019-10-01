@@ -86,7 +86,7 @@ void Window::Initialize(HINSTANCE hInstance, int width, int height, const char* 
 	}
 	this->windowName = windowName;
 	this->windowTitle = windowTitle;
-
+	this->fullscreen = fullscreen;
 	//if (fullscreen)
 	//{
 	//	HMONITOR hmon = MonitorFromWindow(windowHandle,

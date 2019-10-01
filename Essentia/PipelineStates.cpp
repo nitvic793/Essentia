@@ -33,4 +33,7 @@ void PipelineStates::Initialize()
 	psoDesc.NumRenderTargets = 1;
 
 	QuadPSO = ec->ResourceManager->CreatePSO(psoDesc);
+
+	psoDesc.RTVFormats[0] = renderer->GetHDRRenderTargetFormat();
+	HDRQuadPSO = ec->ResourceManager->CreatePSO(psoDesc);
 }

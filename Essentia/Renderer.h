@@ -23,13 +23,18 @@
 #include "Utility.h"
 #include "PostProcess.h"
 
-
-
 struct TransitionDesc
 {
-	ResourceID Resource;
-	D3D12_RESOURCE_STATES From;
-	D3D12_RESOURCE_STATES To;
+	ResourceID				Resource;
+	D3D12_RESOURCE_STATES	From;
+	D3D12_RESOURCE_STATES	To;
+};
+
+struct TransitionResourceDesc
+{
+	ID3D12Resource*			Resource;
+	D3D12_RESOURCE_STATES	From;
+	D3D12_RESOURCE_STATES	To;
 };
 
 class Renderer
@@ -51,11 +56,14 @@ public:
 	MeshManager*				GetMeshManager();
 	RenderTargetID				GetCurrentRenderTarget() const;
 	TextureID					GetCurrentRenderTargetTexture() const;
+	TextureID					GetCurrentHDRRenderTargetTexture() const;
+	TextureID					GetPreviousHDRRenderTargetTexture() const;
 	DepthStencilID				GetCurrentDepthStencil() const;
 	TextureID					GetCurrentDepthStencilTexture() const;
 	ID3D12RootSignature*		GetDefaultRootSignature() const;
 	DXGI_FORMAT					GetRenderTargetFormat() const;
 	DXGI_FORMAT					GetDepthStencilFormat() const;
+	DXGI_FORMAT					GetHDRRenderTargetFormat() const;
 	const GPUHeapOffsets&		GetHeapOffsets() const;
 	FrameManager*				GetFrameManager() const;
 	const D3D12_VIEWPORT&		GetViewport() const;
@@ -67,11 +75,13 @@ public:
 	void						SetShaderResourceViews(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID* textures, uint32 textureCount);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionDesc* transitions, uint32 count);
+	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionResourceDesc* transitions, uint32 count);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 	void						SetTargetSize(ID3D12GraphicsCommandList* commandList, ScreenSize screenSize);
 	ID3D12Resource*				GetCurrentRenderTargetResource();
 	void						SetDefaultRenderTarget();
 	RenderTargetID				GetDefaultRenderTarget();
+	RenderTargetID				GetDefaultHDRRenderTarget();
 	void						SetVSync(bool enabled);
 private:
 	void InitializeCommandContext();
@@ -87,12 +97,14 @@ private:
 	int32			width;
 	int32			height;
 	uint32			backBufferIndex;
+	uint32			prevBackBufferIndex = CFrameBufferCount - 1;
 	RootSignatureID mainRootSignatureID;
 	PipelineStateID	defaultPSO;
 	DepthStencilID	depthStencilId;
 	D3D12_VIEWPORT	viewport;
 	D3D12_RECT		scissorRect;
 	DXGI_FORMAT		renderTargetFormat;
+	DXGI_FORMAT		hdrRenderTargetFormat;
 	DXGI_FORMAT		depthFormat;
 	ID3D12Device*	device;
 	RenderBucket	renderBucket;
@@ -100,13 +112,13 @@ private:
 
 	//Temp -> will move to FrameManager
 	PerObjectConstantBuffer perObject;
-	LightBuffer			lightBuffer;
-	ConstantBufferView	lightBufferView;
-	ConstantBufferView  perObjectView;
-	GPUHeapID			texID;
-	GPUHeapOffsets		offsets;
-	Material			material;
-	bool				vsync = false;
+	LightBuffer				lightBuffer;
+	ConstantBufferView		lightBufferView;
+	ConstantBufferView		perObjectView;
+	GPUHeapID				texID;
+	GPUHeapOffsets			offsets;
+	Material				material;
+	bool					vsync = false;
 
 	TextureID			irradianceTexture;
 	TextureID			brdfLutTexture;
@@ -125,6 +137,10 @@ private:
 	ScopedPtr<FrameManager>					frameManager;
 
 	std::vector<RenderTargetID>				renderTargets;
+	RenderTargetID							hdrRenderTargets[CFrameBufferCount];
+	ResourceID								hdrRenderTargetResources[CFrameBufferCount];
+	TextureID								hdrRenderTargetTextures[CFrameBufferCount];
+
 	Microsoft::WRL::ComPtr<ID3D12Resource>	renderTargetBuffers[CFrameBufferCount];
 	TextureID								renderTargetTextures[CFrameBufferCount];
 	TextureID								depthStencilTexture;

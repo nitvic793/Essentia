@@ -8,6 +8,7 @@ struct PipelineStates
 	void Initialize();
 
 	PipelineStateID QuadPSO;
+	PipelineStateID HDRQuadPSO;
 };
 
 extern PipelineStates GPipelineStates;

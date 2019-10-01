@@ -5,8 +5,8 @@ struct VertexToPixel
 	float2 uv           : TEXCOORD0;
 };
 
-Texture2D		InputTexture : register(t0);
-SamplerState	BasicSampler : register(s0);
+Texture2D<float4>		InputTexture : register(t0);
+SamplerState			BasicSampler : register(s0);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {

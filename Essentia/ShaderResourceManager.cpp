@@ -199,7 +199,7 @@ TextureID ShaderResourceManager::CreateTexture2D(TextureProperties properties, R
 	{
 		*outResourceId = resourceId;
 	}
-	return CreateTexture(texResource);
+	return CreateTexture(texResource, false, nullptr, properties.Format);
 }
 
 MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name)

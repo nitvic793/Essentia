@@ -100,7 +100,10 @@ void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 	);
 
 	if (window->IsFullscreen())
+	{
 		swapChain->SetFullscreenState(TRUE, nullptr);
+		swapChain->ResizeBuffers(CFrameBufferCount, windowSize.Width, windowSize.Height, format, 0);
+	}
 }
 
 DeviceResources::~DeviceResources()

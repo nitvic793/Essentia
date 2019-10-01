@@ -154,9 +154,6 @@
     <ClCompile Include="imgui_impl_win32.cpp">
       <Filter>Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="SkyBoxRenderStage.cpp">
-      <Filter>Source Files\Renderer</Filter>
-    </ClCompile>
     <ClCompile Include="ImguiRenderStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
@@ -174,6 +171,9 @@
     </ClCompile>
     <ClCompile Include="PipelineStates.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SkyBoxRenderStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -306,9 +306,6 @@
     <ClInclude Include="imgui_impl_win32.h">
       <Filter>Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="SkyBoxRenderStage.h">
-      <Filter>Header Files\Renderer</Filter>
-    </ClInclude>
     <ClInclude Include="Utility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -335,6 +332,9 @@
     </ClInclude>
     <ClInclude Include="PipelineStates.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyBoxRenderStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

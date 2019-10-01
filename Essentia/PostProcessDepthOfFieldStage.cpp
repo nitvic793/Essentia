@@ -14,7 +14,7 @@ void PostProcessDepthOfFieldStage::Initialize()
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
-	auto texFormat = renderer->GetRenderTargetFormat();
+	auto texFormat = renderer->GetHDRRenderTargetFormat();
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.InputLayout.pInputElementDescs = nullptr;

@@ -17,6 +17,7 @@ public:
 	bool				IsFullscreen();
 	ScreenSize			GetWindowSize();
 	void				RegisterOnResizeCallback(std::function<void()> callback);
+	void				OnResize();
 	~Window();
 private:
 	Window();
@@ -27,8 +28,6 @@ private:
 	int			height;
 	bool		fullscreen;
 	HWND		windowHandle;
-
-	void		OnResize();
 	
 	friend class Renderer;
 };

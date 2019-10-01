@@ -22,7 +22,7 @@ void PostProcess::Intitialize()
 	auto renderer = ec->RendererInstance;
 	auto screenSize = renderer->GetScreenSize();
 	auto downscaleFactor = 2;
-	auto texFormat = renderer->GetRenderTargetFormat();
+	auto texFormat = renderer->GetHDRRenderTargetFormat();
 
 	screenSize.Height /= downscaleFactor;
 	screenSize.Width /= downscaleFactor;
@@ -70,7 +70,7 @@ void PostProcess::GenerateLowResTextures()
 		{ PostTextures.HalfQuarterTexture.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE }
 	};
 
-	renderer->TransitionBarrier(commandList, postTransitions, _countof(preTransitions));
+	renderer->TransitionBarrier(commandList, postTransitions, _countof(postTransitions));
 }
 
 PostSceneTextures PostProcess::GetPostSceneTextures()
@@ -117,9 +117,9 @@ void PostProcess::RenderToTexture(ID3D12GraphicsCommandList* commandList, PostPr
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 
-	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.QuadPSO));
+	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.HDRQuadPSO));
 
-	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, renderer->GetCurrentRenderTargetTexture());
+	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, renderer->GetCurrentHDRRenderTargetTexture());
 	renderer->DrawScreenQuad(commandList);
 }
 
@@ -133,7 +133,7 @@ void IPostProcessStage::RenderToSceneTarget(TextureID inputTexture)
 	auto ec = EngineContext::Context;
 	auto renderer = ec->RendererInstance;
 	auto commandList = renderer->GetDefaultCommandList();
-	auto rtTexture = renderer->GetCurrentRenderTargetTexture();
+	auto rtTexture = renderer->GetCurrentHDRRenderTargetTexture();
 	auto rtResource = ec->ShaderResourceManager->GetResource(rtTexture);
 
 	D3D12_VIEWPORT viewport = {};
@@ -141,7 +141,7 @@ void IPostProcessStage::RenderToSceneTarget(TextureID inputTexture)
 	renderer->TransitionBarrier(commandList, rtResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	auto screenSize = renderer->GetScreenSize();
 
-	auto rt = renderer->GetDefaultRenderTarget();
+	auto rt = renderer->GetDefaultHDRRenderTarget();
 	renderer->SetRenderTargets(&rt, 1, nullptr);
 
 	viewport.Width = (FLOAT)screenSize.Width;
@@ -151,7 +151,7 @@ void IPostProcessStage::RenderToSceneTarget(TextureID inputTexture)
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.QuadPSO));
+	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.HDRQuadPSO));
 	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, inputTexture);
 	renderer->DrawScreenQuad(commandList);
 

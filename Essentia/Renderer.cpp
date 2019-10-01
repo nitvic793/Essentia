@@ -26,6 +26,7 @@ MeshView mesh;
 void Renderer::Initialize()
 {
 	renderTargetFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
+	hdrRenderTargetFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	width = 1920;
 	height = 1080;
 	depthFormat = DXGI_FORMAT_D32_FLOAT;
@@ -94,6 +95,16 @@ void Renderer::Initialize()
 	for (size_t i = 0; i < CFrameBufferCount; ++i)
 	{
 		renderTargetTextures[i] = shaderResourceManager->CreateTexture(renderTargetBuffers[i].Get());
+	}
+
+	for (size_t i = 0; i < CFrameBufferCount; ++i)
+	{
+		TextureProperties props = { (uint32)width, (uint32)height, DXGI_FORMAT_R32G32B32A32_FLOAT };
+		ResourceID resourceId;
+		auto textureId = shaderResourceManager->CreateTexture2D(props, &resourceId);
+		hdrRenderTargets[i] = renderTargetManager->CreateRenderTargetView(resourceManager->GetResource(resourceId), hdrRenderTargetFormat);
+		hdrRenderTargetResources[i] = resourceId;
+		hdrRenderTargetTextures[i] = textureId;
 	}
 
 	for (size_t i = 0; i < eRenderTypeCount; ++i)
@@ -165,14 +176,18 @@ void Renderer::Clear()
 	commandContext->ResetAllocator(commandAllocator);
 	commandContext->ResetCommandList(commandList, commandAllocator);
 
+	TransitionBarrier(commandList, hdrRenderTargetResources[backBufferIndex], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
 
 	auto rtId = renderTargets[backBufferIndex];
+	auto hdrTarget = hdrRenderTargets[backBufferIndex];
 	auto rtv = renderTargetManager->GetRTVHandle(rtId);
+	auto hdrRtv = renderTargetManager->GetRTVHandle(hdrTarget);
 	auto dsv = renderTargetManager->GetDSVHandle(depthStencilId);
 
 	const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+	commandList->ClearRenderTargetView(hdrRtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	frameManager->Reset(imageIndex);
 	renderBucket.Clear();
@@ -225,11 +240,12 @@ void Renderer::Render(const FrameContext& frameContext)
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
 	auto rtId = renderTargets[backBufferIndex];
+	auto hdrRtId = hdrRenderTargets[backBufferIndex];
 	auto commandList = commandContext->GetDefaultCommandList();
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	this->SetRenderTargets(&rtId, 1, &depthStencilId);
+	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 
@@ -292,13 +308,15 @@ void Renderer::Render(const FrameContext& frameContext)
 		stage->Render(backBufferIndex, frameContext);
 	}
 
+	TransitionBarrier(commandList, shaderResourceManager->GetResource(hdrRenderTargetTextures[backBufferIndex]), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
 	PIXEndEvent(commandList);
 
-	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Post Process");
 	GPostProcess.GenerateLowResTextures();
-	auto inputTexture = renderTargetTextures[backBufferIndex];
+
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Post Process");
+	auto inputTexture = hdrRenderTargetTextures[backBufferIndex];
 	for (auto& postProcessStage : postProcessStages)
 	{
 		if (postProcessStage->Enabled)
@@ -307,11 +325,15 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 
-	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	PIXEndEvent(commandList);
 
 	SetDefaultRenderTarget();
+	
+	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.QuadPSO));
+	SetShaderResourceView(commandList, RootSigSRVPixel1, hdrRenderTargetTextures[backBufferIndex]);
+	DrawScreenQuad(commandList);
+
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"GUI");
 	for (auto& renderStage : renderStages[eRenderStageGUI]) //GUI Render pass
 	{
@@ -435,6 +457,16 @@ TextureID Renderer::GetCurrentRenderTargetTexture() const
 	return renderTargetTextures[backBufferIndex];
 }
 
+TextureID Renderer::GetCurrentHDRRenderTargetTexture() const
+{
+	return hdrRenderTargetTextures[backBufferIndex];
+}
+
+TextureID Renderer::GetPreviousHDRRenderTargetTexture() const
+{
+	return hdrRenderTargetTextures[prevBackBufferIndex];
+}
+
 DepthStencilID Renderer::GetCurrentDepthStencil() const
 {
 	return depthStencilId;
@@ -458,6 +490,11 @@ DXGI_FORMAT Renderer::GetRenderTargetFormat() const
 DXGI_FORMAT Renderer::GetDepthStencilFormat() const
 {
 	return depthFormat;
+}
+
+DXGI_FORMAT Renderer::GetHDRRenderTargetFormat() const
+{
+	return hdrRenderTargetFormat;
 }
 
 const GPUHeapOffsets& Renderer::GetHeapOffsets() const
@@ -537,6 +574,18 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const T
 	commandList->ResourceBarrier(count, barriers.GetData());
 }
 
+void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionResourceDesc* transitions, uint32 count)
+{
+	Vector<CD3DX12_RESOURCE_BARRIER> barriers;
+	barriers.Reserve(count);
+	for (size_t i = 0; i < count; ++i)
+	{
+		barriers.Push(CD3DX12_RESOURCE_BARRIER::Transition(transitions[i].Resource, transitions[i].From, transitions[i].To));
+	}
+
+	commandList->ResourceBarrier(count, barriers.GetData());
+}
+
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to));
@@ -578,6 +627,11 @@ RenderTargetID Renderer::GetDefaultRenderTarget()
 	return renderTargets[backBufferIndex];
 }
 
+RenderTargetID Renderer::GetDefaultHDRRenderTarget()
+{
+	return hdrRenderTargets[backBufferIndex];
+}
+
 void Renderer::SetVSync(bool enabled)
 {
 	vsync = enabled;
@@ -591,7 +645,7 @@ void Renderer::InitializeCommandContext()
 
 void Renderer::CreateRootSignatures()
 {
-	CD3DX12_DESCRIPTOR_RANGE range[6];
+	CD3DX12_DESCRIPTOR_RANGE range[RootSigParamCount];
 	//view dependent CBV
 	range[RootSigCBVertex0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 	//light dependent CBV
@@ -647,7 +701,7 @@ void Renderer::CreatePSOs()
 	psoDesc.PS = pixelShaderBytecode;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+	psoDesc.RTVFormats[0] = hdrRenderTargetFormat;
 	psoDesc.SampleDesc = sampleDesc;
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
@@ -676,6 +730,7 @@ void Renderer::CreateDepthStencil()
 
 void Renderer::WaitForPreviousFrame()
 {
+	prevBackBufferIndex = backBufferIndex;
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	commandContext->WaitForFrame(backBufferIndex);
