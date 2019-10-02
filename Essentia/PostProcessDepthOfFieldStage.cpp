@@ -78,8 +78,8 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 
 	renderer->TransitionBarrier(commandList, dofTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	RenderToSceneTarget(dofTarget.Texture);
-	return inputTexture;
+	//RenderToSceneTarget(dofTarget.Texture);
+	return dofTarget.Texture;
 }
 
 void PostProcessDepthOfFieldStage::RenderBlurTexture(uint32 backbufferIndex)

@@ -18,6 +18,7 @@
 #include "OutlineRenderStage.h"
 #include "PostProcessDepthOfFieldStage.h"
 #include "PipelineStates.h"
+#include "PostProcessToneMap.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
@@ -120,6 +121,7 @@ void Renderer::Initialize()
 
 	postProcessStages.Reserve(32);
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
+	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessToneMap>()));
 
 	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
 	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
@@ -331,7 +333,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	SetDefaultRenderTarget();
 	
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.QuadPSO));
-	SetShaderResourceView(commandList, RootSigSRVPixel1, hdrRenderTargetTextures[backBufferIndex]);
+	SetShaderResourceView(commandList, RootSigSRVPixel1, inputTexture);
 	DrawScreenQuad(commandList);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"GUI");
