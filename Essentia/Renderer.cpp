@@ -223,19 +223,34 @@ void Renderer::Render(const FrameContext& frameContext)
 	modelWorlds.reserve(drawableModelCount);
 	frameContext.EntityManager->GetTransposedWorldMatrices(entities, drawableModelCount, modelWorlds);
 
+	auto projection = XMLoadFloat4x4(&camera->Projection);
+	auto view = XMLoadFloat4x4(&camera->View);
+
 	//Copy world matrix to constant buffer
 	for (size_t i = 0; i < drawCount; ++i)
 	{
-		perObject.PrevWorld = drawables[i].PrevWorld;
+		auto world = XMMatrixTranspose(XMLoadFloat4x4(&worlds[i]));
+		XMStoreFloat4x4(&drawables[i].WorldViewProjection, XMMatrixTranspose(world * view * projection));
+
+		perObject.PrevWorldViewProjection = drawables[i].PrevWorldViewProjection;
 		perObject.World = worlds[i];
+		perObject.WorldViewProjection = drawables[i].WorldViewProjection;
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
 		renderBucket.Insert(drawables[i], 0);
+
+		drawables[i].PrevWorldViewProjection = drawables[i].WorldViewProjection;
 	}
 
 	for (size_t i = 0; i < drawableModelCount; ++i)
 	{
+		auto world = XMMatrixTranspose(XMLoadFloat4x4(&modelWorlds[i]));
+		XMStoreFloat4x4(&drawableModels[i].WorldViewProjection, XMMatrixTranspose(world * view * projection));
+
 		perObject.World = modelWorlds[i];
+		perObject.PrevWorldViewProjection = drawableModels[i].PrevWorldViewProjection;
+		perObject.WorldViewProjection = drawableModels[i].WorldViewProjection;
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawableModels[i].CBView.Offset);
+		perObject.PrevWorldViewProjection = drawableModels[i].WorldViewProjection;
 	}
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);

@@ -30,6 +30,7 @@ public:
 	void			UpdateTransform(EntityHandle entity, const Transform& transform);
 
 	void			GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
+	void			GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
 private:
 	std::vector<uint32> generations;
 	std::vector<uint32> freeIndices;

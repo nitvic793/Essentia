@@ -32,7 +32,8 @@ struct DrawableComponent : public IDrawable
 	MeshHandle			Mesh;
 	MaterialHandle		Material;
 	ConstantBufferView	CBView;
-	DirectX::XMFLOAT4X4 PrevWorld;
+	DirectX::XMFLOAT4X4 WorldViewProjection;
+	DirectX::XMFLOAT4X4 PrevWorldViewProjection;
 
 	static DrawableComponent Create(MeshHandle mesh, MaterialHandle material)
 	{
@@ -50,6 +51,8 @@ struct DrawableModelComponent : public IDrawable
 	GComponent(DrawableModelComponent)
 	ModelHandle			Model;
 	ConstantBufferView	CBView;
+	DirectX::XMFLOAT4X4 WorldViewProjection;
+	DirectX::XMFLOAT4X4 PrevWorldViewProjection;
 
 	static DrawableModelComponent Create(ModelHandle model)
 	{

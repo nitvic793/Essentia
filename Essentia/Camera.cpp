@@ -28,11 +28,14 @@ void Camera::UpdateView()
 	XMStoreFloat3(&Direction, direction);
 	auto view = GetViewMatrix();
 	XMStoreFloat4x4(&View, view);
+	Frustum.Origin = Position;
+	XMStoreFloat4(&Frustum.Orientation, rotation);
 }
 
 void Camera::UpdateProjection(float width, float height, float nearZ, float farZ, float fovInAngles)
 {
 	auto projection = XMMatrixPerspectiveFovLH((fovInAngles / 180.f) * XM_PI, width / height, nearZ, farZ);
+	BoundingFrustum::CreateFromMatrix(Frustum, projection);
 	XMStoreFloat4x4(&Projection, projection);
 }
 

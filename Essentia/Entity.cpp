@@ -68,3 +68,11 @@ void EntityManager::GetTransposedWorldMatrices(EntityHandle* entities, uint32 co
 		matrices.push_back(transformManager.GetTransposedWorldMatrix(entities[i]));
 	}
 }
+
+void EntityManager::GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices)
+{
+	for (uint32 i = 0; i < count; ++i)
+	{
+		matrices.push_back(transformManager.GetWorldMatrix(entities[i]));
+	}
+}

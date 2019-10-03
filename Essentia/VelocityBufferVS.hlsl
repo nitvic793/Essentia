@@ -17,16 +17,15 @@ cbuffer PerObject : register(b0)
 	float4x4 World;
 	float4x4 View;
 	float4x4 Projection;
-	float4x4 PrevWorld;
+	float4x4 WorldViewProjection;
+	float4x4 PrevWorldViewProjection;
 };
 
 PixelInput main(VertexInput input)
 {
 	PixelInput output;
-	matrix worldViewProjection = mul(mul(World, View), Projection);
-	matrix prevWorldViewProjection = mul(mul(PrevWorld, View), Projection);
 
-	output.Position = mul(float4(input.Position, 1.f), worldViewProjection);
-	output.PrevPosition = mul(float4(input.Position, 1.f), prevWorldViewProjection);
+	output.Position = mul(float4(input.Position, 1.f), WorldViewProjection);
+	output.PrevPosition = mul(float4(input.Position, 1.f), PrevWorldViewProjection);
 	return output;
 }

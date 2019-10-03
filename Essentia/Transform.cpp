@@ -69,6 +69,11 @@ DirectX::XMFLOAT4X4 TransformManager::GetTransposedWorldMatrix(EntityHandle enti
 	return outTransposedWorld;
 }
 
+DirectX::XMFLOAT4X4 TransformManager::GetWorldMatrix(EntityHandle entity)
+{
+	return transforms.World[entity.Handle.Index];
+}
+
 TransformManager::~TransformManager()
 {
 	CleanUp();

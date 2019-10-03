@@ -50,6 +50,7 @@ public:
 	void				SetLocal(EntityHandle entity, const Transform& transform);
 	EntityHandle		GetParent(EntityHandle entity);
 	DirectX::XMFLOAT4X4 GetTransposedWorldMatrix(EntityHandle entity);
+	DirectX::XMFLOAT4X4 GetWorldMatrix(EntityHandle entity);
 	~TransformManager();
 private:
 	void UpdateTransform(TransformHandle transform);
