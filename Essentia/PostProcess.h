@@ -4,6 +4,13 @@
 #include <unordered_map>
 #include "FrameContext.h"
 
+struct BlurParams
+{
+	DirectX::XMFLOAT2	Direction; // 0-Horizontal, 1-Vertical
+	float				Width;
+	float				Height;
+};
+
 struct PostProcessRenderTarget
 {
 	TextureID		Texture;
@@ -43,6 +50,13 @@ public:
 	void				Intitialize();
 	void				GenerateLowResTextures();
 	PostSceneTextures	GetPostSceneTextures();
+	void				RenderBlurTexture(TextureID input, 
+										  ScreenSize screenSize,
+										  uint32 backBufferIndex, 
+										  PostProcessRenderTarget target, 
+										  PostProcessRenderTarget intermediateTarget, 
+										  ConstantBufferView vertCBV, 
+										  ConstantBufferView horCBV);
 	void				RegisterPostProcess(std::string_view postProcessString, IPostProcessStage* stage);
 	void				SetEnabled(std::string_view postProcess, bool enabled);
 	IPostProcessStage*	GetPostProcessStage(std::string_view name);

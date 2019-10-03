@@ -33,7 +33,6 @@ void PostProcessDepthOfFieldStage::Initialize()
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.NumRenderTargets = 1;
 
-	blurPso = ec->ResourceManager->CreatePSO(psoDesc);
 	psoDesc.PS = ShaderManager::LoadShader(L"DepthOfFieldPS.cso");
 	dofPso = ec->ResourceManager->CreatePSO(psoDesc);
 
@@ -78,56 +77,13 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 
 	renderer->TransitionBarrier(commandList, dofTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	//RenderToSceneTarget(dofTarget.Texture);
 	return dofTarget.Texture;
 }
 
 void PostProcessDepthOfFieldStage::RenderBlurTexture(uint32 backbufferIndex)
 {
-	auto ec = EngineContext::Context;
-	auto renderer = ec->RendererInstance;
-	auto commandList = renderer->GetDefaultCommandList();
 	auto lowResTextures = GPostProcess.GetPostSceneTextures();
 	auto screenSize = lowResTextures.HalfResSize;
 	auto lowResTarget = GPostProcess.GetPostSceneTextures().HalfResTexture;
-
-	TransitionDesc transitions[] = {
-		{  blurIntermidateTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
-	};
-
-	renderer->TransitionBarrier(commandList, transitions, 1);
-
-	BlurParams = { XMFLOAT2(1.f,0.f), (float)screenSize.Width, (float)screenSize.Height };
-	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &BlurParams, sizeof(BlurParams) }, blurHorizontalCBV.Offset);
-	BlurParams.Direction = XMFLOAT2(0.f, 1.f);
-	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &BlurParams, sizeof(BlurParams) }, blurVerticalCBV.Offset);
-
-	renderer->SetTargetSize(commandList, screenSize);
-	commandList->SetGraphicsRootSignature(renderer->GetDefaultRootSignature());
-
-	auto blurRtv = ec->RenderTargetManager->GetRTVHandle(blurIntermidateTarget.RenderTarget);
-	commandList->ClearRenderTargetView(blurRtv, ColorValues::ClearColor, 0, nullptr);
-	renderer->SetRenderTargets(&blurIntermidateTarget.RenderTarget, 1, nullptr);
-
-	commandList->SetPipelineState(ec->ResourceManager->GetPSO(blurPso));
-
-	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, &lowResTarget.Texture, 1);
-	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, blurHorizontalCBV);
-	renderer->DrawScreenQuad(commandList);
-
-	TransitionDesc blurTransitions[] = {
-		{ blurIntermidateTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE },
-		{ blurFinalTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
-	};
-
-	renderer->TransitionBarrier(commandList, blurTransitions, 2);
-	blurRtv = ec->RenderTargetManager->GetRTVHandle(blurFinalTarget.RenderTarget);
-	renderer->SetRenderTargets(&blurFinalTarget.RenderTarget, 1, nullptr);
-	commandList->ClearRenderTargetView(blurRtv, ColorValues::ClearColor, 0, nullptr);
-
-	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, blurIntermidateTarget.Texture);
-	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, blurVerticalCBV);
-	renderer->DrawScreenQuad(commandList);
-
-	renderer->TransitionBarrier(commandList, blurFinalTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	GPostProcess.RenderBlurTexture(lowResTarget.Texture, screenSize, backbufferIndex, blurFinalTarget, blurIntermidateTarget, blurVerticalCBV, blurHorizontalCBV);
 }

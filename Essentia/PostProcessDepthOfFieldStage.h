@@ -3,13 +3,6 @@
 #include "RenderTargetManager.h"
 #include "PostProcess.h"
 
-struct BlurParams
-{
-	DirectX::XMFLOAT2	Direction; // 0-Horizontal, 1-Vertical
-	float				Width;
-	float				Height;
-};
-
 struct DepthOfFieldParams
 {
 	float zNear;
@@ -30,7 +23,6 @@ public:
 private:
 	void RenderBlurTexture(uint32 backbufferIndex);
 
-	PipelineStateID blurPso;
 	PipelineStateID dofPso;
 
 	PostProcessRenderTarget blurIntermidateTarget;

@@ -36,4 +36,6 @@ void PipelineStates::Initialize()
 
 	psoDesc.RTVFormats[0] = renderer->GetHDRRenderTargetFormat();
 	HDRQuadPSO = ec->ResourceManager->CreatePSO(psoDesc);
+	psoDesc.PS = ShaderManager::LoadShader(L"BlurPS.cso");
+	BlurPSO = ec->ResourceManager->CreatePSO(psoDesc);
 }

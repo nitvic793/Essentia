@@ -4,6 +4,8 @@
 #include "Renderer.h"
 #include "PipelineStates.h"
 
+using namespace DirectX;
+
 PostProcess GPostProcess;
 
 PostProcessRenderTarget CreatePostProcessRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format)
@@ -76,6 +78,61 @@ void PostProcess::GenerateLowResTextures()
 PostSceneTextures PostProcess::GetPostSceneTextures()
 {
 	return PostTextures;
+}
+
+void PostProcess::RenderBlurTexture(
+	TextureID input,
+	ScreenSize screenSize,
+	uint32 backBufferIndex, 
+	PostProcessRenderTarget target,
+	PostProcessRenderTarget intermediateTarget,
+	ConstantBufferView vertCBV,
+	ConstantBufferView horCBV
+)
+{
+	auto ec = EngineContext::Context;
+	auto renderer = ec->RendererInstance;
+	auto commandList = renderer->GetDefaultCommandList();
+
+	TransitionDesc transitions[] = {
+		{  intermediateTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
+	};
+
+	renderer->TransitionBarrier(commandList, transitions, 1);
+
+	BlurParams BlurParams = { XMFLOAT2(1.f,0.f), (float)screenSize.Width, (float)screenSize.Height };
+	ec->ShaderResourceManager->CopyToCB(backBufferIndex, { &BlurParams, sizeof(BlurParams) }, horCBV.Offset);
+	BlurParams.Direction = XMFLOAT2(0.f, 1.f);
+	ec->ShaderResourceManager->CopyToCB(backBufferIndex, { &BlurParams, sizeof(BlurParams) }, vertCBV.Offset);
+
+	renderer->SetTargetSize(commandList, screenSize);
+	commandList->SetGraphicsRootSignature(renderer->GetDefaultRootSignature());
+
+	auto blurRtv = ec->RenderTargetManager->GetRTVHandle(intermediateTarget.RenderTarget);
+	commandList->ClearRenderTargetView(blurRtv, ColorValues::ClearColor, 0, nullptr);
+	renderer->SetRenderTargets(&intermediateTarget.RenderTarget, 1, nullptr);
+
+	commandList->SetPipelineState(ec->ResourceManager->GetPSO(GPipelineStates.BlurPSO));
+
+	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, &input, 1);
+	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, horCBV);
+	renderer->DrawScreenQuad(commandList);
+
+	TransitionDesc blurTransitions[] = {
+		{ intermediateTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE },
+		{ target.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
+	};
+
+	renderer->TransitionBarrier(commandList, blurTransitions, 2);
+	blurRtv = ec->RenderTargetManager->GetRTVHandle(target.RenderTarget);
+	renderer->SetRenderTargets(&target.RenderTarget, 1, nullptr);
+	commandList->ClearRenderTargetView(blurRtv, ColorValues::ClearColor, 0, nullptr);
+
+	renderer->SetShaderResourceView(commandList, RootSigSRVPixel1, intermediateTarget.Texture);
+	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, vertCBV);
+	renderer->DrawScreenQuad(commandList);
+
+	renderer->TransitionBarrier(commandList, target.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
 void PostProcess::RegisterPostProcess(std::string_view postProcessString, IPostProcessStage* stage)

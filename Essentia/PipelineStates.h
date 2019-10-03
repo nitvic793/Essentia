@@ -9,6 +9,7 @@ struct PipelineStates
 
 	PipelineStateID QuadPSO;
 	PipelineStateID HDRQuadPSO;
+	PipelineStateID BlurPSO;
 };
 
 extern PipelineStates GPipelineStates;
