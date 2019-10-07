@@ -50,7 +50,6 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::ShowDemoWindow(&show);*/
 
 	{
-
 		static float f = 0.0f;
 		static int counter = 0;
 		static bool vsync = false;

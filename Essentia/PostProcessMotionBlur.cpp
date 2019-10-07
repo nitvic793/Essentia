@@ -49,9 +49,12 @@ TextureID PostProcessMotionBlur::RenderPostProcess(uint32 backbufferIndex, Textu
 	auto commandList = renderer->GetDefaultCommandList();
 	auto screenSize = renderer->GetScreenSize();
 
+	const float targetFps = 60.f;
+	float fps = 1.f / frameContext.Timer->DeltaTime;
+
 	MotionBlurParams params = {};
 	params.ScreenSize = XMFLOAT2((float)screenSize.Width, (float)screenSize.Height);
-	params.VelocityScale = 1.f;
+	params.VelocityScale = fps / targetFps;
 	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &params, sizeof(params) }, motionCBV.Offset);
 
 	auto rt = ec->RenderTargetManager->GetRTVHandle(motionBlurTarget.RenderTarget);

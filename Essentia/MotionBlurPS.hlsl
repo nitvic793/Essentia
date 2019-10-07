@@ -21,7 +21,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	float2 texelSize = 1.f / ScreenSize;
 	float2 velocity = VelocityTexture.Sample(BasicSampler, input.uv).xy;
-	velocity *= 5.f; //VelocityScale;
+	velocity *= VelocityScale;
 
 	float speed = length(velocity / texelSize);
 	int nSamples = clamp(int(speed), 1, MAX_SAMPLES);

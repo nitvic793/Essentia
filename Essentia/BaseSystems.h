@@ -101,6 +101,14 @@ public:
 		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
 		auto dir = XMLoadFloat3(&camera->Direction);
 		auto pos = XMLoadFloat3(&camera->Position);
+
+		float Speed = this->Speed;
+
+		if (keyboard.IsKeyDown(DirectX::Keyboard::LeftShift))
+		{
+			Speed *= 6.f;
+		}
+
 		if (keyboard.IsKeyDown(DirectX::Keyboard::A))
 		{
 			auto leftDir = XMVector3Cross(dir, up);
