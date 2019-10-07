@@ -20,5 +20,18 @@ public:
 	virtual void Render(const uint32 frameIndex, const FrameContext& frameContext) = 0;
 	virtual void CleanUp() {};
 	virtual ~IRenderStage() {};
+	bool Enabled = true;
 private:
 };
+
+
+class RenderStageManager
+{
+public:
+	void RegisterStage(std::string_view stageName, IRenderStage* stage);
+	void SetEnabled(std::string_view stageName, bool enabled);
+private:
+	std::unordered_map<std::string_view, IRenderStage*> renderStages;
+};
+
+extern RenderStageManager GRenderStageManager;

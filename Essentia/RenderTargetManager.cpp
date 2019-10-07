@@ -1,5 +1,7 @@
-#include "RenderTargetManager.h"
 
+#include "RenderTargetManager.h"
+#include "EngineContext.h"
+#include "ShaderResourceManager.h"
 
 void RenderTargetManager::Initialize(ID3D12Device* device)
 {
@@ -70,4 +72,14 @@ D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetManager::GetRTVHandle(RenderTargetID rtv
 D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetManager::GetDSVHandle(DepthStencilID dsvID)
 {
 	return dsvHeap.handleCPU(dsvID);
+}
+
+SceneRenderTarget CreateSceneRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format)
+{
+	SceneRenderTarget target;
+	auto ec = context;
+	target.Texture = ec->ShaderResourceManager->CreateTexture2D({ width, height, format }, &target.Resource);
+	auto resource = ec->ShaderResourceManager->GetResource(target.Texture);
+	target.RenderTarget = ec->RenderTargetManager->CreateRenderTargetView(resource, format);
+	return target;
 }

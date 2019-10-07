@@ -8,8 +8,9 @@ struct VertexInput
 
 struct PixelInput
 {
-	float4 Position		: SV_POSITION;
-	float4 PrevPosition	: POSITION;
+	float4	Position		: SV_POSITION;
+	float4	CurrentPosition	: POSITION0;
+	float4	PrevPosition	: POSITION1;
 };
 
 cbuffer PerObject : register(b0)
@@ -26,6 +27,7 @@ PixelInput main(VertexInput input)
 	PixelInput output;
 
 	output.Position = mul(float4(input.Position, 1.f), WorldViewProjection);
+	output.CurrentPosition = output.Position;
 	output.PrevPosition = mul(float4(input.Position, 1.f), PrevWorldViewProjection);
 	return output;
 }

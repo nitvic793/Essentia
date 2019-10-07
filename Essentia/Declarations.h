@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 
-//Typedefs
+// Typedefs
+
 typedef int8_t int8;
 typedef int16_t int16;
 typedef int32_t int32;
@@ -22,8 +23,8 @@ typedef uint32 ResourceID;
 typedef uint32 RenderTargetID;
 typedef uint32 DepthStencilID;
 
+// Engine Constants
 
-//Engine Constants
 constexpr uint32 CFrameBufferCount = 3;
 constexpr uint32 CFrameMaxDescriptorHeapCount = 2048;
 constexpr uint32 CMaxTextureCount = 512;
@@ -37,6 +38,8 @@ constexpr uint32 CMaxRootSignatures = 24;
 constexpr int CMaxRenderTargets = 64;
 constexpr int CMaxDepthStencils = 16;
 
+// Engine Types
+
 struct ConstantBufferView
 {
 	uint64		Offset;
@@ -45,7 +48,7 @@ struct ConstantBufferView
 
 struct DataPack
 {
-	void* Data;
+	void*	Data;
 	uint32	Size;
 };
 
@@ -77,6 +80,13 @@ struct ScreenSize
 {
 	int Width;
 	int Height;
+};
+
+struct SceneRenderTarget
+{
+	TextureID		Texture;
+	ResourceID		Resource;
+	RenderTargetID	RenderTarget;
 };
 
 struct ColorValues

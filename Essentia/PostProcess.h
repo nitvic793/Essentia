@@ -11,15 +11,6 @@ struct BlurParams
 	float				Height;
 };
 
-struct PostProcessRenderTarget
-{
-	TextureID		Texture;
-	ResourceID		Resource;
-	RenderTargetID	RenderTarget;
-};
-
-PostProcessRenderTarget CreatePostProcessRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format);
-
 //TODO : Pass the processed screen texture to the next stage
 class IPostProcessStage
 {
@@ -36,12 +27,12 @@ private:
 
 struct PostSceneTextures
 {
-	PostProcessRenderTarget HalfResTexture; 
-	PostProcessRenderTarget QuarterResTexture;
-	PostProcessRenderTarget HalfQuarterTexture; // 1/8th Resolution
-	ScreenSize				HalfResSize;
-	ScreenSize				QuarterResSize;
-	ScreenSize				HalfQuarterSize;
+	SceneRenderTarget	HalfResTexture; 
+	SceneRenderTarget	QuarterResTexture;
+	SceneRenderTarget	HalfQuarterTexture; // 1/8th Resolution
+	ScreenSize			HalfResSize;
+	ScreenSize			QuarterResSize;
+	ScreenSize			HalfQuarterSize;
 };
 
 class PostProcess
@@ -53,8 +44,8 @@ public:
 	void				RenderBlurTexture(TextureID input, 
 										  ScreenSize screenSize,
 										  uint32 backBufferIndex, 
-										  PostProcessRenderTarget target, 
-										  PostProcessRenderTarget intermediateTarget, 
+										  SceneRenderTarget target, 
+										  SceneRenderTarget intermediateTarget, 
 										  ConstantBufferView vertCBV, 
 										  ConstantBufferView horCBV);
 	void				RegisterPostProcess(std::string_view postProcessString, IPostProcessStage* stage);
@@ -62,7 +53,7 @@ public:
 	IPostProcessStage*	GetPostProcessStage(std::string_view name);
 	PostSceneTextures	PostTextures;
 private:
-	void				RenderToTexture(ID3D12GraphicsCommandList* commandList, PostProcessRenderTarget target, ScreenSize screenSize, Renderer* renderer);
+	void				RenderToTexture(ID3D12GraphicsCommandList* commandList, SceneRenderTarget target, ScreenSize screenSize, Renderer* renderer);
 	std::unordered_map<std::string_view, IPostProcessStage*> postProcessStages;
 };
 

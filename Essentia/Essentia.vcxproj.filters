@@ -64,6 +64,12 @@
     <Filter Include="Shaders\AA">
       <UniqueIdentifier>{8946cb6b-92a2-40b4-911c-c2d1fb8d4268}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\PostProcessStages">
+      <UniqueIdentifier>{669f4c94-8574-4f8c-90c6-57d742224e1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\PostProcessStages">
+      <UniqueIdentifier>{6a131292-ca9e-4a60-9d7a-9736b4794697}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -163,20 +169,29 @@
     <ClCompile Include="OutlineRenderStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
-    <ClCompile Include="PostProcessDepthOfFieldStage.cpp">
-      <Filter>Source Files\Renderer\RenderStages</Filter>
-    </ClCompile>
-    <ClCompile Include="PostProcess.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PipelineStates.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="SkyBoxRenderStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
-    <ClCompile Include="PostProcessToneMap.cpp">
+    <ClCompile Include="VelocityBufferStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcessDepthOfFieldStage.cpp">
+      <Filter>Source Files\Renderer\PostProcessStages</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcessToneMap.cpp">
+      <Filter>Source Files\Renderer\PostProcessStages</Filter>
+    </ClCompile>
+    <ClCompile Include="PipelineStates.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="PostProcess.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneResources.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStage.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -324,9 +339,6 @@
     <ClInclude Include="OutlineRenderStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
-    <ClInclude Include="PostProcessDepthOfFieldStage.h">
-      <Filter>Header Files\Renderer\RenderStages</Filter>
-    </ClInclude>
     <ClInclude Include="PostProcess.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -339,7 +351,16 @@
     <ClInclude Include="SkyBoxRenderStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
+    <ClInclude Include="SceneResources.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcessDepthOfFieldStage.h">
+      <Filter>Header Files\Renderer\PostProcessStages</Filter>
+    </ClInclude>
     <ClInclude Include="PostProcessToneMap.h">
+      <Filter>Header Files\Renderer\PostProcessStages</Filter>
+    </ClInclude>
+    <ClInclude Include="VelocityBufferStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
   </ItemGroup>
@@ -382,6 +403,9 @@
     </FxCompile>
     <FxCompile Include="ToneMapPS.hlsl">
       <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="MotionBlur.hlsl">
+      <Filter>Shaders\AA</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "PostProcess.h"
 #include "RenderTargetManager.h"
 #include "Renderer.h"
@@ -7,16 +8,6 @@
 using namespace DirectX;
 
 PostProcess GPostProcess;
-
-PostProcessRenderTarget CreatePostProcessRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format)
-{
-	PostProcessRenderTarget target;
-	auto ec = context;
-	target.Texture = ec->ShaderResourceManager->CreateTexture2D({ width, height, format }, &target.Resource);
-	auto resource = ec->ShaderResourceManager->GetResource(target.Texture);
-	target.RenderTarget = ec->RenderTargetManager->CreateRenderTargetView(resource, format);
-	return target;
-}
 
 void PostProcess::Intitialize()
 {
@@ -29,21 +20,21 @@ void PostProcess::Intitialize()
 	screenSize.Height /= downscaleFactor;
 	screenSize.Width /= downscaleFactor;
 	PostTextures.HalfResSize = screenSize;
-	PostTextures.HalfResTexture = CreatePostProcessRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
+	PostTextures.HalfResTexture = CreateSceneRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
 
 	screenSize = renderer->GetScreenSize();
 	downscaleFactor *= 2;
 	screenSize.Height /= downscaleFactor;
 	screenSize.Width /= downscaleFactor;
 	PostTextures.QuarterResSize = screenSize;
-	PostTextures.QuarterResTexture = CreatePostProcessRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
+	PostTextures.QuarterResTexture = CreateSceneRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
 
 	screenSize = renderer->GetScreenSize();
 	downscaleFactor *= 2;
 	screenSize.Height /= downscaleFactor;
 	screenSize.Width /= downscaleFactor;
 	PostTextures.HalfQuarterSize = screenSize;
-	PostTextures.HalfQuarterTexture = CreatePostProcessRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
+	PostTextures.HalfQuarterTexture = CreateSceneRenderTarget(ec, screenSize.Width, screenSize.Height, texFormat);
 }
 
 void PostProcess::GenerateLowResTextures()
@@ -84,8 +75,8 @@ void PostProcess::RenderBlurTexture(
 	TextureID input,
 	ScreenSize screenSize,
 	uint32 backBufferIndex, 
-	PostProcessRenderTarget target,
-	PostProcessRenderTarget intermediateTarget,
+	SceneRenderTarget target,
+	SceneRenderTarget intermediateTarget,
 	ConstantBufferView vertCBV,
 	ConstantBufferView horCBV
 )
@@ -150,7 +141,7 @@ IPostProcessStage* PostProcess::GetPostProcessStage(std::string_view name)
 	return postProcessStages[name];
 }
 
-void PostProcess::RenderToTexture(ID3D12GraphicsCommandList* commandList, PostProcessRenderTarget target, ScreenSize screenSize, Renderer* renderer)
+void PostProcess::RenderToTexture(ID3D12GraphicsCommandList* commandList, SceneRenderTarget target, ScreenSize screenSize, Renderer* renderer)
 {
 	auto ec = EngineContext::Context;
 	auto rtv = ec->RenderTargetManager->GetRTVHandle(target.RenderTarget);

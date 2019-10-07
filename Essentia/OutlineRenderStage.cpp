@@ -37,6 +37,7 @@ void OutlineRenderStage::Initialize()
 	psoDesc.DSVFormat = ec->RendererInstance->GetDepthStencilFormat();
 
 	outlinePSO = ec->ResourceManager->CreatePSO(psoDesc);
+	GRenderStageManager.RegisterStage("OutlineRenderStage", this);
 }
 
 void OutlineRenderStage::Render(const uint32 frameIndex, const FrameContext& frameContext)

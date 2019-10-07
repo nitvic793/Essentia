@@ -44,6 +44,7 @@ void SkyBoxRenderStage::Initialize()
 
 	auto pso = rm->CreatePSO(descPipelineState);
 	skyPSO = rm->GetPSO(pso);
+	GRenderStageManager.RegisterStage("SkyBoxRenderStage", this);
 }
 
 void SkyBoxRenderStage::Render(const uint32 frameIndex, const FrameContext& frameContext)

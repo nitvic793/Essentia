@@ -183,15 +183,18 @@
     <ClCompile Include="OGLMath.cpp" />
     <ClCompile Include="OutlineRenderStage.cpp" />
     <ClCompile Include="PostProcessToneMap.cpp" />
+    <ClCompile Include="RenderStage.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTargetManager.cpp" />
+    <ClCompile Include="SceneResources.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="ShaderResourceManager.cpp" />
     <ClCompile Include="SkyBoxRenderStage.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
+    <ClCompile Include="VelocityBufferStage.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -238,6 +241,7 @@
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="RenderTargetManager.h" />
+    <ClInclude Include="SceneResources.h" />
     <ClInclude Include="Serialization.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ShaderResourceManager.h" />
@@ -247,6 +251,7 @@
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Utility.h" />
+    <ClInclude Include="VelocityBufferStage.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
@@ -284,6 +289,13 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="MotionBlur.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
     </FxCompile>
     <FxCompile Include="OutlinePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

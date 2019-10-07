@@ -1,28 +1,32 @@
-#include "Renderer.h"
-#include "Window.h"
-#include "DeviceResources.h"
+#include <array>
+#include "pix3.h"
 #include <wrl.h>
 #include "d3dx12.h"
 #include <thread>
-#include "ShaderManager.h"
-#include "InputLayout.h"
-#include <array>
-#include "pix3.h"
-#include "Engine.h"
 #include "imgui.h"
 #include "imgui_impl_win32.h"
 #include "imgui_impl_dx12.h"
+
+#include "Renderer.h"
+#include "Window.h"
+#include "DeviceResources.h"
+#include "ShaderManager.h"
+#include "InputLayout.h"
+#include "Engine.h"
 #include "Entity.h"
+
 #include "ImguiRenderStage.h"
 #include "SkyBoxRenderStage.h"
 #include "OutlineRenderStage.h"
+#include "VelocityBufferStage.h"
 #include "PostProcessDepthOfFieldStage.h"
-#include "PipelineStates.h"
 #include "PostProcessToneMap.h"
+
+#include "PipelineStates.h"
+#include "SceneResources.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
-MeshView mesh;
 
 void Renderer::Initialize()
 {
@@ -86,6 +90,7 @@ void Renderer::Initialize()
 
 	GPipelineStates.Initialize();
 	GPostProcess.Intitialize();
+	GSceneTextures.Initalize();
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -116,10 +121,12 @@ void Renderer::Initialize()
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
+
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
 	postProcessStages.Reserve(32);
+	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessToneMap>()));
 
@@ -250,7 +257,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		perObject.PrevWorldViewProjection = drawableModels[i].PrevWorldViewProjection;
 		perObject.WorldViewProjection = drawableModels[i].WorldViewProjection;
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawableModels[i].CBView.Offset);
-		perObject.PrevWorldViewProjection = drawableModels[i].WorldViewProjection;
+		drawableModels[i].PrevWorldViewProjection = drawableModels[i].WorldViewProjection;
 	}
 
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
@@ -292,10 +299,7 @@ void Renderer::Render(const FrameContext& frameContext)
 				for (uint32 cbIndex : meshes.second.CbIndices)
 				{
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
-					for (auto& m : mesh.MeshEntries)
-					{
-						commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
-					}
+					DrawMesh(mesh);
 				}
 			}
 		}
@@ -312,7 +316,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		commandList->IASetIndexBuffer(&mesh.IndexBufferView);
 		for (auto& m : mesh.MeshEntries)
 		{
-			auto materialHandle = model.Materials[matIndex];
+			auto materialHandle = model.Materials[matIndex]; //material maps to each mesh entry in model.
 			auto material = shaderResourceManager->GetMaterial(materialHandle);
 			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
 			commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
@@ -322,7 +326,10 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
 	{
-		stage->Render(backBufferIndex, frameContext);
+		if (stage->Enabled)
+		{
+			stage->Render(backBufferIndex, frameContext);
+		}
 	}
 
 	TransitionBarrier(commandList, shaderResourceManager->GetResource(hdrRenderTargetTextures[backBufferIndex]), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -330,9 +337,8 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	PIXEndEvent(commandList);
 
-	GPostProcess.GenerateLowResTextures();
-
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Post Process");
+	GPostProcess.GenerateLowResTextures();
 	auto inputTexture = hdrRenderTargetTextures[backBufferIndex];
 	for (auto& postProcessStage : postProcessStages)
 	{
@@ -342,19 +348,33 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 
-	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	TransitionDesc postPPTransitions[] = {
+		{ depthBufferResourceId, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE },
+		{ GSceneTextures.PreviousFrame.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
+	};
+
+	TransitionBarrier(commandList, postPPTransitions, _countof(postPPTransitions));
 	PIXEndEvent(commandList);
 
-	SetDefaultRenderTarget();
-	
+	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.HDRQuadPSO));
+	SetRenderTargets(&GSceneTextures.PreviousFrame.RenderTarget, 1, nullptr);
+	SetShaderResourceView(commandList, RootSigSRVPixel1, hdrRenderTargetTextures[backBufferIndex]);
+	DrawScreenQuad(commandList);
+
+	TransitionBarrier(commandList, GSceneTextures.PreviousFrame.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.QuadPSO));
+	SetDefaultRenderTarget();
 	SetShaderResourceView(commandList, RootSigSRVPixel1, inputTexture);
 	DrawScreenQuad(commandList);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"GUI");
 	for (auto& renderStage : renderStages[eRenderStageGUI]) //GUI Render pass
 	{
-		renderStage->Render(imageIndex, frameContext);
+		if (renderStage->Enabled)
+		{
+			renderStage->Render(imageIndex, frameContext);
+		}
 	}
 	PIXEndEvent(commandList);
 }
@@ -396,6 +416,7 @@ void Renderer::EndInitialization()
 	Default::DefaultRoughness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
 	Default::DefaultMetalness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
 
+	MeshView mesh;
 	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
@@ -426,7 +447,10 @@ void Renderer::DrawMesh(const MeshView& meshView)
 	auto commandList = commandContext->GetDefaultCommandList();
 	commandList->IASetVertexBuffers(0, 1, &meshView.VertexBufferView);
 	commandList->IASetIndexBuffer(&meshView.IndexBufferView);
-	commandList->DrawIndexedInstanced(meshView.IndexCount, 1, 0, 0, 0);
+	for (auto& m : meshView.MeshEntries)
+	{
+		commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
+	}
 }
 
 void Renderer::DrawMesh(MeshHandle mesh)

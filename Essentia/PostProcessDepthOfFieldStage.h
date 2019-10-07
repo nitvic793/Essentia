@@ -25,9 +25,9 @@ private:
 
 	PipelineStateID dofPso;
 
-	PostProcessRenderTarget blurIntermidateTarget;
-	PostProcessRenderTarget blurFinalTarget;
-	PostProcessRenderTarget dofTarget;
+	SceneRenderTarget blurIntermidateTarget;
+	SceneRenderTarget blurFinalTarget;
+	SceneRenderTarget dofTarget;
 
 	ConstantBufferView		blurHorizontalCBV;
 	ConstantBufferView		blurVerticalCBV;

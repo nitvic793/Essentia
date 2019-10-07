@@ -31,7 +31,7 @@ void PostProcessToneMap::Initialize()
 	psoDesc.NumRenderTargets = 1;
 
 	toneMapPSO = ec->ResourceManager->CreatePSO(psoDesc);
-	toneMapRenderTarget = CreatePostProcessRenderTarget(ec, size.Width, size.Height, texFormat);
+	toneMapRenderTarget = CreateSceneRenderTarget(ec, size.Width, size.Height, texFormat);
 	GPostProcess.RegisterPostProcess("ToneMap", this);
 }
 

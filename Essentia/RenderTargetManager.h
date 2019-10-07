@@ -4,6 +4,10 @@
 #include <d3d12.h>
 #include <vector>
 
+struct EngineContext;
+
+SceneRenderTarget CreateSceneRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format);
+
 class RenderTargetManager
 {
 public:

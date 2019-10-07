@@ -9,6 +9,6 @@ public:
 	virtual TextureID RenderPostProcess(uint32 backbufferIndex, TextureID inputTexture, const FrameContext& frameContext) override;
 private:
 	PipelineStateID toneMapPSO;
-	PostProcessRenderTarget toneMapRenderTarget;
+	SceneRenderTarget toneMapRenderTarget;
 };
 

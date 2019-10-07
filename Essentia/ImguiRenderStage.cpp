@@ -26,6 +26,7 @@ void ImguiRenderStage::Initialize()
 		DXGI_FORMAT_R8G8B8A8_UNORM,
 		imguiHeap.hCPUHeapStart,
 		imguiHeap.hGPUHeapStart);
+	GRenderStageManager.RegisterStage("ImguiRenderStage", this);
 }
 
 void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
