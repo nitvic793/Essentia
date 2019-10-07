@@ -12,3 +12,8 @@ void RenderStageManager::SetEnabled(std::string_view stageName, bool enabled)
 {
 	renderStages[stageName]->Enabled = enabled;
 }
+
+const RenderStageMap& RenderStageManager::GetRenderStageMap()
+{
+	return renderStages;
+}

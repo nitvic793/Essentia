@@ -15,13 +15,13 @@ Texture2D<float4>		InputTexture	: register(t0);
 Texture2D<float4>		VelocityTexture	: register(t1);
 SamplerState			BasicSampler	: register(s0);
 
-static const int MAX_SAMPLES = 10;
+static const int MAX_SAMPLES = 5;
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
 	float2 texelSize = 1.f / ScreenSize;
 	float2 velocity = VelocityTexture.Sample(BasicSampler, input.uv).xy;
-	velocity *= 100.f; //VelocityScale;
+	velocity *= 5.f; //VelocityScale;
 
 	float speed = length(velocity / texelSize);
 	int nSamples = clamp(int(speed), 1, MAX_SAMPLES);
@@ -30,7 +30,8 @@ float4 main(VertexToPixel input) : SV_TARGET
 	for (int i = 1; i < nSamples; ++i)
 	{
 		float2 offset = velocity * (float(i) / float(nSamples - 1) - 0.5);
-		result += InputTexture.SampleLevel(BasicSampler, input.uv + offset, 0).rgb;
+		float2 UV = clamp(offset + input.uv, float2(0.f, 0.f), float2(1.f, 1.f));
+		result += InputTexture.SampleLevel(BasicSampler, UV, 0).rgb;
 	}
 
 	result /= float(nSamples);

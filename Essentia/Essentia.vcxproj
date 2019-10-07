@@ -182,6 +182,7 @@
     <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="OGLMath.cpp" />
     <ClCompile Include="OutlineRenderStage.cpp" />
+    <ClCompile Include="PostProcessMotionBlur.cpp" />
     <ClCompile Include="PostProcessToneMap.cpp" />
     <ClCompile Include="RenderStage.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -235,6 +236,7 @@
     <ClInclude Include="OGLMath.h" />
     <ClInclude Include="OutlineRenderStage.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="PostProcessMotionBlur.h" />
     <ClInclude Include="PostProcessToneMap.h" />
     <ClInclude Include="RenderBucket.h" />
     <ClInclude Include="RenderStage.h" />
@@ -290,7 +292,7 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
-    <FxCompile Include="MotionBlur.hlsl">
+    <FxCompile Include="MotionBlurPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>

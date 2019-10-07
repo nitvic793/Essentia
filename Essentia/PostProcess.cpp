@@ -141,6 +141,11 @@ IPostProcessStage* PostProcess::GetPostProcessStage(std::string_view name)
 	return postProcessStages[name];
 }
 
+const PostProcessMap& PostProcess::GetStagesMap()
+{
+	return postProcessStages;
+}
+
 void PostProcess::RenderToTexture(ID3D12GraphicsCommandList* commandList, SceneRenderTarget target, ScreenSize screenSize, Renderer* renderer)
 {
 	auto ec = EngineContext::Context;

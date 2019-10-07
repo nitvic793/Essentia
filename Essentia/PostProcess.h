@@ -35,6 +35,8 @@ struct PostSceneTextures
 	ScreenSize			HalfQuarterSize;
 };
 
+using PostProcessMap = std::unordered_map<std::string_view, IPostProcessStage*>;
+
 class PostProcess
 {
 public:
@@ -52,9 +54,10 @@ public:
 	void				SetEnabled(std::string_view postProcess, bool enabled);
 	IPostProcessStage*	GetPostProcessStage(std::string_view name);
 	PostSceneTextures	PostTextures;
+	const PostProcessMap& GetStagesMap();
 private:
 	void				RenderToTexture(ID3D12GraphicsCommandList* commandList, SceneRenderTarget target, ScreenSize screenSize, Renderer* renderer);
-	std::unordered_map<std::string_view, IPostProcessStage*> postProcessStages;
+	PostProcessMap		postProcessStages;
 };
 
 extern PostProcess GPostProcess;

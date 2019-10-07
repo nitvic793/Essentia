@@ -31,9 +31,10 @@ void VelocityBufferStage::Initialize()
 	psoDesc.SampleDesc = sampleDesc;
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.DepthClipEnable = false;
+	//psoDesc.RasterizerState.DepthClipEnable = false;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.NumRenderTargets = 1;
+	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
 
 	velocityBufferPSO = resourceManager->CreatePSO(psoDesc);
 	GPostProcess.RegisterPostProcess("VelocityBufferStage", this);
@@ -52,7 +53,8 @@ TextureID VelocityBufferStage::RenderPostProcess(uint32 backbufferIndex, Texture
 	renderer->TransitionBarrier(commandList, GSceneTextures.VelocityBuffer.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	renderer->SetTargetSize(commandList, screenSize);
 	commandList->ClearRenderTargetView(rt, ColorValues::ClearColor, 0, nullptr);
-	renderer->SetRenderTargets(&GSceneTextures.VelocityBuffer.RenderTarget, 1, nullptr);
+	auto depthStencil = renderer->GetCurrentDepthStencil();
+	renderer->SetRenderTargets(&GSceneTextures.VelocityBuffer.RenderTarget, 1, &depthStencil);
 	commandList->SetPipelineState(resourceManager->GetPSO(velocityBufferPSO));
 	uint32 count;
 	auto drawables = ec->EntityManager->GetComponents<DrawableComponent>(count);

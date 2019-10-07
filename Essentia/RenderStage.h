@@ -24,14 +24,16 @@ public:
 private:
 };
 
+using RenderStageMap = std::unordered_map<std::string_view, IRenderStage*>;
 
 class RenderStageManager
 {
 public:
 	void RegisterStage(std::string_view stageName, IRenderStage* stage);
 	void SetEnabled(std::string_view stageName, bool enabled);
+	const RenderStageMap& GetRenderStageMap();
 private:
-	std::unordered_map<std::string_view, IRenderStage*> renderStages;
+	RenderStageMap renderStages;
 };
 
 extern RenderStageManager GRenderStageManager;

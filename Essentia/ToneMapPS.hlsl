@@ -21,5 +21,5 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	float3 color = InputTexture.Sample(BasicSampler, input.uv).rgb;
 	color = ToneMapFilmicALU(color);
-	return float4(color, 1.0f);
+	return float4(saturate(color), 1.0f);
 }
