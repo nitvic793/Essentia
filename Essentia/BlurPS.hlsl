@@ -35,11 +35,15 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 color = float3(0.f, 0.f, 0.f);
 	float hstep = dir.x / Width;
 	float vstep = dir.y / Height;
+	float2 texelSize = dir / float2(Width, Height);
 
 	for (int i = 0; i < KERNEL_TAPS; ++i)
 	{
-		float3 lColor = InputTexture.Sample(BasicSampler, input.uv + float2(hstep * offset[i], vstep * offset[i])).rgb * kernel[i];
-		float3 rColor = InputTexture.Sample(BasicSampler, input.uv - float2(hstep * offset[i], vstep * offset[i])).rgb * kernel[i];
+		float2 step = texelSize * offset[i];
+		float2 luv = clamp(input.uv + step, float2(0.f, 0.f), float2(1.f, 1.f));
+		float2 ruv = clamp(input.uv - step, float2(0.f, 0.f), float2(1.f, 1.f));
+		float3 lColor = InputTexture.Sample(BasicSampler, luv).rgb * kernel[i];
+		float3 rColor = InputTexture.Sample(BasicSampler, ruv).rgb * kernel[i];
 		color = color + (lColor + rColor);
 	}
 

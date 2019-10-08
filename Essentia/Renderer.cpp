@@ -18,6 +18,7 @@
 #include "ImguiRenderStage.h"
 #include "SkyBoxRenderStage.h"
 #include "OutlineRenderStage.h"
+#include "PostProcessTemporalAA.h"
 #include "VelocityBufferStage.h"
 #include "PostProcessMotionBlur.h"
 #include "PostProcessDepthOfFieldStage.h"
@@ -128,6 +129,7 @@ void Renderer::Initialize()
 
 	postProcessStages.Reserve(32);
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
+	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessTemporalAA>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessMotionBlur>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessToneMap>()));

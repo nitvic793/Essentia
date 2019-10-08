@@ -196,6 +196,9 @@
     <ClCompile Include="VelocityBufferStage.cpp">
       <Filter>Source Files\Renderer\PostProcessStages</Filter>
     </ClCompile>
+    <ClCompile Include="PostProcessTemporalAA.cpp">
+      <Filter>Source Files\Renderer\PostProcessStages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -369,6 +372,9 @@
     <ClInclude Include="VelocityBufferStage.h">
       <Filter>Header Files\Renderer\PostProcessStages</Filter>
     </ClInclude>
+    <ClInclude Include="PostProcessTemporalAA.h">
+      <Filter>Header Files\Renderer\PostProcessStages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -411,6 +417,9 @@
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
     <FxCompile Include="MotionBlurPS.hlsl">
+      <Filter>Shaders\AA</Filter>
+    </FxCompile>
+    <FxCompile Include="TemporalAAPS.hlsl">
       <Filter>Shaders\AA</Filter>
     </FxCompile>
   </ItemGroup>

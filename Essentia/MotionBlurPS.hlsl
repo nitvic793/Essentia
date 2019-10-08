@@ -15,7 +15,7 @@ Texture2D<float4>		InputTexture	: register(t0);
 Texture2D<float4>		VelocityTexture	: register(t1);
 SamplerState			BasicSampler	: register(s0);
 
-static const int MAX_SAMPLES = 5;
+static const int MAX_SAMPLES = 8;
 
 float4 main(VertexToPixel input) : SV_TARGET
 {

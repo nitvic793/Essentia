@@ -183,6 +183,7 @@
     <ClCompile Include="OGLMath.cpp" />
     <ClCompile Include="OutlineRenderStage.cpp" />
     <ClCompile Include="PostProcessMotionBlur.cpp" />
+    <ClCompile Include="PostProcessTemporalAA.cpp" />
     <ClCompile Include="PostProcessToneMap.cpp" />
     <ClCompile Include="RenderStage.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
@@ -237,6 +238,7 @@
     <ClInclude Include="OutlineRenderStage.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PostProcessMotionBlur.h" />
+    <ClInclude Include="PostProcessTemporalAA.h" />
     <ClInclude Include="PostProcessToneMap.h" />
     <ClInclude Include="RenderBucket.h" />
     <ClInclude Include="RenderStage.h" />
@@ -340,6 +342,12 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="TemporalAAPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="ToneMapPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
