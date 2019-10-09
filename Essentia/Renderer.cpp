@@ -155,27 +155,23 @@ void Renderer::Initialize()
 
 	window->RegisterOnResizeCallback([&]()
 		{
+			auto swapChain = deviceResources->GetSwapChain();
 			if (!commandContext.Get()) return;
+			auto bindex = swapChain->GetCurrentBackBufferIndex();
+			commandContext->WaitForGPU(bindex);
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
 				renderTargetBuffers[i].Reset();
-				commandContext->Fence(i) = commandContext->Fence(backBufferIndex);
+				commandContext->Fence(i) = commandContext->Fence(bindex);
 			}
 
-			resourceManager->Release(depthBufferResourceId);
+			swapChain->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
+			
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
-				commandContext->WaitForFrame(i);
-			}
-
-			deviceResources->GetSwapChain()->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
-			for (int i = 0; i < CFrameBufferCount; ++i)
-			{
-				auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(renderTargetBuffers[i].GetAddressOf()));
+				auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTargetBuffers[i]));
 				renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
 			}
-
-			renderTargetManager->ReCreateDepthStencilView(depthStencilId, resourceManager->GetResource(depthBufferResourceId));
 		});
 }
 

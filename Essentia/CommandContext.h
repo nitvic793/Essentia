@@ -14,6 +14,7 @@ public:
 	void							SubmitCommands(ID3D12GraphicsCommandList* commandList);
 	void							WaitForFrame();
 	void							WaitForFrame(uint32 backBufferIndex);
+	void							WaitForGPU(uint32 backBufferIndex);
 	void							CleanUp();
 	void							ResetAllocator(ID3D12CommandAllocator* allocator);
 	void							ResetCommandList(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator);

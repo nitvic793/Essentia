@@ -108,15 +108,34 @@ uint64& CommandContext::Fence(int index)
 
 void CommandContext::WaitForFrame(uint32 index)
 {
+	auto commandQueue = deviceResources->GetCommandQueue();
 	backBufferIndex = index;
 	if (fences[index]->GetCompletedValue() < fenceValues[index])
 	{
 		auto hr = fences[index]->SetEventOnCompletion(fenceValues[index], fenceEvent);
-		if (FAILED(hr))
+		if (SUCCEEDED(hr))
 		{
+			fenceValues[index]++;
 		}
-		WaitForSingleObject(fenceEvent, INFINITE);
+		if (WaitForSingleObjectEx(fenceEvent, 100, FALSE) == WAIT_TIMEOUT)
+		{
+			WaitForGPU(index);
+		}
 	}
 
-	fenceValues[index]++;
+
+}
+
+void CommandContext::WaitForGPU(uint32 backBufferIndex)
+{
+	auto commandQueue = deviceResources->GetCommandQueue();
+	if (SUCCEEDED(commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex])))
+	{
+		auto hr = fences[backBufferIndex]->SetEventOnCompletion(fenceValues[backBufferIndex], fenceEvent);
+		if (SUCCEEDED(hr))
+		{
+			WaitForSingleObjectEx(fenceEvent, INFINITE, FALSE);
+			fenceValues[backBufferIndex]++;
+		}
+	}
 }
