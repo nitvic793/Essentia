@@ -45,5 +45,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float radius = (FocusPlaneZ - linearZ) * (scale * scale);
 	radius = clamp(radius * 2.0, -1.0, 1.0);
 	float3 result = lerp(sharp.rgb, blur, abs(radius));
+
 	return float4(result, 1.f);
 }

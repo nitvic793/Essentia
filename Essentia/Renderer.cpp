@@ -195,7 +195,7 @@ void Renderer::Clear()
 	auto dsv = renderTargetManager->GetDSVHandle(depthStencilId);
 
 	const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
+	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr); 
 	commandList->ClearRenderTargetView(hdrRtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	frameManager->Reset(imageIndex);

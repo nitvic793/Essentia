@@ -46,8 +46,6 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
 
-	/*if (show)
-		ImGui::ShowDemoWindow(&show);*/
 
 	{
 		static float f = 0.0f;

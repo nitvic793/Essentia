@@ -19,9 +19,9 @@ public:
 		auto entities = GetEntities<PositionComponent>(count);
 		for (uint32 i = 0; i < count; ++i)
 		{
-			auto Pos = pos[i].Position;
-			auto Rot = rot[i].Rotation;
-			auto Scale = scale[i].Scale;
+			auto Pos = pos[i];
+			auto Rot = rot[i];
+			auto Scale = scale[i];
 			Transform transform = { Pos, Rot, Scale };
 			entityManager->UpdateTransform(entities[i], transform);
 		}

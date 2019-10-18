@@ -6,25 +6,70 @@
 #include "Engine.h"
 #include "ConstantBuffer.h"
 
-struct PositionComponent
+struct PositionComponent : public IComponent
 {
 	GComponent(PositionComponent)
-	DirectX::XMFLOAT3 Position;
+	float X;
+	float Y;
+	float Z;
+	
+	const PositionComponent& operator=(const DirectX::XMFLOAT3& position)
+	{
+		this->X = position.x;
+		this->Y = position.y;
+		this->Z = position.z;
+		return *this;
+	}
+
+	operator DirectX::XMFLOAT3()
+	{
+		return DirectX::XMFLOAT3(X, Y, Z);
+	}
 };
 
-struct RotationComponent
+struct RotationComponent : public IComponent
 {
 	GComponent(RotationComponent)
-	DirectX::XMFLOAT3 Rotation;
+	float X;
+	float Y;
+	float Z;
+
+	const RotationComponent& operator=(const DirectX::XMFLOAT3& position)
+	{
+		this->X = position.x;
+		this->Y = position.y;
+		this->Z = position.z;
+		return *this;
+	}
+
+	operator DirectX::XMFLOAT3()
+	{
+		return DirectX::XMFLOAT3(X, Y, Z);
+	}
 };
 
-struct ScaleComponent
+struct ScaleComponent : public IComponent
 {
 	GComponent(ScaleComponent)
-	DirectX::XMFLOAT3 Scale;
+	float X;
+	float Y;
+	float Z;
+
+	const ScaleComponent& operator=(const DirectX::XMFLOAT3& position)
+	{
+		this->X = position.x;
+		this->Y = position.y;
+		this->Z = position.z;
+		return *this;
+	}
+
+	operator DirectX::XMFLOAT3()
+	{
+		return DirectX::XMFLOAT3(X, Y, Z);
+	}
 };
 
-struct IDrawable {};
+struct IDrawable : public IComponent {};
 
 struct DrawableComponent : public IDrawable
 {
@@ -63,7 +108,7 @@ struct DrawableModelComponent : public IDrawable
 	}
 };
 
-struct ILight {};
+struct ILight : public IComponent {};
 
 struct DirectionalLightComponent : public ILight
 {
@@ -112,7 +157,7 @@ struct PointLightComponent : public ILight
 	}
 };
 
-struct SkyboxComponent
+struct SkyboxComponent : public IComponent
 {
 	GComponent(SkyboxComponent)
 	TextureID			CubeMap;
@@ -128,12 +173,12 @@ struct SkyboxComponent
 };
 
 // Add this component to any entity which is to be selected
-struct SelectedComponent
+struct SelectedComponent : public IComponent
 {
 	GComponent(SelectedComponent)
 };
 
 //TODO: Make camera part of Component System 
-struct CameraComponent
+struct CameraComponent : public IComponent
 {
 };

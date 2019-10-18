@@ -24,10 +24,16 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform)
 	handle.Version = generations[handle.Index];
 	transformManager.CreateTransform({ handle });
 	EntityHandle entity = { handle };
+	PositionComponent position = {};
+	RotationComponent rotation = {};
+	ScaleComponent scale = {};
+	position = transform.Position;
+	rotation = transform.Rotation;
+	scale = transform.Scale;
 
-	componentManager.AddComponent<PositionComponent>(entity, { transform.Position });
-	componentManager.AddComponent<RotationComponent>(entity, { transform.Rotation });
-	componentManager.AddComponent<ScaleComponent>(entity, { transform.Scale });
+	componentManager.AddComponent<PositionComponent>(entity, position);
+	componentManager.AddComponent<RotationComponent>(entity, rotation);
+	componentManager.AddComponent<ScaleComponent>(entity, scale);
 	return entity;
 }
 
@@ -50,9 +56,9 @@ TransformRef EntityManager::GetTransform(EntityHandle handle)
 	auto scale = componentManager.GetComponent<ScaleComponent>(handle);
 
 	TransformRef ref = {};
-	ref.Position = &pos->Position;
-	ref.Rotation = &rot->Rotation;
-	ref.Scale = &scale->Scale;
+	ref.Position = (DirectX::XMFLOAT3*)pos;
+	ref.Rotation = (DirectX::XMFLOAT3*)rot;
+	ref.Scale = (DirectX::XMFLOAT3*)scale;
 	return ref;
 }
 

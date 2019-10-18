@@ -5,7 +5,7 @@
 #include <cereal/cereal.hpp>
 #include <visit_struct/visit_struct.hpp>
 
-//
+
 namespace Es::serial
 {
 	struct Vector3
@@ -32,6 +32,17 @@ namespace Es::serial
 
 	struct Entity
 	{
-		Transform Transform;
+		Transform					Transform;
+		std::vector<IComponent*>	Components;
+	};
+
+	struct Material
+	{
+		std::vector<std::string_view> Textures;
+	};
+
+	struct Scene
+	{
+		std::vector<Entity>	Entities;
 	};
 }
