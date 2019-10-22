@@ -5,8 +5,16 @@
 #include <cereal/cereal.hpp>
 #include <visit_struct/visit_struct.hpp>
 
+/*
+Special Components:
+Transform
+Mesh
+Material
+Model
+Lights
+*/
 
-namespace es::interface
+namespace es::interfaces
 {
 	struct Vector3
 	{
@@ -30,10 +38,15 @@ namespace es::interface
 		Vector3 Rotation;
 	};
 
+	struct Mesh
+	{
+		std::string_view Name;
+	}; 
+
 	struct Entity
 	{
 		Transform					Transform;
-		std::vector<IComponent*>	Components;
+		std::vector<std::string>	Components;
 	};
 
 	struct Material
@@ -44,5 +57,12 @@ namespace es::interface
 	struct Scene
 	{
 		std::vector<Entity>	Entities;
+	};
+
+	struct Resources
+	{
+		std::vector<std::string> Textures;
+		std::vector<std::string> CubeMaps;
+		std::vector<std::string> Meshes;
 	};
 }

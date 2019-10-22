@@ -11,7 +11,8 @@ typedef uint32 ComponentTypeID;
 struct IComponent {};
 
 #define GComponent(name) \
-static const ComponentTypeID Type = crc32(#name);
+static const ComponentTypeID Type = crc32(#name); \
+static const char* GetName() { return #name; }; 
 
 typedef uint64 Handle;
 

@@ -25,6 +25,7 @@ private:
 };
 
 
+//Stores scene texture in half, quarter and 1/8th resolutions
 struct PostSceneTextures
 {
 	SceneRenderTarget	HalfResTexture; 
@@ -43,6 +44,7 @@ public:
 	void				Intitialize();
 	void				GenerateLowResTextures();
 	PostSceneTextures	GetPostSceneTextures();
+	//Blurs given texture into final given target.
 	void				RenderBlurTexture(TextureID input, 
 										  ScreenSize screenSize,
 										  uint32 backBufferIndex, 

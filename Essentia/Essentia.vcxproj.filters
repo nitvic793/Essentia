@@ -348,9 +348,6 @@
     <ClInclude Include="PostProcess.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PipelineStates.h">
       <Filter>Header Files\Renderer</Filter>
     </ClInclude>
@@ -374,6 +371,9 @@
     </ClInclude>
     <ClInclude Include="PostProcessTemporalAA.h">
       <Filter>Header Files\Renderer\PostProcessStages</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
