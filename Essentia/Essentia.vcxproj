@@ -161,6 +161,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CommandContext.cpp" />
+    <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="PipelineStates.cpp" />
     <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="PostProcessDepthOfFieldStage.cpp" />
@@ -202,6 +203,7 @@
   <ItemGroup>
     <ClInclude Include="BaseComponents.h" />
     <ClInclude Include="BaseSystems.h" />
+    <ClInclude Include="ComponentFactory.h" />
     <ClInclude Include="PipelineStates.h" />
     <ClInclude Include="PostProcess.h" />
     <ClInclude Include="PostProcessDepthOfFieldStage.h" />

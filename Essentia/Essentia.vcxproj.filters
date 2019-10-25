@@ -199,6 +199,9 @@
     <ClCompile Include="PostProcessTemporalAA.cpp">
       <Filter>Source Files\Renderer\PostProcessStages</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentFactory.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -374,6 +377,9 @@
     </ClInclude>
     <ClInclude Include="Interface.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentFactory.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include "EntityBase.h"
+#include "Memory.h"
 
 class ComponentPoolBase
 {
@@ -12,9 +13,9 @@ public:
 	virtual ComponentTypeID GetType() = 0;
 	virtual void			AddComponent(EntityHandle entity) = 0;
 	virtual void			RemoveComponent(EntityHandle entity) = 0;
-	virtual IComponent*		GetComponent(EntityHandle entity) = 0;
-	virtual IComponent*		GetAllComponents(uint32& count) = 0;
-	virtual EntityHandle*	GetEntities(uint32& count) = 0;
+	virtual IComponent* GetComponent(EntityHandle entity) = 0;
+	virtual IComponent* GetAllComponents(uint32& count) = 0;
+	virtual EntityHandle* GetEntities(uint32& count) = 0;
 	virtual EntityHandle	GetEntity(uint32 index) = 0;
 	virtual ~ComponentPoolBase() {}
 };
@@ -63,7 +64,7 @@ public:
 	virtual IComponent* GetComponent(EntityHandle entity) override
 	{
 		auto index = componentMap[entity.ID];
-		return (IComponent*)&components[index];
+		return (IComponent*)& components[index];
 	}
 
 	virtual IComponent* GetAllComponents(uint32& count) override
@@ -121,7 +122,7 @@ public:
 	template<typename T>
 	EntityHandle GetEntity(uint32 index);
 private:
-	std::unordered_map<ComponentTypeID, std::unique_ptr<ComponentPoolBase>> pools;
+	std::unordered_map<ComponentTypeID, ScopedPtr<ComponentPoolBase>> pools;
 };
 
 template<typename T>
@@ -129,7 +130,16 @@ inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
 {
 	if (pools.find(T::Type) == pools.end())
 	{
-		pools.insert(std::pair<ComponentTypeID, std::unique_ptr<ComponentPoolBase>>(T::Type, std::unique_ptr<ComponentPoolBase>((ComponentPoolBase*)new ComponentPool<T>())));
+		size_t size = sizeof(ComponentPool<T>);
+		auto buffer = Mem::Alloc(size);
+		ComponentPool<T>* pool = new(buffer) ComponentPool<T>();
+		pools.insert(
+			std::pair<ComponentTypeID,
+			ScopedPtr<ComponentPoolBase>>(
+				T::Type,
+				ScopedPtr<ComponentPoolBase>((ComponentPoolBase*)pool)
+				)
+		);
 	}
 	return (ComponentPool<T>*)pools[T::Type].get();
 }
