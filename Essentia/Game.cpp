@@ -21,8 +21,8 @@ void Game::Setup()
 
 	renderer->Initialize();
 	Initialize();
-	systemManager.Initialize();
 	renderer->EndInitialization();
+	systemManager.Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
 	camera = MakeScopedArgs<Camera>((float)windowSize.Width, (float)windowSize.Height);

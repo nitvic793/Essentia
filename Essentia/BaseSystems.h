@@ -49,7 +49,7 @@ public:
 		auto transform = GetTransform(lights[1]);
 		transform.Position->y = 3;
 		MaterialHandle mat = { 0 };
-		MeshHandle mesh = { 2 };
+		MeshHandle mesh = { 1 };
 		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cube.obj");
 
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));

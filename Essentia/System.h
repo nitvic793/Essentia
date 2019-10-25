@@ -56,14 +56,14 @@ public:
 	void Update(const DirectX::Keyboard::State& kbState, const DirectX::Mouse::State& mouseState, Camera* camera);
 	void Destroy();
 private:
-	std::vector<std::unique_ptr<ISystem>> systems;
+	std::vector<ScopedPtr<ISystem>> systems;
 	EntityManager* entityManager = nullptr;
 };
 
 template<typename SystemType>
 inline void SystemManager::RegisterSystem()
 {
-	systems.push_back(std::unique_ptr<ISystem>((ISystem*)new SystemType()));
+	systems.push_back(ScopedPtr<ISystem>((ISystem*)Mem::Alloc<SystemType>()));
 }
 
 
