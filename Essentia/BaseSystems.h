@@ -71,7 +71,6 @@ public:
 		auto transform = GetTransform(entity);
 		transform.Rotation->y = totalTime / 2;
 		transform.Position->x = 3 * sin(totalTime * 2);
-
 		transform = GetTransform(entity2);
 		//transform.Rotation->y = totalTime;
 		//transform.Position->y = cos(totalTime);

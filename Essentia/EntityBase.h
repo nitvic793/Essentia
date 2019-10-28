@@ -8,11 +8,14 @@ constexpr uint32 CMaxInitialComponentCount = 128;
 
 typedef uint32 ComponentTypeID;
 
-struct IComponent {};
+struct IComponent
+{
+	virtual const char* GetName() = 0;
+};
 
 #define GComponent(name) \
 static const ComponentTypeID Type = crc32(#name); \
-static const char* GetName() { return #name; }; 
+virtual const char* GetName() { return #name; }; 
 
 typedef uint64 Handle;
 

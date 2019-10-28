@@ -5,6 +5,7 @@
 #define NOMINMAX
 
 #include "../Essentia/Game.h"
+#include "GameLoader.h"
 #include <dxgidebug.h>
 
 int main()
@@ -27,11 +28,24 @@ int main()
 	}
 
 	{
+		GameLoader gameLoader;
+		gameLoader.LoadGameLibrary();
 		LinearAllocator allocator(CMaxStackHeapSize);
-		Game* game = new Game();
-		game->Setup();
-		game->Run();
-		delete game;
+		{
+			ScopedPtr<Game> game = MakeScoped<Game>();
+			game->Setup();
+			gameLoader.InitializeLoader(EngineContext::Context);
+			gameLoader.LoadSystems(game.get(), &allocator);
+			game->SetSystemReloadCallback([&]() 
+			{
+				gameLoader.FreeGameLibrary();
+				system("msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64");
+				gameLoader.LoadGameLibrary();
+				gameLoader.LoadSystems(game.get(), &allocator);
+			});
+			game->Run();
+		}
+		gameLoader.FreeGameLibrary();
 	}
 
 #ifdef _DEBUG

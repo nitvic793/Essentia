@@ -7,6 +7,12 @@ EntityManager::EntityManager()
 	generations.reserve(CMaxInitialEntityCount);
 }
 
+void EntityManager::Initialize(IAllocator* allocator)
+{
+	this->allocator = allocator;
+	componentManager.Initialize(allocator);
+}
+
 EntityHandle EntityManager::CreateEntity(const Transform& transform)
 {
 	HandleType handle;
@@ -56,9 +62,9 @@ TransformRef EntityManager::GetTransform(EntityHandle handle)
 	auto scale = componentManager.GetComponent<ScaleComponent>(handle);
 
 	TransformRef ref = {};
-	ref.Position = (DirectX::XMFLOAT3*)pos;
-	ref.Rotation = (DirectX::XMFLOAT3*)rot;
-	ref.Scale = (DirectX::XMFLOAT3*)scale;
+	ref.Position = (DirectX::XMFLOAT3*)&pos->X;
+	ref.Rotation = (DirectX::XMFLOAT3*)&rot->X;
+	ref.Scale = (DirectX::XMFLOAT3*)&scale->X;
 	return ref;
 }
 

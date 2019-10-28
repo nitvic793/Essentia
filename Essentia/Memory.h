@@ -2,6 +2,12 @@
 #include "Declarations.h"
 #include <utility>
 
+#ifdef DLL_A
+#define A_EXPORT __declspec(dllexport)
+#else
+#define A_EXPORT __declspec(dllimport)
+#endif
+
 constexpr uint32 CMaxStackHeapSize = 1024 * 1024 * 32; //32MB
 
 class IAllocator

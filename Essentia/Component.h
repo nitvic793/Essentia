@@ -101,6 +101,8 @@ private:
 class ComponentManager
 {
 public:
+	void Initialize(IAllocator* allocator);
+
 	template<typename T>
 	ComponentPool<T>* GetOrCreatePool();
 
@@ -122,6 +124,7 @@ public:
 	template<typename T>
 	EntityHandle GetEntity(uint32 index);
 private:
+	IAllocator* allocator;
 	std::unordered_map<ComponentTypeID, ScopedPtr<ComponentPoolBase>> pools;
 };
 
@@ -131,7 +134,7 @@ inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
 	if (pools.find(T::Type) == pools.end())
 	{
 		size_t size = sizeof(ComponentPool<T>);
-		auto buffer = Mem::Alloc(size);
+		auto buffer = allocator->Alloc(size);
 		ComponentPool<T>* pool = new(buffer) ComponentPool<T>();
 		pools.insert(
 			std::pair<ComponentTypeID,

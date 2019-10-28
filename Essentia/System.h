@@ -52,6 +52,9 @@ public:
 	template<typename SystemType>
 	void RegisterSystem();
 
+	template<typename SystemType>
+	void RegisterSystem(IAllocator* allocator);
+
 	void Initialize();
 	void Update(const DirectX::Keyboard::State& kbState, const DirectX::Mouse::State& mouseState, Camera* camera);
 	void Destroy();
@@ -64,6 +67,14 @@ template<typename SystemType>
 inline void SystemManager::RegisterSystem()
 {
 	systems.push_back(ScopedPtr<ISystem>((ISystem*)Mem::Alloc<SystemType>()));
+}
+
+template<typename SystemType>
+inline void SystemManager::RegisterSystem(IAllocator* allocator)
+{
+	auto buffer = allocator->Alloc(sizeof(SystemType));
+	ISystem* system = new(buffer) SystemType();
+	systems.push_back(ScopedPtr<ISystem>(system));
 }
 
 

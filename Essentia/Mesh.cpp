@@ -8,9 +8,18 @@ using namespace Microsoft::WRL;
 
 MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 {
-	auto meshData = ModelLoader::Load(filename);
-	auto handle = CreateMesh(meshData, meshView);
-	meshMap[String::ID(filename.c_str())] = handle.Id;
+	auto meshStringID = String::ID(filename.c_str());
+	MeshHandle handle;
+	if (meshMap.find(meshStringID) != meshMap.end())
+	{
+		handle.Id = meshMap[meshStringID];
+	}
+	else
+	{
+		auto meshData = ModelLoader::Load(filename);
+		handle = CreateMesh(meshData, meshView);
+		meshMap[meshStringID] = handle.Id;
+	}
 	return handle;
 }
 

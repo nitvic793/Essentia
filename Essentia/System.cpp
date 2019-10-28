@@ -36,6 +36,8 @@ void SystemManager::Destroy()
 	{
 		system->Destroy();
 	}
+
+	systems.clear();
 }
 
 TransformRef ISystem::GetTransform(EntityHandle entity)

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Memory.h"
 
-
 LinearAllocator* LinearAllocator::Instance = nullptr;
 
 void* Mem::Alloc(size_t sizeInBytes)

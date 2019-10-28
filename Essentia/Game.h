@@ -10,12 +10,17 @@
 #include "System.h"
 #include "Engine.h"
 
+using Callback = std::function<void()>;
+
 class Game
 {
 public:
 	Game() {};
-	void Setup();
-	void Run();
+	void			Setup();
+	void			Run();
+	void			ReloadSystems();
+	void			SetSystemReloadCallback(Callback callback);
+	SystemManager*	GetGameSystemsManager();
 	~Game();
 protected:
 	virtual void	Initialize() {};
@@ -28,7 +33,9 @@ protected:
 	ScopedPtr<DirectX::Mouse>		mouse;
 	ScopedPtr<Camera>				camera;
 	EntityManager					entityManager;
-	SystemManager					systemManager;
+	SystemManager					coreSystemsManager;
+	SystemManager					gameSystemsManager;
+	Callback						systemLoadCallback;
 private:
 	EngineContext					engineContext;
 };

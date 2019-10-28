@@ -9,36 +9,41 @@ void Game::Setup()
 	renderer = MakeScoped<Renderer>();
 	keyboard = MakeScoped<DirectX::Keyboard>();
 	mouse = MakeScoped<DirectX::Mouse>();
+	entityManager.Initialize(Mem::GetDefaultAllocator());
 
 	auto ec = EngineContext::Context;
 	ec->EntityManager = &entityManager;
 	ec->RendererInstance = renderer.Get();
 	
-	systemManager.Setup(&entityManager);
-	systemManager.RegisterSystem<TransformUpdateSystem>();
-	systemManager.RegisterSystem<RotationSystem>();
-	systemManager.RegisterSystem<FreeCameraSystem>();
+	coreSystemsManager.Setup(&entityManager);
+	gameSystemsManager.Setup(&entityManager);
+
+	coreSystemsManager.RegisterSystem<TransformUpdateSystem>();
+	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
 
 	renderer->Initialize();
-	Initialize();
 	renderer->EndInitialization();
-	systemManager.Initialize();
+	coreSystemsManager.Initialize();
+
+	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
 	camera = MakeScopedArgs<Camera>((float)windowSize.Width, (float)windowSize.Height);
-	auto id = entityManager.CreateEntity();
 }
 
 void Game::Run()
 {
+	float localCounter = 0.f;
 	auto window = renderer->GetWindow();
 	timer.Start();
 	window->StartMessagePump([&] 
 		{
 			timer.Tick();
+			localCounter += timer.DeltaTime;
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
-			systemManager.Update(kbState, mouseState, camera.Get());
+			coreSystemsManager.Update(kbState, mouseState, camera.Get());
+			gameSystemsManager.Update(kbState, mouseState, camera.Get());
 			Update();
 			camera->Update();
 			Render();
@@ -47,12 +52,34 @@ void Game::Run()
 			{
 				PostQuitMessage(0);
 			}
+
+			if (kbState.IsKeyDown(DirectX::Keyboard::F5) && localCounter > 0.5f)
+			{
+				localCounter = 0;
+				ReloadSystems();
+			}
 		});
+}
+
+void Game::ReloadSystems()
+{
+	systemLoadCallback();
+}
+
+void Game::SetSystemReloadCallback(Callback callback)
+{
+	systemLoadCallback = callback;
+}
+
+SystemManager* Game::GetGameSystemsManager()
+{
+	return &gameSystemsManager;
 }
 
 Game::~Game()
 {
-	systemManager.Destroy();
+	coreSystemsManager.Destroy();
+	gameSystemsManager.Destroy();
 	renderer->CleanUp();
 }
 

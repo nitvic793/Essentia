@@ -10,6 +10,7 @@ class EntityManager
 {
 public:
 	EntityManager();
+	void			Initialize(IAllocator* allocator);
 	EntityHandle	CreateEntity(const Transform& transform = DefaultTransform);
 	bool			IsAlive(EntityHandle handle);
 	void			Destroy(EntityHandle handle);
@@ -36,6 +37,7 @@ private:
 	std::vector<uint32> freeIndices;
 	ComponentManager	componentManager;
 	TransformManager	transformManager;
+	IAllocator*			allocator;
 };
 
 template<typename T>
