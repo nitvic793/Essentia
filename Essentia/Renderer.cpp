@@ -282,47 +282,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
 
-	for (auto pipeline : renderBucket.Pipelines)
-	{
-		auto psoBucket = pipeline.second;
-		auto pso = psoBucket.PipelineStateObject;
-		commandList->SetPipelineState(pso);
-		for (auto mat : psoBucket.Instances)
-		{
-			auto material = mat.second.Material;
-			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
-			for (auto meshes : mat.second.Instances)
-			{
-				auto mesh = meshes.second.Mesh;
-				commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
-				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-				for (uint32 cbIndex : meshes.second.CbIndices)
-				{
-					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + cbIndex));
-					DrawMesh(mesh);
-				}
-			}
-		}
-	}
-
-	for (size_t i = 0; i < drawableModelCount; ++i)
-	{
-		auto& model = modelManager.GetModel(drawableModels[i].Model);
-		commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + drawableModels[i].CBView.Index));
-		auto meshHandle = model.Mesh;
-		auto mesh = meshManager->GetMeshView(meshHandle);
-		int matIndex = 0;
-		commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
-		commandList->IASetIndexBuffer(&mesh.IndexBufferView);
-		for (auto& m : mesh.MeshEntries)
-		{
-			auto materialHandle = model.Materials[matIndex]; //material maps to each mesh entry in model.
-			auto material = shaderResourceManager->GetMaterial(materialHandle);
-			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(imageIndex, offsets.MaterialsOffset + material.StartIndex));
-			commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
-			matIndex++;
-		}
-	}
+	Draw(commandList, renderBucket);
+	Draw(commandList, drawableModels, drawableModelCount);
 
 	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
 	{
@@ -676,6 +637,55 @@ RenderTargetID Renderer::GetDefaultHDRRenderTarget()
 void Renderer::SetVSync(bool enabled)
 {
 	vsync = enabled;
+}
+
+void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket)
+{
+	for (auto pipeline : bucket.Pipelines)
+	{
+		auto psoBucket = pipeline.second;
+		auto pso = psoBucket.PipelineStateObject;
+		commandList->SetPipelineState(pso);
+		for (auto mat : psoBucket.Instances)
+		{
+			auto material = mat.second.Material;
+			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
+			for (auto meshes : mat.second.Instances)
+			{
+				auto mesh = meshes.second.Mesh;
+				commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
+				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+				for (uint32 cbIndex : meshes.second.CbIndices)
+				{
+					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + cbIndex));
+					DrawMesh(mesh);
+				}
+			}
+		}
+	}
+}
+
+void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count)
+{
+	for (size_t i = 0; i < count; ++i)
+	{
+		auto& model = modelManager.GetModel(drawableModels[i].Model);
+		commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + drawableModels[i].CBView.Index));
+		auto meshHandle = model.Mesh;
+		auto mesh = meshManager->GetMeshView(meshHandle);
+		int matIndex = 0;
+		commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
+		commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+		for (auto& m : mesh.MeshEntries)
+		{
+			auto materialHandle = model.Materials[matIndex]; //material maps to each mesh entry in model.
+			auto material = shaderResourceManager->GetMaterial(materialHandle);
+			commandList->SetPipelineState(resourceManager->GetPSO(material.PipelineID));
+			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
+			commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
+			matIndex++;
+		}
+	}
 }
 
 void Renderer::InitializeCommandContext()

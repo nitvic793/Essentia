@@ -431,5 +431,8 @@
     <FxCompile Include="TemporalAAPS.hlsl">
       <Filter>Shaders\AA</Filter>
     </FxCompile>
+    <FxCompile Include="SSAO.hlsl">
+      <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -83,6 +83,8 @@ public:
 	RenderTargetID				GetDefaultRenderTarget();
 	RenderTargetID				GetDefaultHDRRenderTarget();
 	void						SetVSync(bool enabled);
+	void						Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket);
+	void						Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count);
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();
