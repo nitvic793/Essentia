@@ -60,7 +60,7 @@ TextureID PostProcessTemporalAA::RenderPostProcess(uint32 backbufferIndex, Textu
 	renderer->SetRenderTargets(&temporalAATarget.RenderTarget, 1, nullptr);
 	commandList->SetPipelineState(resourceManager->GetPSO(temporalAAPso));
 
-	TextureID textures[] = { renderer->GetCurrentHDRRenderTargetTexture(), GSceneTextures.PreviousFrame.Texture, GSceneTextures.VelocityBuffer.Texture };
+	TextureID textures[] = { inputTexture, GSceneTextures.PreviousFrame.Texture, GSceneTextures.VelocityBuffer.Texture };
 	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, textures, _countof(textures));
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, temporalAACBV);
 	renderer->DrawScreenQuad(commandList);

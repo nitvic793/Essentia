@@ -6,7 +6,9 @@
 struct PipelineStates
 {
 	void Initialize();
+	PipelineStateID DepthOnlyPSO;
 
+	//Post Process PSOs
 	PipelineStateID QuadPSO;
 	PipelineStateID HDRQuadPSO;
 	PipelineStateID BlurPSO;

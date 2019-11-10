@@ -3,6 +3,8 @@
 #include "Engine.h"
 #include "ShaderManager.h"
 #include "Renderer.h"
+#include "InputLayout.h"
+#include "ResourceManager.h"
 
 PipelineStates GPipelineStates;
 
@@ -10,12 +12,32 @@ void PipelineStates::Initialize()
 {
 	auto ec = EngineContext::Context;
 	auto renderer = ec->RendererInstance;
+	auto resourceManager = ec->ResourceManager;
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
 	auto texFormat = renderer->GetRenderTargetFormat();
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
+	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();
+	psoDesc.VS = ShaderManager::LoadShader(L"DefaultVS.cso");
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	//psoDesc.DepthStencilState.DepthEnable = true;
+	psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	//psoDesc.RTVFormats[0] = renderer->GetHDRRenderTargetFormat();
+	psoDesc.SampleDesc = sampleDesc;
+	psoDesc.SampleMask = 0xffffffff;
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	//psoDesc.NumRenderTargets = 1;
+	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
+	
+	DepthOnlyPSO = resourceManager->CreatePSO(psoDesc);
+
 	psoDesc.InputLayout.pInputElementDescs = nullptr;
 	psoDesc.InputLayout.NumElements = 0;
 	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();

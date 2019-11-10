@@ -69,7 +69,7 @@ TextureID VelocityBufferStage::RenderPostProcess(uint32 backbufferIndex, Texture
 	for (uint32 i = 0; i < count; ++i)
 	{
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawables[i].CBView);
-		renderer->DrawMesh(drawables[i].Mesh);
+		renderer->DrawMesh(commandList, drawables[i].Mesh);
 	}
 
 	auto drawableModels = ec->EntityManager->GetComponents<DrawableModelComponent>(count);
@@ -78,7 +78,7 @@ TextureID VelocityBufferStage::RenderPostProcess(uint32 backbufferIndex, Texture
 	{
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawableModels[i].CBView);
 		auto model = ec->ModelManager->GetModel(drawableModels[i].Model);
-		renderer->DrawMesh(model.Mesh);
+		renderer->DrawMesh(commandList, model.Mesh);
 	}
 
 	renderer->TransitionBarrier(commandList, GSceneTextures.VelocityBuffer.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);

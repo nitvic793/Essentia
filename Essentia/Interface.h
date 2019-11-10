@@ -2,8 +2,10 @@
 
 #include "BaseComponents.h"
 #include "Entity.h"
-#include <cereal/cereal.hpp>
-#include <visit_struct/visit_struct.hpp>
+#include <iostream>
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/json.hpp>
+#include <fstream>
 
 /*
 Special Components:
@@ -14,55 +16,60 @@ Model
 Lights
 */
 
-namespace es::interfaces
+
+struct Vector3
 {
-	struct Vector3
-	{
-		float X;
-		float Y;
-		float Z;
-	};
+	float X;
+	float Y;
+	float Z;
 
-	struct Vector4
+	void operator=(const DirectX::XMFLOAT3& vector)
 	{
-		float X;
-		float Y;
-		float Z;
-		float W;
-	};
+		X = vector.x;
+		Y = vector.y;
+		Z = vector.z;
+	}
+};
 
-	struct Transform
-	{
-		Vector3 Position;
-		Vector3 Scale;
-		Vector3 Rotation;
-	};
+struct Vector4
+{
+	float X;
+	float Y;
+	float Z;
+	float W;
+};
 
-	struct Mesh
-	{
-		std::string_view Name;
-	}; 
+struct TransformInterface
+{
+	Vector3 Position;
+	Vector3 Scale;
+	Vector3 Rotation;
+};
 
-	struct Entity
-	{
-		Transform					Transform;
-		std::vector<std::string>	Components;
-	};
+struct MeshInterface
+{
+	std::string_view Name;
+};
 
-	struct Material
-	{
-		std::vector<std::string_view> Textures;
-	};
+struct EntityInterface
+{
+	TransformInterface			Transform;
+	std::vector<std::string>	Components;
+};
 
-	struct Scene
-	{
-		std::vector<Entity>	Entities;
-	};
+struct MaterialInterface
+{
+	std::vector<std::string_view> Textures;
+};
 
-	struct Resources
-	{
-		std::vector<std::string> Textures;
-		std::vector<std::string> CubeMaps;
-		std::vector<std::string> Meshes;
-	};
-}
+struct Scene
+{
+	std::vector<EntityInterface>	Entities;
+};
+
+struct Resources
+{
+	std::vector<std::string> Textures;
+	std::vector<std::string> CubeMaps;
+	std::vector<std::string> Meshes;
+};

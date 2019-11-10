@@ -4,7 +4,8 @@
 
 enum RenderStageType
 {
-	eRenderStageMain = 0,
+	eRenderStagePreMain = 0,
+	eRenderStageMain,
 	eRenderTypeTransparent,
 	eRenderStageGUI,
 	eRenderTypeCount

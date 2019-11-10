@@ -165,6 +165,7 @@
     <ClCompile Include="CommandContext.cpp" />
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
+    <ClCompile Include="DepthOnlyStage.cpp" />
     <ClCompile Include="PipelineStates.cpp" />
     <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="PostProcessDepthOfFieldStage.cpp" />
@@ -194,6 +195,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="RenderTargetManager.cpp" />
     <ClCompile Include="SceneResources.cpp" />
+    <ClCompile Include="Serialization.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="ShaderResourceManager.cpp" />
     <ClCompile Include="SkyBoxRenderStage.cpp" />
@@ -207,6 +209,7 @@
     <ClInclude Include="BaseComponents.h" />
     <ClInclude Include="BaseSystems.h" />
     <ClInclude Include="ComponentFactory.h" />
+    <ClInclude Include="DepthOnlyStage.h" />
     <ClInclude Include="PipelineStates.h" />
     <ClInclude Include="PostProcess.h" />
     <ClInclude Include="PostProcessDepthOfFieldStage.h" />
@@ -252,6 +255,7 @@
     <ClInclude Include="RenderTargetManager.h" />
     <ClInclude Include="SceneResources.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="Serialization.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ShaderResourceManager.h" />
     <ClInclude Include="SkyBoxRenderStage.h" />
@@ -394,7 +398,6 @@
     <Import Project="..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets" Condition="Exists('..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets')" />
     <Import Project="..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets" Condition="Exists('..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets')" />
     <Import Project="..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets" Condition="Exists('..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets')" />
-    <Import Project="..\packages\unofficial-flayan-cereal.1.2.2\build\native\unofficial-flayan-cereal.targets" Condition="Exists('..\packages\unofficial-flayan-cereal.1.2.2\build\native\unofficial-flayan-cereal.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -405,6 +408,5 @@
     <Error Condition="!Exists('..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Assimp_native_4.1.4.1.0\build\native\Assimp_native_4.1.targets'))" />
     <Error Condition="!Exists('..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets'))" />
     <Error Condition="!Exists('..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets'))" />
-    <Error Condition="!Exists('..\packages\unofficial-flayan-cereal.1.2.2\build\native\unofficial-flayan-cereal.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\unofficial-flayan-cereal.1.2.2\build\native\unofficial-flayan-cereal.targets'))" />
   </Target>
 </Project>

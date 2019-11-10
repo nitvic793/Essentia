@@ -4,8 +4,29 @@
 #include "System.h"
 #include "Engine.h"
 #include "imgui.h"
+#include "Serialization.h"
 
 using namespace DirectX;
+
+
+class EditorSaveSystem : public ISystem
+{
+public:
+	virtual void Update(float dt, float totalTime) override
+	{
+		currentTime += dt;
+		if (keyboard.LeftAlt && currentTime > 0.5f)
+		{
+			currentTime = 0;
+			auto transform = GetTransform({ 2 });
+			Save(transform, "test.json");
+			std::cout << "Saved\n";
+		}
+	}
+
+private:
+	float currentTime = 0.f;
+};
 
 class TransformUpdateSystem : public ISystem
 {

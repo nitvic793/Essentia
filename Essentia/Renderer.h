@@ -47,8 +47,8 @@ public:
 	Window* GetWindow();
 	void	CleanUp();
 	void	EndInitialization();
-	void	DrawMesh(const MeshView& meshView);
-	void    DrawMesh(MeshHandle mesh);
+	void	DrawMesh(ID3D12GraphicsCommandList* commandList, const MeshView& meshView);
+	void    DrawMesh(ID3D12GraphicsCommandList* commandList, MeshHandle mesh);
 	void	SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID* depthStencilId, bool singleHandleToRTsDescriptorRange = false);
 
 	ID3D12GraphicsCommandList*	GetDefaultCommandList();

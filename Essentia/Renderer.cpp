@@ -15,6 +15,7 @@
 #include "Engine.h"
 #include "Entity.h"
 
+#include "DepthOnlyStage.h"
 #include "ImguiRenderStage.h"
 #include "SkyBoxRenderStage.h"
 #include "OutlineRenderStage.h"
@@ -121,6 +122,8 @@ void Renderer::Initialize()
 		renderStages.insert(std::pair<RenderStageType, Vector<ScopedPtr<IRenderStage>>>((RenderStageType)i, std::move(stages)));
 	}
 
+	//renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
+
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
 
@@ -166,12 +169,14 @@ void Renderer::Initialize()
 			}
 
 			swapChain->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
-			
+
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
 				auto hr = swapChain->GetBuffer(i, IID_PPV_ARGS(&renderTargetBuffers[i]));
 				renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
 			}
+
+			//swapChain->SetFullscreenState(TRUE, nullptr);
 		});
 }
 
@@ -195,7 +200,7 @@ void Renderer::Clear()
 	auto dsv = renderTargetManager->GetDSVHandle(depthStencilId);
 
 	const float clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr); 
+	commandList->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
 	commandList->ClearRenderTargetView(hdrRtv, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	frameManager->Reset(imageIndex);
@@ -281,6 +286,22 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
+
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"PrePass Stage");
+
+	for (auto& stage : renderStages[eRenderStagePreMain])
+	{
+		if (stage->Enabled)
+		{
+			stage->Render(backBufferIndex, frameContext);
+		}
+	}
+
+	PIXEndEvent(commandList);
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
 	Draw(commandList, renderBucket);
 	Draw(commandList, drawableModels, drawableModelCount);
@@ -403,9 +424,8 @@ void Renderer::EndInitialization()
 	commandContext->SubmitCommands(commandList);
 }
 
-void Renderer::DrawMesh(const MeshView& meshView)
+void Renderer::DrawMesh(ID3D12GraphicsCommandList* commandList, const MeshView& meshView)
 {
-	auto commandList = commandContext->GetDefaultCommandList();
 	commandList->IASetVertexBuffers(0, 1, &meshView.VertexBufferView);
 	commandList->IASetIndexBuffer(&meshView.IndexBufferView);
 	for (auto& m : meshView.MeshEntries)
@@ -414,11 +434,10 @@ void Renderer::DrawMesh(const MeshView& meshView)
 	}
 }
 
-void Renderer::DrawMesh(MeshHandle mesh)
+void Renderer::DrawMesh(ID3D12GraphicsCommandList* commandList, MeshHandle mesh)
 {
-	auto commandList = commandContext->GetDefaultCommandList();
 	auto& meshView = meshManager->GetMeshView(mesh);
-	DrawMesh(meshView);
+	DrawMesh(commandList, meshView);
 }
 
 void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID* depthStencilId, bool singleHandleToRTsDescriptorRange)
@@ -431,7 +450,9 @@ void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, Dept
 
 	auto* dsvHandle = depthStencilId == nullptr ? (D3D12_CPU_DESCRIPTOR_HANDLE*)nullptr : &renderTargetManager->GetDSVHandle(*depthStencilId);
 	auto commandList = GetDefaultCommandList();
-	commandList->OMSetRenderTargets(rtCount, handles.GetData(), singleHandleToRTsDescriptorRange, dsvHandle);
+	
+	D3D12_CPU_DESCRIPTOR_HANDLE* handleList = rtCount == 0 ? nullptr : handles.GetData();
+	commandList->OMSetRenderTargets(rtCount, handleList, singleHandleToRTsDescriptorRange, dsvHandle);
 }
 
 ID3D12GraphicsCommandList* Renderer::GetDefaultCommandList()
@@ -658,7 +679,7 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& 
 				for (uint32 cbIndex : meshes.second.CbIndices)
 				{
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + cbIndex));
-					DrawMesh(mesh);
+					DrawMesh(commandList, mesh);
 				}
 			}
 		}
@@ -751,14 +772,18 @@ void Renderer::CreatePSOs()
 	psoDesc.VS = vertexShaderBytecode;
 	psoDesc.PS = pixelShaderBytecode;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	//psoDesc.DepthStencilState.DepthEnable = false;
+	//psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.RTVFormats[0] = hdrRenderTargetFormat;
 	psoDesc.SampleDesc = sampleDesc;
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.AntialiasedLineEnable = true;
+	//psoDesc.RasterizerState.DepthClipEnable = false;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.NumRenderTargets = 1;
-	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.DSVFormat = depthFormat;
 
 	defaultPSO = resourceManager->CreatePSO(psoDesc);

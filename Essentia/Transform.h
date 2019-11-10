@@ -33,12 +33,12 @@ struct TransformData
 {
 	uint32	Size;
 	uint32	Capacity;
-	byte*	Buffer;
+	byte* Buffer;
 
-	DirectX::XMFLOAT4X4*	World;
-	DirectX::XMFLOAT4X4*	Local;
-	TransformHandle*		Parent;
-	EntityHandle*			Entity;
+	DirectX::XMFLOAT4X4* World;
+	DirectX::XMFLOAT4X4* Local;
+	TransformHandle* Parent;
+	EntityHandle* Entity;
 };
 
 // Transform Index = Entity Index

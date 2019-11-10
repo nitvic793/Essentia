@@ -26,7 +26,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float speed = length(velocity / texelSize);
 	int nSamples = clamp(int(speed), 1, MAX_SAMPLES);
 	float3 result = InputTexture.Sample(BasicSampler, input.uv).rgb;
-	//[unroll]
+	[unroll]
 	for (int i = 1; i < nSamples; ++i)
 	{
 		float2 offset = velocity * (float(i) / float(nSamples - 1) - 0.5);

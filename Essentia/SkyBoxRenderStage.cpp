@@ -68,7 +68,7 @@ void SkyBoxRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	commandList->SetPipelineState(skyPSO);
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frame->GetHandle(frameIndex, offsets.ConstantBufferOffset + skybox[0].CBView.Index));
 	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frame->GetHandle(frameIndex, offsets.TexturesOffset + cubeMap));
-	renderer->DrawMesh(cubeMesh);
+	renderer->DrawMesh(commandList, cubeMesh);
 }
 
 void SkyBoxRenderStage::CleanUp()

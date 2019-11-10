@@ -15,9 +15,11 @@ template<typename T>
 class Vector
 {
 public:
-	Vector() {}
+	Vector() :
+		buffer(nullptr) {}
 
-	Vector(uint32 count, IAllocator* allocator = nullptr)
+	Vector(uint32 count, IAllocator* allocator = nullptr) :
+		buffer(nullptr)
 	{
 		Reserve(count, allocator);
 	}

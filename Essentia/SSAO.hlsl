@@ -1,3 +1,4 @@
+//Credits: Daniel Holden, contact@theorangeduck.com http://theorangeduck.com/page/pure-depth-ssao
 
 struct VertexToPixel
 {
