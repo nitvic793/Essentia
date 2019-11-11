@@ -55,6 +55,16 @@ void EntityManager::Destroy(EntityHandle handle)
 	freeIndices.push_back(index);
 }
 
+ComponentManager* EntityManager::GetComponentManager()
+{
+	return &componentManager;
+}
+
+std::vector<IComponent*> EntityManager::GetEntityComponents(EntityHandle handle)
+{
+	return componentManager.GetComponents(handle);
+}
+
 TransformRef EntityManager::GetTransform(EntityHandle handle)
 {
 	auto pos = componentManager.GetComponent<PositionComponent>(handle);

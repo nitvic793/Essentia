@@ -44,3 +44,8 @@ TransformRef ISystem::GetTransform(EntityHandle entity)
 {
 	return entityManager->GetTransform(entity);
 }
+
+std::vector<IComponent*> ISystem::GetEntityComponents(EntityHandle handle)
+{
+	return entityManager->GetEntityComponents(handle);
+}

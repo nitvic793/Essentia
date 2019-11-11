@@ -6,6 +6,7 @@
 #include <unordered_map>
 #include "EntityBase.h"
 #include "Memory.h"
+#include <cereal/archives/json.hpp>
 
 class ComponentPoolBase
 {
@@ -13,10 +14,13 @@ public:
 	virtual ComponentTypeID GetType() = 0;
 	virtual void			AddComponent(EntityHandle entity) = 0;
 	virtual void			RemoveComponent(EntityHandle entity) = 0;
-	virtual IComponent* GetComponent(EntityHandle entity) = 0;
-	virtual IComponent* GetAllComponents(uint32& count) = 0;
-	virtual EntityHandle* GetEntities(uint32& count) = 0;
+	virtual IComponent*		GetComponent(EntityHandle entity) = 0;
+	virtual IComponent*		GetAllComponents(uint32& count) = 0;
+	virtual EntityHandle*	GetEntities(uint32& count) = 0;
 	virtual EntityHandle	GetEntity(uint32 index) = 0;
+	virtual bool			HasEntity(EntityHandle entity) = 0;
+	virtual void			Serialize(cereal::JSONOutputArchive& archive, EntityHandle entity) = 0;
+	virtual void			Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) = 0;
 	virtual ~ComponentPoolBase() {}
 };
 
@@ -28,6 +32,16 @@ public:
 	{
 		components.reserve(CMaxInitialComponentCount);
 		entities.reserve(CMaxInitialComponentCount);
+	}
+
+	void AddComponent(EntityHandle entity, T& val)
+	{
+		if (componentMap.find(entity.ID) == componentMap.end())
+		{
+			entities.push_back(entity.ID);
+			components.push_back(val);
+			componentMap[entity.ID] = (uint32)components.size() - 1;
+		}
 	}
 
 	virtual void AddComponent(EntityHandle entity) override
@@ -91,6 +105,30 @@ public:
 		return T::Type;
 	}
 
+	virtual bool HasEntity(EntityHandle handle) override
+	{
+		if (componentMap.find(handle.ID) == componentMap.end())
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	virtual void Serialize(cereal::JSONOutputArchive& archive, EntityHandle entity) override
+	{
+		auto index = componentMap[entity.ID];
+		T component = components[index];
+		archive(cereal::make_nvp(component.GetName(), component));
+	}
+
+	virtual void Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) override
+	{
+		T component;
+		archive(cereal::make_nvp(component.GetName(), component));
+		AddComponent(entity, component);
+	}
+
 	~ComponentPool() {}
 private:
 	std::vector<T>						components;
@@ -102,6 +140,8 @@ class ComponentManager
 {
 public:
 	void Initialize(IAllocator* allocator);
+
+	ComponentPoolBase* GetPool(const char* componentName);
 
 	template<typename T>
 	ComponentPool<T>* GetOrCreatePool();
@@ -123,9 +163,12 @@ public:
 
 	template<typename T>
 	EntityHandle GetEntity(uint32 index);
+
+	std::vector<IComponent*> GetComponents(EntityHandle handle);
 private:
 	IAllocator* allocator;
 	std::unordered_map<ComponentTypeID, ScopedPtr<ComponentPoolBase>> pools;
+	std::unordered_map<std::string_view, ComponentPoolBase*> poolStringMap;
 };
 
 template<typename T>
@@ -133,15 +176,18 @@ inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
 {
 	if (pools.find(T::Type) == pools.end())
 	{
+		T temp;
 		size_t size = sizeof(ComponentPool<T>);
 		auto buffer = allocator->Alloc(size);
 		ComponentPool<T>* pool = new(buffer) ComponentPool<T>();
+		poolStringMap[temp.GetName()] = pool;
 		pools.insert(
 			std::pair<ComponentTypeID,
 			ScopedPtr<ComponentPoolBase>>(
 				T::Type,
 				ScopedPtr<ComponentPoolBase>((ComponentPoolBase*)pool)
 				)
+			
 		);
 	}
 	return (ComponentPool<T>*)pools[T::Type].get();

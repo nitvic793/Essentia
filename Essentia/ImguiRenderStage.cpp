@@ -96,6 +96,21 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::End();
 	}
 
+	uint32 count = 0;
+	auto selectedEntities = em->GetEntities<SelectedComponent>(count);
+	static bool showEntity = false;
+	if (count > 0)
+	{
+		ImGui::Begin("Entity", &showEntity);
+		auto components = em->GetEntityComponents(selectedEntities[0]);
+		for (auto comp : components)
+		{
+			ImGui::CollapsingHeader(comp->GetName(), ImGuiTreeNodeFlags_DefaultOpen);
+		}
+
+		ImGui::End();
+	}
+
 
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);

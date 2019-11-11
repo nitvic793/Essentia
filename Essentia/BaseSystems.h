@@ -19,12 +19,31 @@ public:
 		{
 			currentTime = 0;
 			auto transform = GetTransform({ 2 });
-			Save(transform, "test.json");
+			//Save(transform, "test.json");
+			SaveScene();
 			std::cout << "Saved\n";
 		}
 	}
 
 private:
+
+	void SaveScene()
+	{
+		auto componentManager = entityManager->GetComponentManager();
+		uint32 count = 0;
+		auto entities = GetEntities<PositionComponent>(count);
+		for (uint32 i = 0; i < count; ++i)
+		{
+			auto components = entityManager->GetEntityComponents(entities[i]);
+			for (auto comp : components)
+			{
+				auto pool = componentManager->GetPool(comp->GetName());
+				
+				std::cout<<comp->GetName()<<"\n";
+			}
+		}
+	}
+
 	float currentTime = 0.f;
 };
 

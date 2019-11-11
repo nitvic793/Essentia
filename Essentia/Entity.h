@@ -10,10 +10,11 @@ class EntityManager
 {
 public:
 	EntityManager();
-	void			Initialize(IAllocator* allocator);
-	EntityHandle	CreateEntity(const Transform& transform = DefaultTransform);
-	bool			IsAlive(EntityHandle handle);
-	void			Destroy(EntityHandle handle);
+	void				Initialize(IAllocator* allocator);
+	EntityHandle		CreateEntity(const Transform& transform = DefaultTransform);
+	bool				IsAlive(EntityHandle handle);
+	void				Destroy(EntityHandle handle);
+	ComponentManager*	GetComponentManager();
 	
 	template<typename T>
 	void			AddComponent(EntityHandle handle, const T& value = T());
@@ -27,11 +28,11 @@ public:
 	template<typename T>
 	EntityHandle*	GetEntities(uint32& count);
 
-	TransformRef	GetTransform(EntityHandle handle);
-	void			UpdateTransform(EntityHandle entity, const Transform& transform);
-
-	void			GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
-	void			GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
+	std::vector<IComponent*>	GetEntityComponents(EntityHandle handle);
+	TransformRef				GetTransform(EntityHandle handle);
+	void						UpdateTransform(EntityHandle entity, const Transform& transform);
+	void						GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
+	void						GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
 private:
 	std::vector<uint32> generations;
 	std::vector<uint32> freeIndices;

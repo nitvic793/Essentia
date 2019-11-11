@@ -23,6 +23,8 @@ protected:
 
 	TransformRef				GetTransform(EntityHandle entity);
 
+	std::vector<IComponent*>	GetEntityComponents(EntityHandle handle);
+
 	EntityManager*				entityManager;
 	DirectX::Keyboard::State	keyboard;
 	DirectX::Mouse::State		mouse;

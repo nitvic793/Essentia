@@ -23,6 +23,12 @@ void serialize(Archive& archive, Vector3& vector)
 }
 
 template<class Archive>
+void serialize(Archive& archive, DirectX::XMFLOAT3& vector)
+{
+	archive(vector.x, vector.y, vector.z);
+}
+
+template<class Archive>
 void serialize(Archive& archive, TransformInterface& transform)
 {
 	archive(transform.Position, transform.Rotation, transform.Scale);
