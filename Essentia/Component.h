@@ -57,6 +57,11 @@ public:
 
 	virtual void RemoveComponent(EntityHandle entity) override
 	{
+		if (componentMap.find(entity.ID) == componentMap.end())
+		{
+			return;
+		}
+
 		auto index = componentMap[entity.ID];
 		componentMap.erase(entity.ID);
 		auto lastIndex = components.size() - 1;
@@ -77,6 +82,11 @@ public:
 
 	virtual IComponent* GetComponent(EntityHandle entity) override
 	{
+		if (componentMap.find(entity.ID) == componentMap.end())
+		{
+			return nullptr;
+		}
+
 		auto index = componentMap[entity.ID];
 		return (IComponent*)& components[index];
 	}

@@ -57,7 +57,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::Checkbox("Vsync", &vsync);
 		if (ImGui::CollapsingHeader("Lights"))
 		{
-			ImGui::Text("Basic Editor"); 
+			ImGui::Text("Basic Editor");
 			ImGui::ColorEdit3("Dir Light Color", (float*)& dirLights[0].Color.x); // Edit 3 floats representing a color
 			ImGui::DragFloat3("Dir Light Direction", (float*)& dirLights[0].Direction, 0.1f, -1.f, 1.f);
 			ImGui::SliderFloat("Dir Light Intensity", (float*)& dirLights[0].Intensity, 0.0f, 100.f, "%.3f", 2.1f);
@@ -73,7 +73,28 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 				ImGui::Checkbox(stage.first.data(), &stage.second->Enabled);
 			}
 		}
-		
+
+		if (ImGui::CollapsingHeader("Entities"))
+		{
+			static int selected = -1;
+			uint32 count = 0;
+			auto entities = em->GetEntities<PositionComponent>(count);
+			for (uint32 i = 0; i < count; ++i)
+			{
+				if (ImGui::Selectable(std::to_string(i).c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
+				{
+					selected = i;
+					uint32 selectedEntityCount = 0;
+					auto selectedEntities = em->GetEntities<SelectedComponent>(selectedEntityCount);
+					if (selectedEntityCount > 0)
+					{
+						em->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[0]);
+					}
+					em->AddComponent<SelectedComponent>(entities[i]);
+				}
+			}
+		}
+
 		ImGui::End();
 
 		EngineContext::Context->RendererInstance->SetVSync(vsync);
@@ -84,9 +105,9 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		auto dofStage = (PostProcessDepthOfFieldStage*)(GPostProcess.GetPostProcessStage("DepthOfField"));
 		static bool dof = true;
 		ImGui::Begin("Post Process", &show);
-		
+
 		ImGui::DragFloat("DOF Focus Plane", &dofStage->DofParams.FocusPlaneZ);
-		ImGui::DragFloat("DOF Scale", &dofStage->DofParams.Scale, 0.01f, 0.f, 1.f, "%.3f",0.5f);
+		ImGui::DragFloat("DOF Scale", &dofStage->DofParams.Scale, 0.01f, 0.f, 1.f, "%.3f", 0.5f);
 
 		auto postProcesssMap = GPostProcess.GetStagesMap();
 		for (auto stage : postProcesssMap)

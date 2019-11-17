@@ -14,6 +14,7 @@ class EditorSaveSystem : public ISystem
 public:
 	virtual void Update(float dt, float totalTime) override
 	{
+
 		currentTime += dt;
 		if (keyboard.LeftAlt && currentTime > 0.5f)
 		{
@@ -26,10 +27,20 @@ public:
 	}
 
 private:
-
+	bool flip = true;
 	void SaveScene()
 	{
+		ResourcePack resources;
+		resources.Textures.push_back("../../Assets/Textures/floor_albedo.png");
+		resources.CubeMaps.push_back("../../Assets/Textures/SunnyCubeMap.dds");
+		resources.Meshes.push_back("../../Assets/Models/sphere.obj");
+		resources.Models.push_back("../../Assets/Models/Sponza.fbx");
+
+		SaveResources(resources, "resources.json");
+
 		auto componentManager = entityManager->GetComponentManager();
+		flip ? componentManager->RemoveComponent<SelectedComponent>({ 0 }) : componentManager->AddComponent<SelectedComponent>({ 0 });
+		flip = !flip;
 		uint32 count = 0;
 		auto entities = GetEntities<PositionComponent>(count);
 		for (uint32 i = 0; i < count; ++i)
@@ -38,8 +49,8 @@ private:
 			for (auto comp : components)
 			{
 				auto pool = componentManager->GetPool(comp->GetName());
-				
-				std::cout<<comp->GetName()<<"\n";
+
+				std::cout << comp->GetName() << "\n";
 			}
 		}
 	}

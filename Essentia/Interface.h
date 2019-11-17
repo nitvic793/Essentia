@@ -53,7 +53,7 @@ struct MeshInterface
 
 struct EntityInterface
 {
-	TransformInterface			Transform;
+	EntityHandle				Handle;
 	std::vector<std::string>	Components;
 };
 
@@ -67,9 +67,27 @@ struct Scene
 	std::vector<EntityInterface>	Entities;
 };
 
-struct Resources
+struct ResourcePack
 {
 	std::vector<std::string> Textures;
 	std::vector<std::string> CubeMaps;
 	std::vector<std::string> Meshes;
+	std::vector<std::string> Models;
+
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(Textures),
+			CEREAL_NVP(CubeMaps),
+			CEREAL_NVP(Meshes),
+			CEREAL_NVP(Models)
+		);
+	}
+};
+
+struct Level
+{
+	ResourcePack Resources;
+
 };

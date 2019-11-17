@@ -16,6 +16,13 @@ void Save(const TransformRef& transform, const char* fname)
 	}
 }
 
+void SaveResources(ResourcePack& resources, const char* fname)
+{
+	std::ofstream file(fname);
+	cereal::JSONOutputArchive archive(file);
+	archive(cereal::make_nvp("Resources", resources));
+}
+
 template<class Archive>
 void serialize(Archive& archive, Vector3& vector)
 {

@@ -52,7 +52,10 @@ void OutlineRenderStage::Render(const uint32 frameIndex, const FrameContext& fra
 	for (size_t i = 0; i < count; ++i)
 	{
 		auto drawable = frameContext.EntityManager->GetComponent<DrawableComponent>(entities[i]);
-		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
-		renderer->DrawMesh(commandList, drawable->Mesh);
+		if (drawable)
+		{
+			renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
+			renderer->DrawMesh(commandList, drawable->Mesh);
+		}
 	}
 }
