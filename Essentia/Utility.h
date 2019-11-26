@@ -24,11 +24,12 @@ public:
 		Reserve(count, allocator);
 	}
 
-	Vector(Vector&& v)
+	Vector(Vector&& v) 
 	{
 		buffer = v.buffer;
 		currentIndex = v.currentIndex;
 		capacity = v.capacity;
+		allocator = v.allocator;
 		memset(&v, 0, sizeof(v)); //Reset v
 	}
 
@@ -39,6 +40,7 @@ public:
 		buffer = v.buffer;
 		currentIndex = v.currentIndex;
 		capacity = v.capacity;
+		allocator = v.allocator;
 		memset(&v, 0, sizeof(v)); //Reset v
 		return *this;
 	}

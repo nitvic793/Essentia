@@ -23,7 +23,7 @@ protected:
 
 	TransformRef				GetTransform(EntityHandle entity);
 
-	std::vector<IComponent*>	GetEntityComponents(EntityHandle handle);
+	Vector<IComponent*>			GetEntityComponents(EntityHandle handle);
 
 	EntityManager*				entityManager;
 	DirectX::Keyboard::State	keyboard;

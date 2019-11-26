@@ -57,5 +57,16 @@ void OutlineRenderStage::Render(const uint32 frameIndex, const FrameContext& fra
 			renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
 			renderer->DrawMesh(commandList, drawable->Mesh);
 		}
+		else
+		{
+			auto model = frameContext.EntityManager->GetComponent<DrawableModelComponent>(entities[i]);
+			if (model)
+			{
+				renderer->SetConstantBufferView(commandList, RootSigCBVertex0, model->CBView);
+				auto mesh = ec->ModelManager->GetModel(model->Model);
+				renderer->DrawMesh(commandList, mesh.Mesh);
+			}
+		}
+		
 	}
 }

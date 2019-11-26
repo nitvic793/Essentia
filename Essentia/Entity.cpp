@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Entity.h"
+#include "Utility.h"
 
 EntityManager::EntityManager()
 {
@@ -60,7 +61,7 @@ ComponentManager* EntityManager::GetComponentManager()
 	return &componentManager;
 }
 
-std::vector<IComponent*> EntityManager::GetEntityComponents(EntityHandle handle)
+Vector<IComponent*> EntityManager::GetEntityComponents(EntityHandle handle)
 {
 	return componentManager.GetComponents(handle);
 }

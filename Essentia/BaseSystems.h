@@ -32,27 +32,42 @@ private:
 	{
 		ResourcePack resources;
 		resources.Textures.push_back("../../Assets/Textures/floor_albedo.png");
+		resources.Textures.push_back("../../Assets/Textures/floor_normals.png");
+		resources.Textures.push_back("../../Assets/Textures/floor_roughness.png");
+		resources.Textures.push_back("../../Assets/Textures/floor_metal.png");
+		resources.Textures.push_back("../../Assets/Textures/defaultRoughness.png");
+		resources.Textures.push_back("../../Assets/Textures/defaultMetal.png");
 		resources.CubeMaps.push_back("../../Assets/Textures/SunnyCubeMap.dds");
+		resources.CubeMaps.push_back("../../Assets/Textures/envDiffuseHDR.dds");
+		resources.CubeMaps.push_back("../../Assets/Textures/envBrdf.dds");
+		resources.CubeMaps.push_back("../../Assets/Textures/envSpecularHDR.dds");
 		resources.Meshes.push_back("../../Assets/Models/sphere.obj");
+		resources.Meshes.push_back("../../Assets/Models/cube.obj");
 		resources.Models.push_back("../../Assets/Models/Sponza.fbx");
 
 		SaveResources(resources, "resources.json");
+
 
 		auto componentManager = entityManager->GetComponentManager();
 		flip ? componentManager->RemoveComponent<SelectedComponent>({ 0 }) : componentManager->AddComponent<SelectedComponent>({ 0 });
 		flip = !flip;
 		uint32 count = 0;
 		auto entities = GetEntities<PositionComponent>(count);
+		
+		std::vector<EntityInterface> entityList;
 		for (uint32 i = 0; i < count; ++i)
 		{
+			EntityInterface eInterface;
+			eInterface.Entity = entities[i];
 			auto components = entityManager->GetEntityComponents(entities[i]);
 			for (auto comp : components)
 			{
-				auto pool = componentManager->GetPool(comp->GetName());
-
-				std::cout << comp->GetName() << "\n";
+				eInterface.Components.push_back(comp->GetName());
 			}
+			entityList.push_back(eInterface);
 		}
+
+		SaveEntities(entityList, "entities.json");
 	}
 
 	float currentTime = 0.f;

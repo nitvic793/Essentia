@@ -25,6 +25,16 @@ struct PositionComponent : public IComponent
 	{
 		return DirectX::XMFLOAT3(X, Y, Z);
 	}
+
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(X),
+			CEREAL_NVP(Y),
+			CEREAL_NVP(Z)
+		);
+	};
 };
 
 struct RotationComponent : public IComponent
@@ -46,6 +56,16 @@ struct RotationComponent : public IComponent
 	{
 		return DirectX::XMFLOAT3(X, Y, Z);
 	}
+
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(X),
+			CEREAL_NVP(Y),
+			CEREAL_NVP(Z)
+		);
+	};
 };
 
 struct ScaleComponent : public IComponent
@@ -67,6 +87,16 @@ struct ScaleComponent : public IComponent
 	{
 		return DirectX::XMFLOAT3(X, Y, Z);
 	}
+
+	template<class Archive> 
+	void serialize(Archive& archive) 
+	{
+		archive(
+			CEREAL_NVP(X),
+			CEREAL_NVP(Y),
+			CEREAL_NVP(Z)
+		);
+	};
 };
 
 struct IDrawable : public IComponent {};
@@ -88,6 +118,8 @@ struct DrawableComponent : public IDrawable
 		component.Material = material;
 		return component;
 	}
+
+	template<class Archive> void serialize(Archive& a) {};
 };
 
 // To support models with inbuilt textures/materials
@@ -106,6 +138,8 @@ struct DrawableModelComponent : public IDrawable
 		component.Model = model;
 		return component;
 	}
+
+	template<class Archive> void serialize(Archive& a) {};
 };
 
 struct ILight : public IComponent {};
@@ -132,6 +166,8 @@ struct DirectionalLightComponent : public ILight
 	{
 		return { Direction, 0, Color, Intensity };
 	}
+
+	template<class Archive> void serialize(Archive& a) {};
 };
 
 struct PointLightComponent : public ILight
@@ -155,6 +191,11 @@ struct PointLightComponent : public ILight
 	{
 		return { {}, Intensity, Color, Range };
 	}
+
+	template<class Archive> void serialize(Archive& archive) 
+	{
+
+	};
 };
 
 struct SkyboxComponent : public IComponent
@@ -170,15 +211,20 @@ struct SkyboxComponent : public IComponent
 		component.CubeMap = Es::CreateTexture(skyboxFileName, type, false);
 		return component;
 	}
+
+	template<class Archive> void serialize(Archive& a) {};
 };
 
 // Add this component to any entity which is to be selected
 struct SelectedComponent : public IComponent
 {
 	GComponent(SelectedComponent)
+
+	template<class Archive> void serialize(Archive& a) {};
 };
 
 //TODO: Make camera part of Component System 
 struct CameraComponent : public IComponent
 {
+	template<class Archive> void serialize(Archive& a) {};
 };

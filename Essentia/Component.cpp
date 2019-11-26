@@ -11,15 +11,15 @@ ComponentPoolBase* ComponentManager::GetPool(const char* componentName)
 	return poolStringMap[componentName];
 }
 
-std::vector<IComponent*> ComponentManager::GetComponents(EntityHandle handle)
+Vector<IComponent*> ComponentManager::GetComponents(EntityHandle handle)
 {
-	std::vector<IComponent*> components;
+	Vector<IComponent*> components((uint32)pools.size());
 	for (auto& pool : pools)
 	{
 		const auto& poolBase = pool.second;
 		if (poolBase->HasEntity(handle))
 		{
-			components.push_back(poolBase->GetComponent(handle));
+			components.Push(poolBase->GetComponent(handle));
 		}
 	}
 	return components;

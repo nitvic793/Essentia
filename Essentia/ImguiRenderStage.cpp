@@ -7,6 +7,31 @@
 #include "Entity.h"
 #include "PostProcess.h"
 #include "PostProcessDepthOfFieldStage.h"
+#include "Interface.h"
+
+using namespace DirectX;
+
+class ImguiVisitor : public IVisitor
+{
+public:
+	virtual void Visit(const char* compName, const char* name, float& val) override
+	{
+		ImGui::DragFloat((std::string(compName) + "." + name).c_str(), &val, 0.05f);
+	}
+
+	virtual void Visit(const char* compName, const char* name, XMFLOAT3& val) override
+	{
+		auto label = (std::string(compName) + "." + name);
+		if (std::string(name).find("Color") != std::string::npos)
+		{
+			ImGui::ColorEdit3(label.c_str(), &val.x);
+		}
+		else
+		{
+			ImGui::DragFloat3((std::string(compName) + "." + name).c_str(), &val.x, 0.05f);
+		}
+	}
+};
 
 void ImguiRenderStage::Initialize()
 {
@@ -122,11 +147,15 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	static bool showEntity = false;
 	if (count > 0)
 	{
+		static ImguiVisitor visitor;
 		ImGui::Begin("Entity", &showEntity);
 		auto components = em->GetEntityComponents(selectedEntities[0]);
 		for (auto comp : components)
 		{
-			ImGui::CollapsingHeader(comp->GetName(), ImGuiTreeNodeFlags_DefaultOpen);
+			if (ImGui::CollapsingHeader(comp->GetName(), ImGuiTreeNodeFlags_DefaultOpen))
+			{
+				GComponentReflector.VisitFields(comp, &visitor);
+			}
 		}
 
 		ImGui::End();

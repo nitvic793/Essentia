@@ -7,6 +7,7 @@
 #include "EntityBase.h"
 #include "Memory.h"
 #include <cereal/archives/json.hpp>
+#include "Utility.h"
 
 class ComponentPoolBase
 {
@@ -174,7 +175,7 @@ public:
 	template<typename T>
 	EntityHandle GetEntity(uint32 index);
 
-	std::vector<IComponent*> GetComponents(EntityHandle handle);
+	Vector<IComponent*> GetComponents(EntityHandle handle);
 private:
 	IAllocator* allocator;
 	std::unordered_map<ComponentTypeID, ScopedPtr<ComponentPoolBase>> pools;

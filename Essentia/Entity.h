@@ -28,7 +28,7 @@ public:
 	template<typename T>
 	EntityHandle*	GetEntities(uint32& count);
 
-	std::vector<IComponent*>	GetEntityComponents(EntityHandle handle);
+	Vector<IComponent*>	GetEntityComponents(EntityHandle handle);
 	TransformRef				GetTransform(EntityHandle handle);
 	void						UpdateTransform(EntityHandle entity, const Transform& transform);
 	void						GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);

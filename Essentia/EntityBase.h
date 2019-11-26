@@ -16,8 +16,8 @@ struct IComponent
 
 #define GComponent(name) \
 static const ComponentTypeID Type = crc32(#name); \
-virtual const char* GetName() { return #name; }; \
-template<class Archive> void serialize(Archive& a){};
+static constexpr const char* ComponentName = #name; \
+virtual const char* GetName() { return #name; }; 
 
 typedef uint64 Handle;
 
