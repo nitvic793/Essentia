@@ -16,20 +16,24 @@ class ImguiVisitor : public IVisitor
 public:
 	virtual void Visit(const char* compName, const char* name, float& val) override
 	{
-		ImGui::DragFloat((std::string(compName) + "." + name).c_str(), &val, 0.05f);
+		ImGui::PushID(compName);
+		ImGui::DragFloat(name, &val, 0.05f);
+		ImGui::PopID();
 	}
 
 	virtual void Visit(const char* compName, const char* name, XMFLOAT3& val) override
 	{
-		auto label = (std::string(compName) + "." + name);
+		ImGui::PushID(compName);
+		auto label = std::string(name);
 		if (std::string(name).find("Color") != std::string::npos)
 		{
 			ImGui::ColorEdit3(label.c_str(), &val.x);
 		}
 		else
 		{
-			ImGui::DragFloat3((std::string(compName) + "." + name).c_str(), &val.x, 0.05f);
+			ImGui::DragFloat3(label.c_str(), &val.x, 0.05f);
 		}
+		ImGui::PopID();
 	}
 };
 
