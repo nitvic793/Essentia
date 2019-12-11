@@ -45,7 +45,7 @@ void DeviceResources::CreateDevice()
 		IID_PPV_ARGS(device.ReleaseAndGetAddressOf())
 	);
 
-	device->SetStablePowerState(FALSE);
+	//device->SetStablePowerState(FALSE);
 
 	{
 		Microsoft::WRL::ComPtr<ID3D12InfoQueue> d3dInfoQueue;

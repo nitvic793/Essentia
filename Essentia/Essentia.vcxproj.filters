@@ -399,7 +399,7 @@
     <ClInclude Include="Serialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Math.h">
+    <ClInclude Include="CMath.h">
       <Filter>Header Files\Math</Filter>
     </ClInclude>
   </ItemGroup>

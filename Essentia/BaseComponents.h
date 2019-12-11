@@ -5,7 +5,7 @@
 #include "Declarations.h"
 #include "Engine.h"
 #include "ConstantBuffer.h"
-#include "Math.h"
+#include "CMath.h"
 
 /*
 Serialization for predefined types
