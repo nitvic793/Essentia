@@ -5,6 +5,18 @@
 #include "Declarations.h"
 #include "Engine.h"
 #include "ConstantBuffer.h"
+#include "Math.h"
+
+/*
+Serialization for predefined types
+TODO: Figure out cerealization of DrawableComponent and DrawableModelComponent
+*/
+
+template<class Archive>
+void serialize(Archive& archive, DirectX::XMFLOAT3& vector)
+{
+	archive(vector.x, vector.y, vector.z);
+}
 
 struct PositionComponent : public IComponent
 {
@@ -113,7 +125,7 @@ struct DrawableComponent : public IDrawable
 	static DrawableComponent Create(MeshHandle mesh, MaterialHandle material)
 	{
 		DrawableComponent component;
-		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		component.CBView = es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
 		component.Mesh = mesh;
 		component.Material = material;
 		return component;
@@ -134,7 +146,7 @@ struct DrawableModelComponent : public IDrawable
 	static DrawableModelComponent Create(ModelHandle model)
 	{
 		DrawableModelComponent component;
-		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		component.CBView = es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
 		component.Model = model;
 		return component;
 	}
@@ -167,7 +179,16 @@ struct DirectionalLightComponent : public ILight
 		return { Direction, 0, Color, Intensity };
 	}
 
-	template<class Archive> void serialize(Archive& a) {};
+	template<class Archive> void serialize(Archive& archive) 
+	{
+		Vector3 Color(this->Color);
+		Vector3 Direction(this->Direction);
+		archive(
+			CEREAL_NVP(Color), 
+			CEREAL_NVP(Intensity),
+			CEREAL_NVP(Direction)
+		);
+	};
 };
 
 struct PointLightComponent : public ILight
@@ -192,9 +213,15 @@ struct PointLightComponent : public ILight
 		return { {}, Intensity, Color, Range };
 	}
 
-	template<class Archive> void serialize(Archive& archive) 
+	template<class Archive> 
+	void serialize(Archive& archive) 
 	{
-
+		Vector3 Color(this->Color);
+		archive(
+			CEREAL_NVP(Color),
+			CEREAL_NVP(Intensity),
+			CEREAL_NVP(Range)
+		);
 	};
 };
 
@@ -207,8 +234,8 @@ struct SkyboxComponent : public IComponent
 	static SkyboxComponent Create(const char* skyboxFileName, TextureType type = DDS)
 	{
 		SkyboxComponent component;
-		component.CBView = Es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
-		component.CubeMap = Es::CreateTexture(skyboxFileName, type, false);
+		component.CBView = es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		component.CubeMap = es::CreateTexture(skyboxFileName, type, false);
 		return component;
 	}
 

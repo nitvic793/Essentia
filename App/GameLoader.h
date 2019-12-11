@@ -22,7 +22,7 @@ public:
 	void	InitializeLoader(EngineContext* context);
 	void	LoadSystems(Game* game, IAllocator* allocator);
 	Game*	CreateGame(IAllocator* allocator);
-	void	LoadGameLibrary();
+	void	LoadGameLibrary(const char* dll);
 	void	FreeGameLibrary();
 private:
 	LoadSystemsFunc loadSystemsFunc;

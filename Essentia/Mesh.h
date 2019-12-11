@@ -48,6 +48,7 @@ public:
 	const MeshView&								GetMeshView(const char* filename); //WARNING: Lazy loads the mesh
 	MeshHandle									GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
 	const DirectX::BoundingOrientedBox&			GetBoundingBox(MeshHandle handle);
+	const char*									GetName(MeshHandle handle);
 private:
 	MeshManager() {};
 	CommandContext*								context = nullptr;
@@ -55,7 +56,8 @@ private:
 	std::vector<MeshBuffer>						buffers;
 	std::vector<MeshView>						views;
 	std::vector<DirectX::BoundingOrientedBox>	bounds;
-	std::unordered_map<StringID, uint32_t>		meshMap;
+	std::unordered_map<StringID, uint32>		meshMap;
+	std::unordered_map<uint32, std::string>		meshNameMap;
 	friend class Renderer;
 };
 

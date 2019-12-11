@@ -8,45 +8,7 @@
 #include <cereal/archives/json.hpp>
 #include <fstream>
 #include <unordered_map>
-
-/*
-Special Components:
-Transform
-Mesh
-Material
-Model
-Lights
-*/
-
-
-struct Vector3
-{
-	float X;
-	float Y;
-	float Z;
-
-	void operator=(const DirectX::XMFLOAT3& vector)
-	{
-		X = vector.x;
-		Y = vector.y;
-		Z = vector.z;
-	}
-};
-
-struct Vector4
-{
-	float X;
-	float Y;
-	float Z;
-	float W;
-};
-
-struct TransformInterface
-{
-	Vector3 Position;
-	Vector3 Scale;
-	Vector3 Rotation;
-};
+#include "Math.h"
 
 struct MeshInterface
 {
@@ -91,11 +53,6 @@ struct MaterialInterface
 	std::vector<std::string> Textures;
 };
 
-struct Scene
-{
-	std::vector<EntityInterface>	Entities;
-};
-
 struct ResourcePack
 {
 	std::vector<std::string> Textures;
@@ -115,11 +72,18 @@ struct ResourcePack
 	}
 };
 
-struct Level
+struct Scene
 {
-	ResourcePack Resources;
+	ResourcePack					Resources;
+	std::vector<EntityInterface>	Entities;
 
+	template<typename Archive>
+	void serialize(Archive& archive)
+	{
+		archive(CEREAL_NVP(Resources), CEREAL_NVP(Entities));
+	}
 };
+
 
 #define MField(component, name) #name, component->name
 #define MFieldS(component, name) #name, component.name

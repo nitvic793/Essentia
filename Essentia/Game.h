@@ -9,6 +9,8 @@
 #include "Entity.h"
 #include "System.h"
 #include "Engine.h"
+#include <queue>
+#include <mutex>
 
 using Callback = std::function<void()>;
 
@@ -20,7 +22,9 @@ public:
 	void			Run();
 	void			ReloadSystems();
 	void			SetSystemReloadCallback(Callback callback);
+	void			AddEventCallback(std::function<void()>&& callback) { std::scoped_lock lock(centralMutex);  eventCallbacks.push(callback); }
 	SystemManager*	GetGameSystemsManager();
+	std::mutex		centralMutex;
 	~Game();
 protected:
 	virtual void	Initialize() {};
@@ -36,6 +40,7 @@ protected:
 	SystemManager					coreSystemsManager;
 	SystemManager					gameSystemsManager;
 	Callback						systemLoadCallback;
+	std::queue<std::function<void()>> eventCallbacks;
 private:
 	EngineContext					engineContext;
 };

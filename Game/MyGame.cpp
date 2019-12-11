@@ -31,7 +31,7 @@ void InitializeResources()
 	transform.Position->y = 3;
 	MaterialHandle mat = { 0 };
 	MeshHandle mesh = { 1 };
-	MeshHandle cone = Es::CreateMesh("../../Assets/Models/cube.obj");
+	MeshHandle cone = es::CreateMesh("../../Assets/Models/cube.obj");
 
 	entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 	entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));

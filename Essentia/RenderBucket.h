@@ -37,10 +37,10 @@ struct RenderBucket
 		auto matHandle = component.Material;
 		auto meshHandle = component.Mesh;
 		auto cbIndex = component.CBView.Index;
-		auto material = Es::GetMaterial(matHandle);
-		auto meshView = Es::GetMeshView(meshHandle);
+		auto material = es::GetMaterial(matHandle);
+		auto meshView = es::GetMeshView(meshHandle);
 
-		ID3D12PipelineState* pso = Es::GetPSO(material.PipelineID);
+		ID3D12PipelineState* pso = es::GetPSO(material.PipelineID);
 
 		if (Pipelines.find(material.PipelineID) == Pipelines.end())
 		{
@@ -70,7 +70,7 @@ struct RenderBucket
 	void Insert(const DrawableModelComponent& component)
 	{
 		auto modelHandle = component.Model;
-		auto& model = Es::GetModel(modelHandle);
+		auto& model = es::GetModel(modelHandle);
 		auto cbIndex = component.CBView.Index;
 
 		//auto count = model.Meshes.size();

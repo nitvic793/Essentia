@@ -7,6 +7,10 @@
 #include "../Essentia/Game.h"
 #include "GameLoader.h"
 #include <dxgidebug.h>
+#include "FileWatcher.h"
+#include <thread>
+
+static const char* gameDll = "Game.dll";
 
 int main()
 {
@@ -29,21 +33,45 @@ int main()
 
 	{
 		GameLoader gameLoader;
-		gameLoader.LoadGameLibrary();
+		gameLoader.LoadGameLibrary(gameDll);
 		LinearAllocator allocator(CMaxStackHeapSize);
 		{
+			FileWatcher fw{ "../../Game", std::chrono::milliseconds(5000) };
 			ScopedPtr<Game> game = MakeScoped<Game>();
 			game->Setup();
 			gameLoader.InitializeLoader(EngineContext::Context);
 			gameLoader.LoadSystems(game.get(), &allocator);
-			game->SetSystemReloadCallback([&]() 
-			{
-				gameLoader.FreeGameLibrary();
-				system("msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64");
-				gameLoader.LoadGameLibrary();
-				gameLoader.LoadSystems(game.get(), &allocator);
-			});
+			game->SetSystemReloadCallback([&]()
+				{
+					gameLoader.FreeGameLibrary();
+					system("msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64");
+					gameLoader.LoadGameLibrary(gameDll);
+					gameLoader.LoadSystems(game.get(), &allocator);
+				});
+			std::thread th([&]()
+				{
+					fw.start([&game](auto file, auto status)
+						{
+							if (!std::filesystem::is_regular_file(std::filesystem::path(file)) && status != FileStatus::erased) {
+								return;
+							}
+
+							switch (status) {
+							case FileStatus::created:
+							case FileStatus::modified:
+								game->AddEventCallback([&]()
+									{
+										game->ReloadSystems();
+									});
+								break;
+							default:
+								std::cout << "Error! Unknown file status.\n";
+							}
+						});
+				});
 			game->Run();
+			fw.stop();
+			th.join();
 		}
 		gameLoader.FreeGameLibrary();
 	}

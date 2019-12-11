@@ -70,6 +70,9 @@
     <Filter Include="Source Files\Renderer\PostProcessStages">
       <UniqueIdentifier>{6a131292-ca9e-4a60-9d7a-9736b4794697}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Math">
+      <UniqueIdentifier>{772a2224-e9c6-44d7-8efc-e6a8bcdc8fc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -395,6 +398,9 @@
     </ClInclude>
     <ClInclude Include="Serialization.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Math.h">
+      <Filter>Header Files\Math</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

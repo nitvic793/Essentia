@@ -12,18 +12,22 @@ public:
 		entity = { 0 };
 		entity2 = { 1 };
 		auto e = { 2 };
-		lights[0] = { 3 };
+		lights[0] = { 3 }; 
 		lights[1] = { 4 };
 		skybox = { 5 };
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override
 	{
-		auto transform = GetTransform(entity);
+		auto transform = GetTransform(entity);  
 		transform.Rotation->y = totalTime / 2;
-		transform.Position->x = 3 * sin(totalTime * 2);
+		transform.Position->x = 2 * sin(totalTime * 2);
+		transform.Position->y = 1;
 		transform = GetTransform(entity2); 
-		transform.Rotation->y = totalTime;
+
+		float speed = totalTime / 5;
+		transform.Rotation->x = speed;
+		transform.Rotation->y = speed;
 		transform.Position->y = 5 + cos(totalTime);
 	}
 

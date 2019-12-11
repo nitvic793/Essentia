@@ -19,9 +19,9 @@ Game* GameLoader::CreateGame(IAllocator* allocator)
 	return (Game*)createGameFunc(allocator);
 }
 
-void GameLoader::LoadGameLibrary()
+void GameLoader::LoadGameLibrary(const char* dll)
 {
-	hInstLib = LoadLibrary(TEXT("Game.dll"));
+	hInstLib = LoadLibraryA(dll);
 	if (hInstLib)
 	{
 		loadSystemsFunc = (LoadSystemsFunc)GetProcAddress(hInstLib, "LoadSystems");

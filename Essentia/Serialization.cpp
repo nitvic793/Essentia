@@ -14,19 +14,6 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<DirectionalLightComponent>();
 }
 
-void Save(const TransformRef& transform, const char* fname)
-{
-	{
-		TransformInterface transformInt;
-		transformInt.Position = *transform.Position;
-		transformInt.Scale = *transform.Scale;
-		transformInt.Rotation = *transform.Rotation;
-		std::ofstream file(fname);
-		cereal::JSONOutputArchive archive(file);
-		archive(transformInt);
-	}
-}
-
 void SaveResources(ResourcePack& resources, const char* fname)
 {
 	std::ofstream file(fname);
@@ -41,30 +28,18 @@ void SaveEntities(std::vector<EntityInterface>& entities, const char* fname)
 	archive(cereal::make_nvp("Entities", entities));
 }
 
+void SaveScene(Scene&& scene, const char* fname)
+{
+	std::ofstream file(fname);
+	cereal::JSONOutputArchive archive(file);
+	archive(cereal::make_nvp("Scene", scene));
+}
+
 template<class Archive>
 void serialize(Archive& archive, EntityHandle& entity)
 {
 	archive(CEREAL_NVP(entity.ID));
 }
-
-template<class Archive>
-void serialize(Archive& archive, Vector3& vector)
-{
-	archive(vector.X, vector.Y, vector.Z);
-}
-
-template<class Archive>
-void serialize(Archive& archive, DirectX::XMFLOAT3& vector)
-{
-	archive(vector.x, vector.y, vector.z);
-}
-
-template<class Archive>
-void serialize(Archive& archive, TransformInterface& transform)
-{
-	archive(transform.Position, transform.Rotation, transform.Scale);
-}
-
 
 void Visit(PositionComponent* component, IVisitor* visitor)
 {

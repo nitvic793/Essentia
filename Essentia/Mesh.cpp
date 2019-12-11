@@ -20,6 +20,8 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 		handle = CreateMesh(meshData, meshView);
 		meshMap[meshStringID] = handle.Id;
 	}
+
+	meshNameMap[handle.Id] = filename;
 	return handle;
 }
 
@@ -159,6 +161,11 @@ const DirectX::BoundingOrientedBox& MeshManager::GetBoundingBox(MeshHandle handl
 	return bounds[handle.Id];
 }
 
+const char* MeshManager::GetName(MeshHandle handle)
+{
+	return meshNameMap[handle.Id].c_str();
+}
+
 void ModelManager::Initialize(ShaderResourceManager* srManager)
 {
 	shaderResourceManager = srManager;
@@ -171,7 +178,7 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 	ModelHandle modelHandle;
 	modelHandle.Id = (uint32)models.size();
 
-	model.Mesh = Es::CreateMesh(modelData.MeshData);
+	model.Mesh = es::CreateMesh(modelData.MeshData);
 
 	TextureID textures[MaterialTextureCount];
 	std::string assetDirectory = "../../Assets/Textures/";

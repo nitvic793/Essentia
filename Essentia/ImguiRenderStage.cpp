@@ -117,7 +117,10 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 					auto selectedEntities = em->GetEntities<SelectedComponent>(selectedEntityCount);
 					if (selectedEntityCount > 0)
 					{
-						em->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[0]);
+						for (uint32 i = 0; i < selectedEntityCount; ++i)
+						{
+							em->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[i]);
+						}
 					}
 					em->AddComponent<SelectedComponent>(entities[i]);
 				}

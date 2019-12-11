@@ -45,15 +45,12 @@ private:
 		resources.Meshes.push_back("../../Assets/Models/cube.obj");
 		resources.Models.push_back("../../Assets/Models/Sponza.fbx");
 
-		SaveResources(resources, "resources.json");
-
-
 		auto componentManager = entityManager->GetComponentManager();
 		flip ? componentManager->RemoveComponent<SelectedComponent>({ 0 }) : componentManager->AddComponent<SelectedComponent>({ 0 });
 		flip = !flip;
 		uint32 count = 0;
 		auto entities = GetEntities<PositionComponent>(count);
-		
+
 		std::vector<EntityInterface> entityList;
 		for (uint32 i = 0; i < count; ++i)
 		{
@@ -67,7 +64,7 @@ private:
 			entityList.push_back(eInterface);
 		}
 
-		SaveEntities(entityList, "entities.json");
+		::SaveScene({ resources, entityList }, "scene.json");
 	}
 
 	float currentTime = 0.f;
@@ -116,7 +113,7 @@ public:
 		transform.Position->y = 3;
 		MaterialHandle mat = { 0 };
 		MeshHandle mesh = { 1 };
-		MeshHandle cone = Es::CreateMesh("../../Assets/Models/cube.obj");
+		MeshHandle cone = es::CreateMesh("../../Assets/Models/cube.obj");
 
 		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
 		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
@@ -159,7 +156,7 @@ public:
 	virtual void Update(float deltaTime, float totalTime) override
 	{
 		bool debugNav = false;
-#ifdef _DEBUG
+#ifdef EDITOR
 		ImGuiIO& io = ImGui::GetIO();
 		debugNav = io.NavActive;
 #endif

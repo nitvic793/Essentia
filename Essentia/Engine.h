@@ -15,7 +15,7 @@ enum LightType
 	Spot
 };
 
-namespace Es
+namespace es
 {
 	EntityHandle			CreateEntity(const Transform& transform = DefaultTransform);
 	TextureID				CreateTexture(const std::string& filename, TextureType type, bool generateMips = true);

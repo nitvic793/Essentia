@@ -60,6 +60,16 @@ void Game::Run()
 				localCounter = 0;
 				ReloadSystems();
 			}
+
+			{
+				std::scoped_lock lock(centralMutex);
+				while (!eventCallbacks.empty())
+				{
+					auto& eventCb = eventCallbacks.front();
+					eventCb();
+					eventCallbacks.pop();
+				}
+			}
 		});
 }
 
