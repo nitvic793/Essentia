@@ -8,6 +8,7 @@
 #include "Memory.h"
 #include <cereal/archives/json.hpp>
 #include "Utility.h"
+#include "EngineContext.h"
 
 class ComponentPoolBase
 {
@@ -149,8 +150,10 @@ private:
 
 class ComponentManager
 {
+	template<typename T>
+	void GetEntitiesInternal(std::function<void(EntityHandle*, uint32)> callback);
 public:
-	void Initialize(IAllocator* allocator);
+	void Initialize(IAllocator* allocator, EngineContext* context);
 
 	ComponentPoolBase* GetPool(const char* componentName);
 
@@ -172,15 +175,27 @@ public:
 	template<typename T>
 	EntityHandle* GetEntities(uint32& count);
 
+	template<typename ...Args>
+	Vector<EntityHandle> GetEntities();
+
 	template<typename T>
 	EntityHandle GetEntity(uint32 index);
 
 	Vector<IComponent*> GetComponents(EntityHandle handle);
 private:
 	IAllocator* allocator;
+	EngineContext* context;
 	std::unordered_map<ComponentTypeID, ScopedPtr<ComponentPoolBase>> pools;
 	std::unordered_map<std::string_view, ComponentPoolBase*> poolStringMap;
 };
+
+template<typename T>
+inline void ComponentManager::GetEntitiesInternal(std::function<void(EntityHandle*, uint32)> callback)
+{
+	uint32 count;
+	auto entities = GetEntities<T>(count);
+	callback(entities, count);
+}
 
 template<typename T>
 inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
@@ -198,7 +213,7 @@ inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
 				T::Type,
 				ScopedPtr<ComponentPoolBase>((ComponentPoolBase*)pool)
 				)
-			
+
 		);
 	}
 	return (ComponentPool<T>*)pools[T::Type].get();
@@ -237,6 +252,47 @@ inline EntityHandle* ComponentManager::GetEntities(uint32& count)
 {
 	auto pool = GetOrCreatePool<T>();
 	return pool->GetEntities(count);
+}
+
+
+template<typename ...Args>
+inline Vector<EntityHandle> ComponentManager::GetEntities()
+{
+	constexpr size_t argCount = sizeof...(Args);
+	Vector<EntityHandle> commonEntities(context->FrameAllocator);
+	Vector<EntityHandle> entityList(allocator);
+
+	int a = 0;
+	auto cb = [&](EntityHandle* entities, uint32 count)->void
+	{
+		entityList.Grow(count);
+		entityList.CopyFrom(entities, count);
+	};
+
+	auto c = { 0, (GetEntitiesInternal<Args>(cb), 0) ... };
+	entityList.Sort();
+
+	uint64 prevId = INT_MAX;
+	int count = 0;
+	for (auto& e : entityList)
+	{
+		if (e.ID == prevId)
+		{
+			count++;
+		}
+		else
+		{
+			count = 1;
+			prevId = e.ID;
+		}
+
+		if (count == argCount)
+		{
+			commonEntities.Grow(1);
+			commonEntities.Push(e);
+		}
+	}
+	return commonEntities;
 }
 
 template<typename T>

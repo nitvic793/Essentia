@@ -11,7 +11,7 @@ EntityManager::EntityManager()
 void EntityManager::Initialize(IAllocator* allocator)
 {
 	this->allocator = allocator;
-	componentManager.Initialize(allocator);
+	componentManager.Initialize(allocator, EngineContext::Context);
 }
 
 EntityHandle EntityManager::CreateEntity(const Transform& transform)

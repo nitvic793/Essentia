@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "Component.h"
 
-void ComponentManager::Initialize(IAllocator* allocator)
+void ComponentManager::Initialize(IAllocator* allocator, EngineContext* context)
 {
+	this->context = context;
 	this->allocator = allocator;
 }
 
@@ -23,4 +24,15 @@ Vector<IComponent*> ComponentManager::GetComponents(EntityHandle handle)
 		}
 	}
 	return components;
+}
+
+
+bool operator<(EntityHandle lhs, EntityHandle rhs)
+{
+	return lhs.ID < rhs.ID;
+}
+
+bool operator<=(EntityHandle lhs, EntityHandle rhs)
+{
+	return lhs.ID <= rhs.ID;
 }

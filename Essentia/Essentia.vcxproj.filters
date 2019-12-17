@@ -73,6 +73,9 @@
     <Filter Include="Header Files\Math">
       <UniqueIdentifier>{772a2224-e9c6-44d7-8efc-e6a8bcdc8fc9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\DataStructures">
+      <UniqueIdentifier>{01a3a277-ea77-4e55-9d3f-19dd24ac4b3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -345,9 +348,6 @@
     <ClInclude Include="imgui_impl_win32.h">
       <Filter>Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Utility.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BaseSystems.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -401,6 +401,9 @@
     </ClInclude>
     <ClInclude Include="CMath.h">
       <Filter>Header Files\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Header Files\DataStructures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

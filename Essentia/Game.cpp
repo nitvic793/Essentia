@@ -10,10 +10,13 @@ void Game::Setup()
 	keyboard = MakeScoped<DirectX::Keyboard>();
 	mouse = MakeScoped<DirectX::Mouse>();
 	entityManager.Initialize(Mem::GetDefaultAllocator());
+	frameAllocator.Initialize(CMaxScratchSize, Mem::GetDefaultAllocator());
 
 	auto ec = EngineContext::Context;
 	ec->EntityManager = &entityManager;
 	ec->RendererInstance = renderer.Get();
+	ec->DefaultAllocator = Mem::GetDefaultAllocator();
+	ec->FrameAllocator = &frameAllocator;
 	
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);
@@ -70,6 +73,8 @@ void Game::Run()
 					eventCallbacks.pop();
 				}
 			}
+
+			frameAllocator.Reset(); 
 		});
 }
 

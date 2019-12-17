@@ -36,7 +36,7 @@ int main()
 		gameLoader.LoadGameLibrary(gameDll);
 		LinearAllocator allocator(CMaxStackHeapSize);
 		{
-			FileWatcher fw{ "../../Game", std::chrono::milliseconds(5000) };
+			FileWatcher fw{ "../../Game", std::chrono::milliseconds(2000) };
 			ScopedPtr<Game> game = MakeScoped<Game>();
 			game->Setup();
 			gameLoader.InitializeLoader(EngineContext::Context);
@@ -48,6 +48,7 @@ int main()
 					gameLoader.LoadGameLibrary(gameDll);
 					gameLoader.LoadSystems(game.get(), &allocator);
 				});
+
 			std::thread th([&]()
 				{
 					fw.start([&game](auto file, auto status)
@@ -69,6 +70,7 @@ int main()
 							}
 						});
 				});
+
 			game->Run();
 			fw.stop();
 			th.join();

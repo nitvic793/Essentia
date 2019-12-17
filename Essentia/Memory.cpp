@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Memory.h"
+#include "EngineContext.h"
 
 LinearAllocator* LinearAllocator::Instance = nullptr;
 
@@ -11,6 +12,11 @@ void* Mem::Alloc(size_t sizeInBytes)
 void Mem::Free(void* buffer)
 {
 	LinearAllocator::Instance->Free((byte*)buffer);
+}
+
+IAllocator* Mem::GetFrameAllocator()
+{
+	return EngineContext::Context->FrameAllocator;
 }
 
 void* SystemHeapAllocator::Alloc(size_t size)

@@ -10,6 +10,7 @@ class CommandContext;
 class RenderTargetManager;
 class ModelManager;
 class FrameManager;
+class IAllocator;
 
 struct EngineContext
 {
@@ -24,6 +25,8 @@ struct EngineContext
 	RenderTargetManager*	RenderTargetManager = nullptr;
 	ModelManager*			ModelManager = nullptr;
 	FrameManager*			FrameManager = nullptr;
+	IAllocator*				DefaultAllocator = nullptr;
+	IAllocator*				FrameAllocator = nullptr;
 	EngineContext()
 	{
 		Context = this;

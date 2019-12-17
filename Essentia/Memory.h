@@ -8,7 +8,15 @@
 #define A_EXPORT __declspec(dllimport)
 #endif
 
-constexpr uint32 CMaxStackHeapSize = 1024 * 1024 * 32; //32MB
+constexpr uint32 CMaxStackHeapSize = 1024 * 1024 * 64; //64MB
+constexpr uint32 CMaxScratchSize = 1024 * 1024 * 16; //16MB
+
+enum MemorySpaceType
+{
+	kMemStackSpace,
+	kMemScratchSpace,
+	kMemFrameSpace
+};
 
 class IAllocator
 {
@@ -47,6 +55,7 @@ public:
 		buffer = (byte*)allocator->Alloc(sizeInBytes);
 		current = buffer;
 		totalSize = sizeInBytes;
+		memset(buffer, 0, totalSize);
 	}
 
 	virtual void* Alloc(size_t size) override
@@ -87,7 +96,9 @@ private:
 class StackAllocator : public IAllocator
 {
 public:
-	explicit StackAllocator(size_t sizeInBytes, IAllocator* allocator = nullptr)
+	StackAllocator(){}
+
+	void Initialize(size_t sizeInBytes, IAllocator* allocator = nullptr)
 	{
 		if (!allocator)
 		{
@@ -113,12 +124,13 @@ public:
 		current = buff;
 	}
 
-	void Push()
+	byte* Push()
 	{
 		marker = current;
+		return marker;
 	}
 
-	void Pop()
+	void Pop(byte* marker)
 	{
 		current = marker;
 	}
@@ -141,6 +153,7 @@ private:
 	IAllocator* parent = nullptr;
 };
 
+
 namespace Mem
 {
 	void*	Alloc(size_t sizeInBytes);
@@ -150,6 +163,8 @@ namespace Mem
 	{
 		return LinearAllocator::GetInstance();
 	}
+
+	static IAllocator* GetFrameAllocator();
 
 	template<typename T, typename ...Args>
 	T* Alloc(Args&& ... args)

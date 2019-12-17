@@ -22,7 +22,7 @@ public:
 	void			Run();
 	void			ReloadSystems();
 	void			SetSystemReloadCallback(Callback callback);
-	void			AddEventCallback(std::function<void()>&& callback) { std::scoped_lock lock(centralMutex);  eventCallbacks.push(callback); }
+	void			AddEventCallback(Callback&& callback) { std::scoped_lock lock(centralMutex);  eventCallbacks.push(callback); }
 	SystemManager*	GetGameSystemsManager();
 	std::mutex		centralMutex;
 	~Game();
@@ -40,7 +40,8 @@ protected:
 	SystemManager					coreSystemsManager;
 	SystemManager					gameSystemsManager;
 	Callback						systemLoadCallback;
-	std::queue<std::function<void()>> eventCallbacks;
+	StackAllocator					frameAllocator;
+	std::queue<Callback>			eventCallbacks;
 private:
 	EngineContext					engineContext;
 };
