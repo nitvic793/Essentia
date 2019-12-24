@@ -127,7 +127,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;E:\Graphics\Essentia\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
@@ -137,6 +137,9 @@
       <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>E:\Graphics\Essentia\packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release x64\Release /K /D /H /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\Essentia\Essentia.vcxproj">

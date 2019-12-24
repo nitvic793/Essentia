@@ -11,7 +11,11 @@
 #include <thread>
 
 static const char* gameDll = "Game.dll";
-
+#if defined(_DEBUG) | defined(DEBUG)
+static const char* buildCommandLineStr = "msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64 /property:Configuration=Debug";
+#else
+static const char* buildCommandLineStr = "msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64 /property:Configuration=Release";
+#endif
 int main()
 {
 #if defined(DEBUG) | defined(_DEBUG)
@@ -44,7 +48,7 @@ int main()
 			game->SetSystemReloadCallback([&]()
 				{
 					gameLoader.FreeGameLibrary();
-					system("msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64");
+					system(buildCommandLineStr);
 					gameLoader.LoadGameLibrary(gameDll);
 					gameLoader.LoadSystems(game.get(), &allocator);
 				});
