@@ -36,19 +36,34 @@ private:
 	void SaveScene()
 	{
 		ResourcePack resources;
-		resources.Textures.push_back("../../Assets/Textures/floor_albedo.png");
-		resources.Textures.push_back("../../Assets/Textures/floor_normals.png");
-		resources.Textures.push_back("../../Assets/Textures/floor_roughness.png");
-		resources.Textures.push_back("../../Assets/Textures/floor_metal.png");
-		resources.Textures.push_back("../../Assets/Textures/defaultRoughness.png");
-		resources.Textures.push_back("../../Assets/Textures/defaultMetal.png");
-		resources.CubeMaps.push_back("../../Assets/Textures/SunnyCubeMap.dds");
-		resources.CubeMaps.push_back("../../Assets/Textures/envDiffuseHDR.dds");
-		resources.CubeMaps.push_back("../../Assets/Textures/envBrdf.dds");
-		resources.CubeMaps.push_back("../../Assets/Textures/envSpecularHDR.dds");
-		resources.Meshes.push_back("../../Assets/Models/sphere.obj");
-		resources.Meshes.push_back("../../Assets/Models/cube.obj");
-		resources.Models.push_back("../../Assets/Models/Sponza.fbx");
+		//resources.Textures.push_back("../../Assets/Textures/floor_albedo.png");
+		//resources.Textures.push_back("../../Assets/Textures/floor_normals.png");
+		//resources.Textures.push_back("../../Assets/Textures/floor_roughness.png");
+		//resources.Textures.push_back("../../Assets/Textures/floor_metal.png");
+		//resources.Textures.push_back("../../Assets/Textures/defaultRoughness.png");
+		//resources.Textures.push_back("../../Assets/Textures/defaultMetal.png");
+		//resources.CubeMaps.push_back("../../Assets/Textures/SunnyCubeMap.dds");
+		//resources.CubeMaps.push_back("../../Assets/Textures/envDiffuseHDR.dds");
+		//resources.CubeMaps.push_back("../../Assets/Textures/envBrdf.dds");
+		//resources.CubeMaps.push_back("../../Assets/Textures/envSpecularHDR.dds");
+		auto ec = EngineContext::Context;
+		auto meshes = ec->MeshManager->GetAllMeshNames();
+		auto models = ec->ModelManager->GetAllModelNames();
+		auto textures = ec->ShaderResourceManager->GetAllTextureNames();
+		for (auto mesh : meshes)
+		{
+			resources.Meshes.push_back(mesh);
+		}
+
+		for (auto model : models)
+		{
+			resources.Models.push_back(model);
+		}
+
+		for (auto texture : textures)
+		{
+			resources.Textures.push_back(texture);
+		}
 
 		auto componentManager = entityManager->GetComponentManager();
 		flip ? componentManager->RemoveComponent<SelectedComponent>({ 0 }) : componentManager->AddComponent<SelectedComponent>({ 0 });
@@ -69,7 +84,7 @@ private:
 			entityList.push_back(eInterface);
 		}
 
-		::SaveScene({ resources, entityList }, "scene.json");
+		::SaveScene({ resources, entityList }, "../../Scene/scene.json");
 	}
 
 	float currentTime = 0.f;

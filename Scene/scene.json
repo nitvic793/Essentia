@@ -4,20 +4,72 @@
             "Textures": [
                 "../../Assets/Textures/floor_albedo.png",
                 "../../Assets/Textures/floor_normals.png",
+                "../../Assets/Textures/defaultRoughness.png",
+                "../../Assets/Textures/defaultMetal.png",
                 "../../Assets/Textures/floor_roughness.png",
                 "../../Assets/Textures/floor_metal.png",
-                "../../Assets/Textures/defaultRoughness.png",
-                "../../Assets/Textures/defaultMetal.png"
+                "../../Assets/Textures/Sponza_Thorn_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Thorn_normal.DDS",
+                "../../Assets/Textures/Dielectric_metallic.DDS",
+                "../../Assets/Textures/VasePlant_diffuse.DDS",
+                "../../Assets/Textures/VasePlant_normal.DDS",
+                "../../Assets/Textures/VaseRound_diffuse.DDS",
+                "../../Assets/Textures/VaseRound_normal.DDS",
+                "../../Assets/Textures/Background_Albedo.DDS",
+                "../../Assets/Textures/Background_Normal.DDS",
+                "../../Assets/Textures/Sponza_Bricks_a_Albedo.DDS",
+                "../../Assets/Textures/Sponza_Bricks_a_Normal.DDS",
+                "../../Assets/Textures/Sponza_Arch_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Arch_normal.DDS",
+                "../../Assets/Textures/Sponza_Ceiling_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Ceiling_normal.DDS",
+                "../../Assets/Textures/Sponza_Column_a_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Column_a_normal.DDS",
+                "../../Assets/Textures/Sponza_Floor_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Floor_normal.DDS",
+                "../../Assets/Textures/Sponza_Column_c_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Column_c_normal.DDS",
+                "../../Assets/Textures/Sponza_Details_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Details_normal.DDS",
+                "../../Assets/Textures/Sponza_Column_b_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Column_b_normal.DDS",
+                "../../Assets/Textures/Sponza_FlagPole_diffuse.DDS",
+                "../../Assets/Textures/Sponza_FlagPole_normal.DDS",
+                "../../Assets/Textures/Metallic_metallic.DDS",
+                "../../Assets/Textures/Sponza_Fabric_Green_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Fabric_Green_normal.DDS",
+                "../../Assets/Textures/Sponza_Fabric_metallic.DDS",
+                "../../Assets/Textures/Sponza_Fabric_Blue_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Fabric_Blue_normal.DDS",
+                "../../Assets/Textures/Sponza_Fabric_Red_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Fabric_Red_normal.DDS",
+                "../../Assets/Textures/Sponza_Curtain_Blue_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Curtain_Blue_normal.DDS",
+                "../../Assets/Textures/Sponza_Curtain_metallic.DDS",
+                "../../Assets/Textures/Sponza_Curtain_Red_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Curtain_Red_normal.DDS",
+                "../../Assets/Textures/Sponza_Curtain_Green_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Curtain_Green_normal.DDS",
+                "../../Assets/Textures/ChainTexture_Albedo.DDS",
+                "../../Assets/Textures/ChainTexture_Normal.DDS",
+                "../../Assets/Textures/ChainTexture_Metallic.DDS",
+                "../../Assets/Textures/VaseHanging_diffuse.DDS",
+                "../../Assets/Textures/VaseHanging_normal.DDS",
+                "../../Assets/Textures/Vase_diffuse.DDS",
+                "../../Assets/Textures/Vase_normal.DDS",
+                "../../Assets/Textures/Lion_Albedo.DDS",
+                "../../Assets/Textures/Lion_Normal.DDS",
+                "../../Assets/Textures/Sponza_Roof_diffuse.DDS",
+                "../../Assets/Textures/Sponza_Roof_normal.DDS",
+                "../../Assets/IBL/envDiffuseHDR.dds",
+                "../../Assets/IBL/envBrdf.dds",
+                "../../Assets/IBL/envSpecularHDR.dds",
+                "../../Assets/Textures/SunnyCubeMap.dds"
             ],
-            "CubeMaps": [
-                "../../Assets/Textures/SunnyCubeMap.dds",
-                "../../Assets/Textures/envDiffuseHDR.dds",
-                "../../Assets/Textures/envBrdf.dds",
-                "../../Assets/Textures/envSpecularHDR.dds"
-            ],
+            "CubeMaps": [],
             "Meshes": [
-                "../../Assets/Models/sphere.obj",
-                "../../Assets/Models/cube.obj"
+                "../../Assets/Models/cube.obj",
+                "../../Assets/Models/sphere.obj"
             ],
             "Models": [
                 "../../Assets/Models/Sponza.fbx"
@@ -35,13 +87,13 @@
                     "DrawableComponent"
                 ],
                 "PositionComponent": {
-                    "X": -1.4609272480010987,
+                    "X": 1.3745685815811158,
                     "Y": 1.0,
                     "Z": 0.0
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 0.9901483058929443,
+                    "Y": 0.5959622263908386,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -66,12 +118,12 @@
                 ],
                 "PositionComponent": {
                     "X": 0.0,
-                    "Y": 4.60184907913208,
+                    "Y": 5.369872570037842,
                     "Z": 5.0
                 },
                 "RotationComponent": {
-                    "X": 0.3960593342781067,
-                    "Y": 0.3960593342781067,
+                    "X": 0.2383848875761032,
+                    "Y": 0.2383848875761032,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -168,8 +220,8 @@
                         "Y": 0.10000000149011612,
                         "Z": 0.10000000149011612
                     },
-                    "Intensity": 27.519596099853517,
-                    "Range": 27.519596099853517
+                    "Intensity": 27.872474670410158,
+                    "Range": 27.872474670410158
                 },
                 "PositionComponent": {
                     "X": 0.0,

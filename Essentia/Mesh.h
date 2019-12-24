@@ -49,6 +49,7 @@ public:
 	MeshHandle									GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
 	const DirectX::BoundingOrientedBox&			GetBoundingBox(MeshHandle handle);
 	std::string									GetName(MeshHandle handle);
+	std::vector<std::string>					GetAllMeshNames();
 private:
 	MeshManager() {};
 	CommandContext*								context = nullptr;
@@ -80,6 +81,7 @@ public:
 	const Model&	GetModel(ModelHandle model);
 	ModelHandle		GetModelHandle(const char* name);
 	std::string		GetModelName(ModelHandle model);
+	std::vector<std::string> GetAllModelNames();
 private:
 	std::vector<Model>							models;
 	std::unordered_map<uint32, std::string>		modelNameMap;

@@ -70,7 +70,7 @@ struct ResourcePack
 	std::vector<std::string> Models;
 
 	template<class Archive>
-	void serialize(Archive& archive)
+	void save(Archive& archive) const
 	{
 		archive(
 			CEREAL_NVP(Textures),
@@ -78,6 +78,40 @@ struct ResourcePack
 			CEREAL_NVP(Meshes),
 			CEREAL_NVP(Models)
 		);
+	}
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(Textures),
+			CEREAL_NVP(CubeMaps),
+			CEREAL_NVP(Meshes),
+			CEREAL_NVP(Models)
+		);
+
+		for (auto texture : Textures)
+		{
+			std::transform(texture.begin(), texture.end(), texture.begin(),
+				[](unsigned char c) { return std::tolower(c); });
+			TextureType type = TextureType::WIC;
+			if (String::HasSuffix(texture, ".dds"))
+			{
+				type = TextureType::DDS;
+			}
+
+			//es::CreateTexture(texture, type);
+		}
+
+		for (auto mesh : Meshes)
+		{
+			es::CreateMesh(mesh);
+		}
+
+		for (auto model : Models)
+		{
+			es::CreateModel(model.c_str());
+		}
 	}
 };
 

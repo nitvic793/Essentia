@@ -166,6 +166,16 @@ std::string MeshManager::GetName(MeshHandle handle)
 	return meshNameMap[handle.Id];
 }
 
+std::vector<std::string> MeshManager::GetAllMeshNames()
+{
+	std::vector<std::string> meshNames;
+	for (auto mesh : meshNameMap)
+	{
+		meshNames.push_back(mesh.second);
+	}
+	return meshNames;
+}
+
 void ModelManager::Initialize(ShaderResourceManager* srManager)
 {
 	shaderResourceManager = srManager;
@@ -230,4 +240,15 @@ ModelHandle ModelManager::GetModelHandle(const char* name)
 std::string ModelManager::GetModelName(ModelHandle model)
 {
 	return modelNameMap[model.Id];
+}
+
+std::vector<std::string> ModelManager::GetAllModelNames()
+{
+	std::vector<std::string> modelNames;
+	for (auto model : modelNameMap)
+	{
+		modelNames.push_back(model.second);
+	}
+
+	return modelNames;
 }

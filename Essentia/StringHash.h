@@ -84,4 +84,6 @@ namespace String
 	{
 		return crc32(str);
 	}
+
+    bool HasSuffix(const std::string& str, const std::string& suffix);
 }

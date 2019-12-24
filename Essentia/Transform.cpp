@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Transform.h"
+#include "Memory.h"
 
 using namespace DirectX;
 
@@ -96,7 +97,7 @@ void TransformManager::UpdateTransform(TransformHandle transform)
 void TransformManager::Allocate(uint32 count)
 {
 	size_t totalSize = (size_t)count * (sizeof(XMFLOAT4X4) + sizeof(XMFLOAT4X4) + sizeof(TransformHandle) + sizeof(EntityHandle));
-	transforms.Buffer = new byte[totalSize];
+	transforms.Buffer = (byte*)Mem::Alloc(totalSize);
 	transforms.World = (XMFLOAT4X4*)transforms.Buffer;
 	transforms.Local = transforms.World + count;
 	transforms.Parent = (TransformHandle*)transforms.Local + count;
@@ -106,5 +107,5 @@ void TransformManager::Allocate(uint32 count)
 
 void TransformManager::CleanUp()
 {
-	delete[] transforms.Buffer;
+	Mem::Free(transforms.Buffer);
 }

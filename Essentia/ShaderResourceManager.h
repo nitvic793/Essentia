@@ -23,35 +23,40 @@ struct TextureProperties
 	uint32		Width;
 	uint32		Height;
 	DXGI_FORMAT Format;
+	bool		IsCubeMap;
+	bool		HasMips;
 };
 
 class ShaderResourceManager
 {
 public:
-	void				Initialize(ResourceManager* resourceManager, DeviceResources* deviceResources);
-	ConstantBufferView	CreateCBV(uint32 sizeInBytes);
-	void				CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset = 0); //Copy data to constant buffer
-	GPUHeapOffsets		CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
-	TextureID			CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
-	TextureID			CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN);
-	TextureID			CreateTexture2D(TextureProperties properties, 
-										ResourceID* outResourceId = nullptr,
-										const char* name = nullptr, 
-										D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, 
-										D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	MaterialHandle		CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
+	void						Initialize(ResourceManager* resourceManager, DeviceResources* deviceResources);
+	ConstantBufferView			CreateCBV(uint32 sizeInBytes);
+	void						CopyToCB(uint32 frameIndex, const DataPack& data, uint64 offset = 0); //Copy data to constant buffer
+	GPUHeapOffsets				CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
+	TextureID					CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
+	TextureID					CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN);
+	TextureID					CreateTexture2D(TextureProperties properties, 
+												ResourceID* outResourceId = nullptr,
+												const char* name = nullptr, 
+												D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, 
+												D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	MaterialHandle				CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
 	
-	void				CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
+	void						CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
 	D3D12_GPU_DESCRIPTOR_HANDLE	AllocateTextures(TextureID* textures, uint32 textureCount, uint32 frameIndex, FrameManager* frameManager);
 
-	const Material&		GetMaterial(MaterialHandle handle);
-	MaterialHandle		GetMaterialHandle(const char* materialName);
-	MaterialHandle		GetMaterialHandle(StringID material);
-	TextureID			GetTexture(StringID texture);
-	TextureID			RequestUninitializedTexture();
-	ID3D12Resource*		GetResource(TextureID textureId);
-	std::string			GetMaterialName(MaterialHandle handle);
-	std::string			GetTextureName(TextureID textureId);
+	const Material&				GetMaterial(MaterialHandle handle);
+	MaterialHandle				GetMaterialHandle(const char* materialName);
+	MaterialHandle				GetMaterialHandle(StringID material);
+	TextureID					GetTexture(StringID texture);
+	TextureID					RequestUninitializedTexture();
+	ID3D12Resource*				GetResource(TextureID textureId);
+	std::string					GetMaterialName(MaterialHandle handle);
+	std::string					GetTextureName(TextureID textureId);
+
+	//Will only return textures created via files.
+	std::vector<std::string>	GetAllTextureNames(); 
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
@@ -72,8 +77,10 @@ private:
 
 	std::unordered_map<uint32, std::string>			materialNameMap;
 	std::unordered_map<uint32, std::string>			textureNameMap;
+	std::vector<std::string>						textureFiles;
 	std::unordered_map<StringID, MaterialHandle>	materialMap;
 	std::unordered_map<StringID, TextureID>			textureMap;
+	std::unordered_map<StringID, TextureProperties> texturePropertiesMap;
 	std::vector<ID3D12Resource*>					textureResources;
 	friend class Renderer;
 };

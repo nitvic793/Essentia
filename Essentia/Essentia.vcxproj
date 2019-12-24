@@ -201,6 +201,7 @@
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="ShaderResourceManager.cpp" />
     <ClCompile Include="SkyBoxRenderStage.cpp" />
+    <ClCompile Include="StringHash.cpp" />
     <ClCompile Include="System.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />

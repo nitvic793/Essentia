@@ -220,6 +220,9 @@
     <ClCompile Include="Component.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
+    <ClCompile Include="StringHash.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -295,9 +298,6 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Component.h">
-      <Filter>Header Files\Engine</Filter>
-    </ClInclude>
-    <ClInclude Include="StringHash.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="EntityBase.h">
@@ -410,6 +410,9 @@
     </ClInclude>
     <ClInclude Include="ComponentReflector.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringHash.h">
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

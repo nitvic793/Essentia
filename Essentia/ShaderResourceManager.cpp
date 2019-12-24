@@ -135,12 +135,18 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	auto finish = uploadBatch.End(deviceResources->GetCommandQueue());
 	finish.wait();
 
+	TextureProperties properties = {};
+	properties.HasMips = generateMips;
+	properties.IsCubeMap = true;
+
 	auto texIndex = textureCount;
 	textureCount++;
 	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(*resource);
 	textureNameMap[texIndex] = filename;
+	textureFiles.push_back(filename);
+	texturePropertiesMap[texIndex] = properties;
 	return texIndex;
 }
 
@@ -306,6 +312,11 @@ std::string ShaderResourceManager::GetMaterialName(MaterialHandle handle)
 std::string ShaderResourceManager::GetTextureName(TextureID textureId)
 {
 	return textureNameMap[textureId];
+}
+
+std::vector<std::string> ShaderResourceManager::GetAllTextureNames()
+{
+	return textureFiles;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureGPUHandle(TextureID texID)
