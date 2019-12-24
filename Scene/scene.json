@@ -1,0 +1,221 @@
+{
+    "Scene": {
+        "Resources": {
+            "Textures": [
+                "../../Assets/Textures/floor_albedo.png",
+                "../../Assets/Textures/floor_normals.png",
+                "../../Assets/Textures/floor_roughness.png",
+                "../../Assets/Textures/floor_metal.png",
+                "../../Assets/Textures/defaultRoughness.png",
+                "../../Assets/Textures/defaultMetal.png"
+            ],
+            "CubeMaps": [
+                "../../Assets/Textures/SunnyCubeMap.dds",
+                "../../Assets/Textures/envDiffuseHDR.dds",
+                "../../Assets/Textures/envBrdf.dds",
+                "../../Assets/Textures/envSpecularHDR.dds"
+            ],
+            "Meshes": [
+                "../../Assets/Models/sphere.obj",
+                "../../Assets/Models/cube.obj"
+            ],
+            "Models": [
+                "../../Assets/Models/Sponza.fbx"
+            ]
+        },
+        "Entities": [
+            {
+                "Entity": {
+                    "entity.ID": 0
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "DrawableComponent"
+                ],
+                "PositionComponent": {
+                    "X": -1.4609272480010987,
+                    "Y": 1.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.9901483058929443,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "DrawableComponent": {
+                    "MeshName": "../../Assets/Models/sphere.obj",
+                    "MaterialName": "0"
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 1
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "DrawableComponent"
+                ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 4.60184907913208,
+                    "Z": 5.0
+                },
+                "RotationComponent": {
+                    "X": 0.3960593342781067,
+                    "Y": 0.3960593342781067,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "DrawableComponent": {
+                    "MeshName": "../../Assets/Models/cube.obj",
+                    "MaterialName": "0"
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 2
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "DrawableModelComponent"
+                ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 4.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 0.05000000074505806,
+                    "Y": 0.05000000074505806,
+                    "Z": 0.05000000074505806
+                },
+                "DrawableModelComponent": {
+                    "ModelName": "../../Assets/Models/Sponza.fbx"
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 3
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "DirectionalLightComponent"
+                ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "DirectionalLightComponent": {
+                    "Color": {
+                        "X": 0.8999999761581421,
+                        "Y": 0.8999999761581421,
+                        "Z": 0.8999999761581421
+                    },
+                    "Intensity": 1.0,
+                    "Direction": {
+                        "X": 0.5773502588272095,
+                        "Y": -0.5773502588272095,
+                        "Z": 0.5773502588272095
+                    }
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 4
+                },
+                "Components": [
+                    "PointLightComponent",
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent"
+                ],
+                "PointLightComponent": {
+                    "Color": {
+                        "X": 0.8999999761581421,
+                        "Y": 0.10000000149011612,
+                        "Z": 0.10000000149011612
+                    },
+                    "Intensity": 27.519596099853517,
+                    "Range": 27.519596099853517
+                },
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 3.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 5
+                },
+                "Components": [
+                    "SkyboxComponent",
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent"
+                ],
+                "SkyboxComponent": {
+                    "CubeMapName": "../../Assets/Textures/SunnyCubeMap.dds"
+                },
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                }
+            }
+        ]
+    }
+}
