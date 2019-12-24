@@ -146,7 +146,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;E:\Graphics\Essentia\include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
