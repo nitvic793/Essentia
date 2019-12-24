@@ -140,18 +140,22 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(*resource);
+	textureNameMap[texIndex] = filename;
 	return texIndex;
 }
 
 TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool isCubeMap, const char* name, DXGI_FORMAT format)
 {
 	StringID stringId;
+	std::string texName;
 	if (name == nullptr)
 	{
-		stringId = String::ID(std::to_string(textureCount).c_str());
+		texName = std::to_string(textureCount);
+		stringId = String::ID(texName.c_str());
 	}
 	else
 	{
+		texName = name;
 		stringId = String::ID(name);
 	}
 
@@ -170,7 +174,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	}
 	else
 	{
-		auto viewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+		auto viewDimension = D3D12_SRV_DIMENSION::D3D12_SRV_DIMENSION_TEXTURE2D;
 		if (isCubeMap) viewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC descSRV = {};
@@ -185,6 +189,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(resource);
+	textureNameMap[texIndex] = texName;
 	return texIndex;
 }
 
@@ -205,12 +210,15 @@ TextureID ShaderResourceManager::CreateTexture2D(TextureProperties properties, R
 MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name)
 {
 	StringID stringId;
+	std::string matName;
 	if (name == nullptr)
 	{
-		stringId = String::ID(std::to_string(materialCount).c_str());
+		matName = std::to_string(materialCount);
+		stringId = String::ID(matName.c_str());
 	}
 	else
 	{
+		matName = name;
 		stringId = String::ID(name);
 	}
 
@@ -231,6 +239,7 @@ MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32
 	materials.push_back(outMaterial);
 	materialCount += textureCount;
 	materialMap[stringId] = handle;
+	materialNameMap[handle.Index] = matName;
 	return handle;
 }
 
@@ -261,6 +270,12 @@ const Material& ShaderResourceManager::GetMaterial(MaterialHandle handle)
 	return materials[handle.Index];
 }
 
+MaterialHandle ShaderResourceManager::GetMaterialHandle(const char* materialName)
+{
+	auto stringId = String::ID(materialName);
+	return GetMaterialHandle(stringId);
+}
+
 MaterialHandle ShaderResourceManager::GetMaterialHandle(StringID material)
 {
 	return materialMap[material];
@@ -281,6 +296,16 @@ TextureID ShaderResourceManager::RequestUninitializedTexture()
 ID3D12Resource* ShaderResourceManager::GetResource(TextureID textureId)
 {
 	return textureResources[textureId];
+}
+
+std::string ShaderResourceManager::GetMaterialName(MaterialHandle handle)
+{
+	return materialNameMap[handle.Index];
+}
+
+std::string ShaderResourceManager::GetTextureName(TextureID textureId)
+{
+	return textureNameMap[textureId];
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureGPUHandle(TextureID texID)

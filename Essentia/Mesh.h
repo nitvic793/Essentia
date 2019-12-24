@@ -48,7 +48,7 @@ public:
 	const MeshView&								GetMeshView(const char* filename); //WARNING: Lazy loads the mesh
 	MeshHandle									GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
 	const DirectX::BoundingOrientedBox&			GetBoundingBox(MeshHandle handle);
-	const char*									GetName(MeshHandle handle);
+	std::string									GetName(MeshHandle handle);
 private:
 	MeshManager() {};
 	CommandContext*								context = nullptr;
@@ -78,8 +78,12 @@ public:
 	void			Initialize(ShaderResourceManager* srManager);
 	ModelHandle		CreateModel(const char* filename);
 	const Model&	GetModel(ModelHandle model);
+	ModelHandle		GetModelHandle(const char* name);
+	std::string		GetModelName(ModelHandle model);
 private:
-	std::vector<Model> models;
-	ShaderResourceManager* shaderResourceManager;
+	std::vector<Model>							models;
+	std::unordered_map<uint32, std::string>		modelNameMap;
+	std::unordered_map<StringID, ModelHandle>	modelMap;
+	ShaderResourceManager*						shaderResourceManager;
 };
 

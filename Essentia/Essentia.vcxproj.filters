@@ -76,6 +76,9 @@
     <Filter Include="Header Files\DataStructures">
       <UniqueIdentifier>{01a3a277-ea77-4e55-9d3f-19dd24ac4b3e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Scene">
+      <UniqueIdentifier>{6557b1ff-ffab-4d2f-8549-2b3598de52f4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -142,9 +145,6 @@
     <ClCompile Include="System.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -193,9 +193,6 @@
     <ClCompile Include="SceneResources.cpp">
       <Filter>Source Files\Renderer</Filter>
     </ClCompile>
-    <ClCompile Include="RenderStage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PostProcessMotionBlur.cpp">
       <Filter>Source Files\Renderer\PostProcessStages</Filter>
     </ClCompile>
@@ -208,14 +205,20 @@
     <ClCompile Include="ComponentFactory.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Component.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Serialization.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DepthOnlyStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="RenderStage.cpp">
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="Component.cpp">
+      <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -404,6 +407,9 @@
     </ClInclude>
     <ClInclude Include="Utility.h">
       <Filter>Header Files\DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentReflector.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

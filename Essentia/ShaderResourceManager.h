@@ -45,10 +45,13 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE	AllocateTextures(TextureID* textures, uint32 textureCount, uint32 frameIndex, FrameManager* frameManager);
 
 	const Material&		GetMaterial(MaterialHandle handle);
+	MaterialHandle		GetMaterialHandle(const char* materialName);
 	MaterialHandle		GetMaterialHandle(StringID material);
 	TextureID			GetTexture(StringID texture);
 	TextureID			RequestUninitializedTexture();
 	ID3D12Resource*		GetResource(TextureID textureId);
+	std::string			GetMaterialName(MaterialHandle handle);
+	std::string			GetTextureName(TextureID textureId);
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
@@ -67,6 +70,8 @@ private:
 	uint64					currentCBufferOffset = 0;
 	std::vector<Material>	materials;
 
+	std::unordered_map<uint32, std::string>			materialNameMap;
+	std::unordered_map<uint32, std::string>			textureNameMap;
 	std::unordered_map<StringID, MaterialHandle>	materialMap;
 	std::unordered_map<StringID, TextureID>			textureMap;
 	std::vector<ID3D12Resource*>					textureResources;

@@ -161,9 +161,9 @@ const DirectX::BoundingOrientedBox& MeshManager::GetBoundingBox(MeshHandle handl
 	return bounds[handle.Id];
 }
 
-const char* MeshManager::GetName(MeshHandle handle)
+std::string MeshManager::GetName(MeshHandle handle)
 {
-	return meshNameMap[handle.Id].c_str();
+	return meshNameMap[handle.Id];
 }
 
 void ModelManager::Initialize(ShaderResourceManager* srManager)
@@ -173,6 +173,13 @@ void ModelManager::Initialize(ShaderResourceManager* srManager)
 
 ModelHandle ModelManager::CreateModel(const char* filename)
 {
+	auto stringID = String::ID(filename);
+
+	if (modelMap.find(stringID) != modelMap.end())
+	{
+		return modelMap[stringID];
+	}
+
 	auto modelData = ModelLoader::LoadModel(filename);
 	Model model = {};
 	ModelHandle modelHandle;
@@ -205,10 +212,21 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 	}
 
 	models.push_back(model);
+	modelNameMap[modelHandle.Id] = filename;
 	return modelHandle;
 }
 
 const Model& ModelManager::GetModel(ModelHandle model)
 {
 	return models[model.Id];
+}
+
+ModelHandle ModelManager::GetModelHandle(const char* name)
+{
+	return modelMap[String::ID(name)];
+}
+
+std::string ModelManager::GetModelName(ModelHandle model)
+{
+	return modelNameMap[model.Id];
 }

@@ -8,6 +8,7 @@
 #include "PostProcess.h"
 #include "PostProcessDepthOfFieldStage.h"
 #include "Interface.h"
+#include "ComponentReflector.h"
 
 using namespace DirectX;
 

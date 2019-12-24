@@ -10,6 +10,8 @@ void SaveScene(Scene&& scene, const char* fname);
 
 void RegisterComponents();
 
+Scene LoadScene(const char* fname);
+
 /*
 Serialization for predefined types
 */

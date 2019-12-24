@@ -1,5 +1,6 @@
 #pragma once
 #include "Declarations.h"
+#include "cereal/cereal.hpp"
 
 struct Material
 {
@@ -11,6 +12,12 @@ struct Material
 struct MaterialHandle
 {
 	uint32 Index;
+
+	template<class Archive> 
+	void serialize(Archive& a)
+	{
+		a(CEREAL_NVP(Index));
+	};
 };
 
 enum MaterialTextureType

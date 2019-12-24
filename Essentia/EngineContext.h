@@ -11,6 +11,7 @@ class RenderTargetManager;
 class ModelManager;
 class FrameManager;
 class IAllocator;
+class ComponentReflector;
 
 struct EngineContext
 {
@@ -27,6 +28,7 @@ struct EngineContext
 	FrameManager*			FrameManager = nullptr;
 	IAllocator*				DefaultAllocator = nullptr;
 	IAllocator*				FrameAllocator = nullptr;
+	ComponentReflector*		ComponentReflector = nullptr;
 	EngineContext()
 	{
 		Context = this;

@@ -3,6 +3,7 @@
 #include <DirectXMath.h>
 #include "imgui.h"
 #include "BaseSystems.h"
+#include "ComponentReflector.h"
 
 void Game::Setup()
 {
@@ -17,6 +18,7 @@ void Game::Setup()
 	ec->RendererInstance = renderer.Get();
 	ec->DefaultAllocator = Mem::GetDefaultAllocator();
 	ec->FrameAllocator = &frameAllocator;
+	ec->ComponentReflector = &GComponentReflector;
 	
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);

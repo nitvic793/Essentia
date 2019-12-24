@@ -12,6 +12,11 @@ using namespace DirectX;
 class EditorSaveSystem : public ISystem
 {
 public:
+	virtual void Initialize() override
+	{
+		//auto scene = LoadScene("scene.json");
+	}
+
 	virtual void Update(float dt, float totalTime) override
 	{
 

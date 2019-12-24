@@ -211,6 +211,7 @@
     <ClInclude Include="BaseComponents.h" />
     <ClInclude Include="BaseSystems.h" />
     <ClInclude Include="ComponentFactory.h" />
+    <ClInclude Include="ComponentReflector.h" />
     <ClInclude Include="DepthOnlyStage.h" />
     <ClInclude Include="CMath.h" />
     <ClInclude Include="PipelineStates.h" />

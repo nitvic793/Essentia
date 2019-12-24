@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Component.h"
+#include "Serialization.h"
+#include "ComponentReflector.h"
 
 void ComponentManager::Initialize(IAllocator* allocator, EngineContext* context)
 {
@@ -9,6 +11,11 @@ void ComponentManager::Initialize(IAllocator* allocator, EngineContext* context)
 
 ComponentPoolBase* ComponentManager::GetPool(const char* componentName)
 {
+	if (poolStringMap.find(componentName) == poolStringMap.end())
+	{
+		GComponentReflector.CreatePool(componentName, this);
+	}
+
 	return poolStringMap[componentName];
 }
 

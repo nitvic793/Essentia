@@ -2,6 +2,7 @@
 #include "Serialization.h"
 #include <functional>
 #include <cereal/cereal.hpp>
+#include "ComponentReflector.h"
 
 ComponentReflector GComponentReflector;
 
@@ -12,6 +13,18 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<RotationComponent>();
 	GComponentReflector.RegisterComponent<PointLightComponent>();
 	GComponentReflector.RegisterComponent<DirectionalLightComponent>();
+	GComponentReflector.RegisterComponent<DrawableComponent>();
+	GComponentReflector.RegisterComponent<DrawableModelComponent>();
+	GComponentReflector.RegisterComponent<SkyboxComponent>();
+}
+
+Scene LoadScene(const char* fname)
+{
+	Scene scene = {};
+	std::ifstream file(fname);
+	cereal::JSONInputArchive archive(file);
+	archive(cereal::make_nvp("Scene", scene));
+	return scene;
 }
 
 void SaveResources(ResourcePack& resources, const char* fname)
@@ -81,4 +94,16 @@ void Visit(DirectionalLightComponent* component, IVisitor* visitor)
 	auto name = comp->GetName();
 	visitor->Visit(name, MField(comp, Color));
 	visitor->Visit(name, MField(comp, Intensity));
+}
+
+void Visit(DrawableComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(DrawableModelComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(SkyboxComponent* component, IVisitor* visitor)
+{
 }

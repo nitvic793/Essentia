@@ -21,10 +21,10 @@ void serialize(Archive& archive, DirectX::XMFLOAT3& vector)
 struct PositionComponent : public IComponent
 {
 	GComponent(PositionComponent)
-	float X;
+		float X;
 	float Y;
 	float Z;
-	
+
 	const PositionComponent& operator=(const DirectX::XMFLOAT3& position)
 	{
 		this->X = position.x;
@@ -52,7 +52,7 @@ struct PositionComponent : public IComponent
 struct RotationComponent : public IComponent
 {
 	GComponent(RotationComponent)
-	float X;
+		float X;
 	float Y;
 	float Z;
 
@@ -83,7 +83,7 @@ struct RotationComponent : public IComponent
 struct ScaleComponent : public IComponent
 {
 	GComponent(ScaleComponent)
-	float X;
+		float X;
 	float Y;
 	float Z;
 
@@ -100,8 +100,8 @@ struct ScaleComponent : public IComponent
 		return DirectX::XMFLOAT3(X, Y, Z);
 	}
 
-	template<class Archive> 
-	void serialize(Archive& archive) 
+	template<class Archive>
+	void serialize(Archive& archive)
 	{
 		archive(
 			CEREAL_NVP(X),
@@ -131,7 +131,28 @@ struct DrawableComponent : public IDrawable
 		return component;
 	}
 
-	template<class Archive> void serialize(Archive& a) {};
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+		auto ec = EngineContext::Context;
+		auto MeshName = ec->MeshManager->GetName(Mesh);
+		auto MaterialName = ec->ShaderResourceManager->GetMaterialName(Material);
+		archive(CEREAL_NVP(MeshName), CEREAL_NVP(MaterialName));
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		auto ec = EngineContext::Context;
+		std::string MeshName;
+		std::string MaterialName;
+		archive(CEREAL_NVP(MeshName), CEREAL_NVP(MaterialName));
+		auto comp = Create(
+			ec->MeshManager->GetMeshHandle(MeshName.c_str()), 
+			ec->ShaderResourceManager->GetMaterialHandle(MaterialName.c_str())
+		);
+		*this = comp;
+	};
 };
 
 // To support models with inbuilt textures/materials
@@ -151,7 +172,24 @@ struct DrawableModelComponent : public IDrawable
 		return component;
 	}
 
-	template<class Archive> void serialize(Archive& a) {};
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+		auto ec = EngineContext::Context;
+		auto ModelName = ec->ModelManager->GetModelName(Model);
+		archive(CEREAL_NVP(ModelName));
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		auto ec = EngineContext::Context;
+		std::string ModelName;
+		archive(CEREAL_NVP(ModelName));
+		auto handle = ec->ModelManager->GetModelHandle(ModelName.c_str());
+		auto comp = Create(handle);
+		*this = comp;
+	};
 };
 
 struct ILight : public IComponent {};
@@ -179,12 +217,12 @@ struct DirectionalLightComponent : public ILight
 		return { Direction, 0, Color, Intensity };
 	}
 
-	template<class Archive> void serialize(Archive& archive) 
+	template<class Archive> void serialize(Archive& archive)
 	{
 		Vector3 Color(this->Color);
 		Vector3 Direction(this->Direction);
 		archive(
-			CEREAL_NVP(Color), 
+			CEREAL_NVP(Color),
 			CEREAL_NVP(Intensity),
 			CEREAL_NVP(Direction)
 		);
@@ -193,7 +231,6 @@ struct DirectionalLightComponent : public ILight
 
 struct PointLightComponent : public ILight
 {
-	GComponent(PointLightComponent)
 	DirectX::XMFLOAT3	Color;
 	float				Intensity;
 	float				Range;
@@ -213,8 +250,8 @@ struct PointLightComponent : public ILight
 		return { {}, Intensity, Color, Range };
 	}
 
-	template<class Archive> 
-	void serialize(Archive& archive) 
+	template<class Archive>
+	void serialize(Archive& archive)
 	{
 		Vector3 Color(this->Color);
 		archive(
@@ -223,6 +260,8 @@ struct PointLightComponent : public ILight
 			CEREAL_NVP(Range)
 		);
 	};
+
+	GComponent(PointLightComponent)
 };
 
 struct SkyboxComponent : public IComponent
@@ -239,7 +278,23 @@ struct SkyboxComponent : public IComponent
 		return component;
 	}
 
-	template<class Archive> void serialize(Archive& a) {};
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+		auto ec = EngineContext::Context;
+		auto CubeMapName = ec->ShaderResourceManager->GetTextureName(CubeMap);
+		archive(CEREAL_NVP(CubeMapName));
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		auto ec = EngineContext::Context;
+		std::string CubeMapName;
+		archive(CEREAL_NVP(CubeMapName));
+		auto comp = Create(CubeMapName.c_str());
+		*this = comp;
+	};
 };
 
 // Add this component to any entity which is to be selected
@@ -247,7 +302,7 @@ struct SelectedComponent : public IComponent
 {
 	GComponent(SelectedComponent)
 
-	template<class Archive> void serialize(Archive& a) {};
+		template<class Archive> void serialize(Archive& a) {};
 };
 
 //TODO: Make camera part of Component System 
