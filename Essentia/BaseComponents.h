@@ -217,7 +217,8 @@ struct DirectionalLightComponent : public ILight
 		return { Direction, 0, Color, Intensity };
 	}
 
-	template<class Archive> void serialize(Archive& archive)
+	template<class Archive> 
+	void save(Archive& archive) const
 	{
 		Vector3 Color(this->Color);
 		Vector3 Direction(this->Direction);
@@ -226,6 +227,20 @@ struct DirectionalLightComponent : public ILight
 			CEREAL_NVP(Intensity),
 			CEREAL_NVP(Direction)
 		);
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		Vector3 Color;
+		Vector3 Direction;
+		archive(
+			CEREAL_NVP(Color),
+			CEREAL_NVP(Intensity),
+			CEREAL_NVP(Direction)
+		);
+
+		*this = Create((DirectX::XMFLOAT3)Direction, (DirectX::XMFLOAT3)Color, Intensity);
 	};
 };
 
@@ -250,8 +265,9 @@ struct PointLightComponent : public ILight
 		return { {}, Intensity, Color, Range };
 	}
 
+
 	template<class Archive>
-	void serialize(Archive& archive)
+	void save(Archive& archive) const
 	{
 		Vector3 Color(this->Color);
 		archive(
@@ -259,6 +275,19 @@ struct PointLightComponent : public ILight
 			CEREAL_NVP(Intensity),
 			CEREAL_NVP(Range)
 		);
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		Vector3 Color;
+		archive(
+			CEREAL_NVP(Color),
+			CEREAL_NVP(Intensity),
+			CEREAL_NVP(Range)
+		);
+
+		*this = Create((DirectX::XMFLOAT3)Color, Intensity, Range);
 	};
 
 	GComponent(PointLightComponent)

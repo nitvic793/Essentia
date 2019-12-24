@@ -9,6 +9,8 @@ struct Vector3
 	float Y;
 	float Z;
 
+	Vector3() {}
+
 	Vector3(const DirectX::XMFLOAT3& vector)
 	{
 		X = vector.x;
@@ -21,6 +23,11 @@ struct Vector3
 		X = vector.x;
 		Y = vector.y;
 		Z = vector.z;
+	}
+
+	operator DirectX::XMFLOAT3()
+	{
+		return DirectX::XMFLOAT3(X, Y, Z);
 	}
 
 	template<class Archive>

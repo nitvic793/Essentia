@@ -213,6 +213,7 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 
 	models.push_back(model);
 	modelNameMap[modelHandle.Id] = filename;
+	modelMap[stringID] = modelHandle;
 	return modelHandle;
 }
 

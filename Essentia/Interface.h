@@ -47,6 +47,7 @@ struct EntityInterface
 		auto ec = EngineContext::Context;
 		auto componentManager = ec->EntityManager->GetComponentManager();
 		archive(CEREAL_NVP(Entity), CEREAL_NVP(Components));
+		Entity = ec->EntityManager->CreateEntity();
 		for (auto component : Components)
 		{
 			auto pool = componentManager->GetPool(component.c_str());

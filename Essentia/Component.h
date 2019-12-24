@@ -44,6 +44,11 @@ public:
 			components.push_back(val);
 			componentMap[entity.ID] = (uint32)components.size() - 1;
 		}
+		else
+		{
+			auto index = componentMap[entity.ID];
+			components[index] = val;
+		}
 	}
 
 	virtual void AddComponent(EntityHandle entity) override

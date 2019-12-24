@@ -96,61 +96,6 @@ public:
 	}
 };
 
-class RotationSystem : public ISystem
-{
-public:
-	virtual void Initialize()
-	{
-		entity = entityManager->CreateEntity();
-		entity2 = entityManager->CreateEntity();
-		auto e = entityManager->CreateEntity();
-		lights[0] = entityManager->CreateEntity();
-		lights[1] = entityManager->CreateEntity();
-		skybox = entityManager->CreateEntity();
-		entityManager->AddComponent<SkyboxComponent>(skybox, SkyboxComponent::Create("../../Assets/Textures/SunnyCubeMap.dds"));
-		XMFLOAT3 direction;
-		auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
-		XMStoreFloat3(&direction, dir);
-		entityManager->AddComponent<DirectionalLightComponent>(lights[0], DirectionalLightComponent::Create(direction, XMFLOAT3(0.9f, 0.9f, 0.9f)));
-
-		entityManager->AddComponent<PointLightComponent>(lights[1], PointLightComponent::Create(XMFLOAT3(0.9f, 0.1f, 0.1f)));
-		auto transform = GetTransform(lights[1]);
-		transform.Position->y = 3;
-		MaterialHandle mat = { 0 };
-		MeshHandle mesh = { 1 };
-		MeshHandle cone = es::CreateMesh("../../Assets/Models/cube.obj");
-
-		entityManager->AddComponent<DrawableComponent>(entity, DrawableComponent::Create(mesh, mat));
-		entityManager->AddComponent<DrawableComponent>(entity2, DrawableComponent::Create(cone, mat));
-		entityManager->AddComponent<DrawableModelComponent>(e, DrawableModelComponent::Create({ 0 }));
-
-		entityManager->AddComponent<SelectedComponent>(entity);
-		transform = GetTransform(e);
-		transform.Position->z = 4;
-		auto scale = XMFLOAT3(0.05f, 0.05f, 0.05f);
-		memcpy(transform.Scale, &scale, sizeof(scale));
-
-		transform = GetTransform(entity2);
-		transform.Position->z = 5;
-	}
-
-	virtual void Update(float deltaTime, float totalTime) override
-	{
-		auto transform = GetTransform(entity);
-		transform.Rotation->y = totalTime / 2;
-		transform.Position->x = 3 * sin(totalTime * 2);
-		transform = GetTransform(entity2);
-		//transform.Rotation->y = totalTime;
-		//transform.Position->y = cos(totalTime);
-	}
-
-private:
-	EntityHandle entity;
-	EntityHandle entity2;
-	EntityHandle lights[2];
-	EntityHandle skybox;
-};
-
 class FreeCameraSystem : public ISystem
 {
 public:

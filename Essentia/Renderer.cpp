@@ -822,6 +822,9 @@ void Renderer::UpdateLightBuffer()
 	lightBuffer.DirLight = dirLights[0].GetLight();
 
 	auto entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
-	lightBuffer.PointLight = pointLights[0].GetLight();
-	lightBuffer.PointLight.Position = *ec->EntityManager->GetTransform(entities[0]).Position;
+	if (pointLightCount > 0)
+	{
+		lightBuffer.PointLight = pointLights[0].GetLight();
+		lightBuffer.PointLight.Position = *ec->EntityManager->GetTransform(entities[0]).Position;
+	}
 }

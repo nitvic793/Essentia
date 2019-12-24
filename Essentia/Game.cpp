@@ -32,6 +32,7 @@ void Game::Setup()
 	renderer->EndInitialization();
 	coreSystemsManager.Initialize();
 
+	LoadScene("scene.json");
 	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();

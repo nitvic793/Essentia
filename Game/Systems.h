@@ -21,6 +21,7 @@ public:
 	virtual void Update(float deltaTime, float totalTime) override
 	{
 		auto entities = cManager->GetEntities<PositionComponent, DrawableComponent>();
+
 		auto transform = GetTransform(entities[0]);
 		transform.Rotation->y = totalTime / 2;
 		transform.Position->x = 2 * sin(totalTime * 2);

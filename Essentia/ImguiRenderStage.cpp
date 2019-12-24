@@ -88,11 +88,17 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		if (ImGui::CollapsingHeader("Lights"))
 		{
 			ImGui::Text("Basic Editor");
-			ImGui::ColorEdit3("Dir Light Color", (float*)& dirLights[0].Color.x); // Edit 3 floats representing a color
-			ImGui::DragFloat3("Dir Light Direction", (float*)& dirLights[0].Direction, 0.1f, -1.f, 1.f);
-			ImGui::SliderFloat("Dir Light Intensity", (float*)& dirLights[0].Intensity, 0.0f, 100.f, "%.3f", 2.1f);
-			ImGui::SliderFloat("Point Light Range", &pointLights[0].Range, 0.0f, 100.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-			ImGui::DragFloat3("Point Light Pos", (float*)& transform.Position->x, 0.1f);
+			if (dirLightCount > 0)
+			{
+				ImGui::ColorEdit3("Dir Light Color", (float*)&dirLights[0].Color.x); // Edit 3 floats representing a color
+				ImGui::DragFloat3("Dir Light Direction", (float*)&dirLights[0].Direction, 0.1f, -1.f, 1.f);
+				ImGui::SliderFloat("Dir Light Intensity", (float*)&dirLights[0].Intensity, 0.0f, 100.f, "%.3f", 2.1f);
+			}
+			if (pointLightCount > 0)
+			{
+				ImGui::SliderFloat("Point Light Range", &pointLights[0].Range, 0.0f, 100.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+				ImGui::DragFloat3("Point Light Pos", (float*)&transform.Position->x, 0.1f);
+			}
 		}
 
 		if (ImGui::CollapsingHeader("Render Stages"))
