@@ -108,7 +108,7 @@ void Renderer::Initialize()
 
 	for (size_t i = 0; i < CFrameBufferCount; ++i)
 	{
-		TextureProperties props = { (uint32)width, (uint32)height, DXGI_FORMAT_R32G32B32A32_FLOAT };
+		TextureCreateProperties props = { (uint32)width, (uint32)height, DXGI_FORMAT_R32G32B32A32_FLOAT };
 		ResourceID resourceId;
 		auto textureId = shaderResourceManager->CreateTexture2D(props, &resourceId);
 		hdrRenderTargets[i] = renderTargetManager->CreateRenderTargetView(resourceManager->GetResource(resourceId), hdrRenderTargetFormat);
@@ -284,7 +284,10 @@ void Renderer::Render(const FrameContext& frameContext)
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
 
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	// Set constant buffer for lights in Pixel Shader
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
+	// Set textures for IBL. Here we are setting 3 textures, irradiance texture is at index 0 while 
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"PrePass Stage");
@@ -398,22 +401,23 @@ void Renderer::EndInitialization()
 	Default::DefaultRoughness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
 	Default::DefaultMetalness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
 
-	MeshView mesh;
-	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
-	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
-	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
-
 	TextureID textures[MaterialTextureCount];
 	textures[DiffuseID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
 	textures[NormalsID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
 	textures[RoughnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_roughness.png");
 	textures[MetalnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_metal.png");
 	auto matId = shaderResourceManager->CreateMaterial(textures, 4, defaultPSO, material);
-	modelManager.CreateModel("../../Assets/Models/Sponza.fbx");
 
 	irradianceTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envDiffuseHDR.dds", DDS, false);
 	brdfLutTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envBrdf.dds", DDS, false);
 	prefilterTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envSpecularHDR.dds", DDS, false);
+
+	MeshView mesh;
+	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
+	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
+	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+
+	modelManager.CreateModel("../../Assets/Models/Sponza.fbx");
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -450,7 +454,7 @@ void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, Dept
 
 	auto* dsvHandle = depthStencilId == nullptr ? (D3D12_CPU_DESCRIPTOR_HANDLE*)nullptr : &renderTargetManager->GetDSVHandle(*depthStencilId);
 	auto commandList = GetDefaultCommandList();
-	
+
 	D3D12_CPU_DESCRIPTOR_HANDLE* handleList = rtCount == 0 ? nullptr : handles.GetData();
 	commandList->OMSetRenderTargets(rtCount, handleList, singleHandleToRTsDescriptorRange, dsvHandle);
 }
@@ -666,10 +670,12 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& 
 	{
 		auto psoBucket = pipeline.second;
 		auto pso = psoBucket.PipelineStateObject;
+		// Set Pipeline. Defines the shaders and other pipeline states.
 		commandList->SetPipelineState(pso);
 		for (auto mat : psoBucket.Instances)
 		{
 			auto material = mat.second.Material;
+			// Set material textures start index. Typically has 4 textures per PBR material.
 			commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel1, frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + material.StartIndex));
 			for (auto meshes : mat.second.Instances)
 			{
@@ -678,6 +684,7 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& 
 				commandList->IASetIndexBuffer(&mesh.IndexBufferView);
 				for (uint32 cbIndex : meshes.second.CbIndices)
 				{
+					//Set constant buffer index for object being drawn in Vertex shader.
 					commandList->SetGraphicsRootDescriptorTable(RootSigCBVertex0, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + cbIndex));
 					DrawMesh(commandList, mesh);
 				}

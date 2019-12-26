@@ -14,7 +14,7 @@ class EditorSaveSystem : public ISystem
 public:
 	virtual void Initialize() override
 	{
-		//auto scene = LoadScene("scene.json");
+		//auto scene = LoadLevel("scene.json");
 	}
 
 	virtual void Update(float dt, float totalTime) override
@@ -49,7 +49,7 @@ private:
 		auto ec = EngineContext::Context;
 		auto meshes = ec->MeshManager->GetAllMeshNames();
 		auto models = ec->ModelManager->GetAllModelNames();
-		auto textures = ec->ShaderResourceManager->GetAllTextureNames();
+		auto textures = ec->ShaderResourceManager->GetAllTextures();
 		for (auto mesh : meshes)
 		{
 			resources.Meshes.push_back(mesh);

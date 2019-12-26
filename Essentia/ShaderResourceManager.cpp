@@ -135,10 +135,17 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	auto finish = uploadBatch.End(deviceResources->GetCommandQueue());
 	finish.wait();
 
+	auto desc = (*resource)->GetDesc();
+
 	TextureProperties properties = {};
 	properties.HasMips = generateMips;
-	properties.IsCubeMap = true;
-
+	properties.IsCubeMap = isCubeMap;
+	properties.Height = desc.Height;
+	properties.Width = (uint32)desc.Width;
+	properties.Format = desc.Format;
+	properties.Name = filename;
+	properties.TextureLoadType = texType;
+	
 	auto texIndex = textureCount;
 	textureCount++;
 	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
@@ -180,7 +187,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	}
 	else
 	{
-		auto viewDimension = D3D12_SRV_DIMENSION::D3D12_SRV_DIMENSION_TEXTURE2D;
+		auto viewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 		if (isCubeMap) viewDimension = D3D12_SRV_DIMENSION_TEXTURECUBE;
 
 		D3D12_SHADER_RESOURCE_VIEW_DESC descSRV = {};
@@ -199,7 +206,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	return texIndex;
 }
 
-TextureID ShaderResourceManager::CreateTexture2D(TextureProperties properties, ResourceID* outResourceId, const char* name, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState)
+TextureID ShaderResourceManager::CreateTexture2D(TextureCreateProperties properties, ResourceID* outResourceId, const char* name, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState)
 {
 	auto ec = EngineContext::Context;
 	auto resourceId = ec->ResourceManager->CreateResource(
@@ -314,9 +321,15 @@ std::string ShaderResourceManager::GetTextureName(TextureID textureId)
 	return textureNameMap[textureId];
 }
 
-std::vector<std::string> ShaderResourceManager::GetAllTextureNames()
+std::vector<TextureProperties> ShaderResourceManager::GetAllTextures()
 {
-	return textureFiles;
+	std::vector<TextureProperties> properties;
+	for (auto texProp : texturePropertiesMap)
+	{
+		properties.push_back(texProp.second);
+	}
+
+	return properties;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureGPUHandle(TextureID texID)

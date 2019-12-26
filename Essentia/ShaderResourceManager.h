@@ -11,20 +11,43 @@ struct Default
 	static TextureID			DefaultNormals;
 	static TextureID			DefaultRoughness;
 	static TextureID			DefaultMetalness;
-	static PipelineStateID	DefaultMaterialPSO;
+	static PipelineStateID		DefaultMaterialPSO;
 };
 
 class DeviceResources;
 class ResourceManager;
 class FrameManager;
 
+struct TextureCreateProperties
+{
+	uint32		Width;
+	uint32		Height;
+	DXGI_FORMAT Format;
+};
+
 struct TextureProperties
 {
+	std::string Name;
 	uint32		Width;
 	uint32		Height;
 	DXGI_FORMAT Format;
 	bool		IsCubeMap;
 	bool		HasMips;
+	TextureType	TextureLoadType;
+
+	template<typename Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(Name),
+			CEREAL_NVP(Width),
+			CEREAL_NVP(Height),
+			CEREAL_NVP(Format),
+			CEREAL_NVP(IsCubeMap),
+			CEREAL_NVP(HasMips),
+			CEREAL_NVP(TextureLoadType)
+		);
+	}
 };
 
 class ShaderResourceManager
@@ -36,13 +59,13 @@ public:
 	GPUHeapOffsets				CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
 	TextureID					CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
 	TextureID					CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN);
-	TextureID					CreateTexture2D(TextureProperties properties, 
-												ResourceID* outResourceId = nullptr,
-												const char* name = nullptr, 
-												D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET, 
-												D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TextureID					CreateTexture2D(TextureCreateProperties properties,
+		ResourceID* outResourceId = nullptr,
+		const char* name = nullptr,
+		D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	MaterialHandle				CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
-	
+
 	void						CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
 	D3D12_GPU_DESCRIPTOR_HANDLE	AllocateTextures(TextureID* textures, uint32 textureCount, uint32 frameIndex, FrameManager* frameManager);
 
@@ -56,7 +79,7 @@ public:
 	std::string					GetTextureName(TextureID textureId);
 
 	//Will only return textures created via files.
-	std::vector<std::string>	GetAllTextureNames(); 
+	std::vector<TextureProperties>	GetAllTextures();
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
@@ -66,8 +89,8 @@ private:
 	DescriptorHeap			textureHeap;
 	DescriptorHeap			materialHeap;
 
-	ResourceManager*		resourceManager = nullptr;
-	DeviceResources*		deviceResources = nullptr;
+	ResourceManager* resourceManager = nullptr;
+	DeviceResources* deviceResources = nullptr;
 
 	uint32					constantBufferCount = 0;
 	uint32					textureCount = 0;

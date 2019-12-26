@@ -28,11 +28,13 @@ void Game::Setup()
 	coreSystemsManager.RegisterSystem<EditorSaveSystem>();
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
 
+	// Initialize renderer and core systems. gameSystemsManager is initialized through external invocation.
 	renderer->Initialize();
 	renderer->EndInitialization();
 	coreSystemsManager.Initialize();
 
-	LoadScene("../../Scene/scene.json");
+	// This function also loads resources(textures, meshes) along with the scene entities.
+	LoadLevel("../../Scene/scene.json"); 
 	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();

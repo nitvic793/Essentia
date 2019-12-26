@@ -64,7 +64,7 @@ struct MaterialInterface
 
 struct ResourcePack
 {
-	std::vector<std::string> Textures;
+	std::vector<TextureProperties> Textures;
 	std::vector<std::string> CubeMaps;
 	std::vector<std::string> Meshes;
 	std::vector<std::string> Models;
@@ -92,15 +92,7 @@ struct ResourcePack
 
 		for (auto texture : Textures)
 		{
-			std::transform(texture.begin(), texture.end(), texture.begin(),
-				[](unsigned char c) { return std::tolower(c); });
-			TextureType type = TextureType::WIC;
-			if (String::HasSuffix(texture, ".dds"))
-			{
-				type = TextureType::DDS;
-			}
-
-			//es::CreateTexture(texture, type);
+			es::CreateTexture(texture.Name, texture.TextureLoadType, texture.HasMips);
 		}
 
 		for (auto mesh : Meshes)
@@ -141,6 +133,7 @@ void Visit(DirectionalLightComponent* component, IVisitor* visitor);
 void Visit(DrawableComponent* component, IVisitor* visitor);
 void Visit(DrawableModelComponent* component, IVisitor* visitor);
 void Visit(SkyboxComponent* component, IVisitor* visitor);
+void Visit(SelectedComponent* component, IVisitor* visitor);
 
 
 

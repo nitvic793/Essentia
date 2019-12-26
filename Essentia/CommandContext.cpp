@@ -129,6 +129,8 @@ void CommandContext::WaitForFrame(uint32 index)
 void CommandContext::WaitForGPU(uint32 backBufferIndex)
 {
 	auto commandQueue = deviceResources->GetCommandQueue();
+
+	// Signal command queue to update fence to given fence value. 
 	if (SUCCEEDED(commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex])))
 	{
 		auto hr = fences[backBufferIndex]->SetEventOnCompletion(fenceValues[backBufferIndex], fenceEvent);

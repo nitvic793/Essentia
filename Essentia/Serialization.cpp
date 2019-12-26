@@ -16,9 +16,10 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<DrawableComponent>();
 	GComponentReflector.RegisterComponent<DrawableModelComponent>();
 	GComponentReflector.RegisterComponent<SkyboxComponent>();
+	GComponentReflector.RegisterComponent<SelectedComponent>();
 }
 
-Scene LoadScene(const char* fname)
+Scene LoadLevel(const char* fname)
 {
 	Scene scene = {};
 	std::ifstream file(fname);
@@ -105,5 +106,9 @@ void Visit(DrawableModelComponent* component, IVisitor* visitor)
 }
 
 void Visit(SkyboxComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(SelectedComponent* component, IVisitor* visitor)
 {
 }
