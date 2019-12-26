@@ -116,7 +116,7 @@ struct IDrawable : public IComponent {};
 struct DrawableComponent : public IDrawable
 {
 	GComponent(DrawableComponent)
-	MeshHandle			Mesh;
+		MeshHandle			Mesh;
 	MaterialHandle		Material;
 	ConstantBufferView	CBView;
 	DirectX::XMFLOAT4X4 WorldViewProjection;
@@ -148,7 +148,7 @@ struct DrawableComponent : public IDrawable
 		std::string MaterialName;
 		archive(CEREAL_NVP(MeshName), CEREAL_NVP(MaterialName));
 		auto comp = Create(
-			ec->MeshManager->GetMeshHandle(MeshName.c_str()), 
+			ec->MeshManager->GetMeshHandle(MeshName.c_str()),
 			ec->ShaderResourceManager->GetMaterialHandle(MaterialName.c_str())
 		);
 		*this = comp;
@@ -159,7 +159,7 @@ struct DrawableComponent : public IDrawable
 struct DrawableModelComponent : public IDrawable
 {
 	GComponent(DrawableModelComponent)
-	ModelHandle			Model;
+		ModelHandle			Model;
 	ConstantBufferView	CBView;
 	DirectX::XMFLOAT4X4 WorldViewProjection;
 	DirectX::XMFLOAT4X4 PrevWorldViewProjection;
@@ -198,7 +198,7 @@ struct DirectionalLightComponent : public ILight
 {
 	GComponent(DirectionalLightComponent)
 
-	DirectX::XMFLOAT3	Color;
+		DirectX::XMFLOAT3	Color;
 	float				Intensity;
 	DirectX::XMFLOAT3	Direction;
 	float				Padding;
@@ -217,7 +217,7 @@ struct DirectionalLightComponent : public ILight
 		return { Direction, 0, Color, Intensity };
 	}
 
-	template<class Archive> 
+	template<class Archive>
 	void save(Archive& archive) const
 	{
 		Vector3 Color(this->Color);
@@ -293,10 +293,79 @@ struct PointLightComponent : public ILight
 	GComponent(PointLightComponent)
 };
 
+struct SpotLightComponent : public ILight
+{
+	DirectX::XMFLOAT3	Color;
+	float				Intensity;
+	float				Range;
+	DirectX::XMFLOAT3	Direction;
+	float				SpotFalloff;
+
+	static SpotLightComponent Create(
+		const DirectX::XMFLOAT3& direction,
+		const DirectX::XMFLOAT3& color = DirectX::XMFLOAT3(1, 1, 1),
+		float intensity = 1.f,
+		float range = 5.f,
+		float spotFalloff = 10.f
+	)
+	{
+		SpotLightComponent light;
+		light.Direction = direction;
+		light.Color = color;
+		light.Range = range;
+		light.Intensity = intensity;
+		light.SpotFalloff = spotFalloff;
+		return light;
+	}
+
+	SpotLight GetLight()
+	{
+		return { Color, Intensity, {}, Range, Direction, SpotFalloff };
+	}
+
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+		Vector3 Color(this->Color);
+		Vector3 Direction(this->Direction);
+		archive(
+			CEREAL_NVP(Color),
+			CEREAL_NVP(Intensity),
+			CEREAL_NVP(Range),
+			CEREAL_NVP(Direction),
+			CEREAL_NVP(SpotFalloff)
+		);
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+		Vector3 Color;
+		Vector3 Direction;
+		archive(
+			CEREAL_NVP(Color),
+			CEREAL_NVP(Intensity),
+			CEREAL_NVP(Range),
+			CEREAL_NVP(Direction),
+			CEREAL_NVP(SpotFalloff)
+		);
+
+		*this = Create(
+			(DirectX::XMFLOAT3)Direction,
+			(DirectX::XMFLOAT3)Color,
+			Intensity,
+			Range,
+			SpotFalloff
+		);
+	};
+
+	GComponent(SpotLightComponent)
+};
+
 struct SkyboxComponent : public IComponent
 {
 	GComponent(SkyboxComponent)
-	TextureID			CubeMap;
+		TextureID			CubeMap;
 	ConstantBufferView	CBView;
 
 	static SkyboxComponent Create(const char* skyboxFileName, TextureType type = DDS)

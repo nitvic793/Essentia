@@ -9,12 +9,6 @@ class RotationSystem : public ISystem
 public:
 	virtual void Initialize()
 	{
-		entity = { 0 };
-		entity2 = { 1 };
-		auto e = { 2 };
-		lights[0] = { 3 };
-		lights[1] = { 4 };
-		skybox = { 5 };
 		cManager = entityManager->GetComponentManager();
 	}
 
@@ -26,8 +20,8 @@ public:
 		transform.Rotation->y = totalTime / 2;
 		transform.Position->x = 2 * sin(totalTime * 2);
 		transform.Position->y = 1;
-		transform = GetTransform(entities[1]);
 
+		transform = GetTransform(entities[1]);
 		float speed = totalTime / 5;
 		transform.Rotation->x = speed;
 		transform.Rotation->y = speed;
@@ -36,17 +30,15 @@ public:
 		entities = cManager->GetEntities<PointLightComponent>();
 		for (auto e : entities)
 		{
-			float factor = abs(sin(totalTime));
+			transform = GetTransform(e);
+			transform.Position->z = 10 * sin(totalTime);
+			float factor = abs(cos(totalTime));
 			auto component = cManager->GetComponent<PointLightComponent>(e);
-			component->Intensity = factor * 30.f;
-			component->Range = factor * 30.f;
+			component->Intensity = 1 + factor * 2.f;
+			component->Range = 2 + factor * 8.f;
 		}
 	}
 
 private:
 	ComponentManager* cManager;
-	EntityHandle entity;
-	EntityHandle entity2;
-	EntityHandle lights[2];
-	EntityHandle skybox;
 };

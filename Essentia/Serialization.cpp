@@ -12,6 +12,7 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<ScaleComponent>();
 	GComponentReflector.RegisterComponent<RotationComponent>();
 	GComponentReflector.RegisterComponent<PointLightComponent>();
+	GComponentReflector.RegisterComponent<SpotLightComponent>();
 	GComponentReflector.RegisterComponent<DirectionalLightComponent>();
 	GComponentReflector.RegisterComponent<DrawableComponent>();
 	GComponentReflector.RegisterComponent<DrawableModelComponent>();
@@ -87,6 +88,17 @@ void Visit(PointLightComponent* component, IVisitor* visitor)
 	visitor->Visit(name, MField(comp, Color));
 	visitor->Visit(name, MField(comp, Range));
 	visitor->Visit(name, MField(comp, Intensity));
+}
+
+void Visit(SpotLightComponent* component, IVisitor* visitor)
+{
+	auto comp = component;
+	auto name = comp->GetName();
+	visitor->Visit(name, MField(comp, Color));
+	visitor->Visit(name, MField(comp, Range));
+	visitor->Visit(name, MField(comp, Intensity));
+	visitor->Visit(name, MField(comp, Direction));
+	visitor->Visit(name, MField(comp, SpotFalloff));
 }
 
 void Visit(DirectionalLightComponent* component, IVisitor* visitor)

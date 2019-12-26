@@ -5,7 +5,9 @@ cbuffer LightBuffer : register(b0)
 {
 	DirectionalLight	DirLight;
 	PointLight			PointLights;
+	SpotLight			SpotLights;
 	float3				CameraPosition;
+	float				Padding;
 }
 
 sampler		BasicSampler		: register(s0);
@@ -71,7 +73,7 @@ float4 main(PixelInput input) : SV_TARGET
 
 	finalColor += PointLightPBR(PointLights, normalize(normal), worldPos, CameraPosition, roughness, metal, texColor.rgb, specColor, irradiance);
 
-	float3 light = CalculateDirectionalLight(normal, DirLight) + CalculatePointLight(normal, CameraPosition, input.WorldPos, PointLights);
+	finalColor += SpotLightPBR(SpotLights, normalize(normal), worldPos, CameraPosition, roughness, metal, texColor.rgb, specColor);
 	
 	clip(texColor.a - 0.2f);
 	

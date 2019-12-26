@@ -129,6 +129,7 @@ void Visit(PositionComponent* component, IVisitor* visitor);
 void Visit(RotationComponent* component, IVisitor* visitor);
 void Visit(ScaleComponent* component, IVisitor* visitor);
 void Visit(PointLightComponent* component, IVisitor* visitor);
+void Visit(SpotLightComponent* component, IVisitor* visitor);
 void Visit(DirectionalLightComponent* component, IVisitor* visitor);
 void Visit(DrawableComponent* component, IVisitor* visitor);
 void Visit(DrawableModelComponent* component, IVisitor* visitor);

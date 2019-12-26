@@ -14,6 +14,16 @@ struct PointLight
 	float	Range;
 };
 
+struct SpotLight
+{
+	float3	Color;
+	float	Intensity;
+	float3	Position;
+	float	Range;
+	float3	Direction;
+	float	SpotFalloff;
+};
+
 float Attenuate(float3 position, float range, float3 worldPos)
 {
 	float dist = distance(position, worldPos);
@@ -165,4 +175,27 @@ float3 PointLightPBR(PointLight light, float3 normal, float3 worldPos, float3 ca
 	float3 balancedDiff = DiffuseEnergyConserve(diff, spec, metalness);
 
 	return (balancedDiff * surfaceColor + spec) * atten * 1 * light.Intensity * light.Color.rgb;// +ambient;
+}
+
+float3 SpotLightPBR(SpotLight light, float3 normal, float3 worldPos, float3 camPos,
+	float roughness, float metalness, float3 surfaceColor, float3 specularColor)
+{
+
+	float3 kS = float3(0.f, 0.f, 0.f);
+	float ao = 1.0f;
+	float3 toLight = normalize(light.Position - worldPos);
+	float3 toCam = normalize(camPos - worldPos);
+	float a = dot(-toLight, normalize(light.Direction));
+	float b = saturate(a);
+
+	float penumbra = pow(b, light.SpotFalloff);
+
+	float atten = Attenuate(light.Position, light.Range, worldPos);
+	float diff = DiffusePBR(normal, toLight);
+	float3 spec = MicrofacetBRDF(normal, toLight, toCam, roughness, metalness, specularColor, kS);
+
+	float3 balancedDiff = DiffuseEnergyConserve(diff, spec, metalness);
+	float3 final = (balancedDiff * surfaceColor + spec) * atten * light.Intensity * light.Color.rgb;
+	final = final * penumbra;
+	return final;
 }

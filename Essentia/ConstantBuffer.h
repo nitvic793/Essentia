@@ -28,9 +28,21 @@ struct PointLight
 	float				Range;
 };
 
+struct SpotLight
+{
+	DirectX::XMFLOAT3	Color;
+	float				Intensity;
+	DirectX::XMFLOAT3	Position;
+	float				Range;
+	DirectX::XMFLOAT3	Direction;
+	float				SpotFalloff;
+};
+
 struct LightBuffer
 {
 	DirectionalLight	DirLight;
 	PointLight			PointLight;
+	SpotLight			SpotLight;
 	DirectX::XMFLOAT3	CameraPosition;
+	float				Padding;
 };

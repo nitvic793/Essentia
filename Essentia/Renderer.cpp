@@ -824,8 +824,10 @@ void Renderer::UpdateLightBuffer()
 	auto ec = EngineContext::Context;
 	uint32 dirLightCount = 0;
 	uint32 pointLightCount = 0;
+	uint32 spotLightCount = 0;
 	auto dirLights = ec->EntityManager->GetComponents<DirectionalLightComponent>(dirLightCount);
 	auto pointLights = ec->EntityManager->GetComponents<PointLightComponent>(pointLightCount);
+	auto spotLights = ec->EntityManager->GetComponents<SpotLightComponent>(spotLightCount);
 	lightBuffer.DirLight = dirLights[0].GetLight();
 
 	auto entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
@@ -833,5 +835,12 @@ void Renderer::UpdateLightBuffer()
 	{
 		lightBuffer.PointLight = pointLights[0].GetLight();
 		lightBuffer.PointLight.Position = *ec->EntityManager->GetTransform(entities[0]).Position;
+	}
+
+	entities = ec->EntityManager->GetEntities<SpotLightComponent>(spotLightCount);
+	if (spotLightCount > 0)
+	{
+		lightBuffer.SpotLight = spotLights[0].GetLight();
+		lightBuffer.SpotLight.Position = (DirectX::XMFLOAT3)*ec->EntityManager->GetComponent<PositionComponent>(entities[0]);
 	}
 }
