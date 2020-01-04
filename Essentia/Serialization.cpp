@@ -107,6 +107,7 @@ void Visit(DirectionalLightComponent* component, IVisitor* visitor)
 	auto name = comp->GetName();
 	visitor->Visit(name, MField(comp, Color));
 	visitor->Visit(name, MField(comp, Intensity));
+	visitor->Visit(name, MField(comp, Direction));
 }
 
 void Visit(DrawableComponent* component, IVisitor* visitor)

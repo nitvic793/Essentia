@@ -221,7 +221,7 @@
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
     <ClCompile Include="StringHash.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Utility</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -399,19 +399,19 @@
     <ClInclude Include="DepthOnlyStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CMath.h">
       <Filter>Header Files\Math</Filter>
     </ClInclude>
     <ClInclude Include="Utility.h">
       <Filter>Header Files\DataStructures</Filter>
     </ClInclude>
-    <ClInclude Include="ComponentReflector.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="StringHash.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentReflector.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>

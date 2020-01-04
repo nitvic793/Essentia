@@ -110,8 +110,8 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 
 	context->SubmitCommands(commandList.Get());
 	context->WaitForFrame();
-	BoundingOrientedBox meshBounds;
-	BoundingOrientedBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)meshData.Vertices.data(), sizeof(Vertex));
+	BoundingBox meshBounds;
+	BoundingBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)&meshData.Vertices.data()->Position, sizeof(Vertex));
 
 	meshView.MeshEntries = meshData.MeshEntries;
 	bounds.push_back(meshBounds);
@@ -156,7 +156,7 @@ MeshHandle MeshManager::GetMeshHandle(const char* filename)
 	return { meshMap[strId] };
 }
 
-const DirectX::BoundingOrientedBox& MeshManager::GetBoundingBox(MeshHandle handle)
+const DirectX::BoundingBox& MeshManager::GetBoundingBox(MeshHandle handle)
 {
 	return bounds[handle.Id];
 }
@@ -221,6 +221,13 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 		model.Materials.push_back(materialHandle);
 	}
 
+	auto meshView = EngineContext::Context->MeshManager->GetMeshView(model.Mesh);
+	for (auto entry : meshView.MeshEntries)
+	{
+		BoundingBox meshBounds;
+		BoundingBox::CreateFromPoints(meshBounds, entry.NumIndices, (const XMFLOAT3*)&(modelData.MeshData.Vertices.data() + entry.NumIndices)->Position, sizeof(Vertex));
+		model.Bounds.push_back(meshBounds);
+	}
 	models.push_back(model);
 	modelNameMap[modelHandle.Id] = filename;
 	modelMap[stringID] = modelHandle;

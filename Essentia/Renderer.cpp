@@ -145,9 +145,9 @@ void Renderer::Initialize()
 	lightBuffer.PointLight.Range = 5.f;
 	lightBuffer.PointLight.Intensity = 2.f;
 
-	for (auto& stageSegement : renderStages)
+	for (auto& stageSegment : renderStages)
 	{
-		for (auto& stage : stageSegement.second)
+		for (auto& stage : stageSegment.second)
 			stage->Initialize();
 	}
 
@@ -271,6 +271,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto rtId = renderTargets[backBufferIndex];
 	auto hdrRtId = hdrRenderTargets[backBufferIndex];
 	auto commandList = commandContext->GetDefaultCommandList();
+	
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);

@@ -47,7 +47,7 @@ public:
 	const MeshView&								GetMeshView(MeshHandle handle);
 	const MeshView&								GetMeshView(const char* filename); //WARNING: Lazy loads the mesh
 	MeshHandle									GetMeshHandle(const char* filename); //WARNING: Lazy loads the mesh
-	const DirectX::BoundingOrientedBox&			GetBoundingBox(MeshHandle handle);
+	const DirectX::BoundingBox&					GetBoundingBox(MeshHandle handle);
 	std::string									GetName(MeshHandle handle);
 	std::vector<std::string>					GetAllMeshNames();
 private:
@@ -56,7 +56,7 @@ private:
 	std::vector<MeshData>						meshes; 
 	std::vector<MeshBuffer>						buffers;
 	std::vector<MeshView>						views;
-	std::vector<DirectX::BoundingOrientedBox>	bounds;
+	std::vector<DirectX::BoundingBox>			bounds;
 	std::unordered_map<StringID, uint32>		meshMap;
 	std::unordered_map<uint32, std::string>		meshNameMap;
 	friend class Renderer;
@@ -69,8 +69,9 @@ union ModelHandle
 
 struct Model
 {
-	MeshHandle					Mesh;
-	std::vector<MaterialHandle> Materials;
+	MeshHandle							Mesh;
+	std::vector<MaterialHandle>			Materials;
+	std::vector<DirectX::BoundingBox>	Bounds;
 };
 
 class ModelManager
