@@ -69,7 +69,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -87,6 +92,11 @@
       <AdditionalLibraryDirectories>E:\Graphics\Essentia\packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy $(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release $(TargetDir) /K /D /H /Y
+xcopy $(SolutionDir)Assets $(TargetDir)\Assets /K /D /H /Y /s /i
+xcopy $(SolutionDir)Scene $(TargetDir) /K /D /H /Y /s /i</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -138,7 +148,9 @@
       <AdditionalLibraryDirectories>E:\Graphics\Essentia\packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy $(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release x64\Release /K /D /H /Y</Command>
+      <Command>xcopy $(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release $(TargetDir) /K /D /H /Y
+xcopy $(SolutionDir)Assets $(TargetDir)\Assets /K /D /H /Y /s /i
+xcopy $(SolutionDir)Scene $(TargetDir) /K /D /H /Y /s /i</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

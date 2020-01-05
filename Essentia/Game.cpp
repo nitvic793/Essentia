@@ -34,7 +34,7 @@ void Game::Setup()
 	coreSystemsManager.Initialize();
 
 	// This function also loads resources(textures, meshes) along with the scene entities.
-	LoadLevel("../../Scene/scene.json"); 
+	LoadLevel("scene.json"); 
 	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();

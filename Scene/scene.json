@@ -561,7 +561,565 @@
                     "TextureLoadType": 1
                 },
                 {
-                    "Name": "../../Assets/Textures/SunnyCubeMap.dds",
+                    "Name": "Assets/Textures/floor_albedo.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/floor_normals.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/defaultRoughness.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/defaultMetal.png",
+                    "Width": 128,
+                    "Height": 128,
+                    "Format": 29,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/floor_roughness.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/floor_metal.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/IBL/envDiffuseHDR.dds",
+                    "Width": 256,
+                    "Height": 256,
+                    "Format": 2,
+                    "IsCubeMap": true,
+                    "HasMips": false,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/IBL/envBrdf.dds",
+                    "Width": 256,
+                    "Height": 256,
+                    "Format": 2,
+                    "IsCubeMap": false,
+                    "HasMips": false,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/IBL/envSpecularHDR.dds",
+                    "Width": 512,
+                    "Height": 512,
+                    "Format": 2,
+                    "IsCubeMap": true,
+                    "HasMips": false,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Thorn_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Thorn_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Dielectric_metallic.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/VasePlant_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/VasePlant_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/VaseRound_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/VaseRound_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Background_Albedo.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Background_Normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Bricks_a_Albedo.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Bricks_a_Normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Arch_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Arch_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Ceiling_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Ceiling_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Column_a_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Column_a_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Floor_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Floor_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Column_c_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Column_c_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Details_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Details_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Column_b_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Column_b_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_FlagPole_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_FlagPole_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Metallic_metallic.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_Green_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_Green_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_metallic.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_Blue_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_Blue_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_Red_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Fabric_Red_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_Blue_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_Blue_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_metallic.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_Red_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_Red_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_Green_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Curtain_Green_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/ChainTexture_Albedo.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/ChainTexture_Normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/ChainTexture_Metallic.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/VaseHanging_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/VaseHanging_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Vase_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Vase_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Lion_Albedo.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Lion_Normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Roof_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Sponza_Roof_normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 87,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/SunnyCubeMap.dds",
                     "Width": 1024,
                     "Height": 1024,
                     "Format": 87,
@@ -573,10 +1131,13 @@
             "CubeMaps": [],
             "Meshes": [
                 "../../Assets/Models/cube.obj",
-                "../../Assets/Models/sphere.obj"
+                "../../Assets/Models/sphere.obj",
+                "Assets/Models/cube.obj",
+                "Assets/Models/sphere.obj"
             ],
             "Models": [
-                "../../Assets/Models/Sponza.fbx"
+                "../../Assets/Models/Sponza.fbx",
+                "Assets/Models/Sponza.fbx"
             ]
         },
         "Entities": [
@@ -591,13 +1152,13 @@
                     "DrawableComponent"
                 ],
                 "PositionComponent": {
-                    "X": 0.9923573732376099,
+                    "X": 0.7205236554145813,
                     "Y": 1.0,
                     "Z": 0.4000000059604645
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 14.26696491241455,
+                    "Y": 0.6932610273361206,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -606,7 +1167,7 @@
                     "Z": 1.0
                 },
                 "DrawableComponent": {
-                    "MeshName": "../../Assets/Models/sphere.obj",
+                    "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
                 }
             },
@@ -622,12 +1183,12 @@
                 ],
                 "PositionComponent": {
                     "X": 0.0,
-                    "Y": 4.033506393432617,
+                    "Y": 5.183233261108398,
                     "Z": 5.0
                 },
                 "RotationComponent": {
-                    "X": 5.706786155700684,
-                    "Y": 5.706786155700684,
+                    "X": 0.27730441093444826,
+                    "Y": 0.27730441093444826,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -636,7 +1197,7 @@
                     "Z": 1.0
                 },
                 "DrawableComponent": {
-                    "MeshName": "../../Assets/Models/cube.obj",
+                    "MeshName": "Assets/Models/cube.obj",
                     "MaterialName": "0"
                 }
             },
@@ -666,7 +1227,7 @@
                     "Z": 0.05000000074505806
                 },
                 "DrawableModelComponent": {
-                    "ModelName": "../../Assets/Models/Sponza.fbx"
+                    "ModelName": "Assets/Models/Sponza.fbx"
                 }
             },
             {
@@ -726,13 +1287,13 @@
                         "Y": 0.10000000149011612,
                         "Z": 0.10000000149011612
                     },
-                    "Intensity": 2.932987689971924,
-                    "Range": 9.731950759887696
+                    "Intensity": 1.3664662837982178,
+                    "Range": 3.465865135192871
                 },
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 3.0,
-                    "Z": -2.5669004917144777
+                    "Z": 9.830695152282715
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -756,7 +1317,7 @@
                     "ScaleComponent"
                 ],
                 "SkyboxComponent": {
-                    "CubeMapName": "../../Assets/Textures/SunnyCubeMap.dds"
+                    "CubeMapName": "Assets/Textures/SunnyCubeMap.dds"
                 },
                 "PositionComponent": {
                     "X": 0.0,
@@ -831,13 +1392,13 @@
                         "Y": 0.8578431606292725,
                         "Z": 0.23128125071525575
                     },
-                    "Intensity": 2.932987689971924,
-                    "Range": 9.731950759887696
+                    "Intensity": 1.3664662837982178,
+                    "Range": 3.465865135192871
                 },
                 "PositionComponent": {
                     "X": -6.650000095367432,
                     "Y": 3.0,
-                    "Z": -2.5669004917144777
+                    "Z": 9.830695152282715
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -866,13 +1427,13 @@
                         "Y": 0.5578431487083435,
                         "Z": 0.9312812685966492
                     },
-                    "Intensity": 2.932987689971924,
-                    "Range": 9.731950759887696
+                    "Intensity": 1.3664662837982178,
+                    "Range": 3.465865135192871
                 },
                 "PositionComponent": {
                     "X": -15.300000190734864,
                     "Y": 3.0,
-                    "Z": -2.5669004917144777
+                    "Z": 9.830695152282715
                 },
                 "RotationComponent": {
                     "X": 0.0,
