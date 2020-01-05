@@ -226,6 +226,9 @@
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DebugDrawStage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -419,6 +422,9 @@
     </ClInclude>
     <ClInclude Include="DebugDraw.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDrawStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -168,6 +168,7 @@
     <ClCompile Include="Component.cpp" />
     <ClCompile Include="ComponentFactory.cpp" />
     <ClCompile Include="DebugDraw.cpp" />
+    <ClCompile Include="DebugDrawStage.cpp" />
     <ClCompile Include="DepthOnlyStage.cpp" />
     <ClCompile Include="PipelineStates.cpp" />
     <ClCompile Include="PostProcess.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="ComponentFactory.h" />
     <ClInclude Include="ComponentReflector.h" />
     <ClInclude Include="DebugDraw.h" />
+    <ClInclude Include="DebugDrawStage.h" />
     <ClInclude Include="DepthOnlyStage.h" />
     <ClInclude Include="CMath.h" />
     <ClInclude Include="PipelineStates.h" />

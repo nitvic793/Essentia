@@ -1,4 +1,9 @@
 
+#define CMaxDirLights 4
+#define CMaxPointLights 64
+#define CMaxSpotLights 16
+#define CPrimaryDirLight 0
+
 struct DirectionalLight
 {
 	float3 Direction;

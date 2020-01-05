@@ -4,6 +4,7 @@
 #include "Renderer.h"
 
 EngineContext* EngineContext::Context = nullptr;
+EngineContext* GContext = nullptr;
 
 EntityHandle es::CreateEntity(const Transform& transform)
 {

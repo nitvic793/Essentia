@@ -29,7 +29,7 @@ constexpr uint32 CFrameBufferCount = 3;
 constexpr uint32 CFrameMaxDescriptorHeapCount = 2048;
 constexpr uint32 CMaxTextureCount = 512;
 constexpr uint32 CMaxConstantBufferCount = 512;
-constexpr uint64 CMaxConstantBufferSize = 1024 * 4; //4KB
+constexpr uint64 CMaxConstantBufferSize = 1024 * 256; //256KB
 
 constexpr uint32 CMaxD3DResources = 1024;
 constexpr uint32 CMaxPipelineStates = 96;

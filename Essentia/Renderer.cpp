@@ -24,6 +24,7 @@
 #include "PostProcessMotionBlur.h"
 #include "PostProcessDepthOfFieldStage.h"
 #include "PostProcessToneMap.h"
+#include "DebugDrawStage.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -127,8 +128,10 @@ void Renderer::Initialize()
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
 
+
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
+	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<DebugDrawStage>()));
 
 	postProcessStages.Reserve(32);
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
@@ -136,14 +139,6 @@ void Renderer::Initialize()
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessMotionBlur>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessToneMap>()));
-
-	auto dir = XMVector3Normalize(XMVectorSet(1, -1, 1, 0));
-	XMStoreFloat3(&lightBuffer.DirLight.Direction, dir);
-	lightBuffer.DirLight.Color = XMFLOAT3(0.9f, 0.9f, 0.9f);
-	lightBuffer.PointLight.Color = XMFLOAT3(0.9f, 0.1f, 0.1f);
-	lightBuffer.PointLight.Position = XMFLOAT3(2.9f, 0.1f, 0.1f);
-	lightBuffer.PointLight.Range = 5.f;
-	lightBuffer.PointLight.Intensity = 2.f;
 
 	for (auto& stageSegment : renderStages)
 	{
@@ -271,7 +266,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto rtId = renderTargets[backBufferIndex];
 	auto hdrRtId = hdrRenderTargets[backBufferIndex];
 	auto commandList = commandContext->GetDefaultCommandList();
-	
+
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
@@ -829,19 +824,29 @@ void Renderer::UpdateLightBuffer()
 	auto dirLights = ec->EntityManager->GetComponents<DirectionalLightComponent>(dirLightCount);
 	auto pointLights = ec->EntityManager->GetComponents<PointLightComponent>(pointLightCount);
 	auto spotLights = ec->EntityManager->GetComponents<SpotLightComponent>(spotLightCount);
-	lightBuffer.DirLight = dirLights[0].GetLight();
+	lightBuffer.DirLightCount = dirLightCount;
+	lightBuffer.DirLights[0] = dirLights[0].GetLight();
 
 	auto entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
+	lightBuffer.PointLightCount = pointLightCount;
 	if (pointLightCount > 0)
 	{
-		lightBuffer.PointLight = pointLights[0].GetLight();
-		lightBuffer.PointLight.Position = *ec->EntityManager->GetTransform(entities[0]).Position;
+		for (uint32 i = 0; i < pointLightCount; ++i)
+		{
+			lightBuffer.PointLights[i] = pointLights[i].GetLight();
+			lightBuffer.PointLights[i].Position = *ec->EntityManager->GetTransform(entities[i]).Position;
+		}
 	}
 
 	entities = ec->EntityManager->GetEntities<SpotLightComponent>(spotLightCount);
+	lightBuffer.SpotLightCount = spotLightCount;
 	if (spotLightCount > 0)
 	{
-		lightBuffer.SpotLight = spotLights[0].GetLight();
-		lightBuffer.SpotLight.Position = (DirectX::XMFLOAT3)*ec->EntityManager->GetComponent<PositionComponent>(entities[0]);
+		for (uint32 i = 0; i < spotLightCount; ++i)
+		{
+			lightBuffer.SpotLights[i] = spotLights[i].GetLight();
+			lightBuffer.SpotLights[i].Position = (DirectX::XMFLOAT3) * ec->EntityManager->GetComponent<PositionComponent>(entities[i]);
+		}
+
 	}
 }

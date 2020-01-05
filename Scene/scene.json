@@ -591,13 +591,13 @@
                     "DrawableComponent"
                 ],
                 "PositionComponent": {
-                    "X": 0.15498711168766023,
+                    "X": -1.5927051305770875,
                     "Y": 1.0,
-                    "Z": 0.0
+                    "Z": 0.4000000059604645
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 72.2760238647461,
+                    "Y": 8.86968994140625,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -622,12 +622,12 @@
                 ],
                 "PositionComponent": {
                     "X": 0.0,
-                    "Y": 5.999248027801514,
+                    "Y": 5.4445037841796879,
                     "Z": 5.0
                 },
                 "RotationComponent": {
-                    "X": 28.910409927368165,
-                    "Y": 28.910409927368165,
+                    "X": 3.5478758811950685,
+                    "Y": 3.5478758811950685,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -724,13 +724,13 @@
                         "Y": 0.10000000149011612,
                         "Z": 0.10000000149011612
                     },
-                    "Intensity": 2.9984958171844484,
-                    "Range": 9.993983268737793
+                    "Intensity": 1.8890076875686646,
+                    "Range": 5.556030750274658
                 },
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 3.0,
-                    "Z": 0.38775938749313357
+                    "Z": -8.957769393920899
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -780,8 +780,7 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "SpotLightComponent",
-                    "SelectedComponent"
+                    "SpotLightComponent"
                 ],
                 "PositionComponent": {
                     "X": 16.799999237060548,
@@ -812,6 +811,79 @@
                         "Z": 3.5
                     },
                     "SpotFalloff": 41.29999923706055
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 7
+                },
+                "Components": [
+                    "PointLightComponent",
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "SelectedComponent"
+                ],
+                "PointLightComponent": {
+                    "Color": {
+                        "X": 0.7657010555267334,
+                        "Y": 0.8578431606292725,
+                        "Z": 0.23128125071525575
+                    },
+                    "Intensity": 1.8890076875686646,
+                    "Range": 5.556030750274658
+                },
+                "PositionComponent": {
+                    "X": -6.650000095367432,
+                    "Y": 3.0,
+                    "Z": -8.957769393920899
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "SelectedComponent": {}
+            },
+            {
+                "Entity": {
+                    "entity.ID": 8
+                },
+                "Components": [
+                    "PointLightComponent",
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "SelectedComponent"
+                ],
+                "PointLightComponent": {
+                    "Color": {
+                        "X": 0.7657010555267334,
+                        "Y": 0.5578431606292725,
+                        "Z": 0.93128125071525575
+                    },
+                    "Intensity": 1.8890076875686646,
+                    "Range": 5.556030750274658
+                },
+                "PositionComponent": {
+                    "X": -6.650000095367432,
+                    "Y": 3.0,
+                    "Z": -12.957769393920899
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
                 },
                 "SelectedComponent": {}
             }

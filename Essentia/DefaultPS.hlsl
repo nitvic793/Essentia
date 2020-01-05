@@ -3,24 +3,28 @@
 
 cbuffer LightBuffer : register(b0)
 {
-	DirectionalLight	DirLight;
-	PointLight			PointLights;
-	SpotLight			SpotLights;
-	float3				CameraPosition;
-	float				Padding;
+	DirectionalLight DirLights[CMaxDirLights];
+	PointLight PointLights[CMaxPointLights];
+	SpotLight SpotLights[CMaxSpotLights];
+	float3 CameraPosition;
+	float Padding1;
+	uint DirLightCount;
+	uint PointLightCount;
+	uint SpotLightCount;
+	float Padding2;
 }
 
-sampler		BasicSampler		: register(s0);
+sampler BasicSampler : register(s0);
 
-Texture2D	AlbedoTexture		: register(t0);
-Texture2D	NormalTexture		: register(t1);
-Texture2D	RoughnessTexture	: register(t2);
-Texture2D	MetalnessTexture	: register(t3);
+Texture2D AlbedoTexture : register(t0);
+Texture2D NormalTexture : register(t1);
+Texture2D RoughnessTexture : register(t2);
+Texture2D MetalnessTexture : register(t3);
 
 //IBL
-TextureCube skyIrradianceTexture	: register(t16);
-Texture2D	brdfLUTTexture			: register(t17);
-TextureCube skyPrefilterTexture		: register(t18);
+TextureCube skyIrradianceTexture : register(t16);
+Texture2D brdfLUTTexture : register(t17);
+TextureCube skyPrefilterTexture : register(t18);
 
 float3 ToneMapFilmicALU(float3 color)
 {
@@ -63,24 +67,30 @@ float4 main(PixelInput input) : SV_TARGET
 	float3 specColor = lerp(F0_NON_METAL.rrr, texColor.rgb, metal);
 	float3 irradiance = skyIrradianceTexture.Sample(BasicSampler, normal).rgb;
 
-	float3 finalColor = AmbientPBR(DirLight, normalize(normal), worldPos,
+	float3 finalColor = AmbientPBR(DirLights[CPrimaryDirLight], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,
 		specColor, irradiance, prefilter, brdf, 1.f);
 
-	finalColor += DirLightPBR(DirLight, normalize(normal), worldPos,
+	uint i = 0;
+	for (i = 0; i < DirLightCount; ++i)
+	{
+		finalColor += DirLightPBR(DirLights[i], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,
 		specColor, irradiance, prefilter, brdf, 1.f);
+	}
 
-	finalColor += PointLightPBR(PointLights, normalize(normal), worldPos, CameraPosition, roughness, metal, texColor.rgb, specColor, irradiance);
+	for (i = 0; i < PointLightCount; ++i)
+	{
+		finalColor += PointLightPBR(PointLights[i], normalize(normal), worldPos, CameraPosition, roughness, metal, texColor.rgb, specColor, irradiance);
+	}
 
-	finalColor += SpotLightPBR(SpotLights, normalize(normal), worldPos, CameraPosition, roughness, metal, texColor.rgb, specColor);
+	for (i = 0; i < SpotLightCount; ++i)
+	{
+		finalColor += SpotLightPBR(SpotLights[i], normalize(normal), worldPos, CameraPosition, roughness, metal, texColor.rgb, specColor);
+	}
 	
 	clip(texColor.a - 0.2f);
-	
 
 	float3 output = finalColor;
-	//output = output / (float3(1,1,1) + output);
-	//output = lerp(output, pow(abs(output), 1.f / 2.2f), 0.4f); 
-	//output = ToneMapFilmicALU(output);
 	return float4(output, 1.0f);
 }

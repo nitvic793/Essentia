@@ -2,6 +2,10 @@
 
 #include <DirectXMath.h>
 
+constexpr uint32_t CMaxDirLights = 4;
+constexpr uint32_t CMaxPointLights = 64;
+constexpr uint32_t CMaxSpotLights = 16;
+
 struct PerObjectConstantBuffer
 {
 	DirectX::XMFLOAT4X4 World;
@@ -40,9 +44,13 @@ struct SpotLight
 
 struct LightBuffer
 {
-	DirectionalLight	DirLight;
-	PointLight			PointLight;
-	SpotLight			SpotLight;
+	DirectionalLight	DirLights[CMaxDirLights];
+	PointLight			PointLights[CMaxPointLights];
+	SpotLight			SpotLights[CMaxSpotLights];
 	DirectX::XMFLOAT3	CameraPosition;
-	float				Padding;
+	float				Padding1;
+	uint32_t			DirLightCount;
+	uint32_t			PointLightCount;
+	uint32_t			SpotLightCount;
+	float				Padding2;
 };

@@ -13,6 +13,9 @@ class FrameManager;
 class IAllocator;
 class ComponentReflector;
 
+struct EngineContext;
+extern EngineContext* GContext;
+
 struct EngineContext
 {
 	static EngineContext*	Context;
@@ -32,5 +35,7 @@ struct EngineContext
 	EngineContext()
 	{
 		Context = this;
+		GContext = this;
 	}
 };
+

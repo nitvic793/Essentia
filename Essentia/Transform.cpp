@@ -99,9 +99,9 @@ void TransformManager::Allocate(uint32 count)
 	size_t totalSize = (size_t)count * (sizeof(XMFLOAT4X4) + sizeof(XMFLOAT4X4) + sizeof(TransformHandle) + sizeof(EntityHandle));
 	transforms.Buffer = (byte*)Mem::Alloc(totalSize);
 	transforms.World = (XMFLOAT4X4*)transforms.Buffer;
-	transforms.Local = transforms.World + count;
-	transforms.Parent = (TransformHandle*)transforms.Local + count;
-	transforms.Entity = (EntityHandle*)transforms.Parent + count;
+	transforms.Local = (XMFLOAT4X4*)(transforms.World + count);
+	transforms.Parent = (TransformHandle*)(transforms.Local + count);
+	transforms.Entity = (EntityHandle*)(transforms.Parent + count);
 	transforms.Capacity = count;
 }
 
