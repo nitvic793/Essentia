@@ -16,6 +16,7 @@
 #include "Entity.h"
 
 #include "DepthOnlyStage.h"
+#include "ShadowRenderStage.h"
 #include "ImguiRenderStage.h"
 #include "SkyBoxRenderStage.h"
 #include "OutlineRenderStage.h"
@@ -94,7 +95,7 @@ void Renderer::Initialize()
 
 	GPipelineStates.Initialize();
 	GPostProcess.Intitialize();
-	GSceneTextures.Initalize();
+	GSceneResources.Initalize();
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -124,6 +125,7 @@ void Renderer::Initialize()
 	}
 
 	//renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
+	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
@@ -212,23 +214,22 @@ void Renderer::Clear()
 
 void Renderer::Render(const FrameContext& frameContext)
 {
+	auto imageIndex = backBufferIndex;
 	auto camera = frameContext.Camera;
+
 	perObject.View = camera->GetViewTransposed();
 	perObject.Projection = camera->GetProjectionTransposed();
 
 	UpdateLightBuffer();
 	lightBuffer.CameraPosition = camera->Position;
 
-	auto worlds = frameContext.WorldMatrices;
+	auto& worlds = frameContext.WorldMatrices;
 	auto drawables = frameContext.Drawables;
 	auto drawCount = frameContext.DrawableCount;
-	auto imageIndex = backBufferIndex;
-	uint32 drawableModelCount;
-	auto drawableModels = frameContext.EntityManager->GetComponents<DrawableModelComponent>(drawableModelCount);
-	auto entities = frameContext.EntityManager->GetEntities<DrawableModelComponent>(drawableModelCount);
-	std::vector<XMFLOAT4X4> modelWorlds;
-	modelWorlds.reserve(drawableModelCount);
-	frameContext.EntityManager->GetTransposedWorldMatrices(entities, drawableModelCount, modelWorlds);
+	
+	auto& modelWorlds = frameContext.ModelWorldMatrices;
+	auto drawableModelCount = frameContext.DrawableModelCount;
+	auto drawableModels = frameContext.DrawableModels;
 
 	auto projection = XMLoadFloat4x4(&camera->Projection);
 	auto view = XMLoadFloat4x4(&camera->View);
@@ -298,8 +299,12 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	PIXEndEvent(commandList);
 
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Main Render Stage");
+
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
+	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel2, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + GSceneResources.ShadowDepthTarget.Texture));
+	SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
 	Draw(commandList, renderBucket);
@@ -315,6 +320,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	TransitionBarrier(commandList, shaderResourceManager->GetResource(hdrRenderTargetTextures[backBufferIndex]), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	PIXEndEvent(commandList);
 
 	PIXEndEvent(commandList);
 
@@ -331,18 +337,18 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	TransitionDesc postPPTransitions[] = {
 		{ depthBufferResourceId, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE },
-		{ GSceneTextures.PreviousFrame.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
+		{ GSceneResources.PreviousFrame.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
 	};
 
 	TransitionBarrier(commandList, postPPTransitions, _countof(postPPTransitions));
 	PIXEndEvent(commandList);
 
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.HDRQuadPSO));
-	SetRenderTargets(&GSceneTextures.PreviousFrame.RenderTarget, 1, nullptr);
+	SetRenderTargets(&GSceneResources.PreviousFrame.RenderTarget, 1, nullptr);
 	SetShaderResourceView(commandList, RootSigSRVPixel1, hdrRenderTargetTextures[backBufferIndex]);
 	DrawScreenQuad(commandList);
 
-	TransitionBarrier(commandList, GSceneTextures.PreviousFrame.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TransitionBarrier(commandList, GSceneResources.PreviousFrame.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.QuadPSO));
 	SetDefaultRenderTarget();
@@ -619,7 +625,7 @@ void Renderer::SetTargetSize(ID3D12GraphicsCommandList* commandList, ScreenSize 
 	D3D12_VIEWPORT viewport = {};
 	viewport.Width = (FLOAT)screenSize.Width;
 	viewport.Height = (FLOAT)screenSize.Height;
-
+	
 	D3D12_RECT scissorRect = {};
 	scissorRect.left = 0;
 	scissorRect.top = 0;
@@ -726,7 +732,9 @@ void Renderer::CreateRootSignatures()
 	//light dependent CBV
 	range[RootSigCBPixel0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
 	//G-Buffer inputs
-	range[RootSigSRVPixel1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 16, 0);
+	range[RootSigSRVPixel1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 0);
+	//Extra Textures
+	range[RootSigSRVPixel2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 8, 8);
 	//per frame CBV
 	range[RootSigCBAll1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 1);
 	//per bone 
@@ -734,21 +742,24 @@ void Renderer::CreateRootSignatures()
 	//IBL Textures
 	range[RootSigIBL].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 16);
 
-	CD3DX12_ROOT_PARAMETER rootParameters[6];
+	CD3DX12_ROOT_PARAMETER rootParameters[RootSigParamCount];
 	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[RootSigCBVertex0], D3D12_SHADER_VISIBILITY_VERTEX);
 	rootParameters[RootSigCBPixel0].InitAsDescriptorTable(1, &range[RootSigCBPixel0], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigSRVPixel1].InitAsDescriptorTable(1, &range[RootSigSRVPixel1], D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[RootSigSRVPixel2].InitAsDescriptorTable(1, &range[RootSigSRVPixel2], D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[RootSigCBAll1], D3D12_SHADER_VISIBILITY_ALL);
 	rootParameters[RootSigCBAll2].InitAsDescriptorTable(1, &range[RootSigCBAll2], D3D12_SHADER_VISIBILITY_ALL);
 	rootParameters[RootSigIBL].InitAsDescriptorTable(1, &range[RootSigIBL], D3D12_SHADER_VISIBILITY_PIXEL);
 
 	CD3DX12_ROOT_SIGNATURE_DESC descRootSignature;
-	descRootSignature.Init(6, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
+	descRootSignature.Init(RootSigParamCount, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS);
 
 	CD3DX12_STATIC_SAMPLER_DESC StaticSamplers[2];
+	//Base Sampler
 	StaticSamplers[0].Init(0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, 0.f, 4);
+	//Shadow Sampler
 	StaticSamplers[1].Init(1, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,

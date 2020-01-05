@@ -1,6 +1,7 @@
 #pragma once
 #include "Declarations.h"
 #include <utility>
+#include "EngineContext.h"
 
 #ifdef DLL_A
 #define A_EXPORT __declspec(dllexport)
@@ -164,7 +165,10 @@ namespace Mem
 		return LinearAllocator::GetInstance();
 	}
 
-	static IAllocator* GetFrameAllocator();
+	static IAllocator* GetFrameAllocator()
+	{
+		return GContext->FrameAllocator;
+	}
 
 	template<typename T, typename ...Args>
 	T* Alloc(Args&& ... args)

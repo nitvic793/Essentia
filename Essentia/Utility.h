@@ -40,7 +40,14 @@ public:
 		memset(&v, 0, sizeof(v)); //Reset v
 	}
 
-	Vector(const Vector& v) = delete;
+	Vector(Vector const&& v)
+	{
+		buffer = v.buffer;
+		currentIndex = v.currentIndex;
+		capacity = v.capacity;
+		allocator = v.allocator;
+		memset(&v, 0, sizeof(v));
+	}
 
 	Vector& operator=(Vector&& v)
 	{
@@ -102,17 +109,17 @@ public:
 	const T& Pop()
 	{
 		assert(currentIndex >= 0);
-		auto val = buffer[currentIndex];
+		auto& val = buffer[currentIndex];
 		currentIndex--;
 		return val;
 	}
 
-	//const T&& operator[](size_t index) throw
+	//const T operator[](size_t index) noexcept
 	//{
 	//	return buffer[index];
 	//}
 
-	T& operator[](size_t index) noexcept
+	T& operator[](size_t index) const noexcept
 	{ 
 		return buffer[index];
 	}

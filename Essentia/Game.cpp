@@ -108,13 +108,17 @@ Game::~Game()
 void Game::Render()
 {
 	uint32 count;
-	auto entities = entityManager.GetEntities<DrawableComponent>(count);
 	FrameContext frameContext = { camera.Get(), &timer };
 
-	frameContext.WorldMatrices.reserve(count);
-	entityManager.GetTransposedWorldMatrices(entities, count, frameContext.WorldMatrices);
-	frameContext.Drawables = entityManager.GetComponents<DrawableComponent>(frameContext.DrawableCount);
 	frameContext.EntityManager = &entityManager;
+
+	auto entities = entityManager.GetEntities<DrawableComponent>(count);
+	frameContext.WorldMatrices = entityManager.GetTransposedWorldMatrices(entities, count);
+	frameContext.Drawables = entityManager.GetComponents<DrawableComponent>(frameContext.DrawableCount);
+
+	entities = entityManager.GetEntities<DrawableModelComponent>(count);
+	frameContext.DrawableModels = frameContext.EntityManager->GetComponents<DrawableModelComponent>(frameContext.DrawableModelCount);
+	frameContext.ModelWorldMatrices = frameContext.EntityManager->GetTransposedWorldMatrices(entities, count);
 
 	renderer->Clear();
 	renderer->Render(frameContext);

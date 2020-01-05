@@ -14,10 +14,6 @@ void Mem::Free(void* buffer)
 	LinearAllocator::Instance->Free((byte*)buffer);
 }
 
-IAllocator* Mem::GetFrameAllocator()
-{
-	return EngineContext::Context->FrameAllocator;
-}
 
 void* SystemHeapAllocator::Alloc(size_t size)
 {

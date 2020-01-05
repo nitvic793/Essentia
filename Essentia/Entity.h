@@ -32,6 +32,7 @@ public:
 	TransformRef				GetTransform(EntityHandle handle);
 	void						UpdateTransform(EntityHandle entity, const Transform& transform);
 	void						GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
+	Vector<DirectX::XMFLOAT4X4>	GetTransposedWorldMatrices(EntityHandle* entities, uint32 count);
 	void						GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
 private:
 	std::vector<uint32> generations;

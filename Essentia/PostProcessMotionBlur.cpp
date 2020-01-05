@@ -64,7 +64,7 @@ TextureID PostProcessMotionBlur::RenderPostProcess(uint32 backbufferIndex, Textu
 	renderer->SetRenderTargets(&motionBlurTarget.RenderTarget, 1, nullptr);
 	commandList->SetPipelineState(resourceManager->GetPSO(motionBlurPso));
 
-	TextureID textures[] = { inputTexture, GSceneTextures.VelocityBuffer.Texture };
+	TextureID textures[] = { inputTexture, GSceneResources.VelocityBuffer.Texture };
 	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, textures, _countof(textures));
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, motionCBV);
 

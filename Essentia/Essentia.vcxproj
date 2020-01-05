@@ -202,6 +202,7 @@
     <ClCompile Include="Serialization.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
     <ClCompile Include="ShaderResourceManager.cpp" />
+    <ClCompile Include="ShadowRenderStage.cpp" />
     <ClCompile Include="SkyBoxRenderStage.cpp" />
     <ClCompile Include="StringHash.cpp" />
     <ClCompile Include="System.cpp" />
@@ -267,6 +268,7 @@
     <ClInclude Include="Serialization.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="ShaderResourceManager.h" />
+    <ClInclude Include="ShadowRenderStage.h" />
     <ClInclude Include="SkyBoxRenderStage.h" />
     <ClInclude Include="StringHash.h" />
     <ClInclude Include="System.h" />
@@ -347,6 +349,14 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
     </FxCompile>
     <FxCompile Include="QuadVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="ShadowVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

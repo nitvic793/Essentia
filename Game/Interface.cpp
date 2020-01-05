@@ -9,6 +9,7 @@
 void Initialize(EngineContext* context)
 {	
 	EngineContext::Context = context;
+	GContext = context;
 	InitializeResources();
 }
 

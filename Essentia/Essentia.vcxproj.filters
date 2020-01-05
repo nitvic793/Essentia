@@ -229,6 +229,9 @@
     <ClCompile Include="DebugDrawStage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ShadowRenderStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -426,6 +429,9 @@
     <ClInclude Include="DebugDrawStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
+    <ClInclude Include="ShadowRenderStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -475,6 +481,9 @@
     </FxCompile>
     <FxCompile Include="SSAO.hlsl">
       <Filter>Shaders\PostProcess</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowVS.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

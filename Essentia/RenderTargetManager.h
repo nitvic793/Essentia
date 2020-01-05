@@ -6,7 +6,8 @@
 
 struct EngineContext;
 
-SceneRenderTarget CreateSceneRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format);
+SceneRenderTarget	CreateSceneRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format);
+DepthTarget			CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthFormat, DXGI_FORMAT depthTextureFormat);
 
 class RenderTargetManager
 {

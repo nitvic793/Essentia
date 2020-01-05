@@ -2,11 +2,13 @@
 
 #include "Declarations.h"
 
-struct SceneTextures
+struct SceneResources
 {
 	void				Initalize();
 	SceneRenderTarget	VelocityBuffer;
 	SceneRenderTarget	PreviousFrame;
+	DepthTarget			ShadowDepthTarget;
+	ConstantBufferView	ShadowCBV;
 };
 
-extern SceneTextures GSceneTextures;
+extern SceneResources GSceneResources;

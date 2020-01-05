@@ -55,14 +55,14 @@ TextureID VelocityBufferStage::RenderPostProcess(uint32 backbufferIndex, Texture
 	auto renderer = ec->RendererInstance;
 	auto commandList = renderer->GetDefaultCommandList();
 	auto screenSize = renderer->GetScreenSize();
-	auto rt = ec->RenderTargetManager->GetRTVHandle(GSceneTextures.VelocityBuffer.RenderTarget);
+	auto rt = ec->RenderTargetManager->GetRTVHandle(GSceneResources.VelocityBuffer.RenderTarget);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Velocity Buffer");
-	renderer->TransitionBarrier(commandList, GSceneTextures.VelocityBuffer.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	renderer->TransitionBarrier(commandList, GSceneResources.VelocityBuffer.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	renderer->SetTargetSize(commandList, screenSize);
 	commandList->ClearDepthStencilView(ec->RenderTargetManager->GetDSVHandle(depthStencil), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	commandList->ClearRenderTargetView(rt, ColorValues::ClearColor, 0, nullptr);
-	renderer->SetRenderTargets(&GSceneTextures.VelocityBuffer.RenderTarget, 1, &depthStencil);
+	renderer->SetRenderTargets(&GSceneResources.VelocityBuffer.RenderTarget, 1, &depthStencil);
 	commandList->SetPipelineState(resourceManager->GetPSO(velocityBufferPSO));
 	uint32 count;
 	auto drawables = ec->EntityManager->GetComponents<DrawableComponent>(count);
@@ -81,7 +81,7 @@ TextureID VelocityBufferStage::RenderPostProcess(uint32 backbufferIndex, Texture
 		renderer->DrawMesh(commandList, model.Mesh);
 	}
 
-	renderer->TransitionBarrier(commandList, GSceneTextures.VelocityBuffer.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	renderer->TransitionBarrier(commandList, GSceneResources.VelocityBuffer.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	PIXEndEvent(commandList);
 	return inputTexture;
 }

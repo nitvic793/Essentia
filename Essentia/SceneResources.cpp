@@ -4,9 +4,9 @@
 #include "RenderTargetManager.h"
 #include "Renderer.h"
 
-SceneTextures GSceneTextures;
+SceneResources GSceneResources;
 
-void SceneTextures::Initalize()
+void SceneResources::Initalize()
 {
 	auto ec = EngineContext::Context;
 	auto screenSize = ec->RendererInstance->GetScreenSize();

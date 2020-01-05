@@ -96,6 +96,11 @@ void ShaderResourceManager::CopyToCB(uint32 frameIndex, const DataPack& data, ui
 	cbuffer[frameIndex].CopyData(data.Data, data.Size, offset);
 }
 
+void ShaderResourceManager::CopyToCB(uint32 frameIndex, const DataPack& data, const ConstantBufferView& cbv)
+{
+	cbuffer[frameIndex].CopyData(data.Data, data.Size, cbv.Offset);
+}
+
 GPUHeapOffsets ShaderResourceManager::CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame)
 {
 	GPUHeapOffsets offsets;

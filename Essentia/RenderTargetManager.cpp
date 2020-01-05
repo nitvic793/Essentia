@@ -21,7 +21,7 @@ RenderTargetID RenderTargetManager::CreateRenderTargetView(ID3D12Resource* rende
 	desc.Texture2D.PlaneSlice = 0;
 	desc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
 	desc.Format = format;
-	
+
 	renderBuffers.push_back(renderBuffer);
 	renderBuffer->SetName(ToWString(std::to_string(id) + "Render Target").c_str());
 	device->CreateRenderTargetView(renderBuffer, &desc, rtvHeap.handleCPU(id));
@@ -82,4 +82,24 @@ SceneRenderTarget CreateSceneRenderTarget(EngineContext* context, uint32 width, 
 	auto resource = ec->ShaderResourceManager->GetResource(target.Texture);
 	target.RenderTarget = ec->RenderTargetManager->CreateRenderTargetView(resource, format);
 	return target;
+}
+
+DepthTarget CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthFormat, DXGI_FORMAT depthTextureFormat)
+{
+	auto resourceManager = GContext->ResourceManager;
+	auto renderTargetManager = GContext->RenderTargetManager;
+	auto shaderResourceManager = GContext->ShaderResourceManager;
+
+	auto clearVal = CD3DX12_CLEAR_VALUE(depthFormat, 1.f, 0);
+	auto depthBufferResourceId = resourceManager->CreateResource(
+		CD3DX12_RESOURCE_DESC::Tex2D(depthFormat, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
+		&clearVal,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+	);
+
+	auto depthBuffer = resourceManager->GetResource(depthBufferResourceId);
+	auto depthStencilId = renderTargetManager->CreateDepthStencilView(depthBuffer, depthFormat);
+	auto depthStencilTexture = shaderResourceManager->CreateTexture(depthBuffer, false, nullptr, depthTextureFormat);
+
+	return DepthTarget{ depthStencilTexture, depthBufferResourceId,  depthStencilId };
 }

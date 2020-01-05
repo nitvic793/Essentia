@@ -14,6 +14,8 @@ void PipelineStates::Initialize()
 	auto renderer = ec->RendererInstance;
 	auto resourceManager = ec->ResourceManager;
 
+	CreateShadowPSO();
+
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
 	auto texFormat = renderer->GetRenderTargetFormat();
@@ -60,4 +62,35 @@ void PipelineStates::Initialize()
 	HDRQuadPSO = ec->ResourceManager->CreatePSO(psoDesc);
 	psoDesc.PS = ShaderManager::LoadShader(L"BlurPS.cso");
 	BlurPSO = ec->ResourceManager->CreatePSO(psoDesc);
+}
+
+void PipelineStates::CreateShadowPSO()
+{
+	auto renderer = GContext->RendererInstance;
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC descPipelineState;
+	ZeroMemory(&descPipelineState, sizeof(descPipelineState));
+	auto shadowMapFormat = DXGI_FORMAT_D32_FLOAT;
+	descPipelineState.VS = ShaderManager::LoadShader(L"ShadowVS.cso");
+	descPipelineState.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	descPipelineState.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
+	descPipelineState.pRootSignature = renderer->GetDefaultRootSignature();
+	descPipelineState.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	descPipelineState.DepthStencilState.DepthEnable = true;
+	descPipelineState.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	descPipelineState.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	descPipelineState.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+	descPipelineState.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+	descPipelineState.RasterizerState.AntialiasedLineEnable = TRUE;
+	descPipelineState.RasterizerState.DepthClipEnable = true;
+	descPipelineState.RasterizerState.DepthBias = 1000;
+	descPipelineState.RasterizerState.DepthBiasClamp = 0.f;
+	descPipelineState.RasterizerState.SlopeScaledDepthBias = 5.f;
+	descPipelineState.SampleMask = UINT_MAX;
+	descPipelineState.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	descPipelineState.NumRenderTargets = 0;
+	//descPipelineState.RTVFormats[0] = mDsvFormat;
+	descPipelineState.DSVFormat = shadowMapFormat;
+	descPipelineState.SampleDesc.Count = 1;
+
+	ShadowDirPSO = GContext->ResourceManager->CreatePSO(descPipelineState);
 }

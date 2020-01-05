@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "Entity.h"
+#include "Memory.h"
 #include "Utility.h"
+
+using namespace DirectX;
 
 EntityManager::EntityManager()
 {
@@ -90,6 +93,16 @@ void EntityManager::GetTransposedWorldMatrices(EntityHandle* entities, uint32 co
 	{
 		matrices.push_back(transformManager.GetTransposedWorldMatrix(entities[i]));
 	}
+}
+
+Vector<DirectX::XMFLOAT4X4> EntityManager::GetTransposedWorldMatrices(EntityHandle* entities, uint32 count)
+{
+	Vector<XMFLOAT4X4> matrices(count, Mem::GetFrameAllocator());
+	for (uint32 i = 0; i < count; ++i)
+	{
+		matrices.Push(transformManager.GetTransposedWorldMatrix(entities[i]));
+	}
+	return matrices;
 }
 
 void EntityManager::GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices)

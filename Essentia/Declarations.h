@@ -35,8 +35,8 @@ constexpr uint32 CMaxD3DResources = 1024;
 constexpr uint32 CMaxPipelineStates = 96;
 constexpr uint32 CMaxRootSignatures = 24;
 
-constexpr int CMaxRenderTargets = 64;
-constexpr int CMaxDepthStencils = 16;
+constexpr int32 CMaxRenderTargets = 64;
+constexpr int32 CMaxDepthStencils = 16;
 
 // Engine Types
 
@@ -70,6 +70,7 @@ enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
 	RootSigCBPixel0,
 	RootSigSRVPixel1,
+	RootSigSRVPixel2,
 	RootSigCBAll1,
 	RootSigCBAll2,
 	RootSigIBL,
@@ -87,6 +88,13 @@ struct SceneRenderTarget
 	TextureID		Texture;
 	ResourceID		Resource;
 	RenderTargetID	RenderTarget;
+};
+
+struct DepthTarget
+{
+	TextureID		Texture;
+	ResourceID		Resource;
+	DepthStencilID	DepthStencil;
 };
 
 struct ColorValues
