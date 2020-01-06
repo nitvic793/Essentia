@@ -1149,16 +1149,17 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "DrawableComponent"
+                    "DrawableComponent",
+                    "SelectedComponent"
                 ],
                 "PositionComponent": {
-                    "X": 0.7205236554145813,
+                    "X": 1.621821641921997,
                     "Y": 1.0,
                     "Z": 0.4000000059604645
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 0.6932610273361206,
+                    "Y": 22.227575302124025,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -1169,7 +1170,8 @@
                 "DrawableComponent": {
                     "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
-                }
+                },
+                "SelectedComponent": {}
             },
             {
                 "Entity": {
@@ -1183,12 +1185,12 @@
                 ],
                 "PositionComponent": {
                     "X": 0.0,
-                    "Y": 5.183233261108398,
+                    "Y": 5.89027214050293,
                     "Z": 5.0
                 },
                 "RotationComponent": {
-                    "X": 0.27730441093444826,
-                    "Y": 0.27730441093444826,
+                    "X": 8.891030311584473,
+                    "Y": 8.891030311584473,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -1238,8 +1240,7 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "DirectionalLightComponent",
-                    "SelectedComponent"
+                    "DirectionalLightComponent"
                 ],
                 "PositionComponent": {
                     "X": 0.0,
@@ -1268,8 +1269,7 @@
                         "Y": -0.5773502588272095,
                         "Z": 0.027000000700354577
                     }
-                },
-                "SelectedComponent": {}
+                }
             },
             {
                 "Entity": {
@@ -1287,13 +1287,13 @@
                         "Y": 0.10000000149011612,
                         "Z": 0.10000000149011612
                     },
-                    "Intensity": 1.3664662837982178,
-                    "Range": 3.465865135192871
+                    "Intensity": 2.7805447578430177,
+                    "Range": 9.12217903137207
                 },
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 3.0,
-                    "Z": 9.830695152282715
+                    "Z": 4.554285049438477
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -1392,13 +1392,13 @@
                         "Y": 0.8578431606292725,
                         "Z": 0.23128125071525575
                     },
-                    "Intensity": 1.3664662837982178,
-                    "Range": 3.465865135192871
+                    "Intensity": 2.7805447578430177,
+                    "Range": 9.12217903137207
                 },
                 "PositionComponent": {
                     "X": -6.650000095367432,
                     "Y": 3.0,
-                    "Z": 9.830695152282715
+                    "Z": 4.554285049438477
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -1427,13 +1427,13 @@
                         "Y": 0.5578431487083435,
                         "Z": 0.9312812685966492
                     },
-                    "Intensity": 1.3664662837982178,
-                    "Range": 3.465865135192871
+                    "Intensity": 2.7805447578430177,
+                    "Range": 9.12217903137207
                 },
                 "PositionComponent": {
                     "X": -15.300000190734864,
                     "Y": 3.0,
-                    "Z": 9.830695152282715
+                    "Z": 4.554285049438477
                 },
                 "RotationComponent": {
                     "X": 0.0,

@@ -10,6 +10,8 @@ public:
 	virtual void Initialize()
 	{
 		cManager = entityManager->GetComponentManager();
+		auto e = entityManager->CreateEntity(DefaultTransform, { {0, 0} });
+		entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override

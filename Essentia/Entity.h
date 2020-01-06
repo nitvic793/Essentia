@@ -6,27 +6,29 @@
 #include "Transform.h"
 #include "BaseComponents.h"
 
+constexpr EntityHandle Unknown = { {INT32_MAX} };
+
 class EntityManager
 {
 public:
 	EntityManager();
 	void				Initialize(IAllocator* allocator);
-	EntityHandle		CreateEntity(const Transform& transform = DefaultTransform);
+	EntityHandle		CreateEntity(const Transform& transform = DefaultTransform, EntityHandle parent = Unknown);
 	bool				IsAlive(EntityHandle handle);
 	void				Destroy(EntityHandle handle);
-	ComponentManager*	GetComponentManager();
-	
+	ComponentManager* GetComponentManager();
+
 	template<typename T>
 	void			AddComponent(EntityHandle handle, const T& value = T());
 
 	template<typename T>
-	T*				GetComponent(EntityHandle handle);
+	T* GetComponent(EntityHandle handle);
 
 	template<typename T>
-	T*				GetComponents(uint32& count);
+	T* GetComponents(uint32& count);
 
 	template<typename T>
-	EntityHandle*	GetEntities(uint32& count);
+	EntityHandle* GetEntities(uint32& count);
 
 	Vector<IComponent*>	GetEntityComponents(EntityHandle handle);
 	TransformRef				GetTransform(EntityHandle handle);
@@ -39,7 +41,7 @@ private:
 	std::vector<uint32> freeIndices;
 	ComponentManager	componentManager;
 	TransformManager	transformManager;
-	IAllocator*			allocator;
+	IAllocator* allocator;
 };
 
 template<typename T>

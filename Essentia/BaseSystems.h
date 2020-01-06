@@ -122,8 +122,11 @@ public:
 	{
 		bool debugNav = false;
 #ifdef EDITOR
+		auto stages = GRenderStageManager.GetRenderStageMap();
 		ImGuiIO& io = ImGui::GetIO();
-		debugNav = io.NavActive;
+		debugNav = io.NavActive && stages["ImguiRenderStage"]->Enabled;
+#else
+		debugNav = false;
 #endif
 		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
 		auto dir = XMLoadFloat3(&camera->Direction);

@@ -127,6 +127,7 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	bool isCubeMap = false;
 
 	uploadBatch.Begin();
+	
 	switch (texType)
 	{
 	case WIC:

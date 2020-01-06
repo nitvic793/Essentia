@@ -14,7 +14,7 @@ using namespace DirectX;
 
 void ShadowRenderStage::Initialize()
 {
-	shadowCBVs = Vector<ConstantBufferView>(4);
+	shadowCBVs = Vector<ConstantBufferView>(10);
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 	auto renderer = GContext->RendererInstance;
 	shadowDepthTarget = CreateDepthTarget(CShadowMapSize, CShadowMapSize, DXGI_FORMAT_D32_FLOAT, DXGI_FORMAT_R32_FLOAT);
