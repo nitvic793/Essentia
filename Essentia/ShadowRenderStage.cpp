@@ -14,14 +14,14 @@ using namespace DirectX;
 
 void ShadowRenderStage::Initialize()
 {
-	shadowCBVs = Vector<ConstantBufferView>(10);
+	shadowCBVs = Vector<ConstantBufferView>(CMaxInitialEntityCount);
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 	auto renderer = GContext->RendererInstance;
 	shadowDepthTarget = CreateDepthTarget(CShadowMapSize, CShadowMapSize, DXGI_FORMAT_D32_FLOAT, DXGI_FORMAT_R32_FLOAT);
 	GSceneResources.ShadowDepthTarget = shadowDepthTarget;
 	GSceneResources.ShadowCBV = shaderResourceManager->CreateCBV(sizeof(ShadowConstantBuffer));
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 10; ++i)
 	{
 		shadowCBVs.Push(shaderResourceManager->CreateCBV(sizeof(ShadowDirParams)));
 	}

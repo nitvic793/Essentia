@@ -6,17 +6,18 @@
 #include "Transform.h"
 #include "BaseComponents.h"
 
-constexpr EntityHandle Unknown = { {INT32_MAX} };
+constexpr uint32		CRootParentEntityIndex = UINT32_MAX;
+constexpr EntityHandle	Unknown = { {UINT32_MAX} };
 
 class EntityManager
 {
 public:
 	EntityManager();
 	void				Initialize(IAllocator* allocator);
-	EntityHandle		CreateEntity(const Transform& transform = DefaultTransform, EntityHandle parent = Unknown);
+	EntityHandle		CreateEntity(const Transform& transform = DefaultTransform, uint32 parentIndex = CRootParentEntityIndex);
 	bool				IsAlive(EntityHandle handle);
 	void				Destroy(EntityHandle handle);
-	ComponentManager* GetComponentManager();
+	ComponentManager*	GetComponentManager();
 
 	template<typename T>
 	void			AddComponent(EntityHandle handle, const T& value = T());
@@ -30,7 +31,7 @@ public:
 	template<typename T>
 	EntityHandle* GetEntities(uint32& count);
 
-	Vector<IComponent*>	GetEntityComponents(EntityHandle handle);
+	Vector<IComponent*>			GetEntityComponents(EntityHandle handle);
 	TransformRef				GetTransform(EntityHandle handle);
 	void						UpdateTransform(EntityHandle entity, const Transform& transform);
 	void						GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);

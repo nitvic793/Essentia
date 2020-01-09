@@ -9,7 +9,7 @@ EngineContext* GContext = nullptr;
 EntityHandle es::CreateEntity(const Transform& transform)
 {
 	auto ec = EngineContext::Context;
-	return ec->EntityManager->CreateEntity(transform);
+	return ec->EntityManager->CreateEntity(transform, CRootParentEntityIndex); 
 }
 
 TextureID es::CreateTexture(const std::string& filename, TextureType type, bool generateMips)

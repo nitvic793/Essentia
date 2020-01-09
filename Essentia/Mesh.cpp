@@ -198,7 +198,7 @@ ModelHandle ModelManager::CreateModel(const char* filename)
 	model.Mesh = es::CreateMesh(modelData.MeshData);
 
 	TextureID textures[MaterialTextureCount];
-	std::string assetDirectory = "../../Assets/Textures/";
+	std::string assetDirectory = "Assets/Textures/";
 	for (auto& material : modelData.Materials)
 	{
 		MaterialHandle materialHandle;

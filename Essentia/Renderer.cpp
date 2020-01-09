@@ -398,28 +398,28 @@ void Renderer::CleanUp()
 void Renderer::EndInitialization()
 {
 	//Load Default Textures
-	Default::DefaultDiffuse = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
-	Default::DefaultNormals = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
-	Default::DefaultRoughness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultRoughness.png");
-	Default::DefaultMetalness = shaderResourceManager->CreateTexture("../../Assets/Textures/defaultMetal.png");
+	Default::DefaultDiffuse = shaderResourceManager->CreateTexture("Assets/Textures/floor_albedo.png");
+	Default::DefaultNormals = shaderResourceManager->CreateTexture("Assets/Textures/floor_normals.png");
+	Default::DefaultRoughness = shaderResourceManager->CreateTexture("Assets/Textures/defaultRoughness.png");
+	Default::DefaultMetalness = shaderResourceManager->CreateTexture("Assets/Textures/defaultMetal.png");
 
 	TextureID textures[MaterialTextureCount];
-	textures[DiffuseID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_albedo.png");
-	textures[NormalsID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_normals.png");
-	textures[RoughnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_roughness.png");
-	textures[MetalnessID] = shaderResourceManager->CreateTexture("../../Assets/Textures/floor_metal.png");
+	textures[DiffuseID] = shaderResourceManager->CreateTexture("Assets/Textures/floor_albedo.png");
+	textures[NormalsID] = shaderResourceManager->CreateTexture("Assets/Textures/floor_normals.png");
+	textures[RoughnessID] = shaderResourceManager->CreateTexture("Assets/Textures/floor_roughness.png");
+	textures[MetalnessID] = shaderResourceManager->CreateTexture("Assets/Textures/floor_metal.png");
 	auto matId = shaderResourceManager->CreateMaterial(textures, 4, defaultPSO, material);
 
-	irradianceTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envDiffuseHDR.dds", DDS, false);
-	brdfLutTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envBrdf.dds", DDS, false);
-	prefilterTexture = shaderResourceManager->CreateTexture("../../Assets/IBL/envSpecularHDR.dds", DDS, false);
+	irradianceTexture = shaderResourceManager->CreateTexture("Assets/IBL/envDiffuseHDR.dds", DDS, false);
+	brdfLutTexture = shaderResourceManager->CreateTexture("Assets/IBL/envBrdf.dds", DDS, false);
+	prefilterTexture = shaderResourceManager->CreateTexture("Assets/IBL/envSpecularHDR.dds", DDS, false);
 
 	MeshView mesh;
-	auto meshId = meshManager->CreateMesh("../../Assets/Models/sphere.obj", mesh);
+	auto meshId = meshManager->CreateMesh("Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
-	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer)); 
 
-	modelManager.CreateModel("../../Assets/Models/Sponza.fbx");
+	modelManager.CreateModel("Assets/Models/Sponza.fbx");
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{

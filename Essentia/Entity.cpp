@@ -17,7 +17,12 @@ void EntityManager::Initialize(IAllocator* allocator)
 	componentManager.Initialize(allocator, EngineContext::Context);
 }
 
-EntityHandle EntityManager::CreateEntity(const Transform& transform, EntityHandle parent)
+//EntityHandle EntityManager::CreateEntity(const Transform& transform, EntityHandle parent)
+//{
+//	return CreateEntity(transform, parent.Handle.Index);
+//}
+
+EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 parentIndex)
 {
 	HandleType handle;
 	if (freeIndices.size() > 0)
@@ -35,9 +40,9 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, EntityHandl
 
 	TransformHandle parentTransform = { -1 };
 
-	if (parent.Handle.Index != Unknown.Handle.Index)
+	if (parentIndex != CRootParentEntityIndex)
 	{
-		parentTransform.Index = (int)parent.Handle.Index;
+		parentTransform.Index = (int)parentIndex;
 	}
 
 	transformManager.CreateTransform({ handle }, parentTransform);

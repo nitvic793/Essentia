@@ -26,6 +26,7 @@ struct MeshInterface
 struct EntityInterface
 {
 	EntityHandle				Entity;
+	int32						ParentIndex = -1;
 	std::vector<std::string>	Components;
 
 	template<typename Archive>
@@ -33,7 +34,11 @@ struct EntityInterface
 	{
 		auto ec = EngineContext::Context;
 		auto componentManager = ec->EntityManager->GetComponentManager();
-		archive(CEREAL_NVP(Entity), CEREAL_NVP(Components));
+		archive(
+			CEREAL_NVP(Entity),
+			CEREAL_NVP(ParentIndex),
+			CEREAL_NVP(Components)
+		);
 		for (auto component : Components)
 		{
 			auto pool = componentManager->GetPool(component.c_str());

@@ -13,7 +13,7 @@ void SkyBoxRenderStage::Initialize()
 	auto meshManager = context->MeshManager;
 	renderer = context->RendererInstance;
 	entityManager = context->EntityManager;
-	cubeMesh = meshManager->GetMeshView("../../Assets/Models/cube.obj");
+	cubeMesh = meshManager->GetMeshView("Assets/Models/cube.obj");
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC descPipelineState;
 	ZeroMemory(&descPipelineState, sizeof(descPipelineState));
