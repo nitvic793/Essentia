@@ -75,7 +75,7 @@ DirectX::XMFLOAT4X4 TransformManager::GetWorldMatrix(EntityHandle entity)
 	return transforms.World[entity.Handle.Index];
 }
 
-const Transform& TransformManager::GetWorldTransform(EntityHandle entity)
+const Transform TransformManager::GetWorldTransform(EntityHandle entity)
 {
 	int32 index = (int32)entity.Handle.Index;
 	auto world = transforms.World[index];

@@ -38,6 +38,23 @@ Vector<IComponent*> ComponentManager::GetComponents(EntityHandle handle)
 	return components;
 }
 
+Vector<ComponentData> ComponentManager::GetEntityComponents(EntityHandle handle)
+{
+	Vector<ComponentData> components((uint32)pools.size(), Mem::GetFrameAllocator());
+	for (auto& pool : pools)
+	{
+		const auto& poolBase = pool.second;
+		if (poolBase->HasEntity(handle))
+		{
+			components.Push({
+					poolBase->GetTypeName(),
+					poolBase->GetComponent(handle)
+				});
+		}
+	}
+	return components;
+}
+
 Vector<const char*> ComponentManager::GetComponentNameList()
 {
 	Vector<const char*> list((uint32)pools.size(), Mem::GetFrameAllocator());
@@ -58,7 +75,7 @@ void ComponentManager::AddComponent(const char* name, EntityHandle entity, IComp
 		auto component = pool->GetComponent(entity);
 		memcpy(component, initValue, pool->GetTypeSize());
 	}
-	
+
 }
 
 

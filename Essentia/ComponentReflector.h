@@ -26,11 +26,10 @@ public:
 		return componentFactoryMap[componentName](componentManager);
 	}
 
-	void VisitFields(IComponent* component, IVisitor* visitor)
+	void VisitFields(const char* componentName, IComponent* component, IVisitor* visitor)
 	{
-		auto name = component->GetName();
-		if (componentVisitorMap.find(name) != componentVisitorMap.end())
-			componentVisitorMap[name](component, visitor);
+		if (componentVisitorMap.find(componentName) != componentVisitorMap.end())
+			componentVisitorMap[componentName](component, visitor);
 	}
 private:
 	std::unordered_map<std::string_view, std::function<void(IComponent*, IVisitor*)>> componentVisitorMap;

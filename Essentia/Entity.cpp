@@ -77,9 +77,19 @@ ComponentManager* EntityManager::GetComponentManager()
 	return &componentManager;
 }
 
+EntityHandle EntityManager::GetParent(EntityHandle entity)
+{
+	return transformManager.GetParent(entity);
+}
+
 Vector<IComponent*> EntityManager::GetEntityComponents(EntityHandle handle)
 {
 	return componentManager.GetComponents(handle);
+}
+
+Vector<ComponentData> EntityManager::GetComponents(EntityHandle handle)
+{
+	return componentManager.GetEntityComponents(handle);
 }
 
 TransformRef EntityManager::GetTransform(EntityHandle handle)

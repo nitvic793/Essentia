@@ -138,16 +138,16 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	{
 		static ImguiVisitor visitor;
 		ImGui::Begin("Entity", &showEntity);
-		auto components = em->GetEntityComponents(selectedEntities[0]);
+		auto components = em->GetComponents(selectedEntities[0]);
 		for (auto comp : components)
 		{
-			if (ImGui::CollapsingHeader(comp->GetName(), ImGuiTreeNodeFlags_DefaultOpen))
+			if (ImGui::CollapsingHeader(comp.ComponentName.data(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				GComponentReflector.VisitFields(comp, &visitor);
-				ImGui::PushID(comp->GetName());
+				GComponentReflector.VisitFields(comp.ComponentName.data(), comp.Data, &visitor);
+				ImGui::PushID(comp.ComponentName.data());
 				if (ImGui::Button("Remove"))
 				{
-					cm->RemoveComponent(comp->GetName(), selectedEntities[0]);
+					cm->RemoveComponent(comp.ComponentName.data(), selectedEntities[0]);
 				}
 				ImGui::PopID();
 			}

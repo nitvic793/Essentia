@@ -59,7 +59,7 @@ void serialize(Archive& archive, EntityHandle& entity)
 void Visit(PositionComponent* component, IVisitor* visitor)
 {
 	auto comp = component;
-	auto name = comp->GetName();
+	auto name = comp->ComponentName;
 	visitor->Visit(name, MField(comp, X));
 	visitor->Visit(name, MField(comp, Y));
 	visitor->Visit(name, MField(comp, Z));
@@ -68,23 +68,25 @@ void Visit(PositionComponent* component, IVisitor* visitor)
 void Visit(RotationComponent* component, IVisitor* visitor)
 {
 	auto comp = component;
-	visitor->Visit(comp->GetName(), MField(comp, X));
-	visitor->Visit(comp->GetName(), MField(comp, Y));
-	visitor->Visit(comp->GetName(), MField(comp, Z));
+	auto name = comp->ComponentName;
+	visitor->Visit(name, MField(comp, X));
+	visitor->Visit(name, MField(comp, Y));
+	visitor->Visit(name, MField(comp, Z));
 }
 
 void Visit(ScaleComponent* component, IVisitor* visitor)
 {
 	auto comp = component;
-	visitor->Visit(comp->GetName(), MField(comp, X));
-	visitor->Visit(comp->GetName(), MField(comp, Y));
-	visitor->Visit(comp->GetName(), MField(comp, Z));
+	auto name = comp->ComponentName;
+	visitor->Visit(name, MField(comp, X));
+	visitor->Visit(name, MField(comp, Y));
+	visitor->Visit(name, MField(comp, Z));
 }
 
 void Visit(PointLightComponent* component, IVisitor* visitor)
 {
 	auto comp = component;
-	auto name = comp->GetName();
+	auto name = comp->ComponentName;
 	visitor->Visit(name, MField(comp, Color));
 	visitor->Visit(name, MField(comp, Range));
 	visitor->Visit(name, MField(comp, Intensity));
@@ -93,7 +95,7 @@ void Visit(PointLightComponent* component, IVisitor* visitor)
 void Visit(SpotLightComponent* component, IVisitor* visitor)
 {
 	auto comp = component;
-	auto name = comp->GetName();
+	auto name = comp->ComponentName;
 	visitor->Visit(name, MField(comp, Color));
 	visitor->Visit(name, MField(comp, Range));
 	visitor->Visit(name, MField(comp, Intensity));
@@ -104,7 +106,7 @@ void Visit(SpotLightComponent* component, IVisitor* visitor)
 void Visit(DirectionalLightComponent* component, IVisitor* visitor)
 {
 	auto comp = component;
-	auto name = comp->GetName();
+	auto name = comp->ComponentName;
 	visitor->Visit(name, MField(comp, Color));
 	visitor->Visit(name, MField(comp, Intensity));
 	visitor->Visit(name, MField(comp, Direction));

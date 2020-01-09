@@ -76,10 +76,10 @@ private:
 		{
 			EntityInterface eInterface;
 			eInterface.Entity = entities[i];
-			auto components = entityManager->GetEntityComponents(entities[i]);
+			auto components = entityManager->GetComponents(entities[i]);
 			for (auto comp : components)
 			{
-				eInterface.Components.push_back(comp->GetName());
+				eInterface.Components.push_back(comp.ComponentName.data());
 			}
 			entityList.push_back(eInterface);
 		}

@@ -24,6 +24,7 @@ public:
 	virtual void			Serialize(cereal::JSONOutputArchive& archive, EntityHandle entity) = 0;
 	virtual void			Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) = 0;
 	virtual const size_t	GetTypeSize() = 0;
+	virtual const char*		GetTypeName() = 0 ;
 	virtual ~ComponentPoolBase() {}
 };
 
@@ -137,19 +138,24 @@ public:
 	{
 		auto index = componentMap[entity.ID];
 		T component = components[index];
-		archive(cereal::make_nvp(component.GetName(), component));
+		archive(cereal::make_nvp(T::ComponentName, component));
 	}
 
 	virtual void Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) override
 	{
 		T component;
-		archive(cereal::make_nvp(component.GetName(), component));
+		archive(cereal::make_nvp(T::ComponentName, component));
 		AddComponent(entity, component);
 	}
 
 	virtual const size_t GetTypeSize() override
 	{
 		return sizeof(T);
+	}
+
+	virtual const char* GetTypeName() override
+	{
+		return T::ComponentName;
 	}
 
 	~ComponentPool() {}
@@ -194,9 +200,9 @@ public:
 	template<typename T>
 	EntityHandle GetEntity(uint32 index);
 
-	Vector<IComponent*> GetComponents(EntityHandle handle);
-
-	Vector<const char*> GetComponentNameList();
+	Vector<IComponent*>		GetComponents(EntityHandle handle);
+	Vector<ComponentData>	GetEntityComponents(EntityHandle handle);
+	Vector<const char*>		GetComponentNameList();
 	void				AddComponent(const char* name, EntityHandle entity, IComponent* initValue = nullptr);
 private:
 	IAllocator* allocator;
@@ -218,11 +224,10 @@ inline ComponentPool<T>* ComponentManager::GetOrCreatePool()
 {
 	if (pools.find(T::Type) == pools.end())
 	{
-		T temp;
 		size_t size = sizeof(ComponentPool<T>);
 		auto buffer = allocator->Alloc(size);
 		ComponentPool<T>* pool = new(buffer) ComponentPool<T>();
-		poolStringMap[temp.GetName()] = pool;
+		poolStringMap[T::ComponentName] = pool;
 		pools.insert(
 			std::pair<ComponentTypeID,
 			ScopedPtr<ComponentPoolBase>>(

@@ -15,6 +15,7 @@ public:
 	bool				IsAlive(EntityHandle handle);
 	void				Destroy(EntityHandle handle);
 	ComponentManager*	GetComponentManager();
+	EntityHandle		GetParent(EntityHandle entity);
 
 	template<typename T>
 	void				AddComponent(EntityHandle handle, const T& value = T());
@@ -29,6 +30,7 @@ public:
 	EntityHandle*		GetEntities(uint32& count);
 
 	Vector<IComponent*>			GetEntityComponents(EntityHandle handle);
+	Vector<ComponentData>		GetComponents(EntityHandle handle);
 	TransformRef				GetTransform(EntityHandle handle);
 	void						UpdateTransform(EntityHandle entity, const Transform& transform);
 	void						GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
