@@ -75,6 +75,25 @@ DirectX::XMFLOAT4X4 TransformManager::GetWorldMatrix(EntityHandle entity)
 	return transforms.World[entity.Handle.Index];
 }
 
+const Transform& TransformManager::GetWorldTransform(EntityHandle entity)
+{
+	int32 index = (int32)entity.Handle.Index;
+	auto world = transforms.World[index];
+	XMVECTOR pos;
+	XMVECTOR rot;
+	XMVECTOR scale;
+	XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&world));
+	Transform outTransform;
+	XMVECTOR rotation = XMVectorSet(0, 0, 0, 0);
+	float angle = 0.f;
+	XMQuaternionToAxisAngle(&rotation, &angle, rot);
+
+	XMStoreFloat3(&outTransform.Position, pos);
+	XMStoreFloat3(&outTransform.Scale, scale);
+	XMStoreFloat3(&outTransform.Rotation, rotation);
+	return outTransform;
+}
+
 TransformManager::~TransformManager()
 {
 	CleanUp();

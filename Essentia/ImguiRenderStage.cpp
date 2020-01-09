@@ -62,6 +62,7 @@ void ImguiRenderStage::Initialize()
 void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
 {
 	auto em = EngineContext::Context->EntityManager;
+	auto cm = GContext->EntityManager->GetComponentManager();
 	auto commandList = EngineContext::Context->RendererInstance->GetDefaultCommandList();
 
 	ID3D12DescriptorHeap* heaps[] = { imguiHeap.pDescriptorHeap.Get() };
@@ -143,9 +144,40 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			if (ImGui::CollapsingHeader(comp->GetName(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
 				GComponentReflector.VisitFields(comp, &visitor);
+				ImGui::PushID(comp->GetName());
+				if (ImGui::Button("Remove"))
+				{
+					cm->RemoveComponent(comp->GetName(), selectedEntities[0]);
+				}
+				ImGui::PopID();
 			}
 		}
 
+		ImGui::NewLine();
+
+		static int selected = -1;
+		Vector<const char*> list = cm->GetComponentNameList();
+		static const char* currentItem = NULL;
+		
+		if (ImGui::BeginCombo("##combo", currentItem)) 
+		{
+			for (auto component : list)
+			{
+				bool isSelected = (currentItem == component); 
+				if (ImGui::Selectable(component, isSelected))
+					currentItem = component;
+				if (isSelected)
+					ImGui::SetItemDefaultFocus();
+			}
+			ImGui::EndCombo();
+		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Add Component"))
+		{
+			cm->AddComponent(currentItem, selectedEntities[0]);
+		}
+		
 		ImGui::End();
 	}
 

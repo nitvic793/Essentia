@@ -25,15 +25,16 @@ typedef uint32 DepthStencilID;
 
 // Engine Constants
 
-constexpr uint32 CFrameBufferCount = 3;
-constexpr uint32 CFrameMaxDescriptorHeapCount = 2048;
-constexpr uint32 CMaxTextureCount = 512;
-constexpr uint32 CMaxConstantBufferCount = 512;
+constexpr uint32 CFrameBufferCount = 3; // Triple buffered
+constexpr uint32 CFrameMaxDescriptorHeapCount = 2048; // Number of descriptors in the main GPU facing descriptor heap
+constexpr uint32 CMaxTextureCount = 512; // Max number of textures
+constexpr uint32 CMaxConstantBufferCount = 512; // Max count of constant buffers
 constexpr uint64 CMaxConstantBufferSize = 1024 * 256; //256KB
 
-constexpr uint32 CMaxD3DResources = 1024;
-constexpr uint32 CMaxPipelineStates = 96;
+constexpr uint32 CMaxD3DResources = 1024; // Max D3D12 resources.
+constexpr uint32 CMaxPipelineStates = 96; 
 constexpr uint32 CMaxRootSignatures = 24;
+constexpr uint32 CRootParentEntityIndex = UINT32_MAX; // Default Root parent index. 
 
 constexpr int32 CMaxRenderTargets = 64;
 constexpr int32 CMaxDepthStencils = 16;
@@ -52,6 +53,7 @@ struct DataPack
 	uint32	Size;
 };
 
+// Offset of resources in GPU Descriptor heap 
 struct GPUHeapOffsets
 {
 	uint32 ConstantBufferOffset;

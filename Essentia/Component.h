@@ -23,6 +23,7 @@ public:
 	virtual bool			HasEntity(EntityHandle entity) = 0;
 	virtual void			Serialize(cereal::JSONOutputArchive& archive, EntityHandle entity) = 0;
 	virtual void			Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) = 0;
+	virtual const size_t	GetTypeSize() = 0;
 	virtual ~ComponentPoolBase() {}
 };
 
@@ -146,6 +147,11 @@ public:
 		AddComponent(entity, component);
 	}
 
+	virtual const size_t GetTypeSize() override
+	{
+		return sizeof(T);
+	}
+
 	~ComponentPool() {}
 private:
 	std::vector<T>						components;
@@ -171,6 +177,8 @@ public:
 	template<typename T>
 	void RemoveComponent(EntityHandle entity);
 
+	void RemoveComponent(std::string_view componentName, EntityHandle handle);
+
 	template<typename T>
 	T* GetComponent(EntityHandle entity);
 
@@ -187,6 +195,9 @@ public:
 	EntityHandle GetEntity(uint32 index);
 
 	Vector<IComponent*> GetComponents(EntityHandle handle);
+
+	Vector<const char*> GetComponentNameList();
+	void				AddComponent(const char* name, EntityHandle entity, IComponent* initValue = nullptr);
 private:
 	IAllocator* allocator;
 	EngineContext* context;

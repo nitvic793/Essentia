@@ -19,6 +19,11 @@ ComponentPoolBase* ComponentManager::GetPool(const char* componentName)
 	return poolStringMap[componentName];
 }
 
+void ComponentManager::RemoveComponent(std::string_view componentName, EntityHandle handle)
+{
+	poolStringMap[componentName]->RemoveComponent(handle);
+}
+
 Vector<IComponent*> ComponentManager::GetComponents(EntityHandle handle)
 {
 	Vector<IComponent*> components((uint32)pools.size());
@@ -31,6 +36,29 @@ Vector<IComponent*> ComponentManager::GetComponents(EntityHandle handle)
 		}
 	}
 	return components;
+}
+
+Vector<const char*> ComponentManager::GetComponentNameList()
+{
+	Vector<const char*> list((uint32)pools.size(), Mem::GetFrameAllocator());
+	for (auto& pool : poolStringMap)
+	{
+		list.Push(pool.first.data());
+	}
+
+	return list;
+}
+
+void ComponentManager::AddComponent(const char* name, EntityHandle entity, IComponent* initValue)
+{
+	auto pool = GetPool(name);
+	pool->AddComponent(entity);
+	if (initValue)
+	{
+		auto component = pool->GetComponent(entity);
+		memcpy(component, initValue, pool->GetTypeSize());
+	}
+	
 }
 
 

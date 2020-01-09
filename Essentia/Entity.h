@@ -6,9 +6,6 @@
 #include "Transform.h"
 #include "BaseComponents.h"
 
-constexpr uint32		CRootParentEntityIndex = UINT32_MAX;
-constexpr EntityHandle	Unknown = { {UINT32_MAX} };
-
 class EntityManager
 {
 public:
@@ -20,16 +17,16 @@ public:
 	ComponentManager*	GetComponentManager();
 
 	template<typename T>
-	void			AddComponent(EntityHandle handle, const T& value = T());
+	void				AddComponent(EntityHandle handle, const T& value = T());
 
 	template<typename T>
-	T* GetComponent(EntityHandle handle);
+	T*					GetComponent(EntityHandle handle);
 
 	template<typename T>
-	T* GetComponents(uint32& count);
+	T*					GetComponents(uint32& count);
 
 	template<typename T>
-	EntityHandle* GetEntities(uint32& count);
+	EntityHandle*		GetEntities(uint32& count);
 
 	Vector<IComponent*>			GetEntityComponents(EntityHandle handle);
 	TransformRef				GetTransform(EntityHandle handle);
@@ -42,7 +39,7 @@ private:
 	std::vector<uint32> freeIndices;
 	ComponentManager	componentManager;
 	TransformManager	transformManager;
-	IAllocator* allocator;
+	IAllocator*			allocator;
 };
 
 template<typename T>
