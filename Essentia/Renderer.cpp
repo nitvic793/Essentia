@@ -49,7 +49,7 @@ void Renderer::Initialize()
 	shaderResourceManager = ScopedPtr<ShaderResourceManager>(Allocate<ShaderResourceManager>());
 	frameManager = ScopedPtr<FrameManager>(Allocate<FrameManager>());
 
-	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
+	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", false);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
 
 	device = deviceResources->GetDevice();
@@ -173,7 +173,8 @@ void Renderer::Initialize()
 				renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
 			}
 
-			//swapChain->SetFullscreenState(TRUE, nullptr);
+			if(!window->IsFullscreen())
+				swapChain->SetFullscreenState(FALSE, nullptr);
 		});
 }
 

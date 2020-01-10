@@ -90,7 +90,7 @@ void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	swapChainDesc.OutputWindow = window->GetWindowHandle();
 	swapChainDesc.SampleDesc = sampleDesc;
-	swapChainDesc.Windowed = FALSE;// !window->IsFullscreen();
+	swapChainDesc.Windowed = !window->IsFullscreen();
 	swapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 
 	dxgiFactory->CreateSwapChain(
@@ -108,7 +108,9 @@ void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
 
 DeviceResources::~DeviceResources()
 {
-	if (window->IsFullscreen())
+	DXGI_SWAP_CHAIN_FULLSCREEN_DESC desc;
+	swapChain->GetFullscreenDesc(&desc);
+	if (!desc.Windowed)
 		swapChain->SetFullscreenState(FALSE, nullptr);
 }
 

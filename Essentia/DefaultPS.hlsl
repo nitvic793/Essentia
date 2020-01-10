@@ -14,15 +14,15 @@ cbuffer LightBuffer : register(b0)
     float Padding2;
 }
 
-SamplerState BasicSampler   : register(s0);
-SamplerComparisonState ShadowSampler  : register(s1);
+SamplerState            BasicSampler   : register(s0);
+SamplerComparisonState  ShadowSampler  : register(s1);
 
 Texture2D AlbedoTexture     : register(t0);
 Texture2D NormalTexture     : register(t1);
 Texture2D RoughnessTexture  : register(t2);
 Texture2D MetalnessTexture  : register(t3);
 
-//Shadow Bufer
+//Shadow Buffer
 Texture2D ShadowMapDirLight : register(t8);
 
 //IBL
