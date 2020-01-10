@@ -133,7 +133,6 @@ float3 DirLightPBR(DirectionalLight light, float3 normal, float3 worldPos,
 	float3 camPos, float roughness, float metalness,
 	float3 surfaceColor, float3 specularColor, float3 irradiance, float3 prefilteredColor, float2 brdf, float shadowAmount)
 {
-    float ao = 1.0f;
     float3 toLight = normalize(-light.Direction);
     float3 toCam = normalize(camPos - worldPos);
     float diff = DiffusePBR(normal, toLight);
@@ -150,9 +149,8 @@ float3 DirLightPBR(DirectionalLight light, float3 normal, float3 worldPos,
 
 float3 AmbientPBR(DirectionalLight light, float3 normal, float3 worldPos,
 	float3 camPos, float roughness, float metalness,
-	float3 surfaceColor, float3 specularColor, float3 irradiance, float3 prefilteredColor, float2 brdf, float shadowAmount)
+	float3 surfaceColor, float3 specularColor, float3 irradiance, float3 prefilteredColor, float2 brdf, float ao = 1.f)
 {
-    float ao = 1.0f;
     float3 toLight = normalize(-light.Direction);
     float3 toCam = normalize(camPos - worldPos);
     float diff = DiffusePBR(normal, toLight);

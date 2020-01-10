@@ -114,9 +114,11 @@ private:
 
 	//Temp -> will move to FrameManager
 	PerObjectConstantBuffer perObject;
+	PerFrameConstantBuffer	perFrame;
 	LightBuffer				lightBuffer;
 	ConstantBufferView		lightBufferView;
 	ConstantBufferView		perObjectView;
+	ConstantBufferView		perFrameView;
 	GPUHeapID				texID;
 	GPUHeapOffsets			offsets;
 	Material				material;
@@ -129,7 +131,7 @@ private:
 	ModelManager							modelManager;
 	std::map<RenderStageType, Vector<ScopedPtr<IRenderStage>>> renderStages;
 	Vector<ScopedPtr<IPostProcessStage>>	postProcessStages;
-	DescriptorHeap							imguiHeap;
+	::DescriptorHeap						imguiHeap;
 	ScopedPtr<Window>						window;
 	ScopedPtr<DeviceResources>				deviceResources;
 	ScopedPtr<ResourceManager>				resourceManager;

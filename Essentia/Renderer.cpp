@@ -26,6 +26,7 @@
 #include "PostProcessDepthOfFieldStage.h"
 #include "PostProcessToneMap.h"
 #include "DebugDrawStage.h"
+#include "ScreenSpaceAOStage.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -125,6 +126,7 @@ void Renderer::Initialize()
 	}
 
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
+	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ScreenSpaceAOStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
@@ -173,7 +175,7 @@ void Renderer::Initialize()
 				renderTargetManager->ReCreateRenderTargetView(renderTargets[i], renderTargetBuffers[i].Get(), renderTargetFormat);
 			}
 
-			if(!window->IsFullscreen())
+			if (!window->IsFullscreen())
 				swapChain->SetFullscreenState(FALSE, nullptr);
 		});
 }
@@ -227,7 +229,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto& worlds = frameContext.WorldMatrices;
 	auto drawables = frameContext.Drawables;
 	auto drawCount = frameContext.DrawableCount;
-	
+
 	auto& modelWorlds = frameContext.ModelWorldMatrices;
 	auto drawableModelCount = frameContext.DrawableModelCount;
 	auto drawableModels = frameContext.DrawableModels;
@@ -262,7 +264,19 @@ void Renderer::Render(const FrameContext& frameContext)
 		drawableModels[i].PrevWorldViewProjection = drawableModels[i].WorldViewProjection;
 	}
 
-	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView.Offset);
+	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView);
+
+	XMMATRIX T(
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.5f, 0.5f, 0.0f, 1.0f);
+	XMMATRIX viewProjTex = XMMatrixMultiply(XMMatrixMultiply(view, projection), T);
+	PerFrameConstantBuffer perFrameCb = {};
+	XMStoreFloat4x4(&perFrameCb.ViewProjectionTex, XMMatrixTranspose(viewProjTex));
+
+	shaderResourceManager->CopyToCB(imageIndex, { &perFrameCb, sizeof(perFrameCb) }, perFrameView);
+
 	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
 
 	auto rtId = renderTargets[backBufferIndex];
@@ -283,11 +297,6 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	// Set constant buffer for lights in Pixel Shader
-	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
-	// Set textures for IBL. Here we are setting 3 textures, irradiance texture is at index 0 while 
-	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
-
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"PrePass Stage");
 
 	for (auto& stage : renderStages[eRenderStagePreMain])
@@ -302,10 +311,18 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Main Render Stage");
 
+	// Set constant buffer for lights in Pixel Shader
+	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
+	// Set textures for IBL. Here we are setting 3 textures, irradiance texture is at index 0 while 
+	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
+
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	commandList->SetGraphicsRootDescriptorTable(RootSigSRVPixel2, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + GSceneResources.ShadowDepthTarget.Texture));
-	SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
+
+	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture };
+	SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
+	SetConstantBufferView(commandList, RootSigCBAll1, perFrameView);
+	SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
 	Draw(commandList, renderBucket);
@@ -418,7 +435,8 @@ void Renderer::EndInitialization()
 	MeshView mesh;
 	auto meshId = meshManager->CreateMesh("Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
-	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer)); 
+	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
+	perFrameView = shaderResourceManager->CreateCBV(sizeof(PerFrameConstantBuffer));
 
 	modelManager.CreateModel("Assets/Models/Sponza.fbx");
 
@@ -626,7 +644,7 @@ void Renderer::SetTargetSize(ID3D12GraphicsCommandList* commandList, ScreenSize 
 	D3D12_VIEWPORT viewport = {};
 	viewport.Width = (FLOAT)screenSize.Width;
 	viewport.Height = (FLOAT)screenSize.Height;
-	
+
 	D3D12_RECT scissorRect = {};
 	scissorRect.left = 0;
 	scissorRect.top = 0;
@@ -757,7 +775,7 @@ void Renderer::CreateRootSignatures()
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS |
 		D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS);
 
-	CD3DX12_STATIC_SAMPLER_DESC StaticSamplers[2];
+	CD3DX12_STATIC_SAMPLER_DESC StaticSamplers[3];
 	//Base Sampler
 	StaticSamplers[0].Init(0, D3D12_FILTER_ANISOTROPIC, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, D3D12_TEXTURE_ADDRESS_MODE_WRAP, 0.f, 4);
 	//Shadow Sampler
@@ -766,7 +784,13 @@ void Renderer::CreateRootSignatures()
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
 		D3D12_TEXTURE_ADDRESS_MODE_BORDER,
 		0.f, 16u, D3D12_COMPARISON_FUNC_LESS_EQUAL);
-	descRootSignature.NumStaticSamplers = 2;
+
+	StaticSamplers[2].Init(2, D3D12_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP);
+
+	descRootSignature.NumStaticSamplers = _countof(StaticSamplers);
 	descRootSignature.pStaticSamplers = StaticSamplers;
 
 	mainRootSignatureID = resourceManager->CreateRootSignature(descRootSignature);

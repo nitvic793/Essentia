@@ -20,5 +20,6 @@ PixelInput main(VertexInput input)
     output.Tangent = normalize(mul(input.Tangent, (float3x3) World));;
     output.WorldPos = mul(float4(input.Position, 1.0f), World).xyz;
     output.ShadowPos = float4(0.f, 0.f, 0.f, 0.f);
+    output.SSAOPos = float4(0.f, 0.f, 0.f, 0.f);
     return output;
 }

@@ -23,7 +23,9 @@ Texture2D RoughnessTexture  : register(t2);
 Texture2D MetalnessTexture  : register(t3);
 
 //Shadow Buffer
-Texture2D ShadowMapDirLight : register(t8);
+Texture2D ShadowMapDirLight     : register(t8);
+//SSAO
+Texture2D AmbientOcclusionTex   : register(t9);
 
 //IBL
 TextureCube skyIrradianceTexture    : register(t16);
@@ -139,10 +141,13 @@ float4 main(PixelInput input) : SV_TARGET
 
     float3 specColor = lerp(F0_NON_METAL.rrr, texColor.rgb, metal);
     float3 irradiance = skyIrradianceTexture.Sample(BasicSampler, normal).rgb;
+    
+    input.SSAOPos /= input.SSAOPos.w;
+    float ao = AmbientOcclusionTex.Sample(BasicSampler, input.SSAOPos.xy, 0.0f).r;
 
     float3 finalColor = AmbientPBR(DirLights[CPrimaryDirLight], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,
-		specColor, irradiance, prefilter, brdf, 1.f);
+		specColor, irradiance, prefilter, brdf, ao);
     
     float shadowAmount = SampleShadowMapOptimizedPCF(input.ShadowPos);
 

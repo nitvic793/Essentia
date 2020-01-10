@@ -48,3 +48,37 @@ struct Vector4
 	float Z;
 	float W;
 };
+
+
+
+//***************************************************************************************
+// Reference: https://github.com/d3dcoder/d3d12book/blob/master/Common/MathHelper.h
+// MathHelper.h by Frank Luna (C) 2011 All Rights Reserved.
+//
+// Helper math class.
+//***************************************************************************************
+class MathHelper
+{
+public:
+	static float RandF()
+	{
+		return (float)(rand()) / (float)RAND_MAX;
+	}
+
+	// Returns random float in [a, b).
+	static float RandF(float a, float b)
+	{
+		return a + RandF() * (b - a);
+	}
+
+	static DirectX::XMFLOAT4X4 Identity4x4()
+	{
+		static DirectX::XMFLOAT4X4 I(
+			1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f);
+
+		return I;
+	}
+};

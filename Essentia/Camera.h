@@ -15,6 +15,7 @@ public:
 	const DirectX::XMFLOAT4X4&	GetView();
 	const DirectX::XMFLOAT4X4&	GetProjection();
 	DirectX::XMFLOAT4X4			GetInverseProjectionTransposed();
+	DirectX::XMFLOAT4X4			GetInverseViewTransposed();
 	DirectX::XMFLOAT4X4			GetViewTransposed();
 	DirectX::XMFLOAT4X4			GetProjectionTransposed();
 

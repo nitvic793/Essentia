@@ -7,6 +7,7 @@ struct SceneResources
 	void				Initalize();
 	SceneRenderTarget	VelocityBuffer;
 	SceneRenderTarget	PreviousFrame;
+	SceneRenderTarget	AmbientOcclusion;
 	DepthTarget			DepthPrePass;
 	DepthTarget			ShadowDepthTarget;
 	ConstantBufferView	ShadowCBV;

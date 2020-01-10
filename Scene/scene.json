@@ -57,33 +57,6 @@
                     "TextureLoadType": 0
                 },
                 {
-                    "Name": "Assets/IBL/envDiffuseHDR.dds",
-                    "Width": 256,
-                    "Height": 256,
-                    "Format": 2,
-                    "IsCubeMap": true,
-                    "HasMips": false,
-                    "TextureLoadType": 1
-                },
-                {
-                    "Name": "Assets/IBL/envBrdf.dds",
-                    "Width": 256,
-                    "Height": 256,
-                    "Format": 2,
-                    "IsCubeMap": false,
-                    "HasMips": false,
-                    "TextureLoadType": 1
-                },
-                {
-                    "Name": "Assets/IBL/envSpecularHDR.dds",
-                    "Width": 512,
-                    "Height": 512,
-                    "Format": 2,
-                    "IsCubeMap": true,
-                    "HasMips": false,
-                    "TextureLoadType": 1
-                },
-                {
                     "Name": "Assets/Textures/Sponza_Thorn_diffuse.DDS",
                     "Width": 1024,
                     "Height": 1024,
@@ -561,6 +534,33 @@
                     "TextureLoadType": 1
                 },
                 {
+                    "Name": "Assets/IBL/envDiffuseHDR.dds",
+                    "Width": 256,
+                    "Height": 256,
+                    "Format": 2,
+                    "IsCubeMap": true,
+                    "HasMips": false,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/IBL/envBrdf.dds",
+                    "Width": 256,
+                    "Height": 256,
+                    "Format": 2,
+                    "IsCubeMap": false,
+                    "HasMips": false,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/IBL/envSpecularHDR.dds",
+                    "Width": 512,
+                    "Height": 512,
+                    "Format": 2,
+                    "IsCubeMap": true,
+                    "HasMips": false,
+                    "TextureLoadType": 1
+                },
+                {
                     "Name": "Assets/Textures/SunnyCubeMap.dds",
                     "Width": 1024,
                     "Height": 1024,
@@ -592,13 +592,13 @@
                     "DrawableComponent"
                 ],
                 "PositionComponent": {
-                    "X": -1.5858433246612549,
+                    "X": -0.06715089082717896,
                     "Y": 1.0,
                     "Z": 0.4000000059604645
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 4.155888080596924,
+                    "Y": 2.3645899295806886,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -624,12 +624,12 @@
                 ],
                 "PositionComponent": {
                     "X": 0.0,
-                    "Y": 4.5580291748046879,
+                    "Y": 5.01678991317749,
                     "Z": 5.0
                 },
                 "RotationComponent": {
-                    "X": 1.6623551845550538,
-                    "Y": 1.6623551845550538,
+                    "X": 0.9458359479904175,
+                    "Y": 0.9458359479904175,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -685,7 +685,7 @@
                 ],
                 "PositionComponent": {
                     "X": 0.0,
-                    "Y": 0.0,
+                    "Y": 4.0,
                     "Z": 0.0
                 },
                 "RotationComponent": {
@@ -729,13 +729,13 @@
                         "Y": 0.10000000149011612,
                         "Z": 0.10000000149011612
                     },
-                    "Intensity": 1.883941650390625,
-                    "Range": 5.5357666015625
+                    "Intensity": 1.0335801839828492,
+                    "Range": 2.1343207359313967
                 },
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 3.0,
-                    "Z": 8.970294952392579
+                    "Z": -9.998590469360352
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -837,13 +837,13 @@
                         "Y": 0.8578431606292725,
                         "Z": 0.23128125071525575
                     },
-                    "Intensity": 1.883941650390625,
-                    "Range": 5.5357666015625
+                    "Intensity": 1.0335801839828492,
+                    "Range": 2.1343207359313967
                 },
                 "PositionComponent": {
                     "X": -6.650000095367432,
                     "Y": 3.0,
-                    "Z": 8.970294952392579
+                    "Z": -9.998590469360352
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -873,13 +873,13 @@
                         "Y": 0.5578431487083435,
                         "Z": 0.9312812685966492
                     },
-                    "Intensity": 1.883941650390625,
-                    "Range": 5.5357666015625
+                    "Intensity": 1.0335801839828492,
+                    "Range": 2.1343207359313967
                 },
                 "PositionComponent": {
                     "X": -15.300000190734864,
                     "Y": 3.0,
-                    "Z": 8.970294952392579
+                    "Z": -9.998590469360352
                 },
                 "RotationComponent": {
                     "X": 0.0,

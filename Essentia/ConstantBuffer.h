@@ -21,6 +21,11 @@ struct ShadowConstantBuffer
 	DirectX::XMFLOAT4X4 Projection;
 };
 
+struct PerFrameConstantBuffer
+{
+	DirectX::XMFLOAT4X4 ViewProjectionTex;
+};
+
 struct DirectionalLight
 {
 	DirectX::XMFLOAT3	Direction;

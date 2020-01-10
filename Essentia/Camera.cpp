@@ -54,8 +54,17 @@ DirectX::XMFLOAT4X4 Camera::GetInverseProjectionTransposed()
 	XMFLOAT4X4 invProjMatrix;
 	auto proj = XMLoadFloat4x4(&Projection);
 	auto invProj = XMMatrixInverse(nullptr, proj);
-	XMStoreFloat4x4(&invProjMatrix, invProj);
+	XMStoreFloat4x4(&invProjMatrix, XMMatrixTranspose(invProj));
 	return invProjMatrix;
+}
+
+DirectX::XMFLOAT4X4 Camera::GetInverseViewTransposed()
+{
+	XMFLOAT4X4 invViewMatrix;
+	auto view = XMLoadFloat4x4(&View);
+	auto invView = XMMatrixInverse(nullptr, view);
+	XMStoreFloat4x4(&invViewMatrix, XMMatrixTranspose(invView));
+	return invViewMatrix;
 }
 
 XMFLOAT4X4 Camera::GetViewTransposed()

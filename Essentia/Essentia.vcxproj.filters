@@ -83,11 +83,11 @@
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="cpp.hint" />
-    <None Include="Common.hlsli">
-      <Filter>Shaders\PBR</Filter>
-    </None>
     <None Include="Lighting.hlsli">
       <Filter>Shaders\PBR</Filter>
+    </None>
+    <None Include="Common.hlsli">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -230,6 +230,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShadowRenderStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenSpaceAOStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
   </ItemGroup>
@@ -432,6 +435,9 @@
     <ClInclude Include="ShadowRenderStage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ScreenSpaceAOStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -486,6 +492,12 @@
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="DepthOnlyVS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="ScreenSpaceAOPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="AOQuadVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

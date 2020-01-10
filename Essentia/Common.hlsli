@@ -13,8 +13,9 @@ struct PixelInput
 	float2 UV			: TEXCOORD;
 	float3 Normal		: NORMAL;
 	float3 Tangent		: TANGENT;
-	float3 WorldPos		: POSITION;
+	float3 WorldPos		: POSITION0;
     float4 ShadowPos	: SHADOW_POS;
+    float4 SSAOPos		: POSITION1;
 };
 
 float3 CalculateNormalFromSample(float3 normalSample, float2 uv, float3 normal, float3 tangent)
