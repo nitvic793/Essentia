@@ -49,7 +49,7 @@ void Renderer::Initialize()
 	shaderResourceManager = ScopedPtr<ShaderResourceManager>(Allocate<ShaderResourceManager>());
 	frameManager = ScopedPtr<FrameManager>(Allocate<FrameManager>());
 
-	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
+	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", false);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
 
 	device = deviceResources->GetDevice();
@@ -124,7 +124,7 @@ void Renderer::Initialize()
 		renderStages.insert(std::pair<RenderStageType, Vector<ScopedPtr<IRenderStage>>>((RenderStageType)i, std::move(stages)));
 	}
 
-	//renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
+	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));

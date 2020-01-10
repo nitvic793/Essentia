@@ -15,10 +15,12 @@ public:
 	ID3D12Device*		GetDevice();
 	IDXGISwapChain3*	GetSwapChain();
 	ID3D12CommandQueue* GetCommandQueue();
+	ID3D12CommandQueue* GetComputeQueue();
 private:
 	DeviceResources();
 	Microsoft::WRL::ComPtr<ID3D12Device>		device;
 	Microsoft::WRL::ComPtr<ID3D12CommandQueue>	commandQueue;
+	Microsoft::WRL::ComPtr<ID3D12CommandQueue>	computeQueue;
 	Microsoft::WRL::ComPtr<IDXGISwapChain3>		swapChain;
 	Microsoft::WRL::ComPtr<IDXGIFactory4>		dxgiFactory;
 	Window* window;

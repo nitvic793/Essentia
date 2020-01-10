@@ -25,7 +25,7 @@ void PipelineStates::Initialize()
 	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
 	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
 	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();
-	psoDesc.VS = ShaderManager::LoadShader(L"DefaultVS.cso");
+	psoDesc.VS = ShaderManager::LoadShader(L"DepthOnlyVS.cso");
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	//psoDesc.DepthStencilState.DepthEnable = true;
 	psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
@@ -39,7 +39,8 @@ void PipelineStates::Initialize()
 	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
 	
 	DepthOnlyPSO = resourceManager->CreatePSO(psoDesc);
-
+	
+	psoDesc.VS = ShaderManager::LoadShader(L"DefaultVS.cso");
 	psoDesc.InputLayout.pInputElementDescs = nullptr;
 	psoDesc.InputLayout.NumElements = 0;
 	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();

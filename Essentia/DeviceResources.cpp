@@ -70,6 +70,8 @@ void DeviceResources::CreateCommandQueue()
 {
 	D3D12_COMMAND_QUEUE_DESC cqDesc = {};
 	auto hr = device->CreateCommandQueue(&cqDesc, IID_PPV_ARGS(commandQueue.GetAddressOf()));
+	cqDesc.Type = D3D12_COMMAND_LIST_TYPE_COMPUTE;
+	hr = device->CreateCommandQueue(&cqDesc, IID_PPV_ARGS(computeQueue.GetAddressOf()));
 }
 
 void DeviceResources::CreateSwapChain(Window* window, DXGI_FORMAT format)
@@ -142,4 +144,9 @@ IDXGISwapChain3* DeviceResources::GetSwapChain()
 ID3D12CommandQueue* DeviceResources::GetCommandQueue()
 {
 	return commandQueue.Get();
+}
+
+ID3D12CommandQueue* DeviceResources::GetComputeQueue()
+{
+	return computeQueue.Get();
 }

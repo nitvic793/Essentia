@@ -7,7 +7,7 @@
 struct EngineContext;
 
 SceneRenderTarget	CreateSceneRenderTarget(EngineContext* context, uint32 width, uint32 height, DXGI_FORMAT format);
-DepthTarget			CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthFormat, DXGI_FORMAT depthTextureFormat);
+DepthTarget			CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthFormat, DXGI_FORMAT depthTextureFormat, D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 class RenderTargetManager
 {

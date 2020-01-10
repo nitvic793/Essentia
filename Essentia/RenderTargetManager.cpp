@@ -84,7 +84,7 @@ SceneRenderTarget CreateSceneRenderTarget(EngineContext* context, uint32 width, 
 	return target;
 }
 
-DepthTarget CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthFormat, DXGI_FORMAT depthTextureFormat)
+DepthTarget CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthFormat, DXGI_FORMAT depthTextureFormat, D3D12_RESOURCE_STATES initialState)
 {
 	auto resourceManager = GContext->ResourceManager;
 	auto renderTargetManager = GContext->RenderTargetManager;
@@ -94,7 +94,7 @@ DepthTarget CreateDepthTarget(uint32 width, uint32 height, DXGI_FORMAT depthForm
 	auto depthBufferResourceId = resourceManager->CreateResource(
 		CD3DX12_RESOURCE_DESC::Tex2D(depthFormat, width, height, 1, 0, 1, 0, D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL),
 		&clearVal,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE
+		initialState
 	);
 
 	auto depthBuffer = resourceManager->GetResource(depthBufferResourceId);

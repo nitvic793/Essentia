@@ -8,6 +8,7 @@ public:
 	virtual void Initialize() override;
 	virtual void Render(const uint32 frameIndex, const FrameContext& frameContext) override;
 private:
-	ID3D12PipelineState* depthOnlyPso;
+	ID3D12PipelineState*	depthOnlyPso;
+	DepthTarget				depthTarget;
 };
 

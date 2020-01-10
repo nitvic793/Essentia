@@ -12,6 +12,8 @@
 
 using namespace DirectX;
 
+constexpr float CSkyHeight = 200.f;
+
 void ShadowRenderStage::Initialize()
 {
 	shadowCBVs = Vector<ConstantBufferView>(CMaxInitialEntityCount);
@@ -21,7 +23,7 @@ void ShadowRenderStage::Initialize()
 	GSceneResources.ShadowDepthTarget = shadowDepthTarget;
 	GSceneResources.ShadowCBV = shaderResourceManager->CreateCBV(sizeof(ShadowConstantBuffer));
 
-	for (int i = 0; i < 10; ++i)
+	for (int i = 0; i < CMaxInitialEntityCount; ++i)
 	{
 		shadowCBVs.Push(shaderResourceManager->CreateCBV(sizeof(ShadowDirParams)));
 	}
@@ -69,9 +71,7 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	auto lights = GContext->EntityManager->GetComponents<DirectionalLightComponent>(count);
 
 	auto dir = -XMVector3Normalize(XMLoadFloat3(&lights[0].Direction));
-	auto eyePosV = XMVectorSet(0, 0, 0, 0) + 100 * dir;
-	XMFLOAT3 eyePos;
-	XMStoreFloat3(&eyePos, eyePosV);
+	auto eyePosV = XMVectorSet(0, 0, 0, 0) + CSkyHeight * dir;
 
 	//Create Shadow CBVs
 	XMMATRIX shView = XMMatrixLookAtLH(
