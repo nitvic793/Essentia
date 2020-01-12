@@ -79,6 +79,9 @@
     <Filter Include="Source Files\Scene">
       <UniqueIdentifier>{6557b1ff-ffab-4d2f-8549-2b3598de52f4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\SSAO">
+      <UniqueIdentifier>{5d3285fd-e20e-4710-87d9-94f314b44dda}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -494,11 +497,14 @@
     <FxCompile Include="DepthOnlyVS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="ScreenSpaceAOPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="AOQuadVS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\SSAO</Filter>
+    </FxCompile>
+    <FxCompile Include="ScreenSpaceAOPS.hlsl">
+      <Filter>Shaders\SSAO</Filter>
+    </FxCompile>
+    <FxCompile Include="SSAOBlurPS.hlsl">
+      <Filter>Shaders\SSAO</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

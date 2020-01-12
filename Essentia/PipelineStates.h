@@ -10,6 +10,7 @@ public:
 	PipelineStateID DepthOnlyPSO;
 	PipelineStateID	ShadowDirPSO; // Directional Light Shadow Map PSO
 	PipelineStateID ScreenSpaceAOPSO;
+	PipelineStateID SSAOBlurPSO;
 
 	//Post Process PSOs
 	PipelineStateID QuadPSO;

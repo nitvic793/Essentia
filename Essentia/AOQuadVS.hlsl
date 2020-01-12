@@ -1,5 +1,5 @@
 
-cbuffer AOVSParams
+cbuffer AOVSParams : register(b0)
 {
     float4x4 InvProj;
 };

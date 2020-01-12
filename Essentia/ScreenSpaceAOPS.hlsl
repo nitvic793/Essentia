@@ -28,6 +28,7 @@ static const int gSampleCount = 14;
 SamplerState BasicSampler               : register(s0);
 SamplerComparisonState ShadowSampler    : register(s1);
 SamplerState LinearWrapSampler          : register(s2);
+SamplerState PointClampSampler          : register(s3);
 
 Texture2D DepthTexture      : register(t0);
 Texture2D RandomVecTexture  : register(t1);
@@ -83,7 +84,7 @@ float4 main(VertexOut input) : SV_TARGET
     float3 p = (pz / input.PosV.z) * input.PosV;
   
     float3 randVec = 2.0f * RandomVecTexture.SampleLevel(BasicSampler, 4.0f * input.UV, 0.0f).rgb - 1.0f;
-    
+    //randVec = lerp(randVec, float3(BlurWeights[0].xyz), 0.5f);
     float occlusionSum = 0.0f;
 
     for (int i = 0; i < gSampleCount; ++i)

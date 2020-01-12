@@ -28,18 +28,17 @@ void ScreenSpaceAOStage::Initialize()
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 	auto renderer = GContext->RendererInstance;
 	auto sz = renderer->GetScreenSize();
-
 	auto format = DXGI_FORMAT_R32G32B32A32_FLOAT; //For debugging, should be R32_FLOAT;
 	aoRenderTarget = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
-	aoBlurIntermediate = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format); 
+	aoBlurIntermediate = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
 	aoBlurFinal = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
 	aoParamsCBV = shaderResourceManager->CreateCBV(sizeof(AOParams));
 	aoVSParamsCBV = shaderResourceManager->CreateCBV(sizeof(AOVSParams));
 
-	aoBlurDir1 = shaderResourceManager->CreateCBV(sizeof(BlurParams));
-	aoBlurDir2 = shaderResourceManager->CreateCBV(sizeof(BlurParams));
+	aoBlurDir1 = shaderResourceManager->CreateCBV(sizeof(SSAOBlurParams));
+	aoBlurDir2 = shaderResourceManager->CreateCBV(sizeof(SSAOBlurParams));
 
-	BuildOffsetVectors();
+	BuildOffsetVectors(); 
 	memcpy(aoParams.OffsetVectors, mOffsets, sizeof(XMFLOAT4) * 14);
 
 	Vector<float> weights = CalcGaussWeights(2.5f);
@@ -47,10 +46,10 @@ void ScreenSpaceAOStage::Initialize()
 	aoParams.BlurWeights[1] = XMFLOAT4(&weights.GetData()[4]);
 	aoParams.BlurWeights[2] = XMFLOAT4(&weights.GetData()[8]);
 
-	aoParams.OcclusionRadius = 1.5f;
-	aoParams.OcclusionFadeStart = 0.4f;
-	aoParams.OcclusionFadeEnd = 1.1f;
-	aoParams.SurfaceEpsilon = 0.10f;
+	aoParams.OcclusionRadius = 0.5f;
+	aoParams.OcclusionFadeStart = 0.2f;
+	aoParams.OcclusionFadeEnd = 1.0f;
+	aoParams.SurfaceEpsilon = 0.05f;
 
 	BuildRandomVectorTexture(renderer->GetDefaultCommandList());
 	GSceneResources.AmbientOcclusion = aoBlurFinal;
@@ -98,7 +97,57 @@ void ScreenSpaceAOStage::Render(const uint32 frameIndex, const FrameContext& fra
 
 	renderer->TransitionBarrier(commandList, aoRenderTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-	GPostProcess.RenderBlurTexture(aoRenderTarget.Texture, sz, frameIndex, aoBlurFinal, aoBlurIntermediate, aoBlurDir1, aoBlurDir2);
+	BlurSSAO(frameIndex);
+}
+
+void ScreenSpaceAOStage::BlurSSAO(uint32 frameIndex)
+{
+	auto shaderResourceManager = GContext->ShaderResourceManager;
+	auto resourceManager = GContext->ResourceManager;
+	auto renderer = GContext->RendererInstance;
+	auto commandList = renderer->GetDefaultCommandList();
+	auto rtManager = GContext->RenderTargetManager;
+	auto sz = renderer->GetScreenSize();
+
+	SSAOBlurParams blurDirHorizontal = { XMFLOAT2(1.f / (float)sz.Width, 0.f) };
+	SSAOBlurParams blurDirVertical = { XMFLOAT2(0.f, 1.f / (float)sz.Height) };
+
+	shaderResourceManager->CopyToCB(frameIndex, { &blurDirHorizontal, sizeof(blurDirHorizontal) }, aoBlurDir1);
+	shaderResourceManager->CopyToCB(frameIndex, { &blurDirVertical, sizeof(blurDirVertical) }, aoBlurDir2);
+
+	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.SSAOBlurPSO));
+
+	renderer->TransitionBarrier(commandList, aoBlurIntermediate.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	renderer->SetRenderTargets(&aoBlurIntermediate.RenderTarget, 1, nullptr);
+	commandList->ClearRenderTargetView(rtManager->GetRTVHandle(aoBlurIntermediate.RenderTarget), ColorValues::ClearColor, 0, nullptr);
+
+	TextureID textures[] = { GSceneResources.DepthPrePass.Texture, randomVecTextureId, aoRenderTarget.Texture };
+	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, textures, _countof(textures));
+	renderer->SetConstantBufferView(commandList, RootSigCBAll1, aoBlurDir1);
+	//Draw Screen Quad
+	commandList->IASetVertexBuffers(0, 0, nullptr);
+	commandList->IASetIndexBuffer(nullptr);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->DrawInstanced(6, 1, 0, 0);
+
+	renderer->TransitionBarrier(commandList, aoBlurIntermediate.Resource,  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	renderer->TransitionBarrier(commandList, aoBlurFinal.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	renderer->SetRenderTargets(&aoBlurFinal.RenderTarget, 1, nullptr);
+	commandList->ClearRenderTargetView(rtManager->GetRTVHandle(aoBlurFinal.RenderTarget), ColorValues::ClearColor, 0, nullptr);
+	renderer->SetConstantBufferView(commandList, RootSigCBAll1, aoBlurDir2);
+	TextureID textures2[] = { GSceneResources.DepthPrePass.Texture, randomVecTextureId, aoBlurIntermediate.Texture };
+	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, textures2, _countof(textures2));
+
+	//Draw Screen Quad
+	commandList->IASetVertexBuffers(0, 0, nullptr);
+	commandList->IASetIndexBuffer(nullptr);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->DrawInstanced(6, 1, 0, 0);
+
+	renderer->TransitionBarrier(commandList, aoBlurFinal.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
 }
 
 void ScreenSpaceAOStage::BuildRandomVectorTexture(ID3D12GraphicsCommandList* commandList)
@@ -123,18 +172,6 @@ void ScreenSpaceAOStage::BuildRandomVectorTexture(ID3D12GraphicsCommandList* com
 	randomVectorResourceId = resourceManager->CreateResource(texDesc, nullptr, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	auto randomVectorMap = resourceManager->GetResource(randomVectorResourceId);
-	//ThrowIfFailed(device->CreateCommittedResource(
-	//	&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
-	//	D3D12_HEAP_FLAG_NONE,
-	//	&texDesc,
-	//	D3D12_RESOURCE_STATE_GENERIC_READ,
-	//	nullptr,
-	//	IID_PPV_ARGS(&mRandomVectorMap)));
-
-	//
-	// In order to copy CPU memory data into our default buffer, we need to create
-	// an intermediate upload heap. 
-	//
 
 	const UINT num2DSubresources = texDesc.DepthOrArraySize * texDesc.MipLevels;
 	const UINT64 uploadBufferSize = GetRequiredIntermediateSize(randomVectorMap, 0, num2DSubresources);
@@ -160,12 +197,6 @@ void ScreenSpaceAOStage::BuildRandomVectorTexture(ID3D12GraphicsCommandList* com
 	subResourceData.pData = initData.GetData();
 	subResourceData.RowPitch = 256 * sizeof(PackedVector::XMCOLOR);
 	subResourceData.SlicePitch = subResourceData.RowPitch * 256;
-
-	//
-	// Schedule to copy the data to the default resource, and change states.
-	// Note that mCurrSol is put in the GENERIC_READ state so it can be 
-	// read by a shader.
-	//
 
 	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(randomVectorMap,
 		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST));

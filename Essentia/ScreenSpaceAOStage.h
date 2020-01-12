@@ -23,6 +23,11 @@ struct AOVSParams
 	DirectX::XMFLOAT4X4	InvProjection;
 };
 
+struct SSAOBlurParams
+{
+	DirectX::XMFLOAT2 TexOffset; // 1/ScreenSize.x or y
+};
+
 class ScreenSpaceAOStage : public IRenderStage
 {
 public:
@@ -44,6 +49,7 @@ private:
 	ResourceID				randomVectorResourceId;
 	ResourceID				randomVecTextureId;
 
+	void					BlurSSAO(uint32 frameIndex);
 	void					BuildRandomVectorTexture(ID3D12GraphicsCommandList* commandList);
 	void					BuildOffsetVectors();
 	Vector<float>			CalcGaussWeights(float sigma);

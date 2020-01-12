@@ -123,4 +123,8 @@ void PipelineStates::CreateScreenSpaceAOPSO()
 	psoDesc.NumRenderTargets = 1;
 
 	ScreenSpaceAOPSO = GContext->ResourceManager->CreatePSO(psoDesc);
+
+	psoDesc.PS = ShaderManager::LoadShader(L"SSAOBlurPS.cso");
+
+	SSAOBlurPSO = GContext->ResourceManager->CreatePSO(psoDesc);
 }
