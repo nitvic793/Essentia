@@ -238,6 +238,9 @@
     <ClCompile Include="ScreenSpaceAOStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
+    <ClCompile Include="ComputeContext.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -441,6 +444,9 @@
     <ClInclude Include="ScreenSpaceAOStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
+    <ClInclude Include="ComputeContext.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -505,6 +511,9 @@
     </FxCompile>
     <FxCompile Include="SSAOBlurPS.hlsl">
       <Filter>Shaders\SSAO</Filter>
+    </FxCompile>
+    <FxCompile Include="LightCullingCS.hlsl">
+      <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

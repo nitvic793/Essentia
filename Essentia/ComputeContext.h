@@ -4,7 +4,7 @@
 #include "d3dx12.h"
 #include "DeviceResources.h"
 
-class CommandContext
+class ComputeContext
 {
 public:
 	void							Initialize(DeviceResources* deviceResources);
@@ -20,13 +20,15 @@ public:
 	void							ResetCommandList(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator);
 	void							CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator** allocator);
 	uint64&							Fence(int index);
+	ID3D12RootSignature*			GetComputeRootSignature();
 private:
 	uint32												backBufferIndex;
-	DeviceResources*									deviceResources;
+	DeviceResources* deviceResources;
 	Microsoft::WRL::ComPtr<ID3D12CommandAllocator>		commandAllocators[CFrameBufferCount];
 	Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList>	commandList;
 	Microsoft::WRL::ComPtr<ID3D12Fence>					fences[CFrameBufferCount];
+	RootSignatureID										computeRootSignatureID;
+	ID3D12RootSignature*								computeRootSignature;
 	uint64												fenceValues[CFrameBufferCount];
 	HANDLE												fenceEvent[CFrameBufferCount];
 };
-

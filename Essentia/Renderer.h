@@ -10,6 +10,7 @@
 #include "ResourceManager.h"
 #include "Camera.h"
 #include "CommandContext.h"
+#include "ComputeContext.h"
 #include "Mesh.h"
 #include "ConstantBuffer.h"
 #include "DXUtility.h"
@@ -150,6 +151,7 @@ private:
 	TextureID								depthStencilTexture;
 
 	ScopedPtr<CommandContext>				commandContext;
+	ScopedPtr<ComputeContext>				computeContext;
 };
 
 template<typename T>

@@ -12,6 +12,7 @@ class ModelManager;
 class FrameManager;
 class IAllocator;
 class ComponentReflector;
+class ComputeContext;
 
 struct EngineContext;
 extern EngineContext* GContext;
@@ -25,6 +26,7 @@ struct EngineContext
 	ShaderResourceManager*	ShaderResourceManager = nullptr;
 	ResourceManager*		ResourceManager = nullptr;
 	CommandContext*			CommandContext = nullptr;
+	ComputeContext*			ComputeContext = nullptr;
 	DeviceResources*		DeviceResources = nullptr;
 	RenderTargetManager*	RenderTargetManager = nullptr;
 	ModelManager*			ModelManager = nullptr;
