@@ -14,6 +14,7 @@ void PipelineStates::Initialize()
 	auto renderer = ec->RendererInstance;
 	auto resourceManager = ec->ResourceManager;
 
+	CreateDefaultPSOs();
 	CreateShadowPSO();
 	CreateScreenSpaceAOPSO();
 
@@ -66,6 +67,40 @@ void PipelineStates::Initialize()
 	BlurPSO = ec->ResourceManager->CreatePSO(psoDesc);
 }
 
+void PipelineStates::CreateDefaultPSOs()
+{
+	auto resourceManager = GContext->ResourceManager;
+	auto renderer = GContext->RendererInstance;
+	auto vertexShaderBytecode = ShaderManager::LoadShader(L"DefaultVS.cso");
+	auto pixelShaderBytecode = ShaderManager::LoadShader(L"DefaultPS.cso");
+
+	DXGI_SAMPLE_DESC sampleDesc = {};
+	sampleDesc.Count = 1;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
+	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();
+	psoDesc.VS = vertexShaderBytecode;
+	psoDesc.PS = pixelShaderBytecode;
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	//psoDesc.DepthStencilState.DepthEnable = false;
+	//psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.RTVFormats[0] = renderer->GetHDRRenderTargetFormat();
+	psoDesc.SampleDesc = sampleDesc;
+	psoDesc.SampleMask = 0xffffffff;
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.AntialiasedLineEnable = true;
+	//psoDesc.RasterizerState.DepthClipEnable = false;
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.NumRenderTargets = 1;
+	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
+
+	DefaultPSO = resourceManager->CreatePSO(psoDesc);
+}
+
 void PipelineStates::CreateShadowPSO()
 {
 	auto renderer = GContext->RendererInstance;
@@ -90,7 +125,7 @@ void PipelineStates::CreateShadowPSO()
 	descPipelineState.SampleMask = UINT_MAX;
 	descPipelineState.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	descPipelineState.NumRenderTargets = 0;
-	//descPipelineState.RTVFormats[0] = mDsvFormat;
+	//descPipelineState.RTVFormats[0] = mDsvFormat; 
 	descPipelineState.DSVFormat = shadowMapFormat;
 	descPipelineState.SampleDesc.Count = 1;
 
@@ -100,7 +135,7 @@ void PipelineStates::CreateShadowPSO()
 void PipelineStates::CreateScreenSpaceAOPSO()
 {
 	auto renderer = GContext->RendererInstance;
-	auto texFormat = DXGI_FORMAT_R32G32B32A32_FLOAT; //For debugging, should be R32_FLOAT
+	auto texFormat = DXGI_FORMAT_R32_FLOAT; //For debugging, should be R32_FLOAT
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;

@@ -7,6 +7,8 @@ struct PipelineStates
 {
 public:
 	void Initialize();
+	PipelineStateID	DefaultPSO;
+	PipelineStateID DefaultNoAOPSO;
 	PipelineStateID DepthOnlyPSO;
 	PipelineStateID	ShadowDirPSO; // Directional Light Shadow Map PSO
 	PipelineStateID ScreenSpaceAOPSO;
@@ -17,6 +19,7 @@ public:
 	PipelineStateID HDRQuadPSO;
 	PipelineStateID BlurPSO;
 private:
+	void CreateDefaultPSOs();
 	void CreateShadowPSO();
 	void CreateScreenSpaceAOPSO();
 };

@@ -5,6 +5,7 @@
 struct SceneResources
 {
 	void				Initalize();
+	PipelineStateID		CurrentPSO;
 	SceneRenderTarget	VelocityBuffer;
 	SceneRenderTarget	PreviousFrame;
 	SceneRenderTarget	AmbientOcclusion;

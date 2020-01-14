@@ -16,6 +16,8 @@ cbuffer LightBuffer : register(b0)
 
 SamplerState            BasicSampler   : register(s0);
 SamplerComparisonState  ShadowSampler  : register(s1);
+SamplerState            LinearWrapSampler : register(s2);
+SamplerState            PointClampSampler : register(s3);
 
 Texture2D AlbedoTexture     : register(t0);
 Texture2D NormalTexture     : register(t1);
@@ -143,7 +145,7 @@ float4 main(PixelInput input) : SV_TARGET
     float3 irradiance = skyIrradianceTexture.Sample(BasicSampler, normal).rgb;
     
     input.SSAOPos /= input.SSAOPos.w;
-    float ao = AmbientOcclusionTex.Sample(BasicSampler, input.SSAOPos.xy, 0.0f).r;
+    float ao = AmbientOcclusionTex.SampleLevel(BasicSampler, input.SSAOPos.xy, 0.0f).r;
 
     float3 finalColor = AmbientPBR(DirLights[CPrimaryDirLight], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,

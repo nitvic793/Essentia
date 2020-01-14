@@ -75,7 +75,7 @@ void Renderer::Initialize()
 
 	InitializeCommandContext();
 	CreateRootSignatures();
-	CreatePSOs();
+
 
 	meshManager->Initialize(commandContext.get());
 	shaderResourceManager->Initialize(resourceManager.get(), deviceResources.get());
@@ -99,6 +99,7 @@ void Renderer::Initialize()
 	GPipelineStates.Initialize();
 	GPostProcess.Intitialize();
 	GSceneResources.Initalize();
+	CreatePSOs();
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -327,8 +328,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
-	Draw(commandList, renderBucket);
-	Draw(commandList, drawableModels, drawableModelCount);
+	Draw(commandList, renderBucket, frameContext.Camera);
+	Draw(commandList, drawableModels, drawableModelCount, frameContext.Camera);
 
 	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
 	{
@@ -687,7 +688,7 @@ void Renderer::SetVSync(bool enabled)
 	vsync = enabled;
 }
 
-void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket)
+void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, Camera* camera)
 {
 	for (auto pipeline : bucket.Pipelines)
 	{
@@ -716,8 +717,9 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& 
 	}
 }
 
-void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count)
+void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, Camera* camera)
 {
+	auto frustum = camera->Frustum;
 	for (size_t i = 0; i < count; ++i)
 	{
 		auto& model = modelManager.GetModel(drawableModels[i].Model);
@@ -805,34 +807,7 @@ void Renderer::CreateRootSignatures()
 
 void Renderer::CreatePSOs()
 {
-	auto vertexShaderBytecode = ShaderManager::LoadShader(L"DefaultVS.cso");
-	auto pixelShaderBytecode = ShaderManager::LoadShader(L"DefaultPS.cso");
-
-	DXGI_SAMPLE_DESC sampleDesc = {};
-	sampleDesc.Count = 1;
-
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
-	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
-	psoDesc.pRootSignature = resourceManager->GetRootSignature(mainRootSignatureID);
-	psoDesc.VS = vertexShaderBytecode;
-	psoDesc.PS = pixelShaderBytecode;
-	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
-	//psoDesc.DepthStencilState.DepthEnable = false;
-	//psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	//psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
-	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-	psoDesc.RTVFormats[0] = hdrRenderTargetFormat;
-	psoDesc.SampleDesc = sampleDesc;
-	psoDesc.SampleMask = 0xffffffff;
-	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.AntialiasedLineEnable = true;
-	//psoDesc.RasterizerState.DepthClipEnable = false;
-	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
-	psoDesc.NumRenderTargets = 1;
-	psoDesc.DSVFormat = depthFormat;
-
-	defaultPSO = resourceManager->CreatePSO(psoDesc);
+	defaultPSO = GPipelineStates.DefaultPSO;
 }
 
 void Renderer::CreateDepthStencil()

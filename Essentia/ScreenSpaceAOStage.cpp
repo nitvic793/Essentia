@@ -28,7 +28,7 @@ void ScreenSpaceAOStage::Initialize()
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 	auto renderer = GContext->RendererInstance;
 	auto sz = renderer->GetScreenSize();
-	auto format = DXGI_FORMAT_R32G32B32A32_FLOAT; //For debugging, should be R32_FLOAT;
+	auto format = DXGI_FORMAT_R32_FLOAT; //For debugging, should be R32_FLOAT;
 	aoRenderTarget = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
 	aoBlurIntermediate = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
 	aoBlurFinal = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);

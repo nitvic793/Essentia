@@ -30,7 +30,7 @@ SamplerComparisonState ShadowSampler    : register(s1);
 SamplerState LinearWrapSampler          : register(s2);
 SamplerState PointClampSampler          : register(s3);
 
-Texture2D DepthTexture      : register(t0);
+Texture2D<float> DepthTexture      : register(t0);
 Texture2D RandomVecTexture  : register(t1);
 
 float3 VSPositionFromDepth(float2 vTexCoord, float depth)
