@@ -229,9 +229,6 @@
     <ClCompile Include="DebugDraw.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="DebugDrawStage.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ShadowRenderStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
@@ -239,7 +236,10 @@
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
     <ClCompile Include="ComputeContext.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDrawStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -429,23 +429,23 @@
     <ClInclude Include="ComponentReflector.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="Serialization.h">
-      <Filter>Header Files\Utility</Filter>
-    </ClInclude>
     <ClInclude Include="DebugDraw.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="DebugDrawStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
-    <ClInclude Include="ShadowRenderStage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScreenSpaceAOStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
     <ClInclude Include="ComputeContext.h">
       <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowRenderStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
