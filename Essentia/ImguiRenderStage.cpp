@@ -17,6 +17,12 @@ class ImguiVisitor : public IVisitor
 	std::vector<std::string> meshList; 
 	std::string meshName = ""; // Needs to be declared here to maintain state
 public:
+	ImguiVisitor()
+	{
+		auto meshManager = GContext->MeshManager;
+		meshList = meshManager->GetAllMeshNames();
+	}
+
 	virtual void Visit(const char* compName, const char* name, float& val) override
 	{
 		ImGui::PushID(compName);
@@ -43,10 +49,9 @@ public:
 	{
 		auto meshManager = GContext->MeshManager;
 		meshName = meshManager->GetName(val);
-		meshList = meshManager->GetAllMeshNames();
 
 		ImGui::PushID(compName);
-		if (ImGui::BeginCombo("##meshCombo", meshName.c_str(), ImGuiSelectableFlags_SpanAllColumns))
+		if (ImGui::BeginCombo("##meshCombo", meshName.c_str()))
 		{
 			for (auto mesh : meshList)
 			{
@@ -69,7 +74,7 @@ public:
 
 	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) override
 	{
-
+		
 	}
 };
 
