@@ -15,6 +15,8 @@ class IVisitor
 public:
 	virtual void Visit(const char* compName, const char* name, float& val) { };
 	virtual void Visit(const char* compName, const char* name, DirectX::XMFLOAT3& val) { };
+	virtual void Visit(const char* compName, const char* name, MeshHandle& val) { };
+	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) { };
 private:
 };
 

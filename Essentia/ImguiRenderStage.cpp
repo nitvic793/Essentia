@@ -14,6 +14,8 @@ using namespace DirectX;
 
 class ImguiVisitor : public IVisitor
 {
+	std::vector<std::string> meshList; 
+	std::string meshName = ""; // Needs to be declared here to maintain state
 public:
 	virtual void Visit(const char* compName, const char* name, float& val) override
 	{
@@ -35,6 +37,39 @@ public:
 			ImGui::DragFloat3(label.c_str(), &val.x, 0.05f);
 		}
 		ImGui::PopID();
+	}
+
+	virtual void Visit(const char* compName, const char* name, MeshHandle& val) override
+	{
+		auto meshManager = GContext->MeshManager;
+		meshName = meshManager->GetName(val);
+		meshList = meshManager->GetAllMeshNames();
+
+		ImGui::PushID(compName);
+		if (ImGui::BeginCombo("##meshCombo", meshName.c_str(), ImGuiSelectableFlags_SpanAllColumns))
+		{
+			for (auto mesh : meshList)
+			{
+				bool isSelected = (strcmp(meshName.c_str(), mesh.c_str()) == 0);
+				if (ImGui::Selectable(mesh.c_str(), isSelected))
+				{
+					meshName = mesh;
+				}
+
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		val = meshManager->GetMeshHandle(meshName.c_str());
+		ImGui::PopID();
+	}
+
+	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) override
+	{
+
 	}
 };
 
@@ -158,12 +193,12 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		static int selected = -1;
 		Vector<const char*> list = cm->GetComponentNameList();
 		static const char* currentItem = NULL;
-		
-		if (ImGui::BeginCombo("##combo", currentItem)) 
+
+		if (ImGui::BeginCombo("##combo", currentItem))
 		{
 			for (auto component : list)
 			{
-				bool isSelected = (currentItem == component); 
+				bool isSelected = (currentItem == component);
 				if (ImGui::Selectable(component, isSelected))
 					currentItem = component;
 				if (isSelected)
@@ -177,7 +212,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		{
 			cm->AddComponent(currentItem, selectedEntities[0]);
 		}
-		
+
 		ImGui::End();
 	}
 

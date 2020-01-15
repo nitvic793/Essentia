@@ -114,6 +114,10 @@ void Visit(DirectionalLightComponent* component, IVisitor* visitor)
 
 void Visit(DrawableComponent* component, IVisitor* visitor)
 {
+	auto comp = component;
+	auto name = comp->ComponentName;
+	visitor->Visit(name, MField(comp, Mesh));
+	visitor->Visit(name, MField(comp, Material));
 }
 
 void Visit(DrawableModelComponent* component, IVisitor* visitor)
