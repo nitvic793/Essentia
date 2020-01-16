@@ -5,8 +5,9 @@ struct VertexToPixel
 	float2 uv           : TEXCOORD0;
 };
 
-Texture2D<float4>		InputTexture : register(t0);
-SamplerState			BasicSampler : register(s0);
+Texture2D<float4>		InputTexture		: register(t0);
+SamplerState			BasicSampler		: register(s0);
+SamplerState			LinearWrapSampler	: register(s1);
 
 float3 ToneMapFilmicALU(float3 color)
 {
@@ -19,7 +20,7 @@ float3 ToneMapFilmicALU(float3 color)
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float3 color = InputTexture.Sample(BasicSampler, input.uv).rgb;
+    float3 color = InputTexture.Sample(LinearWrapSampler, input.uv).rgb;
 	color = ToneMapFilmicALU(color);
 	return float4(saturate(color), 1.0f);
 }

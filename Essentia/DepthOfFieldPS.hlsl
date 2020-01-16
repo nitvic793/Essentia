@@ -33,12 +33,14 @@ Texture2D			BlurTexture		: register(t1);
 Texture2D<float>	DepthTexture	: register(t2);
 
 SamplerState		BasicSampler	: register(s0);
+SamplerState		LinearWrapSampler : register(s1);
+SamplerState		PointClampSampler : register(s2);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	float3 sharp = SceneTexture.Sample(BasicSampler, input.uv).rgb;
-	float3 blur = BlurTexture.Sample(BasicSampler, input.uv).rgb;
-	float depth = DepthTexture.Sample(BasicSampler, input.uv).r;
+    float3 sharp = SceneTexture.Sample(LinearWrapSampler, input.uv).rgb;
+    float3 blur = BlurTexture.Sample(LinearWrapSampler, input.uv).rgb;
+    float depth = DepthTexture.Sample(PointClampSampler, input.uv).r;
 
 	float linearZ = LinearZ(depth);
 	float scale = 1.f - Scale;

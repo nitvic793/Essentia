@@ -14,6 +14,7 @@ Texture2D<float4>		InputTexture		: register(t0);
 Texture2D<float4>		PrevFrameTexture	: register(t1);
 Texture2D<float4>		VelocityTexture		: register(t2);
 SamplerState			BasicSampler		: register(s0);
+SamplerState			LinearWrapSampler	: register(s1);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
@@ -22,15 +23,15 @@ float4 main(VertexToPixel input) : SV_TARGET
 
 	float3 neighbourhood[9];
 
-	neighbourhood[0] = InputTexture.Sample(BasicSampler, input.uv + float2(-1, -1) * texelSize).xyz;
-	neighbourhood[1] = InputTexture.Sample(BasicSampler, input.uv + float2(+0, -1) * texelSize).xyz;
-	neighbourhood[2] = InputTexture.Sample(BasicSampler, input.uv + float2(+1, -1) * texelSize).xyz;
-	neighbourhood[3] = InputTexture.Sample(BasicSampler, input.uv + float2(-1, +0) * texelSize).xyz;
-	neighbourhood[4] = InputTexture.Sample(BasicSampler, input.uv + float2(+0, +0) * texelSize).xyz;
-	neighbourhood[5] = InputTexture.Sample(BasicSampler, input.uv + float2(+1, +0) * texelSize).xyz;
-	neighbourhood[6] = InputTexture.Sample(BasicSampler, input.uv + float2(-1, +1) * texelSize).xyz;
-	neighbourhood[7] = InputTexture.Sample(BasicSampler, input.uv + float2(+0, +1) * texelSize).xyz;
-	neighbourhood[8] = InputTexture.Sample(BasicSampler, input.uv + float2(+1, +1) * texelSize).xyz;
+	neighbourhood[0] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(-1, -1) * texelSize).xyz;
+	neighbourhood[1] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(+0, -1) * texelSize).xyz;
+	neighbourhood[2] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(+1, -1) * texelSize).xyz;
+	neighbourhood[3] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(-1, +0) * texelSize).xyz;
+	neighbourhood[4] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(+0, +0) * texelSize).xyz;
+	neighbourhood[5] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(+1, +0) * texelSize).xyz;
+	neighbourhood[6] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(-1, +1) * texelSize).xyz;
+	neighbourhood[7] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(+0, +1) * texelSize).xyz;
+    neighbourhood[8] = InputTexture.Sample(LinearWrapSampler, input.uv + float2(+1, +1) * texelSize).xyz;
 
 	float3 nmin = neighbourhood[0];
 	float3 nmax = neighbourhood[0];
@@ -39,9 +40,9 @@ float4 main(VertexToPixel input) : SV_TARGET
 		nmax = max(nmax, neighbourhood[i]);
 	}
 
-	float2 vel = VelocityTexture.Sample(BasicSampler, input.uv).xy;
+    float2 vel = VelocityTexture.Sample(LinearWrapSampler, input.uv).xy;
 	float2 histUv = input.uv + vel.xy;
-	float3 histSample = clamp(PrevFrameTexture.Sample(BasicSampler, histUv).xyz, nmin, nmax);
+    float3 histSample = clamp(PrevFrameTexture.Sample(LinearWrapSampler, histUv).xyz, nmin, nmax);
 	float blend = 0.05;
 
 	bool a = (bool)(histUv > float2(1.0, 1.0));

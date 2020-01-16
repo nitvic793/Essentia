@@ -129,12 +129,12 @@ float SampleShadowMapOptimizedPCF(float4 shadowPos)
 
 float4 main(PixelInput input) : SV_TARGET
 {
-    float roughness = RoughnessTexture.Sample(BasicSampler, input.UV).r;
-    float metal = MetalnessTexture.Sample(BasicSampler, input.UV).r;
+    float roughness = RoughnessTexture.Sample(LinearWrapSampler, input.UV).r;
+    float metal = MetalnessTexture.Sample(LinearWrapSampler, input.UV).r;
     float3 worldPos = input.WorldPos;
     float4 texColor = AlbedoTexture.Sample(BasicSampler, input.UV);
     float3 color = texColor.rgb;
-    float3 normalSample = NormalTexture.Sample(BasicSampler, input.UV).xyz;
+    float3 normalSample = NormalTexture.Sample(LinearWrapSampler, input.UV).xyz;
     float3 normal = CalculateNormalFromSample(normalSample, input.UV, input.Normal, input.Tangent);
 
     float3 viewDir = normalize(CameraPosition - worldPos);
@@ -142,7 +142,7 @@ float4 main(PixelInput input) : SV_TARGET
     float2 brdf = BrdfLUT(normal, viewDir, roughness);
 
     float3 specColor = lerp(F0_NON_METAL.rrr, texColor.rgb, metal);
-    float3 irradiance = skyIrradianceTexture.Sample(BasicSampler, normal).rgb;
+    float3 irradiance = skyIrradianceTexture.Sample(LinearWrapSampler, normal).rgb;
     
     input.SSAOPos /= input.SSAOPos.w;
     float ao = AmbientOcclusionTex.SampleLevel(BasicSampler, input.SSAOPos.xy, 0.0f).r;
