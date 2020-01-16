@@ -75,7 +75,7 @@ float4 main(VertexOut input) : SV_TARGET
     };
     
     float2 texelSize = 1.f / ScreenSize;
-    float depth = DepthTexture.SampleLevel(BasicSampler, input.UV, 0.f).r;
+    float depth = DepthTexture.SampleLevel(LinearWrapSampler, input.UV, 0.f).r;
     float3 vsPos = VSPositionFromDepth(input.UV, depth);
     float3 normal = ReconstructNormal(vsPos);
     float3 n = normal;
@@ -93,7 +93,7 @@ float4 main(VertexOut input) : SV_TARGET
 
         float2 tex = input.UV + i * TexOffset;
 
-        float depthValue = DepthTexture.SampleLevel(BasicSampler, tex, 0.0f).r;
+        float depthValue = DepthTexture.SampleLevel(LinearWrapSampler, tex, 0.0f).r;
         vsPos = VSPositionFromDepth(input.UV, depthValue);
         float3 neighborNormal = ReconstructNormal(VSPositionFromDepth(tex, depthValue));
         float neighborDepth = NdcDepthToViewDepth(depthValue);
@@ -106,7 +106,7 @@ float4 main(VertexOut input) : SV_TARGET
 
 			// Add neighbor pixel to blur.
             color += weight * InputTexture.SampleLevel(
-                BasicSampler, tex, 0.0);
+                LinearWrapSampler, tex, 0.0);
 		
             totalWeight += weight;
         }

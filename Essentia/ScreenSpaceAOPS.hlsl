@@ -74,7 +74,7 @@ float OcclusionFunction(float distZ)
 float4 main(VertexOut input) : SV_TARGET
 {
     float2 texelSize = 1.f / ScreenSize;
-    float depth = DepthTexture.SampleLevel(BasicSampler, input.UV, 0.f).r;
+    float depth = DepthTexture.SampleLevel(LinearWrapSampler, input.UV, 0.f).r;
     float3 vsPos = VSPositionFromDepth(input.UV, depth);
     float3 normal = ReconstructNormal(vsPos);
     float3 n = normal;
@@ -83,7 +83,7 @@ float4 main(VertexOut input) : SV_TARGET
     pz = NdcDepthToViewDepth(pz);
     float3 p = (pz / input.PosV.z) * input.PosV;
   
-    float3 randVec = 2.0f * RandomVecTexture.SampleLevel(BasicSampler, 4.0f * input.UV, 0.0f).rgb - 1.0f;
+    float3 randVec = 2.0f * RandomVecTexture.SampleLevel(LinearWrapSampler, 4.0f * input.UV, 0.0f).rgb - 1.0f;
     randVec = normalize(randVec);
     //randVec = lerp(randVec, float3(BlurWeights[0].xyz), 0.5f);
     float occlusionSum = 0.0f;
@@ -97,7 +97,7 @@ float4 main(VertexOut input) : SV_TARGET
         float4 projQ = mul(float4(q, 1.0f), ProjectionTex);
         projQ /= projQ.w;
 
-        float rz = DepthTexture.SampleLevel(BasicSampler, projQ.xy, 0.0f).r;
+        float rz = DepthTexture.SampleLevel(LinearWrapSampler, projQ.xy, 0.0f).r;
         rz = NdcDepthToViewDepth(rz);
 
         float3 r = (rz / q.z) * q;
