@@ -182,14 +182,14 @@ void ScreenSpaceAOStage::BuildRandomVectorTexture(ID3D12GraphicsCommandList* com
 	Vector<PackedVector::XMCOLOR> initData;
 	initData.SetSize(256 * 256);
 	//PackedVector::XMCOLOR initData[256 * 256];
-	for (int i = 0; i < 256; ++i)
+	for (size_t i = 0; i < 256; ++i)
 	{
-		for (int j = 0; j < 256; ++j)
+		for (size_t j = 0; j < 256; ++j)
 		{
 			// Random vector in [0,1].  We will decompress in shader to [-1,1].
 			XMFLOAT3 v(MathHelper::RandF(), MathHelper::RandF(), MathHelper::RandF());
 
-			initData[(uint32)i * 256 + j] = PackedVector::XMCOLOR(v.x, v.y, v.z, 0.0f);
+			initData[(uint32)(i * 256 + j)] = PackedVector::XMCOLOR(v.x, v.y, v.z, 0.0f);
 		}
 	}
 

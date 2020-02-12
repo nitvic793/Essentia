@@ -435,13 +435,9 @@ void Renderer::EndInitialization()
 	brdfLutTexture = shaderResourceManager->CreateTexture("Assets/IBL/envBrdf.dds", DDS, false);
 	prefilterTexture = shaderResourceManager->CreateTexture("Assets/IBL/envSpecularHDR.dds", DDS, false);
 
-	MeshView mesh;
-	auto meshId = meshManager->CreateMesh("Assets/Models/sphere.obj", mesh);
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 	perFrameView = shaderResourceManager->CreateCBV(sizeof(PerFrameConstantBuffer));
-
-	modelManager.CreateModel("Assets/Models/Sponza.fbx");
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
