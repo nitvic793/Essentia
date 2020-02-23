@@ -14,34 +14,25 @@ cbuffer LightBuffer : register(b0)
     float Padding2;
 }
 
-SamplerState            BasicSampler   : register(s0);
-SamplerComparisonState  ShadowSampler  : register(s1);
-SamplerState            LinearWrapSampler : register(s2);
-SamplerState            PointClampSampler : register(s3);
+SamplerState BasicSampler : register(s0);
+SamplerComparisonState ShadowSampler : register(s1);
+SamplerState LinearWrapSampler : register(s2);
+SamplerState PointClampSampler : register(s3);
 
-Texture2D AlbedoTexture     : register(t0);
-Texture2D NormalTexture     : register(t1);
-Texture2D RoughnessTexture  : register(t2);
-Texture2D MetalnessTexture  : register(t3);
+Texture2D AlbedoTexture : register(t0);
+Texture2D NormalTexture : register(t1);
+Texture2D RoughnessTexture : register(t2);
+Texture2D MetalnessTexture : register(t3);
 
 //Shadow Buffer
-Texture2D ShadowMapDirLight     : register(t8);
+Texture2D ShadowMapDirLight : register(t8);
 //SSAO
-Texture2D AmbientOcclusionTex   : register(t9);
+Texture2D AmbientOcclusionTex : register(t9);
 
 //IBL
-TextureCube skyIrradianceTexture    : register(t16);
-Texture2D brdfLUTTexture            : register(t17);
-TextureCube skyPrefilterTexture     : register(t18);
-
-float3 ToneMapFilmicALU(float3 color)
-{
-    color = max(0, color - 0.004f);
-    color = (color * (6.2f * color + 0.5f)) / (color * (6.2f * color + 1.7f) + 0.06f);
-    return color;
-	// result has 1/2.2 baked in
-    return pow(color, 2.2f);
-}
+TextureCube skyIrradianceTexture : register(t16);
+Texture2D brdfLUTTexture : register(t17);
+TextureCube skyPrefilterTexture : register(t18);
 
 float3 PrefilteredColor(float3 viewDir, float3 normal, float roughness)
 {
@@ -137,7 +128,7 @@ float4 main(PixelInput input) : SV_TARGET
     float3 normalSample = NormalTexture.Sample(LinearWrapSampler, input.UV).xyz;
     float3 normal = CalculateNormalFromSample(normalSample, input.UV, input.Normal, input.Tangent);
 
-    float3 viewDir = normalize(CameraPosition - worldPos);
+    float3 viewDir = normalize(worldPos - CameraPosition);
     float3 prefilter = PrefilteredColor(viewDir, normal, roughness);
     float2 brdf = BrdfLUT(normal, viewDir, roughness);
 

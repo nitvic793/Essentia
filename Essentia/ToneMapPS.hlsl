@@ -18,9 +18,19 @@ float3 ToneMapFilmicALU(float3 color)
 	return pow(color, 2.2f);
 }
 
+float3 ACESFilm(float3 x)
+{
+    float a = 2.51;
+    float b = 0.03;
+    float c = 2.43;
+    float d = 0.59;
+    float e = 0.14;
+    return (x * (a * x + b)) / (x * (c * x + d) + e);
+}
+
 float4 main(VertexToPixel input) : SV_TARGET
 {
     float3 color = InputTexture.Sample(LinearWrapSampler, input.uv).rgb;
-	color = ToneMapFilmicALU(color);
+    color = ToneMapFilmicALU(color);
 	return float4(saturate(color), 1.0f);
 }
