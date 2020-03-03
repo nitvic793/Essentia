@@ -9,6 +9,7 @@
 #include <fstream>
 #include <unordered_map>
 #include "Math.h"
+#include "PostProcessComponents.h"
 
 class IVisitor
 {
@@ -142,7 +143,9 @@ void Visit(DrawableComponent* component, IVisitor* visitor);
 void Visit(DrawableModelComponent* component, IVisitor* visitor);
 void Visit(SkyboxComponent* component, IVisitor* visitor);
 void Visit(SelectedComponent* component, IVisitor* visitor);
-
+void Visit(PostProcessVolumeComponent* component, IVisitor* visitor);
+void Visit(BaseDrawableComponent* component, IVisitor* visitor);
+void Visit(CameraComponent* component, IVisitor* visitor);
 
 
 

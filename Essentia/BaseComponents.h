@@ -6,6 +6,7 @@
 #include "Engine.h"
 #include "ConstantBuffer.h"
 #include "CMath.h"
+#include "Camera.h"
 
 /*
 Serialization for predefined types
@@ -112,6 +113,32 @@ struct ScaleComponent : public IComponent
 };
 
 struct IDrawable : public IComponent {};
+
+struct BaseDrawableComponent : public IComponent
+{
+	ConstantBufferView	CBView;
+	DirectX::XMFLOAT4X4 WorldViewProjection;
+	DirectX::XMFLOAT4X4 PrevWorldViewProjection;
+
+	static BaseDrawableComponent Create()
+	{
+		BaseDrawableComponent component;
+		component.CBView = es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
+		return component;
+	}
+
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+	};
+
+	GComponent(BaseDrawableComponent)
+};
 
 struct DrawableComponent : public IDrawable
 {
@@ -406,5 +433,30 @@ struct SelectedComponent : public IComponent
 //TODO: Make camera part of Component System 
 struct CameraComponent : public IComponent
 {
-	template<class Archive> void serialize(Archive& a) {};
+	Camera CameraInstance;
+
+	CameraComponent() :
+		CameraInstance(1920, 1080) {};
+
+	CameraComponent(int width, int height) : 
+		CameraInstance((float)width, (float)height)
+	{}
+
+	template<class Archive> 
+	void serialize(Archive& archive) 
+	{
+		archive(
+			CEREAL_NVP(CameraInstance.NearZ),
+			CEREAL_NVP(CameraInstance.FarZ),
+			CEREAL_NVP(CameraInstance.FieldOfView)
+		);
+	}
+
+	static CameraComponent Create(int width = 1920, int height = 1080)
+	{
+		CameraComponent component(width, height);
+		return component;
+	}
+
+	GComponent(CameraComponent)
 };

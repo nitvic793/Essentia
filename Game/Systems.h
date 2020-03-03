@@ -10,7 +10,7 @@ public:
 	virtual void Initialize()
 	{
 		cManager = entityManager->GetComponentManager();
-		auto e = entityManager->CreateEntity(DefaultTransform, 0);
+		auto e = entityManager->CreateEntity(DefaultTransform, 1);
 		entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
 	}
 

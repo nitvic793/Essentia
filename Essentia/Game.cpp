@@ -25,6 +25,7 @@ void Game::Setup()
 
 	RegisterComponents();
 	coreSystemsManager.RegisterSystem<TransformUpdateSystem>();
+	coreSystemsManager.RegisterSystem<UpdateCameraSystem>();
 	coreSystemsManager.RegisterSystem<EditorSaveSystem>();
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
 

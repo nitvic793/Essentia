@@ -3,6 +3,7 @@
 #include <functional>
 #include <cereal/cereal.hpp>
 #include "ComponentReflector.h"
+#include "PostProcessComponents.h"
 
 ComponentReflector GComponentReflector;
 
@@ -18,6 +19,9 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<DrawableModelComponent>();
 	GComponentReflector.RegisterComponent<SkyboxComponent>();
 	GComponentReflector.RegisterComponent<SelectedComponent>();
+	GComponentReflector.RegisterComponent<PostProcessVolumeComponent>();
+	GComponentReflector.RegisterComponent<BaseDrawableComponent>();
+	GComponentReflector.RegisterComponent<CameraComponent>();
 }
 
 Scene LoadLevel(const char* fname)
@@ -129,5 +133,17 @@ void Visit(SkyboxComponent* component, IVisitor* visitor)
 }
 
 void Visit(SelectedComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(PostProcessVolumeComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(BaseDrawableComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(CameraComponent* component, IVisitor* visitor)
 {
 }

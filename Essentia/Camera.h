@@ -28,6 +28,7 @@ public:
 	DirectX::BoundingFrustum	Frustum;
 	float						NearZ;
 	float						FarZ;
+	float						FieldOfView;
 
 private:
 	DirectX::XMMATRIX XM_CALLCONV GetViewMatrix();

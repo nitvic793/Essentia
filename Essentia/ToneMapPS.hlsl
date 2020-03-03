@@ -9,6 +9,25 @@ Texture2D<float4>		InputTexture		: register(t0);
 SamplerState			BasicSampler		: register(s0);
 SamplerState			LinearWrapSampler	: register(s1);
 
+// linear white point
+static const float W = 1.2;
+static const float T2 = 7.5;
+
+float FilmicReinhardCurve(float x)
+{
+    float q = (T2 * T2 + 1.0) * x * x;
+    return q / (q + x + T2 * T2);
+}
+
+float3 FilmicReinhard(float3 x)
+{
+    float w = FilmicReinhardCurve(W);
+    return float3(
+        FilmicReinhardCurve(x.r),
+        FilmicReinhardCurve(x.g),
+        FilmicReinhardCurve(x.b)) / w;
+}
+
 float3 ToneMapFilmicALU(float3 color)
 {
 	color = max(0, color - 0.004f);

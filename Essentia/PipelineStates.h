@@ -13,6 +13,7 @@ public:
 	PipelineStateID	ShadowDirPSO; // Directional Light Shadow Map PSO
 	PipelineStateID ScreenSpaceAOPSO;
 	PipelineStateID SSAOBlurPSO;
+	PipelineStateID LightAccumPSO;
 
 	//Post Process PSOs
 	PipelineStateID QuadPSO;
@@ -20,6 +21,7 @@ public:
 	PipelineStateID BlurPSO;
 private:
 	void CreateDefaultPSOs();
+	void CreateLightAccumPSO();
 	void CreateShadowPSO();
 	void CreateScreenSpaceAOPSO();
 };

@@ -241,6 +241,9 @@
     <ClCompile Include="DebugDrawStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
+    <ClCompile Include="VolumetricLightStage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -447,6 +450,12 @@
     <ClInclude Include="Serialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="VolumetricLightStage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PostProcessComponents.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -513,6 +522,9 @@
       <Filter>Shaders\SSAO</Filter>
     </FxCompile>
     <FxCompile Include="LightCullingCS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="AccumulateFogPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

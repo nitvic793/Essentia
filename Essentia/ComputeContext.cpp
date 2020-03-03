@@ -74,7 +74,7 @@ ID3D12Device* ComputeContext::GetDevice()
 
 void ComputeContext::SubmitCommands(ID3D12GraphicsCommandList* commandList)
 {
-	auto commandQueue = deviceResources->GetCommandQueue();
+	auto commandQueue = deviceResources->GetComputeQueue();
 	commandList->Close();
 	ID3D12CommandList* ppCommandLists[] = { commandList };
 	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);;
@@ -91,7 +91,7 @@ void ComputeContext::WaitForFrame()
 
 void ComputeContext::CleanUp()
 {
-	auto commandQueue = deviceResources->GetCommandQueue();
+	auto commandQueue = deviceResources->GetComputeQueue();
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
 		uint32 backBufferIndex = i;
@@ -135,7 +135,7 @@ ID3D12RootSignature* ComputeContext::GetComputeRootSignature()
 
 void ComputeContext::WaitForFrame(uint32 index)
 {
-	auto commandQueue = deviceResources->GetCommandQueue();
+	auto commandQueue = deviceResources->GetComputeQueue();
 	backBufferIndex = index;
 	if (fences[index]->GetCompletedValue() < fenceValues[index])
 	{

@@ -181,3 +181,25 @@ public:
 	DirectX::XMFLOAT2 prevPos = {};
 	float Speed = 20.f;
 };
+
+class UpdateCameraSystem : public ISystem
+{
+public:
+	void Initialize()
+	{}
+
+	virtual void Update(float deltaTime, float totalTime) override
+	{
+		uint32 count = 0;
+		auto entities = GetEntities<CameraComponent>(count);
+		auto components = GetComponents<CameraComponent>(count);
+		for (uint32 i = 0; i < count; ++i)
+		{
+			auto position = entityManager->GetComponent<PositionComponent>(entities[i]);
+			auto rotation = entityManager->GetComponent<RotationComponent>(entities[i]);
+			components[i].CameraInstance.Position = *position;
+			components[i].CameraInstance.Rotation = *rotation;
+			components[i].CameraInstance.Update(deltaTime, totalTime);
+		}
+	}
+};

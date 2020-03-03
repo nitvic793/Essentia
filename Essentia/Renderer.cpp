@@ -27,6 +27,7 @@
 #include "PostProcessToneMap.h"
 #include "DebugDrawStage.h"
 #include "ScreenSpaceAOStage.h"
+#include "VolumetricLightStage.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -131,6 +132,7 @@ void Renderer::Initialize()
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ScreenSpaceAOStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
+	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VolumetricLightStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));

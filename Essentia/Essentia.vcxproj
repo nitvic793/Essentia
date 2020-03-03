@@ -277,6 +277,7 @@
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VelocityBufferStage.cpp" />
+    <ClCompile Include="VolumetricLightStage.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -291,6 +292,7 @@
     <ClInclude Include="CMath.h" />
     <ClInclude Include="PipelineStates.h" />
     <ClInclude Include="PostProcess.h" />
+    <ClInclude Include="PostProcessComponents.h" />
     <ClInclude Include="PostProcessDepthOfFieldStage.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="EngineContext.h" />
@@ -347,9 +349,18 @@
     <ClInclude Include="Utility.h" />
     <ClInclude Include="VelocityBufferStage.h" />
     <ClInclude Include="Vertex.h" />
+    <ClInclude Include="VolumetricLightStage.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
+    <FxCompile Include="AccumulateFogPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
     <FxCompile Include="AOQuadVS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Vertex</ShaderType>

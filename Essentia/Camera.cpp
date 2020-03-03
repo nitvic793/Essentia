@@ -5,7 +5,8 @@ using namespace DirectX;
 
 Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAngles):
 	NearZ(nearZ),
-	FarZ(farZ)
+	FarZ(farZ),
+	FieldOfView(fovInAngles)
 {
 	Position = XMFLOAT3(0, 0, -5);
 	Direction = XMFLOAT3(0, 0, 1);
