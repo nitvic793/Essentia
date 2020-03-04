@@ -120,6 +120,11 @@ public:
 
 	virtual void Update(float deltaTime, float totalTime) override
 	{
+		uint32 count = 0;
+		auto camEntity = entityManager->GetEntities<CameraComponent>(count);
+		auto transform = entityManager->GetTransform(camEntity[0]);
+		auto cameras = entityManager->GetComponents<CameraComponent>(count);
+		auto camera = cameras[0].CameraInstance;
 		bool debugNav = false;
 #ifdef EDITOR
 		auto stages = GRenderStageManager.GetRenderStageMap();
@@ -129,8 +134,8 @@ public:
 		debugNav = false;
 #endif
 		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
-		auto dir = XMLoadFloat3(&camera->Direction);
-		auto pos = XMLoadFloat3(&camera->Position);
+		auto dir = XMLoadFloat3(&camera.Direction);
+		auto pos = XMLoadFloat3(transform.Position);
 
 		float Speed = this->Speed;
 
@@ -170,10 +175,10 @@ public:
 			yDiff = (float)(mouse.y - prevPos.y) * 0.005f;
 		}
 
-		XMStoreFloat3(&camera->Position, pos);
+		XMStoreFloat3(transform.Position, pos);
 
-		camera->Rotation.x += yDiff;
-		camera->Rotation.y += xDiff;
+		transform.Rotation->x += yDiff;
+		transform.Rotation->y += xDiff;
 		prevPos.x = (float)mouse.x;
 		prevPos.y = (float)mouse.y;
 	}

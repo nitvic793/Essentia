@@ -146,4 +146,13 @@ void Visit(BaseDrawableComponent* component, IVisitor* visitor)
 
 void Visit(CameraComponent* component, IVisitor* visitor)
 {
+	auto comp = component;
+	auto name = comp->ComponentName;
+	auto Cam = &comp->CameraInstance;
+	visitor->Visit(name, MField(Cam, Width));
+	visitor->Visit(name, MField(Cam, Height));
+	visitor->Visit(name, MField(Cam, NearZ));
+	visitor->Visit(name, MField(Cam, FarZ));
+	visitor->Visit(name, MField(Cam, FieldOfView));
+	visitor->Visit(name, MField(Cam, IsOrthographic));
 }

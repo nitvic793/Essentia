@@ -53,8 +53,8 @@ void Game::Run()
 			localCounter += timer.DeltaTime;
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
-			coreSystemsManager.Update(kbState, mouseState, camera.Get());
-			gameSystemsManager.Update(kbState, mouseState, camera.Get());
+			coreSystemsManager.Update(kbState, mouseState, nullptr);
+			gameSystemsManager.Update(kbState, mouseState, nullptr);
 			Update();
 			camera->Update();
 			Render();
@@ -109,7 +109,7 @@ Game::~Game()
 void Game::Render()
 {
 	uint32 count;
-	FrameContext frameContext = { camera.Get(), &timer };
+	FrameContext frameContext = { nullptr, &timer };
 
 	frameContext.EntityManager = &entityManager;
 

@@ -55,14 +55,15 @@ void SkyBoxRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 
 	if (count == 0) return;
 
+	auto camera = entityManager->GetComponents<CameraComponent>(count)[0].CameraInstance;
 	auto cubeMap = skybox[0].CubeMap;
 	auto offsets = renderer->GetHeapOffsets();
 	auto frame = renderer->GetFrameManager();
 	auto commandList = renderer->GetDefaultCommandList();
 
 	PerObjectConstantBuffer buffer;
-	buffer.View = frameContext.Camera->GetViewTransposed();
-	buffer.Projection = frameContext.Camera->GetProjectionTransposed();
+	buffer.View = camera.GetViewTransposed();
+	buffer.Projection = camera.GetProjectionTransposed();
 	shaderResourceManager->CopyToCB(frameIndex, { &buffer, sizeof(buffer) }, skybox[0].CBView.Offset);
 
 	commandList->SetPipelineState(skyPSO);

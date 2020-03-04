@@ -29,6 +29,9 @@ public:
 	float						NearZ;
 	float						FarZ;
 	float						FieldOfView;
+	float						Width;
+	float						Height;
+	bool						IsOrthographic;
 
 private:
 	DirectX::XMMATRIX XM_CALLCONV GetViewMatrix();

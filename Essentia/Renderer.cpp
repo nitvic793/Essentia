@@ -222,14 +222,15 @@ void Renderer::Clear()
 
 void Renderer::Render(const FrameContext& frameContext)
 {
+	uint32 camCount;
+	auto camera = frameContext.EntityManager->GetComponents<CameraComponent>(camCount)[0].CameraInstance;
 	auto imageIndex = backBufferIndex;
-	auto camera = frameContext.Camera;
 
-	perObject.View = camera->GetViewTransposed();
-	perObject.Projection = camera->GetProjectionTransposed();
+	perObject.View = camera.GetViewTransposed();
+	perObject.Projection = camera.GetProjectionTransposed();
 
 	UpdateLightBuffer();
-	lightBuffer.CameraPosition = camera->Position;
+	lightBuffer.CameraPosition = camera.Position;
 
 	auto& worlds = frameContext.WorldMatrices;
 	auto drawables = frameContext.Drawables;
@@ -239,8 +240,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto drawableModelCount = frameContext.DrawableModelCount;
 	auto drawableModels = frameContext.DrawableModels;
 
-	auto projection = XMLoadFloat4x4(&camera->Projection);
-	auto view = XMLoadFloat4x4(&camera->View);
+	auto projection = XMLoadFloat4x4(&camera.Projection);
+	auto view = XMLoadFloat4x4(&camera.View);
 
 	//Copy world matrix to constant buffer
 	for (size_t i = 0; i < drawCount; ++i)
@@ -330,8 +331,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
-	Draw(commandList, renderBucket, frameContext.Camera);
-	Draw(commandList, drawableModels, drawableModelCount, frameContext.Camera);
+	Draw(commandList, renderBucket, &camera);
+	Draw(commandList, drawableModels, drawableModelCount, &camera);
 
 	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
 	{
@@ -717,7 +718,6 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& 
 
 void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, Camera* camera)
 {
-	auto frustum = camera->Frustum;
 	for (size_t i = 0; i < count; ++i)
 	{
 		auto& model = modelManager.GetModel(drawableModels[i].Model);

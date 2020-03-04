@@ -25,7 +25,6 @@ void SystemManager::Update(const DirectX::Keyboard::State& kbState, const Direct
 	{
 		system->keyboard = kbState;
 		system->mouse = mouseState;
-		system->camera = camera;
 		system->Update(deltaTime, totalTime);
 	}
 }

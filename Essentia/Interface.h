@@ -18,6 +18,7 @@ public:
 	virtual void Visit(const char* compName, const char* name, DirectX::XMFLOAT3& val) { };
 	virtual void Visit(const char* compName, const char* name, MeshHandle& val) { };
 	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) { };
+	virtual void Visit(const char* compName, const char* name, bool& val) { };
 private:
 };
 

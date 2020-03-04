@@ -6,6 +6,7 @@
 #include "SceneResources.h"
 #include <DirectXPackedVector.h>
 #include "d3dx12.h"
+#include "Entity.h"
 
 using namespace DirectX;
 
@@ -64,8 +65,10 @@ void ScreenSpaceAOStage::Render(const uint32 frameIndex, const FrameContext& fra
 	auto commandList = renderer->GetDefaultCommandList();
 	auto rtManager = GContext->RenderTargetManager;
 	auto sz = renderer->GetScreenSize();
+	auto entityManager = GContext->EntityManager;
+	uint32 count = 0;
 
-	auto camera = frameContext.Camera;
+	auto camera = &entityManager->GetComponents<CameraComponent>(count)[0].CameraInstance;
 	auto projTransposed = camera->GetProjectionTransposed();
 	aoParams.Projection = projTransposed;
 	aoParams.InvProjection = camera->GetInverseProjectionTransposed();

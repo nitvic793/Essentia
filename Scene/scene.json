@@ -885,7 +885,42 @@
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 0.0, 
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                }
+            },
+            {
+                "Entity": {
+                    "entity.ID": 9
+                },
+                "ParentIndex": -1,
+                "Components": [
+                    "CameraComponent",
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent"
+                ],
+                "CameraComponent": {
+                    "CameraInstance.Width": 1920.0,
+                    "CameraInstance.Height": 1080.0,
+                    "CameraInstance.NearZ": 0.1,
+                    "CameraInstance.FarZ": 300.0,
+                    "CameraInstance.FieldOfView": 45.0,
+                    "CameraInstance.IsOrthographic": false
+                },
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": -5.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
                     "Z": 0.0
                 },
                 "ScaleComponent": {

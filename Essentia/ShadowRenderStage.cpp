@@ -38,6 +38,9 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	auto resourceManager = GContext->ResourceManager;
 	auto rtManager = GContext->RenderTargetManager;
 	auto commandList = renderer->GetDefaultCommandList();
+	auto entityManager = GContext->EntityManager;
+	uint32 count = 0;
+	auto camera = &entityManager->GetComponents<CameraComponent>(count)[0].CameraInstance;
 
 	D3D12_VIEWPORT viewport = {};
 	viewport.Width = (FLOAT)CShadowMapSize;
@@ -67,7 +70,6 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	auto& worlds = frameContext.WorldMatrices;
 	auto& modelWorlds = frameContext.ModelWorldMatrices;
 	ShadowDirParams params = {};
-	uint32 count = 0;
 	auto lights = GContext->EntityManager->GetComponents<DirectionalLightComponent>(count);
 
 	auto dir = -XMVector3Normalize(XMLoadFloat3(&lights[0].Direction));
@@ -80,7 +82,7 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 		XMVectorSet(0, 1, 0, 0));	// Up is up
 	XMStoreFloat4x4(&params.View, XMMatrixTranspose(shView));
 
-	XMMATRIX shProj = XMMatrixOrthographicLH(200.0f, 200.0f, frameContext.Camera->NearZ, frameContext.Camera->FarZ);
+	XMMATRIX shProj = XMMatrixOrthographicLH(200.0f, 200.0f, camera->NearZ, camera->FarZ);
 	XMStoreFloat4x4(&params.Projection, XMMatrixTranspose(shProj));
 
 	ShadowConstantBuffer shadowCB = { params.View, params.Projection };

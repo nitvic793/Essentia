@@ -30,6 +30,13 @@ public:
 		ImGui::PopID();
 	}
 
+	virtual void Visit(const char* compName, const char* name, bool& val) override
+	{
+		ImGui::PushID(compName);
+		ImGui::Checkbox(name, &val);
+		ImGui::PopID();
+	}
+
 	virtual void Visit(const char* compName, const char* name, XMFLOAT3& val) override
 	{
 		ImGui::PushID(compName);

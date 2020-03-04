@@ -446,9 +446,12 @@ struct CameraComponent : public IComponent
 	void serialize(Archive& archive) 
 	{
 		archive(
+			CEREAL_NVP(CameraInstance.Width),
+			CEREAL_NVP(CameraInstance.Height),
 			CEREAL_NVP(CameraInstance.NearZ),
 			CEREAL_NVP(CameraInstance.FarZ),
-			CEREAL_NVP(CameraInstance.FieldOfView)
+			CEREAL_NVP(CameraInstance.FieldOfView),
+			CEREAL_NVP(CameraInstance.IsOrthographic)
 		);
 	}
 

@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "PostProcess.h"
 #include "PipelineStates.h"
+#include "Entity.h"
 //Do AO?
 using namespace DirectX;
 
@@ -53,15 +54,18 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 {
 	auto ec = EngineContext::Context;
 	auto renderer = ec->RendererInstance;
+	auto em = ec->EntityManager;
 	auto commandList = renderer->GetDefaultCommandList();
 	auto inputResource = ec->ShaderResourceManager->GetResource(inputTexture);
 	auto screenSize = renderer->GetScreenSize();
+	uint32 count = 0;
+	auto camera = &em->GetComponents<CameraComponent>(count)[0].CameraInstance;
 
 	RenderBlurTexture(backbufferIndex);
 
 	renderer->TransitionBarrier(commandList, dofTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	DofParams.zNear = frameContext.Camera->NearZ;
-	DofParams.zFar = frameContext.Camera->FarZ;
+	DofParams.zNear = camera->NearZ;
+	DofParams.zFar = camera->FarZ;
 
 	ec->ShaderResourceManager->CopyToCB(backbufferIndex, { &DofParams, sizeof(DofParams) }, dofCBV.Offset);
 	auto dofRtv = ec->RenderTargetManager->GetRTVHandle(dofTarget.RenderTarget);

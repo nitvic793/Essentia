@@ -3,10 +3,13 @@
 
 using namespace DirectX;
 
-Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAngles):
+Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAngles) :
 	NearZ(nearZ),
 	FarZ(farZ),
-	FieldOfView(fovInAngles)
+	FieldOfView(fovInAngles),
+	Width(width),
+	Height(height),
+	IsOrthographic(false)
 {
 	Position = XMFLOAT3(0, 0, -5);
 	Direction = XMFLOAT3(0, 0, 1);
@@ -18,7 +21,9 @@ Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAn
 
 void Camera::Update(float deltaTime, float totalTime)
 {
+	NearZ = std::max(NearZ, 0.001f);
 	UpdateView();
+	UpdateProjection(Width, Height, NearZ, FarZ, FieldOfView);
 }
 
 void Camera::UpdateView()
@@ -35,7 +40,7 @@ void Camera::UpdateView()
 
 void Camera::UpdateProjection(float width, float height, float nearZ, float farZ, float fovInAngles)
 {
-	auto projection = XMMatrixPerspectiveFovLH((fovInAngles / 180.f) * XM_PI, width / height, nearZ, farZ);
+	auto projection = IsOrthographic? XMMatrixOrthographicLH(width, height, nearZ, farZ) : XMMatrixPerspectiveFovLH((fovInAngles / 180.f) * XM_PI, width / height, nearZ, farZ);
 	BoundingFrustum::CreateFromMatrix(Frustum, projection);
 	XMStoreFloat4x4(&Projection, projection);
 }
