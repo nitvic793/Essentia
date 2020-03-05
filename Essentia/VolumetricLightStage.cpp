@@ -21,7 +21,7 @@ void VolumetricLightStage::Initialize()
 	{
 		volumeEntity = GContext->EntityManager->CreateEntity();
 		GContext->EntityManager->AddComponent<PostProcessVolumeComponent>(volumeEntity);
-		GContext->EntityManager->AddComponent<BaseDrawableComponent>(volumeEntity);
+		GContext->EntityManager->AddComponent<BaseDrawableComponent>(volumeEntity, BaseDrawableComponent::Create());
 	}
 	else
 	{
@@ -57,6 +57,7 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
+	renderer->SetShaderResourceView(commandList, RootSigSRVPixel2, GSceneResources.ShadowDepthTarget.Texture);
 	renderer->DrawMesh(commandList, cubeMesh);
 
 	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource,  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);

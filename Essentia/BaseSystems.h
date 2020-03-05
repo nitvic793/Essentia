@@ -228,15 +228,17 @@ public:
 
 		entities = GetEntities<BaseDrawableComponent>(count);
 		auto worlds = entityManager->GetTransposedWorldMatrices(entities, count);
-
+		auto transform = entityManager->GetTransform(entities[0]);
+		transform.Position->x;
 		auto projection = XMLoadFloat4x4(&camera.Projection);
-		auto view = XMLoadFloat4x4(&camera.View);
+		auto view = XMLoadFloat4x4(&camera.View); 
 
 		PerObjectConstantBuffer perObject;
-
+		XMStoreFloat4x4(&perObject.View, XMMatrixTranspose(view));
+		XMStoreFloat4x4(&perObject.Projection, XMMatrixTranspose(projection));
 		for (size_t i = 0; i < count; ++i)
 		{
-			auto world = XMMatrixTranspose(XMLoadFloat4x4(&worlds[i]));
+			auto world = XMLoadFloat4x4(&worlds[i]);
 			XMStoreFloat4x4(&drawables[i].WorldViewProjection, XMMatrixTranspose(world * view * projection));
 
 			perObject.PrevWorldViewProjection = drawables[i].PrevWorldViewProjection;
