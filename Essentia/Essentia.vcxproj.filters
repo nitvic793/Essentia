@@ -242,7 +242,7 @@
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
     <ClCompile Include="VolumetricLightStage.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

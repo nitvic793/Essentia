@@ -70,6 +70,7 @@ public:
 	const D3D12_VIEWPORT&		GetViewport() const;
 	const D3D12_RECT&			GetScissorRect() const;
 	ScreenSize					GetScreenSize() const;
+	uint32						GetCurrentBackbufferIndex() const;
 	void						DrawScreenQuad(ID3D12GraphicsCommandList* commandList);
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
 	void						SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture);
@@ -84,8 +85,8 @@ public:
 	RenderTargetID				GetDefaultRenderTarget();
 	RenderTargetID				GetDefaultHDRRenderTarget();
 	void						SetVSync(bool enabled);
-	void						Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, Camera* camera);
-	void						Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, Camera* camera);
+	void						Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, const Camera* camera);
+	void						Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, const Camera* camera);
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();

@@ -12,6 +12,7 @@ struct SceneResources
 	DepthTarget			DepthPrePass;
 	DepthTarget			ShadowDepthTarget;
 	ConstantBufferView	ShadowCBV;
+	ConstantBufferView	LightBufferCBV;
 };
 
 extern SceneResources GSceneResources;

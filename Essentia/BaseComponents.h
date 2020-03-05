@@ -135,6 +135,7 @@ struct BaseDrawableComponent : public IComponent
 	template<class Archive>
 	void load(Archive& archive)
 	{
+		*this = Create();
 	};
 
 	GComponent(BaseDrawableComponent)

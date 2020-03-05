@@ -21,7 +21,7 @@ Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAn
 
 void Camera::Update(float deltaTime, float totalTime)
 {
-	NearZ = std::max(NearZ, 0.001f);
+	NearZ = XMMax(NearZ, 0.001f);
 	UpdateView();
 	UpdateProjection(Width, Height, NearZ, FarZ, FieldOfView);
 }
@@ -45,17 +45,17 @@ void Camera::UpdateProjection(float width, float height, float nearZ, float farZ
 	XMStoreFloat4x4(&Projection, projection);
 }
 
-const XMFLOAT4X4& Camera::GetView()
+const XMFLOAT4X4& Camera::GetView() const
 {
 	return View;
 }
 
-const DirectX::XMFLOAT4X4& Camera::GetProjection()
+const DirectX::XMFLOAT4X4& Camera::GetProjection() const
 {
 	return Projection;
 }
 
-DirectX::XMFLOAT4X4 Camera::GetInverseProjectionTransposed()
+DirectX::XMFLOAT4X4 Camera::GetInverseProjectionTransposed() const
 {
 	XMFLOAT4X4 invProjMatrix;
 	auto proj = XMLoadFloat4x4(&Projection);
@@ -64,7 +64,7 @@ DirectX::XMFLOAT4X4 Camera::GetInverseProjectionTransposed()
 	return invProjMatrix;
 }
 
-DirectX::XMFLOAT4X4 Camera::GetInverseViewTransposed()
+DirectX::XMFLOAT4X4 Camera::GetInverseViewTransposed() const
 {
 	XMFLOAT4X4 invViewMatrix;
 	auto view = XMLoadFloat4x4(&View);
@@ -73,7 +73,7 @@ DirectX::XMFLOAT4X4 Camera::GetInverseViewTransposed()
 	return invViewMatrix;
 }
 
-XMFLOAT4X4 Camera::GetViewTransposed()
+XMFLOAT4X4 Camera::GetViewTransposed() const
 {
 	XMFLOAT4X4 viewMatrix;
 	auto view = XMLoadFloat4x4(&View);
@@ -82,7 +82,7 @@ XMFLOAT4X4 Camera::GetViewTransposed()
 	return viewMatrix;
 }
 
-DirectX::XMFLOAT4X4 Camera::GetProjectionTransposed()
+DirectX::XMFLOAT4X4 Camera::GetProjectionTransposed() const
 {
 	XMFLOAT4X4 projMatrix;
 	auto proj = XMLoadFloat4x4(&Projection);

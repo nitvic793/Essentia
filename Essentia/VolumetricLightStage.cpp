@@ -7,6 +7,7 @@
 #include "PostProcessComponents.h"
 #include "Mesh.h"
 #include "PipelineStates.h"
+#include "SceneResources.h"
 
 void VolumetricLightStage::Initialize()
 {
@@ -29,10 +30,12 @@ void VolumetricLightStage::Initialize()
 
 	MeshView meshView;
 	cubeMesh = GContext->MeshManager->CreateMesh("Assets/Models/cube.obj", meshView);
+	GRenderStageManager.RegisterStage("LightAccumulateStage", this);
 }
 
 void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
 {
+	auto compManager = GContext->EntityManager->GetComponentManager();
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 	auto resourceManager = GContext->ResourceManager;
 	auto renderer = GContext->RendererInstance;
@@ -40,7 +43,22 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	auto rtManager = GContext->RenderTargetManager;
 	auto sz = GPostProcess.GetPostSceneTextures().HalfResSize;
 
-	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.LightAccumPSO));
+	uint32 count = 0;
+	auto postProcessEntities = compManager->GetEntities<BaseDrawableComponent, PostProcessVolumeComponent>();
+	auto baseDrawable = compManager->GetComponent<BaseDrawableComponent>(postProcessEntities[0]);
 
+	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+	commandList->ClearRenderTargetView(rtManager->GetRTVHandle(lightAccumTarget.RenderTarget), ColorValues::ClearColor, 0, nullptr);
+	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.LightAccumPSO));
+	renderer->SetTargetSize(commandList, sz);
+	renderer->SetRenderTargets(&lightAccumTarget.RenderTarget, 1, &GSceneResources.DepthPrePass.DepthStencil);
+
+	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
+	renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
+	renderer->SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
+	renderer->DrawMesh(commandList, cubeMesh);
+
+	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource,  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 }

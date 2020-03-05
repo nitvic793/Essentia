@@ -223,7 +223,7 @@ void Renderer::Clear()
 void Renderer::Render(const FrameContext& frameContext)
 {
 	uint32 camCount;
-	auto camera = frameContext.EntityManager->GetComponents<CameraComponent>(camCount)[0].CameraInstance;
+	const auto& camera = frameContext.EntityManager->GetComponents<CameraComponent>(camCount)[0].CameraInstance;
 	auto imageIndex = backBufferIndex;
 
 	perObject.View = camera.GetViewTransposed();
@@ -307,10 +307,13 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	for (auto& stage : renderStages[eRenderStagePreMain])
 	{
+		PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Sub Render Stage");
 		if (stage->Enabled)
 		{
 			stage->Render(backBufferIndex, frameContext);
 		}
+
+		PIXEndEvent(commandList);
 	}
 
 	PIXEndEvent(commandList);
@@ -336,10 +339,12 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
 	{
+		PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Sub Render Stage");
 		if (stage->Enabled)
 		{
 			stage->Render(backBufferIndex, frameContext);
 		}
+		PIXEndEvent(commandList);
 	}
 
 	TransitionBarrier(commandList, shaderResourceManager->GetResource(hdrRenderTargetTextures[backBufferIndex]), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -441,6 +446,7 @@ void Renderer::EndInitialization()
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 	perFrameView = shaderResourceManager->CreateCBV(sizeof(PerFrameConstantBuffer));
+	GSceneResources.LightBufferCBV = lightBufferView;
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
@@ -572,6 +578,11 @@ ScreenSize Renderer::GetScreenSize() const
 	return ScreenSize{ width, height };
 }
 
+uint32 Renderer::GetCurrentBackbufferIndex() const
+{
+	return deviceResources->GetSwapChain()->GetCurrentBackBufferIndex();
+}
+
 void Renderer::DrawScreenQuad(ID3D12GraphicsCommandList* commandList)
 {
 	D3D12_INDEX_BUFFER_VIEW ibv;
@@ -687,7 +698,7 @@ void Renderer::SetVSync(bool enabled)
 	vsync = enabled;
 }
 
-void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, Camera* camera)
+void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, const Camera* camera)
 {
 	for (auto pipeline : bucket.Pipelines)
 	{
@@ -716,7 +727,7 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& 
 	}
 }
 
-void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, Camera* camera)
+void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, const Camera* camera)
 {
 	for (size_t i = 0; i < count; ++i)
 	{

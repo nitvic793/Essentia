@@ -5,6 +5,7 @@
 #include "Engine.h"
 #include "imgui.h"
 #include "Serialization.h"
+#include "Renderer.h"
 
 using namespace DirectX;
 
@@ -205,6 +206,44 @@ public:
 			components[i].CameraInstance.Position = *position;
 			components[i].CameraInstance.Rotation = *rotation;
 			components[i].CameraInstance.Update(deltaTime, totalTime);
+		}
+	}
+};
+
+class UpdateBaseDrawablesSystem : public ISystem
+{
+public:
+	void Initialize()
+	{}
+
+	virtual void Update(float deltaTime, float totalTime) override
+	{
+		auto shaderResourceManager = GContext->ShaderResourceManager;
+		uint32 count = 0;
+		auto entities = GetEntities<CameraComponent>(count);
+		auto components = GetComponents<CameraComponent>(count);
+		const Camera& camera = components[0].CameraInstance;
+		auto imageIndex = GContext->RendererInstance->GetCurrentBackbufferIndex();
+		auto drawables = GetComponents<BaseDrawableComponent>(count);
+
+		entities = GetEntities<BaseDrawableComponent>(count);
+		auto worlds = entityManager->GetTransposedWorldMatrices(entities, count);
+
+		auto projection = XMLoadFloat4x4(&camera.Projection);
+		auto view = XMLoadFloat4x4(&camera.View);
+
+		PerObjectConstantBuffer perObject;
+
+		for (size_t i = 0; i < count; ++i)
+		{
+			auto world = XMMatrixTranspose(XMLoadFloat4x4(&worlds[i]));
+			XMStoreFloat4x4(&drawables[i].WorldViewProjection, XMMatrixTranspose(world * view * projection));
+
+			perObject.PrevWorldViewProjection = drawables[i].PrevWorldViewProjection;
+			perObject.World = worlds[i];
+			perObject.WorldViewProjection = drawables[i].WorldViewProjection;
+			shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
+			drawables[i].PrevWorldViewProjection = drawables[i].WorldViewProjection;
 		}
 	}
 };
