@@ -270,6 +270,8 @@ void Renderer::Render(const FrameContext& frameContext)
 		drawableModels[i].PrevWorldViewProjection = drawableModels[i].WorldViewProjection;
 	}
 
+	lightBuffer.NearZ = camera.NearZ;
+	lightBuffer.FarZ = camera.FarZ;
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView);
 
 	XMMATRIX T(

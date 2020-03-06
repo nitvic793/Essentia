@@ -59,9 +59,9 @@ struct LightBuffer
 	PointLight			PointLights[CMaxPointLights];
 	SpotLight			SpotLights[CMaxSpotLights];
 	DirectX::XMFLOAT3	CameraPosition;
-	float				Padding1;
+	float				NearZ;
 	uint32_t			DirLightCount;
 	uint32_t			PointLightCount;
 	uint32_t			SpotLightCount;
-	float				Padding2;
+	float				FarZ;
 };

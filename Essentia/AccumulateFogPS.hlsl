@@ -8,11 +8,16 @@ cbuffer LightBuffer : register(b0)
 	PointLight PointLights[CMaxPointLights];
 	SpotLight SpotLights[CMaxSpotLights];
 	float3 CameraPosition;
-	float Padding1;
+	float NearZ;
 	uint DirLightCount;
 	uint PointLightCount;
 	uint SpotLightCount;
-	float Padding2;
+	float FarZ;
+}
+
+cbuffer LightAccumBuffer : register(b1)
+{
+    float4x4 InvProjection;
 }
 
 cbuffer ShadowBuffer : register(b2)
@@ -27,10 +32,40 @@ SamplerState LinearWrapSampler : register(s2);
 SamplerState PointClampSampler : register(s3);
 
 Texture2D ShadowMapDirLight : register(t8);
+Texture2D SceneDepthTexture	: register(t9);
 ///Credits: https://www.alexandre-pestana.com/volumetric-lights/
 
-static const float G_SCATTERING = 0.5f;
+static const float G_SCATTERING = 0.1f;
 static const int NB_STEPS = 32;
+
+float3 VSPositionFromDepth(float2 vTexCoord, float depth)
+{
+    // Get the depth value for this pixel
+    float z = depth;
+    // Get x/w and y/w from the viewport position
+    float x = vTexCoord.x * 2 - 1;
+    float y = (1 - vTexCoord.y) * 2 - 1;
+    float4 vProjectedPos = float4(x, y, z, 1.0f);
+    // Transform by the inverse projection matrix
+    float4 vPositionVS = mul(vProjectedPos, InvProjection);
+    // Divide by w to get the view-space position
+    return vPositionVS.xyz / vPositionVS.w;
+}
+
+float2 ProjectionConstants(float nearZ, float farZ)
+{
+    float2 projectionConstants;
+    projectionConstants.x = farZ / (farZ - nearZ);
+    projectionConstants.y = (-farZ * nearZ) / (farZ - nearZ);
+    return projectionConstants;
+}
+
+float LinearZ(float depth)
+{
+    float2 projectionConstants = ProjectionConstants(NearZ, FarZ);
+    float linearZ = projectionConstants.y / (depth - projectionConstants.x);
+    return linearZ;
+}
 
 float ComputeScattering(float lightDotView)
 {
@@ -53,7 +88,9 @@ float4 main(PixelInput input) : SV_TARGET
 	float3 worldPos = input.WorldPos;
 	float4 shadowPos = input.ShadowPos;
 	float3 startPos = CameraPosition;
-	float3 rayVector = worldPos - startPos;
+    float depth = SceneDepthTexture.Sample(LinearWrapSampler, input.UV).r;
+    float3 depthPos = VSPositionFromDepth(input.UV, depth);
+    float3 rayVector = worldPos - startPos;
 	float3 rayDirection = normalize(rayVector);
 	float rayLength = length(rayVector);
 	float3 sunDir = normalize(DirLights[0].Direction);
@@ -62,20 +99,20 @@ float4 main(PixelInput input) : SV_TARGET
 	
 	float3 currPos = startPos;
 	float4x4 shadowViewProj = ShadowView * ShadowProjection;
-	float2 shadowUV = shadowPos.xy / shadowPos.w * 0.5f + 0.5f;
-	shadowUV.y = 1.0f - shadowUV.y;
-	float depthFromLight = shadowPos.z / shadowPos.w;
+
 	float3 sunColor = float3(1.f, 1.f, 1.f);
 	float3 accumFog = float3(0.f, 0.f, 0.f);
+	
+	[unroll]
 	for (int i = 0; i < NB_STEPS; ++i)
 	{
 		float4 worldInShadowCameraSpace = mul(float4(currPos, 1.0f), shadowViewProj);
-		worldInShadowCameraSpace /= worldInShadowCameraSpace.w;
-		float shadowMapValue = ShadowMapDirLight.Load(uint3(shadowUV, 0)).r;
-		if (shadowMapValue > depthFromLight)
-		{
-			accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor;
-		}
+		worldInShadowCameraSpace /= worldInShadowCameraSpace.w; 
+        float shadowMapValue = ShadowAmount(worldInShadowCameraSpace);
+		//if (shadowMapValue > 0.f)
+		//{
+            accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor * shadowMapValue;
+        //}
 		currPos += step;
 	}
 	

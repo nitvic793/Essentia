@@ -128,7 +128,7 @@ void PipelineStates::CreateLightAccumPSO()
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
-	psoDesc.RasterizerState.DepthClipEnable = false;
+	//psoDesc.RasterizerState.DepthClipEnable = false;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.NumRenderTargets = 1;
 	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
