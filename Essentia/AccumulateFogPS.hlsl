@@ -2,6 +2,12 @@
 #include "Common.hlsli"
 #include "Lighting.hlsli"
 
+struct VertexToPixel
+{
+    float4 Position : SV_POSITION;
+    float2 UV : TEXCOORD0;
+};
+
 cbuffer LightBuffer : register(b0)
 {
 	DirectionalLight DirLights[CMaxDirLights];
@@ -18,6 +24,7 @@ cbuffer LightBuffer : register(b0)
 cbuffer LightAccumBuffer : register(b1)
 {
     float4x4 InvProjection;
+    float4x4 World;
 }
 
 cbuffer ShadowBuffer : register(b2)
@@ -33,9 +40,10 @@ SamplerState PointClampSampler : register(s3);
 
 Texture2D ShadowMapDirLight : register(t8);
 Texture2D SceneDepthTexture	: register(t9);
+Texture2D NoiseTexture		: register(t9);
 ///Credits: https://www.alexandre-pestana.com/volumetric-lights/
 
-static const float G_SCATTERING = 0.1f;
+static const float G_SCATTERING = -0.2f;
 static const int NB_STEPS = 32;
 
 float3 VSPositionFromDepth(float2 vTexCoord, float depth)
@@ -83,14 +91,12 @@ float ShadowAmount(float4 shadowPos)
 	return shadowAmount;
 }
 
-float4 main(PixelInput input) : SV_TARGET
+float4 main(VertexToPixel input) : SV_TARGET
 {
-	float3 worldPos = input.WorldPos;
-	float4 shadowPos = input.ShadowPos;
 	float3 startPos = CameraPosition;
     float depth = SceneDepthTexture.Sample(LinearWrapSampler, input.UV).r;
     float3 depthPos = VSPositionFromDepth(input.UV, depth);
-    float3 rayVector = worldPos - startPos;
+    float3 rayVector = depthPos - startPos;
 	float3 rayDirection = normalize(rayVector);
 	float rayLength = length(rayVector);
 	float3 sunDir = normalize(DirLights[0].Direction);
@@ -98,7 +104,7 @@ float4 main(PixelInput input) : SV_TARGET
 	float3 step = rayDirection * stepLength;
 	
 	float3 currPos = startPos;
-	float4x4 shadowViewProj = ShadowView * ShadowProjection;
+    float4x4 shadowViewProj = mul(ShadowView, ShadowProjection);
 
 	float3 sunColor = float3(1.f, 1.f, 1.f);
 	float3 accumFog = float3(0.f, 0.f, 0.f);
@@ -108,11 +114,13 @@ float4 main(PixelInput input) : SV_TARGET
 	{
 		float4 worldInShadowCameraSpace = mul(float4(currPos, 1.0f), shadowViewProj);
 		worldInShadowCameraSpace /= worldInShadowCameraSpace.w; 
-        float shadowMapValue = ShadowAmount(worldInShadowCameraSpace);
-		//if (shadowMapValue > 0.f)
-		//{
-            accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor * shadowMapValue;
-        //}
+        worldInShadowCameraSpace.xy = worldInShadowCameraSpace.xy * 0.5f + 0.5f;
+        worldInShadowCameraSpace.y = 1 - worldInShadowCameraSpace.y;
+        float shadowMapValue = ShadowMapDirLight.Sample(LinearWrapSampler, worldInShadowCameraSpace.xy).r;
+        if (shadowMapValue > worldInShadowCameraSpace.z)
+        {
+            accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor;
+        }
 		currPos += step;
 	}
 	

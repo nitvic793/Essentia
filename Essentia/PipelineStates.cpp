@@ -106,7 +106,7 @@ void PipelineStates::CreateLightAccumPSO()
 {
 	auto resourceManager = GContext->ResourceManager;
 	auto renderer = GContext->RendererInstance;
-	auto vertexShaderBytecode = ShaderManager::LoadShader(L"DefaultVS.cso");
+	auto vertexShaderBytecode = ShaderManager::LoadShader(L"QuadVS.cso");
 	auto pixelShaderBytecode = ShaderManager::LoadShader(L"AccumulateFogPS.cso");
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
@@ -120,20 +120,23 @@ void PipelineStates::CreateLightAccumPSO()
 	psoDesc.PS = pixelShaderBytecode;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.DepthStencilState.DepthEnable = false;
-	psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-	psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
+	//psoDesc.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	//psoDesc.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_NEVER;
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.RTVFormats[0] = renderer->GetHDRRenderTargetFormat();
 	psoDesc.SampleDesc = sampleDesc;
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
-	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
-	//psoDesc.RasterizerState.DepthClipEnable = false;
+	//psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
+	psoDesc.RasterizerState.DepthClipEnable = false;
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	psoDesc.NumRenderTargets = 1;
 	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
 
 	LightAccumPSO = resourceManager->CreatePSO(psoDesc);
+
+	psoDesc.PS = ShaderManager::LoadShader(L"ApplyVolumetricFogPS.cso");
+	ApplyFogPSO = resourceManager->CreatePSO(psoDesc);
 }
 
 void PipelineStates::CreateShadowPSO()
@@ -154,9 +157,9 @@ void PipelineStates::CreateShadowPSO()
 	descPipelineState.RasterizerState.CullMode = D3D12_CULL_MODE_FRONT;
 	descPipelineState.RasterizerState.AntialiasedLineEnable = TRUE;
 	descPipelineState.RasterizerState.DepthClipEnable = true;
-	descPipelineState.RasterizerState.DepthBias = 1000;
-	descPipelineState.RasterizerState.DepthBiasClamp = 0.f;
-	descPipelineState.RasterizerState.SlopeScaledDepthBias = 5.f;
+	//descPipelineState.RasterizerState.DepthBias = 1000;
+	//descPipelineState.RasterizerState.DepthBiasClamp = 0.f;
+	//descPipelineState.RasterizerState.SlopeScaledDepthBias = 5.f;
 	descPipelineState.SampleMask = UINT_MAX;
 	descPipelineState.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	descPipelineState.NumRenderTargets = 0;

@@ -209,6 +209,7 @@ void ScreenSpaceAOStage::BuildRandomVectorTexture(ID3D12GraphicsCommandList* com
 		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
 
 	randomVecTextureId = shaderResourceManager->CreateTexture(randomVectorMap);
+	GSceneResources.NoiseTexture = randomVecTextureId;
 }
 
 void ScreenSpaceAOStage::BuildOffsetVectors()

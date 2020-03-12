@@ -19,6 +19,7 @@ public:
 	PipelineStateID QuadPSO;
 	PipelineStateID HDRQuadPSO;
 	PipelineStateID BlurPSO;
+	PipelineStateID ApplyFogPSO;
 private:
 	void CreateDefaultPSOs();
 	void CreateLightAccumPSO();

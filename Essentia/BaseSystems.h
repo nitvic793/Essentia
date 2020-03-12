@@ -238,9 +238,9 @@ public:
 		XMStoreFloat4x4(&perObject.Projection, XMMatrixTranspose(projection));
 		for (size_t i = 0; i < count; ++i)
 		{
-			auto world = XMLoadFloat4x4(&worlds[i]);
+			auto world = XMMatrixTranspose(XMLoadFloat4x4(&worlds[i]));
 			XMStoreFloat4x4(&drawables[i].WorldViewProjection, XMMatrixTranspose(world * view * projection));
-
+			drawables[i].World = worlds[i];
 			perObject.PrevWorldViewProjection = drawables[i].PrevWorldViewProjection;
 			perObject.World = worlds[i];
 			perObject.WorldViewProjection = drawables[i].WorldViewProjection;

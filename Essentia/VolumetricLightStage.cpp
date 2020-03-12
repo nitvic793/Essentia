@@ -12,6 +12,7 @@
 struct LightAccumParams
 {
 	DirectX::XMFLOAT4X4 InvProjection;
+	DirectX::XMFLOAT4X4 World;
 };
 
 void VolumetricLightStage::Initialize()
@@ -20,6 +21,7 @@ void VolumetricLightStage::Initialize()
 	auto entityManager = GContext->EntityManager;
 	auto halfResSize = GPostProcess.GetPostSceneTextures().HalfResSize;
 	lightAccumTarget = CreateSceneRenderTarget(GContext, halfResSize.Width, halfResSize.Height, renderer->GetHDRRenderTargetFormat());
+	GSceneResources.LightAccumTarget = lightAccumTarget;
 	uint32 count = 0;
 	auto entities = entityManager->GetEntities<PostProcessVolumeComponent>(count);
 	if (count == 0)
@@ -28,7 +30,7 @@ void VolumetricLightStage::Initialize()
 		GContext->EntityManager->AddComponent<PostProcessVolumeComponent>(volumeEntity);
 		GContext->EntityManager->AddComponent<BaseDrawableComponent>(volumeEntity, BaseDrawableComponent::Create());
 		auto transform = GContext->EntityManager->GetTransform(volumeEntity);
-		*transform.Scale = DirectX::XMFLOAT3(100.f, 100.f, 100.f);
+		//*transform.Scale = DirectX::XMFLOAT3(100.f, 100.f, 100.f);
 	}
 	else
 	{
@@ -57,10 +59,11 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	auto invProjection = DirectX::XMMatrixInverse(nullptr, projection);
 	LightAccumParams params;
 	DirectX::XMStoreFloat4x4(&params.InvProjection, DirectX::XMMatrixTranspose(invProjection));
-	shaderResourceManager->CopyToCB(frameIndex, { &params, sizeof(params) }, lightAccumCBV);
+	
 	auto postProcessEntities = compManager->GetEntities<BaseDrawableComponent, PostProcessVolumeComponent>();
 	auto baseDrawable = compManager->GetComponent<BaseDrawableComponent>(postProcessEntities[0]);
-
+	params.World = baseDrawable->World;
+	shaderResourceManager->CopyToCB(frameIndex, { &params, sizeof(params) }, lightAccumCBV);
 	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
 	commandList->ClearRenderTargetView(rtManager->GetRTVHandle(lightAccumTarget.RenderTarget), ColorValues::ClearColor, 0, nullptr);
@@ -80,16 +83,17 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	renderer->SetRenderTargets(&lightAccumTarget.RenderTarget, 1, &GSceneResources.DepthPrePass.DepthStencil);
+	renderer->SetRenderTargets(&lightAccumTarget.RenderTarget, 1, nullptr);
 
-	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture, GSceneResources.DepthPrePass.Texture };
+	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture, GSceneResources.DepthPrePass.Texture, GSceneResources.NoiseTexture };
 	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures)); 
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, lightAccumCBV);
 
-	renderer->DrawMesh(commandList, cubeMesh);
+	renderer->DrawScreenQuad(commandList);
+	//renderer->DrawMesh(commandList, cubeMesh);
 
 	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource,  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 

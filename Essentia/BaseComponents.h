@@ -117,6 +117,7 @@ struct IDrawable : public IComponent {};
 struct BaseDrawableComponent : public IComponent
 {
 	ConstantBufferView	CBView;
+	DirectX::XMFLOAT4X4 World;
 	DirectX::XMFLOAT4X4 WorldViewProjection;
 	DirectX::XMFLOAT4X4 PrevWorldViewProjection;
 

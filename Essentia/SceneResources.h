@@ -9,10 +9,12 @@ struct SceneResources
 	SceneRenderTarget	VelocityBuffer;
 	SceneRenderTarget	PreviousFrame;
 	SceneRenderTarget	AmbientOcclusion;
+	SceneRenderTarget	LightAccumTarget;
 	DepthTarget			DepthPrePass;
 	DepthTarget			ShadowDepthTarget;
 	ConstantBufferView	ShadowCBV;
 	ConstantBufferView	LightBufferCBV;
+	TextureID			NoiseTexture;
 };
 
 extern SceneResources GSceneResources;
