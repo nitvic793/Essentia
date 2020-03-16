@@ -15,6 +15,7 @@ struct SceneResources
 	ConstantBufferView	ShadowCBV;
 	ConstantBufferView	LightBufferCBV;
 	TextureID			NoiseTexture;
+	SceneRenderTarget	WorldPosTexture;
 };
 
 extern SceneResources GSceneResources;

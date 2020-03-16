@@ -59,7 +59,7 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	auto invProjection = DirectX::XMMatrixInverse(nullptr, projection);
 	LightAccumParams params;
 	DirectX::XMStoreFloat4x4(&params.InvProjection, DirectX::XMMatrixTranspose(invProjection));
-	
+
 	auto postProcessEntities = compManager->GetEntities<BaseDrawableComponent, PostProcessVolumeComponent>();
 	auto baseDrawable = compManager->GetComponent<BaseDrawableComponent>(postProcessEntities[0]);
 	params.World = baseDrawable->World;
@@ -85,8 +85,8 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	commandList->RSSetScissorRects(1, &scissorRect);
 	renderer->SetRenderTargets(&lightAccumTarget.RenderTarget, 1, nullptr);
 
-	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture, GSceneResources.DepthPrePass.Texture, GSceneResources.NoiseTexture };
-	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures)); 
+	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture, GSceneResources.DepthPrePass.Texture, GSceneResources.NoiseTexture, GSceneResources.WorldPosTexture.Texture };
+	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
@@ -95,6 +95,6 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	renderer->DrawScreenQuad(commandList);
 	//renderer->DrawMesh(commandList, cubeMesh);
 
-	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource,  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	renderer->TransitionBarrier(commandList, lightAccumTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 }

@@ -61,7 +61,7 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 	uint32 count = 0;
 	auto camera = &em->GetComponents<CameraComponent>(count)[0].CameraInstance;
 
-	RenderBlurTexture(backbufferIndex);
+	RenderBlurTexture(backbufferIndex, inputTexture);
 
 	renderer->TransitionBarrier(commandList, dofTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	DofParams.zNear = camera->NearZ;
@@ -84,10 +84,9 @@ TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex
 	return dofTarget.Texture;
 }
 
-void PostProcessDepthOfFieldStage::RenderBlurTexture(uint32 backbufferIndex)
+void PostProcessDepthOfFieldStage::RenderBlurTexture(uint32 backbufferIndex, TextureID inputTexture)
 {
 	auto lowResTextures = GPostProcess.GetPostSceneTextures();
 	auto screenSize = lowResTextures.HalfResSize;
-	auto lowResTarget = GPostProcess.GetPostSceneTextures().HalfResTexture;
-	GPostProcess.RenderBlurTexture(lowResTarget.Texture, screenSize, backbufferIndex, blurFinalTarget, blurIntermidateTarget, blurVerticalCBV, blurHorizontalCBV);
+	GPostProcess.RenderBlurTexture(inputTexture, screenSize, backbufferIndex, blurFinalTarget, blurIntermidateTarget, blurVerticalCBV, blurHorizontalCBV);
 }

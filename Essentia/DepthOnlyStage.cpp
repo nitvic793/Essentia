@@ -13,7 +13,9 @@ void DepthOnlyStage::Initialize()
 	auto sz = renderer->GetScreenSize();
 	depthOnlyPso = ec->ResourceManager->GetPSO(GPipelineStates.DepthOnlyPSO);
 	depthTarget = CreateDepthTarget(sz.Width, sz.Height, renderer->GetDepthStencilFormat(), DXGI_FORMAT_R32_FLOAT);
+	worldPosTarget = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, renderer->GetHDRRenderTargetFormat());
 	GSceneResources.DepthPrePass = depthTarget;
+	GSceneResources.WorldPosTexture = worldPosTarget;
 	GRenderStageManager.RegisterStage("DepthOnlyStage", this);
 }
 
@@ -37,11 +39,18 @@ void DepthOnlyStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 	scissorRect.right = sz.Width;
 	scissorRect.bottom = sz.Height;
 
+	TransitionDesc transitions[] = {
+		{ depthTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE },
+		{ worldPosTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET }
+	};
+
+	renderer->TransitionBarrier(commandList, transitions, _countof(transitions));
+
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	renderer->SetRenderTargets(nullptr, 0, &depthTarget.DepthStencil);
+	renderer->SetRenderTargets(&worldPosTarget.RenderTarget, 1, &depthTarget.DepthStencil);
 	commandList->SetPipelineState(depthOnlyPso);
-	renderer->TransitionBarrier(commandList, depthTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
+	commandList->ClearRenderTargetView(rtManager->GetRTVHandle(worldPosTarget.RenderTarget), ColorValues::ClearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(rtManager->GetDSVHandle(depthTarget.DepthStencil), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	uint32 count = 0;
 	auto drawables = frameContext.EntityManager->GetComponents<DrawableComponent>(count);
@@ -61,6 +70,11 @@ void DepthOnlyStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 		auto meshHandle = model.Mesh;
 		renderer->DrawMesh(commandList, meshHandle);
 	}
-	
-	renderer->TransitionBarrier(commandList, depthTarget.Resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	TransitionDesc endTransitions[] = {
+		{ depthTarget.Resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE },
+		{ worldPosTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE }
+	};
+
+	renderer->TransitionBarrier(commandList, endTransitions, _countof(endTransitions));
 }

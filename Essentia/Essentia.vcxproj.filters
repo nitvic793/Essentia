@@ -536,5 +536,8 @@
     <FxCompile Include="ApplyVolumetricFogPS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+    <FxCompile Include="WorldPosPS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

@@ -40,11 +40,12 @@ SamplerState PointClampSampler : register(s3);
 
 Texture2D ShadowMapDirLight : register(t8);
 Texture2D SceneDepthTexture	: register(t9);
-Texture2D NoiseTexture		: register(t9);
+Texture2D NoiseTexture		: register(t10);
+Texture2D WorldPosMap		: register(t11);
 ///Credits: https://www.alexandre-pestana.com/volumetric-lights/
 
 static const float G_SCATTERING = -0.2f;
-static const int NB_STEPS = 32;
+static const int NB_STEPS = 128;
 
 float3 VSPositionFromDepth(float2 vTexCoord, float depth)
 {
@@ -95,7 +96,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
 	float3 startPos = CameraPosition;
     float depth = SceneDepthTexture.Sample(LinearWrapSampler, input.UV).r;
-    float3 depthPos = VSPositionFromDepth(input.UV, depth);
+    float3 depthPos = WorldPosMap.Sample(LinearWrapSampler, input.UV).xyz;
     float3 rayVector = depthPos - startPos;
 	float3 rayDirection = normalize(rayVector);
 	float rayLength = length(rayVector);
@@ -106,20 +107,19 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float3 currPos = startPos;
     float4x4 shadowViewProj = mul(ShadowView, ShadowProjection);
 
-	float3 sunColor = float3(1.f, 1.f, 1.f);
+    float3 sunColor = DirLights[0].Color;
+    float intensity = DirLights[0].Intensity;
 	float3 accumFog = float3(0.f, 0.f, 0.f);
 	
 	[unroll]
 	for (int i = 0; i < NB_STEPS; ++i)
 	{
-		float4 worldInShadowCameraSpace = mul(float4(currPos, 1.0f), shadowViewProj);
-		worldInShadowCameraSpace /= worldInShadowCameraSpace.w; 
-        worldInShadowCameraSpace.xy = worldInShadowCameraSpace.xy * 0.5f + 0.5f;
-        worldInShadowCameraSpace.y = 1 - worldInShadowCameraSpace.y;
-        float shadowMapValue = ShadowMapDirLight.Sample(LinearWrapSampler, worldInShadowCameraSpace.xy).r;
-        if (shadowMapValue > worldInShadowCameraSpace.z)
+        float4 worldInShadowCameraSpace = mul(float4(currPos, 1.0f), shadowViewProj);
+      
+        float shadowMapValue = ShadowAmount(worldInShadowCameraSpace);
+		//if (shadowMapValue > worldInShadowCameraSpace.z)
         {
-            accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor;
+            accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor * shadowMapValue * intensity;
         }
 		currPos += step;
 	}

@@ -10,5 +10,6 @@ public:
 private:
 	ID3D12PipelineState*	depthOnlyPso;
 	DepthTarget				depthTarget;
+	SceneRenderTarget		worldPosTarget;
 };
 

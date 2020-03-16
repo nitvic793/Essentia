@@ -21,7 +21,7 @@ public:
 	DepthOfFieldParams	DofParams;
 	BlurParams			BlurParams;
 private:
-	void RenderBlurTexture(uint32 backbufferIndex);
+	void RenderBlurTexture(uint32 backbufferIndex, TextureID input);
 
 	PipelineStateID dofPso;
 
