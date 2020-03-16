@@ -245,7 +245,7 @@
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
     <ClCompile Include="ApplyVolumetricFog.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer\PostProcessStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -453,14 +453,14 @@
     <ClInclude Include="Serialization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VolumetricLightStage.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PostProcessComponents.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="VolumetricLightStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
     <ClInclude Include="ApplyVolumetricFog.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Renderer\PostProcessStages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
