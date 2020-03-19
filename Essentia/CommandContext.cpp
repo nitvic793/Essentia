@@ -26,7 +26,7 @@ void CommandContext::Initialize(DeviceResources* deviceResources)
 		{
 			throw std::runtime_error("Unable to create fences.");
 		}
-		fenceValues[i] = 0;
+		fenceValues[i] = i == 0 ? 1 : 0; // This is to ensure that the fence is set when 
 		fenceEvent[i] = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 	}
 
@@ -55,15 +55,23 @@ void CommandContext::SubmitCommands(ID3D12GraphicsCommandList* commandList)
 	commandList->Close();
 	ID3D12CommandList* ppCommandLists[] = { commandList };
 	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);;
-	fenceValues[backBufferIndex]++;
-	auto hr = commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex]);
 }
 
 void CommandContext::WaitForFrame()
 {
 	auto swapChain = deviceResources->GetSwapChain();
+	auto commandQueue = deviceResources->GetCommandQueue();
+	const UINT64 currentFenceValue = fenceValues[backBufferIndex];
+
+	auto hr = commandQueue->Signal(fences[backBufferIndex].Get(), currentFenceValue);
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	WaitForFrame(backBufferIndex);
+	if (fences[backBufferIndex]->GetCompletedValue() < fenceValues[backBufferIndex])
+	{
+		auto hr = fences[backBufferIndex]->SetEventOnCompletion(fenceValues[backBufferIndex], fenceEvent[backBufferIndex]);
+		WaitForSingleObjectEx(fenceEvent[backBufferIndex], INFINITE, FALSE);
+	}
+
+	fenceValues[backBufferIndex] = currentFenceValue + 1;
 }
 
 void CommandContext::CleanUp()
@@ -114,7 +122,7 @@ void CommandContext::WaitForFrame(uint32 index)
 		auto hr = fences[index]->SetEventOnCompletion(fenceValues[index], fenceEvent[index]);
 		if (SUCCEEDED(hr))
 		{
-			fenceValues[index]++;
+
 		}
 		if (WaitForSingleObjectEx(fenceEvent[index], 100, FALSE) == WAIT_TIMEOUT)
 		{
@@ -122,7 +130,7 @@ void CommandContext::WaitForFrame(uint32 index)
 		}
 	}
 
-
+	fenceValues[index]++;
 }
 
 void CommandContext::WaitForGPU(uint32 backBufferIndex)
@@ -136,7 +144,7 @@ void CommandContext::WaitForGPU(uint32 backBufferIndex)
 		if (SUCCEEDED(hr))
 		{
 			WaitForSingleObjectEx(fenceEvent[backBufferIndex], INFINITE, FALSE);
-			fenceValues[backBufferIndex]++;
 		}
 	}
+	fenceValues[backBufferIndex]++;
 }

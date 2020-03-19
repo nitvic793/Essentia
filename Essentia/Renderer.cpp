@@ -844,7 +844,7 @@ void Renderer::WaitForPreviousFrame()
 	prevBackBufferIndex = backBufferIndex;
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	commandContext->WaitForFrame(backBufferIndex);
+	commandContext->WaitForFrame();
 }
 
 void Renderer::UpdateLightBuffer()
