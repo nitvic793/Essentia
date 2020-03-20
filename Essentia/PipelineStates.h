@@ -14,6 +14,7 @@ public:
 	PipelineStateID ScreenSpaceAOPSO;
 	PipelineStateID SSAOBlurPSO;
 	PipelineStateID LightAccumPSO;
+	PipelineStateID BilateralBlurPSO;
 
 	//Post Process PSOs
 	PipelineStateID QuadPSO;
