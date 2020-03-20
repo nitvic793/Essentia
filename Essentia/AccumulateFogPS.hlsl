@@ -46,7 +46,7 @@ Texture2D WorldPosMap		: register(t11);
 ///Credits: https://www.alexandre-pestana.com/volumetric-lights/
 
 static const float G_SCATTERING = -0.2f;
-static const int NB_STEPS = 12;
+static const int NB_STEPS = 16;
 
 float3 VSPositionFromDepth(float2 vTexCoord, float depth)
 {

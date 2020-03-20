@@ -11,8 +11,12 @@ private:
 
 	ConstantBufferView	lightAccumCBV;
 	ConstantBufferView	bilateralBlurCBV;
+	ConstantBufferView	blurHorizontalCBV;
+	ConstantBufferView	blurVerticalCBV;
 	SceneRenderTarget lightAccumTarget;
 	SceneRenderTarget intermediatelightAccumTarget;
+	SceneRenderTarget blurFinalTarget;
+	SceneRenderTarget blurIntermediateTarget;
 	EntityHandle volumeEntity;
 	MeshHandle cubeMesh;
 };

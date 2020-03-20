@@ -30,6 +30,8 @@ void VolumetricLightStage::Initialize()
 	auto halfResSize = GPostProcess.GetPostSceneTextures().HalfResSize;
 	lightAccumTarget = CreateSceneRenderTarget(GContext, fullSize.Width, fullSize.Height, renderer->GetHDRRenderTargetFormat());
 	intermediatelightAccumTarget = CreateSceneRenderTarget(GContext, halfResSize.Width, halfResSize.Height, renderer->GetHDRRenderTargetFormat());
+	blurFinalTarget = CreateSceneRenderTarget(GContext, halfResSize.Width, halfResSize.Height, renderer->GetHDRRenderTargetFormat());
+	blurIntermediateTarget = CreateSceneRenderTarget(GContext, halfResSize.Width, halfResSize.Height, renderer->GetHDRRenderTargetFormat());
 	GSceneResources.LightAccumTarget = lightAccumTarget;
 	uint32 count = 0;
 	auto entities = entityManager->GetEntities<PostProcessVolumeComponent>(count);
@@ -48,6 +50,10 @@ void VolumetricLightStage::Initialize()
 
 	lightAccumCBV = GContext->ShaderResourceManager->CreateCBV(sizeof(LightAccumParams));
 	bilateralBlurCBV = GContext->ShaderResourceManager->CreateCBV(sizeof(BilateralBlurParams));
+
+	blurHorizontalCBV = GContext->ShaderResourceManager->CreateCBV(sizeof(BlurParams));
+	blurVerticalCBV = GContext->ShaderResourceManager->CreateCBV(sizeof(BlurParams));
+
 	MeshView meshView;
 	cubeMesh = GContext->MeshManager->CreateMesh("Assets/Models/cube.obj", meshView);
 	GRenderStageManager.RegisterStage("LightAccumulateStage", this);
@@ -109,6 +115,7 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 
 	renderer->TransitionBarrier(commandList, intermediatelightAccumTarget.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
+	GPostProcess.RenderBlurTexture(intermediatelightAccumTarget.Texture, sz, frameIndex, blurFinalTarget,blurIntermediateTarget, blurVerticalCBV, blurHorizontalCBV);
 	BilateralBlur(frameIndex);
 }
 
@@ -148,7 +155,7 @@ void VolumetricLightStage::BilateralBlur(int frameIndex)
 	commandList->RSSetScissorRects(1, &scissorRect);
 	renderer->SetRenderTargets(&lightAccumTarget.RenderTarget, 1, nullptr);
 
-	TextureID textures[] = { GSceneResources.DepthPrePass.Texture, intermediatelightAccumTarget.Texture };
+	TextureID textures[] = { GSceneResources.DepthPrePass.Texture, blurFinalTarget.Texture };
 	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel1, textures, _countof(textures));
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, bilateralBlurCBV);
 
