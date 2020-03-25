@@ -147,7 +147,7 @@ void Renderer::Initialize()
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<ApplyVolumetricFog>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessTemporalAA>()));
-	
+
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessMotionBlur>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessToneMap>()));
@@ -198,8 +198,12 @@ void Renderer::Clear()
 	commandContext->ResetAllocator(commandAllocator);
 	commandContext->ResetCommandList(commandList, commandAllocator);
 
-	TransitionBarrier(commandList, hdrRenderTargetResources[backBufferIndex], D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET));
+	TransitionResourceDesc frameEndTransitions[] = { 
+		{resourceManager->GetResource(hdrRenderTargetResources[backBufferIndex]), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET},
+		{renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET}
+	};
+
+	TransitionBarrier(commandList, frameEndTransitions, _countof(frameEndTransitions));
 
 	auto rtId = renderTargets[backBufferIndex];
 	auto hdrTarget = hdrRenderTargets[backBufferIndex];
@@ -352,8 +356,11 @@ void Renderer::Render(const FrameContext& frameContext)
 		PIXEndEvent(commandList);
 	}
 
-	TransitionBarrier(commandList, shaderResourceManager->GetResource(hdrRenderTargetTextures[backBufferIndex]), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-	TransitionBarrier(commandList, depthBufferResourceId, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TransitionResourceDesc mainHdrTransitions[] = {
+		{shaderResourceManager->GetResource(hdrRenderTargetTextures[backBufferIndex]), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE },
+		{resourceManager->GetResource(depthBufferResourceId), D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE}
+	};
+	TransitionBarrier(commandList, mainHdrTransitions, _countof(mainHdrTransitions));
 	PIXEndEvent(commandList);
 
 	PIXEndEvent(commandList);
@@ -377,17 +384,21 @@ void Renderer::Render(const FrameContext& frameContext)
 	TransitionBarrier(commandList, postPPTransitions, _countof(postPPTransitions));
 	PIXEndEvent(commandList);
 
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render PrevFrame Target");
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.HDRQuadPSO));
 	SetRenderTargets(&GSceneResources.PreviousFrame.RenderTarget, 1, nullptr);
 	SetShaderResourceView(commandList, RootSigSRVPixel1, hdrRenderTargetTextures[backBufferIndex]);
 	DrawScreenQuad(commandList);
 
 	TransitionBarrier(commandList, GSceneResources.PreviousFrame.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
-
+	PIXEndEvent(commandList);
+	
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render Scene Main Target");
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.QuadPSO));
 	SetDefaultRenderTarget();
 	SetShaderResourceView(commandList, RootSigSRVPixel1, inputTexture);
 	DrawScreenQuad(commandList);
+	PIXEndEvent(commandList);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"GUI");
 	for (auto& renderStage : renderStages[eRenderStageGUI]) //GUI Render pass

@@ -85,8 +85,18 @@ void ComputeContext::SubmitCommands(ID3D12GraphicsCommandList* commandList)
 void ComputeContext::WaitForFrame()
 {
 	auto swapChain = deviceResources->GetSwapChain();
+	auto commandQueue = deviceResources->GetCommandQueue();
+	const UINT64 currentFenceValue = fenceValues[backBufferIndex];
+
+	auto hr = commandQueue->Signal(fences[backBufferIndex].Get(), currentFenceValue);
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
-	WaitForFrame(backBufferIndex);
+	if (fences[backBufferIndex]->GetCompletedValue() < fenceValues[backBufferIndex])
+	{
+		auto hr = fences[backBufferIndex]->SetEventOnCompletion(fenceValues[backBufferIndex], fenceEvent[backBufferIndex]);
+		WaitForSingleObjectEx(fenceEvent[backBufferIndex], INFINITE, FALSE);
+	}
+
+	fenceValues[backBufferIndex] = currentFenceValue + 1;
 }
 
 void ComputeContext::CleanUp()

@@ -122,14 +122,12 @@ float4 main(VertexToPixel input) : SV_TARGET
     float intensity = DirLights[0].Intensity;
 	float3 accumFog = float3(0.f, 0.f, 0.f);
 	
-	
-
-	
 	[unroll]
 	for (int i = 0; i < NB_STEPS; ++i)
 	{
         float4 worldInShadowCameraSpace = mul(float4(currPos, 1.0f), shadowViewProj);
         float shadowMapValue = ShadowAmount(worldInShadowCameraSpace);
+		//if(shadowMapValue == 1.f)
         accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor * shadowMapValue * intensity;
 		currPos += step ;
 	}
