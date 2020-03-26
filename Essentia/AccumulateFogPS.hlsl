@@ -127,7 +127,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 	{
         float4 worldInShadowCameraSpace = mul(float4(currPos, 1.0f), shadowViewProj);
         float shadowMapValue = ShadowAmount(worldInShadowCameraSpace);
-		//if(shadowMapValue == 1.f)
         accumFog += ComputeScattering(dot(rayDirection, sunDir)).xxx * sunColor * shadowMapValue * intensity;
 		currPos += step ;
 	}

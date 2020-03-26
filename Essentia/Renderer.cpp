@@ -10,7 +10,7 @@
 #include "Renderer.h"
 #include "Window.h"
 #include "DeviceResources.h"
-#include "ShaderManager.h"
+#include "ShaderManager.h" 
 #include "InputLayout.h"
 #include "Engine.h"
 #include "Entity.h"
@@ -198,7 +198,7 @@ void Renderer::Clear()
 	commandContext->ResetAllocator(commandAllocator);
 	commandContext->ResetCommandList(commandList, commandAllocator);
 
-	TransitionResourceDesc frameEndTransitions[] = { 
+	TransitionResourceDesc frameEndTransitions[] = {
 		{resourceManager->GetResource(hdrRenderTargetResources[backBufferIndex]), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET},
 		{renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET}
 	};
@@ -260,8 +260,11 @@ void Renderer::Render(const FrameContext& frameContext)
 		perObject.World = worlds[i];
 		perObject.WorldViewProjection = drawables[i].WorldViewProjection;
 		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
-		renderBucket.Insert(drawables[i], 0);
+
 		auto bounding = meshManager->GetBoundingBox(drawables[i].Mesh);
+		bounding.Transform(bounding, world);
+		if (camera.Frustum.Contains(bounding) == ContainmentType::INTERSECTS) // TODO: Make Frustum Culling System 
+			renderBucket.Insert(drawables[i], 0);
 		drawables[i].PrevWorldViewProjection = drawables[i].WorldViewProjection;
 	}
 
@@ -392,7 +395,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	TransitionBarrier(commandList, GSceneResources.PreviousFrame.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	PIXEndEvent(commandList);
-	
+
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render Scene Main Target");
 	commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.QuadPSO));
 	SetDefaultRenderTarget();

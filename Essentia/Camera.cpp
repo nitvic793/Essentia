@@ -24,6 +24,12 @@ void Camera::Update(float deltaTime, float totalTime)
 	NearZ = XMMax(NearZ, 0.001f);
 	UpdateView();
 	UpdateProjection(Width, Height, NearZ, FarZ, FieldOfView);
+
+	auto view = GetViewMatrix();
+	auto projection = GetProjection();
+	XMVECTOR determinant;
+	BoundingFrustum::CreateFromMatrix(Frustum, XMLoadFloat4x4(&projection));
+	Frustum.Transform(Frustum, XMMatrixInverse(&determinant, view));
 }
 
 void Camera::UpdateView()
@@ -34,14 +40,11 @@ void Camera::UpdateView()
 	XMStoreFloat3(&Direction, direction);
 	auto view = GetViewMatrix();
 	XMStoreFloat4x4(&View, view);
-	Frustum.Origin = Position;
-	XMStoreFloat4(&Frustum.Orientation, rotation);
 }
 
 void Camera::UpdateProjection(float width, float height, float nearZ, float farZ, float fovInAngles)
 {
-	auto projection = IsOrthographic? XMMatrixOrthographicLH(width, height, nearZ, farZ) : XMMatrixPerspectiveFovLH((fovInAngles / 180.f) * XM_PI, width / height, nearZ, farZ);
-	BoundingFrustum::CreateFromMatrix(Frustum, projection);
+	auto projection = IsOrthographic ? XMMatrixOrthographicLH(width, height, nearZ, farZ) : XMMatrixPerspectiveFovLH((fovInAngles / 180.f) * XM_PI, width / height, nearZ, farZ);
 	XMStoreFloat4x4(&Projection, projection);
 }
 
