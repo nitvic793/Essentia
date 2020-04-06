@@ -24,6 +24,7 @@ cbuffer LightBuffer : register(b0)
 cbuffer LightAccumBuffer : register(b1)
 {
     float4x4 InvProjection;
+    float4x4 InvView;
     float4x4 World;
 	uint2	 ScreenResolution;
 }
@@ -93,6 +94,30 @@ float ShadowAmount(float4 shadowPos)
 	return shadowAmount;
 }
 
+float3 WorldPosFromDepth(float depth, float2 uv)
+{
+    float z = depth * 2.0 - 1.0;
+
+    float4 clipSpacePosition = float4(uv * 2.0 - 1.0, z, 1.0);
+    float4 viewSpacePosition = mul(clipSpacePosition, InvProjection);
+
+    // Perspective division
+    viewSpacePosition /= viewSpacePosition.w;
+
+    float4 worldSpacePosition = mul(viewSpacePosition, InvView);
+
+    return worldSpacePosition.xyz;
+}
+
+float3 GetNoise(float3 pos)
+{
+    static const float textureFrequency = 0.1f;
+    float2 uv = textureFrequency * pos.xy;
+	
+    return NoiseTexture.SampleLevel(LinearWrapSampler, uv, 0.f).rgb;
+}
+
+
 static const float ditherPattern[4][4] =
 {
 	{ 0.0f, 0.5f, 0.125f, 0.625f },
@@ -103,8 +128,9 @@ static const float ditherPattern[4][4] =
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
+    float depth = SceneDepthTexture.SampleLevel(LinearWrapSampler, input.UV, 0).r;
 	float3 startPos = CameraPosition;
-    float3 endPos = WorldPosMap.Sample(LinearWrapSampler, input.UV).xyz;
+    float3 endPos = WorldPosMap.Sample(LinearWrapSampler, input.UV).xyz; //WorldPosFromDepth(depth, input.UV); //
 	float3 rayVector = endPos - startPos;
 	float3 rayDirection = normalize(rayVector);
 	float rayLength = length(rayVector);

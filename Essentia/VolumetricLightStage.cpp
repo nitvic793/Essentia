@@ -12,6 +12,7 @@
 struct LightAccumParams
 {
 	DirectX::XMFLOAT4X4 InvProjection;
+	DirectX::XMFLOAT4X4 InvView;
 	DirectX::XMFLOAT4X4 World;
 	DirectX::XMUINT2	ScreenResolution;
 };
@@ -70,14 +71,14 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	auto sz = GPostProcess.GetPostSceneTextures().HalfResSize;
 	uint32 count;
 	const auto& camera = compManager->GetAllComponents<CameraComponent>(count)[0].CameraInstance;
-
-	auto projection = DirectX::XMLoadFloat4x4(&camera.Projection);
-	auto invProjection = DirectX::XMMatrixInverse(nullptr, projection);
+	
+	//auto projection = DirectX::XMLoadFloat4x4(&camera.Projection);
+	//auto invProjection = DirectX::XMMatrixInverse(nullptr, projection);
 	LightAccumParams params;
-
+	params.InvView = camera.GetInverseViewTransposed();
 	params.ScreenResolution = DirectX::XMUINT2((uint32)sz.Width, (uint32)sz.Height);
-	DirectX::XMStoreFloat4x4(&params.InvProjection, DirectX::XMMatrixTranspose(invProjection));
-
+	//DirectX::XMStoreFloat4x4(&params.InvProjection, DirectX::XMMatrixTranspose(invProjection));
+	params.InvProjection = camera.GetInverseProjectionTransposed();
 	auto postProcessEntities = compManager->GetEntities<BaseDrawableComponent, PostProcessVolumeComponent>();
 	auto baseDrawable = compManager->GetComponent<BaseDrawableComponent>(postProcessEntities[0]);
 	params.World = baseDrawable->World;

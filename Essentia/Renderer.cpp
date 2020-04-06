@@ -263,7 +263,7 @@ void Renderer::Render(const FrameContext& frameContext)
 
 		auto bounding = meshManager->GetBoundingBox(drawables[i].Mesh);
 		bounding.Transform(bounding, world);
-		if (camera.Frustum.Contains(bounding) == ContainmentType::INTERSECTS) // TODO: Make Frustum Culling System 
+		if (camera.Frustum.Contains(bounding)) // TODO: Make Frustum Culling System 
 			renderBucket.Insert(drawables[i], 0);
 		drawables[i].PrevWorldViewProjection = drawables[i].WorldViewProjection;
 	}
