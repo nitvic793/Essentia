@@ -890,6 +890,8 @@ void Renderer::UpdateLightBuffer()
 	{
 		for (uint32 i = 0; i < spotLightCount; ++i)
 		{
+			auto direction = (DirectX::XMFLOAT3) * ec->EntityManager->GetComponent<RotationComponent>(entities[i]);
+			spotLights[i].Direction = direction;
 			lightBuffer.SpotLights[i] = spotLights[i].GetLight();
 			lightBuffer.SpotLights[i].Position = (DirectX::XMFLOAT3) * ec->EntityManager->GetComponent<PositionComponent>(entities[i]);
 		}
