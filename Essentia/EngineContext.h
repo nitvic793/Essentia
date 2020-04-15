@@ -20,6 +20,7 @@ extern EngineContext* GContext;
 struct EngineContext
 {
 	static EngineContext*	Context;
+	bool					bIsPlaying = false;
 	Renderer*				RendererInstance = nullptr;
 	EntityManager*			EntityManager = nullptr;
 	MeshManager*			MeshManager = nullptr;
@@ -34,10 +35,16 @@ struct EngineContext
 	IAllocator*				DefaultAllocator = nullptr;
 	IAllocator*				FrameAllocator = nullptr;
 	ComponentReflector*		ComponentReflector = nullptr;
+
 	EngineContext()
 	{
 		Context = this;
 		GContext = this;
+	}
+
+	bool IsPlaying() const
+	{
+		return bIsPlaying;
 	}
 };
 

@@ -9,6 +9,7 @@ struct AOParams
 	DirectX::XMFLOAT4X4	Projection;
 	DirectX::XMFLOAT4X4	InvProjection;
 	DirectX::XMFLOAT4X4	ProjectionTex;
+	DirectX::XMFLOAT4X4	InvView;
 	DirectX::XMFLOAT4	OffsetVectors[14];
 	DirectX::XMFLOAT4	BlurWeights[3];
 	DirectX::XMFLOAT2	ScreenSize;

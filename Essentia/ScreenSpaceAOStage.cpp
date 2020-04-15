@@ -29,6 +29,8 @@ void ScreenSpaceAOStage::Initialize()
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 	auto renderer = GContext->RendererInstance;
 	auto sz = renderer->GetScreenSize();
+	auto halfSz = GPostProcess.GetPostSceneTextures().HalfResSize;
+	//sz = halfSz;
 	auto format = DXGI_FORMAT_R32_FLOAT; //For debugging, should be R32_FLOAT;
 	aoRenderTarget = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
 	aoBlurIntermediate = CreateSceneRenderTarget(GContext, sz.Width, sz.Height, format);
@@ -67,9 +69,11 @@ void ScreenSpaceAOStage::Render(const uint32 frameIndex, const FrameContext& fra
 	auto sz = renderer->GetScreenSize();
 	auto entityManager = GContext->EntityManager;
 	uint32 count = 0;
-
+	auto halfSz = GPostProcess.GetPostSceneTextures().HalfResSize;
+	//sz = halfSz;
 	auto camera = &entityManager->GetComponents<CameraComponent>(count)[0].CameraInstance;
 	auto projTransposed = camera->GetProjectionTransposed();
+	aoParams.InvView = camera->GetInverseViewTransposed();
 	aoParams.Projection = projTransposed;
 	aoParams.InvProjection = camera->GetInverseProjectionTransposed();
 	aoParams.ProjectionTex = GetProjTex(camera->GetProjection());
@@ -111,6 +115,8 @@ void ScreenSpaceAOStage::BlurSSAO(uint32 frameIndex)
 	auto commandList = renderer->GetDefaultCommandList();
 	auto rtManager = GContext->RenderTargetManager;
 	auto sz = renderer->GetScreenSize();
+	auto halfSz = GPostProcess.GetPostSceneTextures().HalfResSize;
+	//sz = halfSz;
 
 	SSAOBlurParams blurDirHorizontal = { XMFLOAT2(1.f / (float)sz.Width, 0.f) };
 	SSAOBlurParams blurDirVertical = { XMFLOAT2(0.f, 1.f / (float)sz.Height) };

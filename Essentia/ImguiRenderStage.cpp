@@ -126,6 +126,21 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Vsync", &vsync);
 
+		if (!GContext->IsPlaying())
+		{
+			if (ImGui::Button("Play"))
+			{
+				GContext->bIsPlaying = true;
+			}
+		}
+		else
+		{
+			if (ImGui::Button("Pause"))
+			{
+				GContext->bIsPlaying = false;
+			}
+		}
+
 		if (ImGui::CollapsingHeader("Render Stages"))
 		{
 			auto stages = GRenderStageManager.GetRenderStageMap();

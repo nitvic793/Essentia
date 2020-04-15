@@ -5,33 +5,34 @@
 struct VertexOut
 {
     float4 Position : SV_POSITION;
-    float3 PosV     : POSITION;
-    float2 UV       : TEXCOORD0;
+    float3 PosV : POSITION;
+    float2 UV : TEXCOORD0;
 };
 
 cbuffer AOParams : register(b0)
 {
-    float4x4    Projection;
-    float4x4    InvProjection;
-    float4x4    ProjectionTex;
-    float4      OffsetVectors[14];
-    float4      BlurWeights[3];
-    float2      ScreenSize;
-    float       OcclusionRadius;
-    float       OcclusionFadeStart;
-    float       OcclusionFadeEnd;
-    float       SurfaceEpsilon;
+    float4x4 Projection;
+    float4x4 InvProjection;
+    float4x4 ProjectionTex;
+    float4x4 InvView;
+    float4 OffsetVectors[14];
+    float4 BlurWeights[3];
+    float2 ScreenSize;
+    float OcclusionRadius;
+    float OcclusionFadeStart;
+    float OcclusionFadeEnd;
+    float SurfaceEpsilon;
 }
 
 static const int gSampleCount = 14;
 
-SamplerState BasicSampler               : register(s0);
-SamplerComparisonState ShadowSampler    : register(s1);
-SamplerState LinearWrapSampler          : register(s2);
-SamplerState PointClampSampler          : register(s3);
+SamplerState BasicSampler : register(s0);
+SamplerComparisonState ShadowSampler : register(s1);
+SamplerState LinearWrapSampler : register(s2);
+SamplerState PointClampSampler : register(s3);
 
-Texture2D<float> DepthTexture      : register(t0);
-Texture2D RandomVecTexture  : register(t1);
+Texture2D<float> DepthTexture : register(t0);
+Texture2D RandomVecTexture : register(t1);
 
 float3 VSPositionFromDepth(float2 vTexCoord, float depth)
 {
@@ -46,6 +47,71 @@ float3 VSPositionFromDepth(float2 vTexCoord, float depth)
     // Divide by w to get the view-space position
     return vPositionVS.xyz / vPositionVS.w;
 }
+
+float3 WorldPosFromDepth(float2 uv, float depth)
+{
+    float z = depth * 2.0 - 1.0;
+
+    float4 clipSpacePosition = float4(uv * 2.0 - 1.0, z, 1.0);
+    float4 viewSpacePosition = mul(clipSpacePosition, InvProjection);
+
+    // Perspective division
+    viewSpacePosition /= viewSpacePosition.w;
+
+    float4 worldSpacePosition = mul(viewSpacePosition, InvView);
+
+    return worldSpacePosition.xyz;
+}
+
+
+float3 ReconstructNormal(float2 uv)
+{
+    float2 stc = uv;
+    float depth = DepthTexture.Sample(LinearWrapSampler, stc).x;
+    float3 Pos = VSPositionFromDepth(uv, depth);
+    int bestZV;
+    int bestZH;
+    float4 H;
+    H.x = DepthTexture.Sample(LinearWrapSampler, stc - float2(1 / ScreenSize.x, 0)).x;
+    H.y = DepthTexture.Sample(LinearWrapSampler, stc + float2(1 / ScreenSize.x, 0)).x;
+    H.z = DepthTexture.Sample(LinearWrapSampler, stc - float2(2 / ScreenSize.x, 0)).x;
+    H.w = DepthTexture.Sample(LinearWrapSampler, stc + float2(2 / ScreenSize.x, 0)).x;
+    
+    float3 HPos[4];
+    HPos[0] = VSPositionFromDepth(stc - float2(1 / ScreenSize.x, 0), H.x);
+    HPos[1] = VSPositionFromDepth(stc + float2(1 / ScreenSize.x, 0), H.y);
+    HPos[2] = VSPositionFromDepth(stc - float2(2 / ScreenSize.x, 0), H.z);
+    HPos[3] = VSPositionFromDepth(stc + float2(2 / ScreenSize.x, 0), H.w);
+    float2 he = abs(H.xy * H.zw * rcp(2 * H.zw - H.xy) - depth);
+    float3 hDeriv;
+    
+    if (he.x > he.y)
+        hDeriv = ddx(HPos[2]);
+    else
+        hDeriv = ddx(HPos[3]);
+
+    float4 V;
+    V.x = DepthTexture.Sample(LinearWrapSampler, stc - float2(0, 1 / ScreenSize.y)).x;
+    V.y = DepthTexture.Sample(LinearWrapSampler, stc + float2(0, 1 / ScreenSize.y)).x;
+    V.z = DepthTexture.Sample(LinearWrapSampler, stc - float2(0, 2 / ScreenSize.y)).x;
+    V.w = DepthTexture.Sample(LinearWrapSampler, stc + float2(0, 2 / ScreenSize.y)).x;
+    
+    float3 VPos[4];
+    VPos[0] = VSPositionFromDepth(stc - float2(0, 1 / ScreenSize.y), V.x);
+    VPos[1] = VSPositionFromDepth(stc + float2(0, 1 / ScreenSize.y), V.y);
+    VPos[2] = VSPositionFromDepth(stc - float2(0, 2 / ScreenSize.y), V.z);
+    VPos[3] = VSPositionFromDepth(stc + float2(0, 2 / ScreenSize.y), V.w);
+    
+    float2 ve = abs(V.xy * V.zw * rcp(2 * V.zw - V.xy) - depth);
+    float3 vDeriv;
+    if (ve.x > ve.y)
+        vDeriv = ddy(VPos[0]);
+    else
+        vDeriv = ddy(VPos[3]);
+    
+    return normalize(cross(hDeriv, vDeriv));
+}
+
 
 float3 ReconstructNormal(float3 viewSpacePos)
 {

@@ -19,7 +19,7 @@ void Game::Setup()
 	ec->DefaultAllocator = Mem::GetDefaultAllocator();
 	ec->FrameAllocator = &frameAllocator;
 	ec->ComponentReflector = &GComponentReflector;
-	
+
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);
 
@@ -36,7 +36,7 @@ void Game::Setup()
 	coreSystemsManager.Initialize();
 
 	// This function also loads resources(textures, meshes) along with the scene entities.
-	LoadLevel("scene.json"); 
+	LoadLevel("scene.json");
 	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
@@ -48,14 +48,15 @@ void Game::Run()
 	float localCounter = 0.f;
 	auto window = renderer->GetWindow();
 	timer.Start();
-	window->StartMessagePump([&] 
+	window->StartMessagePump([&]
 		{
 			timer.Tick();
 			localCounter += timer.DeltaTime;
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
 			coreSystemsManager.Update(kbState, mouseState, nullptr);
-			gameSystemsManager.Update(kbState, mouseState, nullptr);
+			if (GContext->IsPlaying())
+				gameSystemsManager.Update(kbState, mouseState, nullptr);
 			Update();
 			camera->Update();
 			Render();
@@ -81,7 +82,7 @@ void Game::Run()
 				}
 			}
 
-			frameAllocator.Reset(); 
+			frameAllocator.Reset();
 		});
 }
 

@@ -14,6 +14,7 @@ cbuffer AOParams : register(b0)
     float4x4 Projection;
     float4x4 InvProjection;
     float4x4 ProjectionTex;
+    float4x4 InvView;
     float4 OffsetVectors[14];
     float4 BlurWeights[3];
     float2 ScreenSize;
