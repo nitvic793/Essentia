@@ -769,6 +769,12 @@ void Renderer::Draw(ID3D12GraphicsCommandList* commandList, DrawableModelCompone
 	}
 }
 
+void Renderer::SetPipelineState(ID3D12GraphicsCommandList* commandList, PipelineStateID pipelineStateId)
+{
+	ID3D12PipelineState* pso = resourceManager->GetPSO(pipelineStateId);
+	commandList->SetPipelineState(pso);
+}
+
 void Renderer::InitializeCommandContext()
 {
 	commandContext = MakeScoped<CommandContext>();

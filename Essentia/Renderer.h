@@ -87,6 +87,7 @@ public:
 	void						SetVSync(bool enabled);
 	void						Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, const Camera* camera);
 	void						Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, const Camera* camera);
+	void						SetPipelineState(ID3D12GraphicsCommandList* commandList, PipelineStateID pipelineStateId);
 private:
 	void InitializeCommandContext();
 	void CreateRootSignatures();

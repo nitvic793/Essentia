@@ -55,8 +55,8 @@ void Game::Run()
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
 			coreSystemsManager.Update(kbState, mouseState, nullptr);
-			if (GContext->IsPlaying())
-				gameSystemsManager.Update(kbState, mouseState, nullptr);
+			//if (GContext->IsPlaying())
+			gameSystemsManager.Update(kbState, mouseState, nullptr);
 			Update();
 			camera->Update();
 			Render();

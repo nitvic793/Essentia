@@ -20,7 +20,7 @@ extern EngineContext* GContext;
 struct EngineContext
 {
 	static EngineContext*	Context;
-	bool					bIsPlaying = false;
+	//bool					bIsPlaying = false;
 	Renderer*				RendererInstance = nullptr;
 	EntityManager*			EntityManager = nullptr;
 	MeshManager*			MeshManager = nullptr;
@@ -42,9 +42,9 @@ struct EngineContext
 		GContext = this;
 	}
 
-	bool IsPlaying() const
-	{
-		return bIsPlaying;
-	}
+	//bool IsPlaying() const
+	//{
+	//	return bIsPlaying;
+	//}
 };
 
