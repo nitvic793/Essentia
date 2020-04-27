@@ -8,6 +8,7 @@ enum RenderStageType
 	eRenderStageMain,
 	eRenderTypeTransparent,
 	eRenderStageGUI,
+	eRenderStageCompute,
 	eRenderTypeCount
 };
 
