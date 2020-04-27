@@ -127,7 +127,7 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	bool isCubeMap = false;
 
 	uploadBatch.Begin();
-	
+
 	switch (texType)
 	{
 	case WIC:
@@ -151,9 +151,8 @@ TextureID ShaderResourceManager::CreateTexture(const std::string& filename, Text
 	properties.Format = desc.Format;
 	properties.Name = filename;
 	properties.TextureLoadType = texType;
-	
-	auto texIndex = textureCount;
-	textureCount++;
+
+	auto texIndex = GetNextTextureIndex();
 	CreateShaderResourceView(device, *resource, textureHeap.handleCPU(texIndex), isCubeMap);
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(*resource);
@@ -184,8 +183,7 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 	}
 
 	auto device = deviceResources->GetDevice();
-	auto texIndex = textureCount;
-	textureCount++;
+	auto texIndex = GetNextTextureIndex();
 
 	if (format == DXGI_FORMAT_UNKNOWN)
 	{
@@ -206,13 +204,14 @@ TextureID ShaderResourceManager::CreateTexture(ID3D12Resource* resource, bool is
 		device->CreateShaderResourceView(resource, &descSRV, textureHeap.handleCPU(texIndex));
 	}
 
+	resource->SetName(ToWString(texName).c_str());
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(resource);
 	textureNameMap[texIndex] = texName;
 	return texIndex;
 }
 
-TextureID ShaderResourceManager::CreateTexture2D(TextureCreateProperties properties, ResourceID* outResourceId, const char* name, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState)
+TextureID ShaderResourceManager::CreateTexture2D(const TextureCreateProperties& properties, ResourceID* outResourceId, const char* name, D3D12_RESOURCE_FLAGS flags, D3D12_RESOURCE_STATES initialState)
 {
 	auto ec = EngineContext::Context;
 	auto resourceId = ec->ResourceManager->CreateResource(
@@ -224,6 +223,107 @@ TextureID ShaderResourceManager::CreateTexture2D(TextureCreateProperties propert
 		*outResourceId = resourceId;
 	}
 	return CreateTexture(texResource, false, nullptr, properties.Format);
+}
+
+TextureID ShaderResourceManager::CreateTexture3D(const Texture3DCreateProperties& properties,
+	ResourceID* outResourceId,
+	const char* name,
+	D3D12_RESOURCE_FLAGS flags,
+	D3D12_RESOURCE_STATES initialState)
+{
+	auto resourceId = GContext->ResourceManager->CreateResource(
+		CD3DX12_RESOURCE_DESC::Tex3D(properties.Format, properties.Width, properties.Height, properties.Depth, properties.MipLevels, flags),
+		nullptr, initialState);
+	auto texResource = GContext->ResourceManager->GetResource(resourceId);
+	if (outResourceId != nullptr)
+	{
+		*outResourceId = resourceId;
+	}
+
+	StringID stringId;
+	std::string texName;
+	if (name == nullptr)
+	{
+		texName = std::to_string(textureCount);
+		stringId = String::ID(texName.c_str());
+	}
+	else
+	{
+		texName = name;
+		stringId = String::ID(name);
+	}
+
+	if (textureMap.find(stringId) != textureMap.end())
+	{
+		return textureMap[stringId];
+	}
+
+	auto device = deviceResources->GetDevice();
+	auto texIndex = GetNextTextureIndex();
+
+	if (properties.Format == DXGI_FORMAT_UNKNOWN)
+	{
+		CreateShaderResourceView(device, texResource, textureHeap.handleCPU(texIndex));
+	}
+	else
+	{
+		auto viewDimension = D3D12_SRV_DIMENSION_TEXTURE3D;
+
+		D3D12_SHADER_RESOURCE_VIEW_DESC descSRV = {};
+		ZeroMemory(&descSRV, sizeof(descSRV));
+		descSRV.Texture3D.MipLevels = properties.MipLevels;
+		descSRV.Texture3D.MostDetailedMip = 0;
+		descSRV.Format = properties.Format;
+		descSRV.ViewDimension = viewDimension;
+		descSRV.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+		device->CreateShaderResourceView(texResource, &descSRV, textureHeap.handleCPU(texIndex));
+	}
+
+	texResource->SetName(ToWString(texName).c_str());
+	textureMap[stringId] = texIndex;
+	textureResources.push_back(texResource);
+	textureNameMap[texIndex] = texName;
+	return texIndex;
+}
+
+TextureID ShaderResourceManager::CreateTextureUAV(ResourceID resourceId)
+{
+	auto texName = std::to_string(textureCount);
+	auto stringId = String::ID(texName.c_str());
+	auto resource = GContext->ResourceManager->GetResource(resourceId);
+	auto rDesc = resource->GetDesc();
+	auto texIndex = GetNextTextureIndex();
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+	desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+	desc.Format = desc.Format;
+	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
+	
+	textureMap[stringId] = texIndex;
+	textureResources.push_back(resource);
+	textureNameMap[texIndex] = texName;
+	return texIndex;
+}
+
+TextureID ShaderResourceManager::CreateTexture3DUAV(ResourceID resourceId, uint32 depthSlices)
+{
+	auto texName = std::to_string(textureCount);
+	auto stringId = String::ID(texName.c_str());
+	auto resource = GContext->ResourceManager->GetResource(resourceId);
+	auto rDesc = resource->GetDesc();
+	auto texIndex = GetNextTextureIndex();
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+	desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
+	desc.Format = desc.Format;
+	desc.Texture3D.MipSlice = 0;
+	desc.Texture3D.WSize = depthSlices;
+	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
+	
+	textureMap[stringId] = texIndex;
+	textureResources.push_back(resource);
+	textureNameMap[texIndex] = texName;
+	return texIndex;
 }
 
 MaterialHandle ShaderResourceManager::CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name)
@@ -346,4 +446,11 @@ D3D12_GPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureGPUHandle(TextureID
 D3D12_CPU_DESCRIPTOR_HANDLE ShaderResourceManager::GetTextureCPUHandle(TextureID texID)
 {
 	return textureHeap.handleCPU(texID);
+}
+
+uint32 ShaderResourceManager::GetNextTextureIndex()
+{
+	auto texIndex = textureCount;
+	textureCount++;
+	return texIndex;
 }

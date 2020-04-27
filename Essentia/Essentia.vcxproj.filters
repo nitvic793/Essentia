@@ -247,6 +247,9 @@
     <ClCompile Include="ApplyVolumetricFog.cpp">
       <Filter>Source Files\Renderer\PostProcessStages</Filter>
     </ClCompile>
+    <ClCompile Include="VoxelizationStage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -461,6 +464,9 @@
     </ClInclude>
     <ClInclude Include="ApplyVolumetricFog.h">
       <Filter>Header Files\Renderer\PostProcessStages</Filter>
+    </ClInclude>
+    <ClInclude Include="VoxelizationStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

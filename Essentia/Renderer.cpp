@@ -29,6 +29,7 @@
 #include "ScreenSpaceAOStage.h"
 #include "VolumetricLightStage.h"
 #include "ApplyVolumetricFog.h"
+#include "VoxelizationStage.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -133,6 +134,7 @@ void Renderer::Initialize()
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ScreenSpaceAOStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
+	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VoxelizationStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VolumetricLightStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));

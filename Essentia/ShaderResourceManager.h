@@ -25,6 +25,15 @@ struct TextureCreateProperties
 	DXGI_FORMAT Format;
 };
 
+struct Texture3DCreateProperties
+{
+	uint64 Width;
+	uint32 Height;
+	uint16 Depth;
+	DXGI_FORMAT Format;
+	uint16 MipLevels;
+};
+
 struct TextureProperties
 {
 	std::string Name;
@@ -60,22 +69,29 @@ public:
 	GPUHeapOffsets				CopyDescriptorsToGPUHeap(uint32 frameIndex, FrameManager* frame);
 	TextureID					CreateTexture(const std::string& filename, TextureType texType = WIC, bool generateMips = true);
 	TextureID					CreateTexture(ID3D12Resource* resource, bool isCubeMap = false, const char* name = nullptr, DXGI_FORMAT format = DXGI_FORMAT_UNKNOWN);
-	TextureID					CreateTexture2D(TextureCreateProperties properties,
+	TextureID					CreateTexture2D(const TextureCreateProperties& properties,
 		ResourceID* outResourceId = nullptr,
 		const char* name = nullptr,
 		D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
 		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TextureID					CreateTexture3D(const Texture3DCreateProperties& properties,
+		ResourceID* outResourceId = nullptr,
+		const char* name = nullptr,
+		D3D12_RESOURCE_FLAGS flags = D3D12_RESOURCE_FLAG_NONE,
+		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	TextureID					CreateTextureUAV(ResourceID resourceId);
+	TextureID					CreateTexture3DUAV(ResourceID resourceId, uint32 depthSlices = 1);
 	MaterialHandle				CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
 
 	void						CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
 	D3D12_GPU_DESCRIPTOR_HANDLE	AllocateTextures(TextureID* textures, uint32 textureCount, uint32 frameIndex, FrameManager* frameManager);
 
-	const Material&				GetMaterial(MaterialHandle handle);
+	const Material& GetMaterial(MaterialHandle handle);
 	MaterialHandle				GetMaterialHandle(const char* materialName);
 	MaterialHandle				GetMaterialHandle(StringID material);
 	TextureID					GetTexture(StringID texture);
 	TextureID					RequestUninitializedTexture();
-	ID3D12Resource*				GetResource(TextureID textureId);
+	ID3D12Resource* GetResource(TextureID textureId);
 	std::string					GetMaterialName(MaterialHandle handle);
 	std::string					GetTextureName(TextureID textureId);
 
@@ -85,6 +101,7 @@ public:
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
 private:
+	uint32					GetNextTextureIndex();
 	GPUConstantBuffer		cbuffer[CFrameBufferCount];
 	DescriptorHeap			cbvHeap[CFrameBufferCount];
 	DescriptorHeap			textureHeap;
@@ -113,13 +130,13 @@ class FrameManager
 {
 public:
 	void						Initialize(ID3D12Device* device);
-	ID3D12DescriptorHeap*		GetGPUDescriptorHeap(uint32 frameIndex) const;
+	ID3D12DescriptorHeap* GetGPUDescriptorHeap(uint32 frameIndex) const;
 	void						Reset(uint32 frameIndex);
 	uint32						Allocate(uint32 frameIndex, const DescriptorHeap& heap, uint32 numDescriptors, uint32 offset = 0);
 	D3D12_GPU_DESCRIPTOR_HANDLE GetHandle(uint32 frameIndex, GPUHeapID index) const;
 private:
 	FrameManager() {};
-	ID3D12Device*		device = nullptr;
+	ID3D12Device* device = nullptr;
 	DescriptorHeap		gpuHeap[CFrameBufferCount];
 	uint32				heapIndex[CFrameBufferCount] = { 0 };
 	friend class Renderer;

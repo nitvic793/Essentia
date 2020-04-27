@@ -279,6 +279,7 @@
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VelocityBufferStage.cpp" />
     <ClCompile Include="VolumetricLightStage.cpp" />
+    <ClCompile Include="VoxelizationStage.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -352,6 +353,7 @@
     <ClInclude Include="VelocityBufferStage.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="VolumetricLightStage.h" />
+    <ClInclude Include="VoxelizationStage.h" />
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
