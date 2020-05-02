@@ -307,6 +307,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
+	
 
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 
@@ -604,6 +605,11 @@ uint32 Renderer::GetCurrentBackbufferIndex() const
 	return deviceResources->GetSwapChain()->GetCurrentBackBufferIndex();
 }
 
+D3D12_GPU_DESCRIPTOR_HANDLE Renderer::GetTextureGPUHandle(TextureID textureId) const
+{
+	return frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + textureId);
+}
+
 void Renderer::DrawScreenQuad(ID3D12GraphicsCommandList* commandList)
 {
 	D3D12_INDEX_BUFFER_VIEW ibv;
@@ -800,6 +806,8 @@ void Renderer::CreateRootSignatures()
 	range[RootSigCBAll2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 2);
 	//IBL Textures
 	range[RootSigIBL].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 4, 16);
+	// UAV textures
+	range[RootSigUAV0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[RootSigParamCount];
 	rootParameters[RootSigCBVertex0].InitAsDescriptorTable(1, &range[RootSigCBVertex0], D3D12_SHADER_VISIBILITY_VERTEX);
@@ -809,6 +817,7 @@ void Renderer::CreateRootSignatures()
 	rootParameters[RootSigCBAll1].InitAsDescriptorTable(1, &range[RootSigCBAll1], D3D12_SHADER_VISIBILITY_ALL);
 	rootParameters[RootSigCBAll2].InitAsDescriptorTable(1, &range[RootSigCBAll2], D3D12_SHADER_VISIBILITY_ALL);
 	rootParameters[RootSigIBL].InitAsDescriptorTable(1, &range[RootSigIBL], D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[RootSigUAV0].InitAsDescriptorTable(1, &range[RootSigUAV0], D3D12_SHADER_VISIBILITY_ALL);
 
 	CD3DX12_ROOT_SIGNATURE_DESC descRootSignature;
 	descRootSignature.Init(RootSigParamCount, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT | // we can deny shader stages here for better performance

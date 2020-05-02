@@ -82,6 +82,9 @@
     <Filter Include="Shaders\SSAO">
       <UniqueIdentifier>{5d3285fd-e20e-4710-87d9-94f314b44dda}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Voxelization">
+      <UniqueIdentifier>{8b94897f-c292-4880-8fa9-bf1ab6a9c781}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -91,6 +94,9 @@
     </None>
     <None Include="Common.hlsli">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="VoxelCommon.hlsli">
+      <Filter>Shaders\Voxelization</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -248,7 +254,7 @@
       <Filter>Source Files\Renderer\PostProcessStages</Filter>
     </ClCompile>
     <ClCompile Include="VoxelizationStage.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -547,6 +553,15 @@
     </FxCompile>
     <FxCompile Include="BilateralBlurPS.hlsl">
       <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="VoxelizeVS.hlsl">
+      <Filter>Shaders\Voxelization</Filter>
+    </FxCompile>
+    <FxCompile Include="VoxelizeGS.hlsl">
+      <Filter>Shaders\Voxelization</Filter>
+    </FxCompile>
+    <FxCompile Include="VoxelizePS.hlsl">
+      <Filter>Shaders\Voxelization</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

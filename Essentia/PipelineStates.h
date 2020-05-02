@@ -15,6 +15,7 @@ public:
 	PipelineStateID SSAOBlurPSO;
 	PipelineStateID LightAccumPSO;
 	PipelineStateID BilateralBlurPSO;
+	PipelineStateID VoxelizePSO;
 
 	//Post Process PSOs
 	PipelineStateID QuadPSO;
@@ -26,6 +27,7 @@ private:
 	void CreateLightAccumPSO();
 	void CreateShadowPSO();
 	void CreateScreenSpaceAOPSO();
+	void CreateVoxelizePSO();
 };
 
 extern PipelineStates GPipelineStates;

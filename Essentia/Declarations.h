@@ -76,6 +76,7 @@ enum RootParameterSlot {
 	RootSigCBAll1,
 	RootSigCBAll2,
 	RootSigIBL,
+	RootSigUAV0,
 	RootSigParamCount
 };
 

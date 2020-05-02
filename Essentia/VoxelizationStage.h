@@ -11,5 +11,7 @@ public:
 private:
 	TextureID voxelGrid3dTextureSRV;
 	TextureID voxelGrid3dTextureUAV;
+	ResourceID voxelGridResource;
+	SceneRenderTarget voxelRT;
 };
 

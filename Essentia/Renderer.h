@@ -71,6 +71,7 @@ public:
 	const D3D12_RECT&			GetScissorRect() const;
 	ScreenSize					GetScreenSize() const;
 	uint32						GetCurrentBackbufferIndex() const;
+	D3D12_GPU_DESCRIPTOR_HANDLE	GetTextureGPUHandle(TextureID textureId) const;
 	void						DrawScreenQuad(ID3D12GraphicsCommandList* commandList);
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
 	void						SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture);
