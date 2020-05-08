@@ -6,15 +6,15 @@
 #include "PipelineStates.h"
 #include "SceneResources.h"
 
-constexpr uint32 VOXELSIZE = 128;
+constexpr uint32 CVoxelSize = 128;
 
 void VoxelizationStage::Initialize()
 {
 	auto shaderResourceManager = GContext->ShaderResourceManager;
-	uint32 voxelGridSize = VOXELSIZE;
+	uint32 voxelGridSize = CVoxelSize;
 	Texture3DCreateProperties props = {};
 	auto renderer = GContext->RendererInstance;
-	props.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	props.Format = DXGI_FORMAT_R16G16B16A16_UNORM; //DXGI_FORMAT_R16G16B16A16_FLOAT; 
 	props.Width = voxelGridSize;
 	props.Depth = voxelGridSize;
 	props.Height = voxelGridSize;
@@ -39,8 +39,8 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	auto srManager = GContext->ShaderResourceManager;
 	auto resourceManager = GContext->ResourceManager;
 	D3D12_VIEWPORT viewport = {};
-	viewport.Width = (FLOAT)sz.Width;
-	viewport.Height = (FLOAT)sz.Height;
+	viewport.Width = (FLOAT)CVoxelSize;
+	viewport.Height = (FLOAT)CVoxelSize;
 	viewport.MaxDepth = 1.f;
 	viewport.MinDepth = 0.f;
 
@@ -61,10 +61,11 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	renderer->SetRenderTargets(nullptr, 0, nullptr);
 	renderer->SetPipelineState(commandList, GPipelineStates.VoxelizePSO);
 	uint32 clearVal[] = { 0, 0, 0, 0 };
-	commandList->ClearUnorderedAccessViewUint(
+	const FLOAT clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	commandList->ClearUnorderedAccessViewFloat(
 		renderer->GetTextureGPUHandle(voxelGrid3dTextureUAV),
 		srManager->GetTextureCPUHandle(voxelGrid3dTextureUAV), 
-		resourceManager->GetResource(voxelGridResource), clearVal, 0, nullptr);
+		resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
 
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
 	renderer->SetShaderResourceView(commandList, RootSigUAV0, voxelGrid3dTextureUAV);

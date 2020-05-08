@@ -28,7 +28,7 @@ void main(
 	{
 		GSOutput element;
         element = input[i];
-        element.Position = float4((element.Position.xyz - CVoxelGridCenter) / CVoxelGridSize, 1.f);
+        element.Position = float4((element.WorldPos.xyz - CVoxelGridCenter) / CVoxelGridSize, 1.f);
         if(maxi == 0)
         {
             element.Position.xyz = element.WorldPos.zyx;
