@@ -5,8 +5,50 @@
 #include "Entity.h"
 #include "PipelineStates.h"
 #include "SceneResources.h"
+#include <DirectXCollision.h>
+using namespace DirectX;
 
 constexpr uint32 CVoxelSize = 128;
+
+
+struct DECLSPEC_ALIGN(16) VoxelParams
+{
+	XMFLOAT3 VoxelRCPSize;
+	float Padding;
+	XMFLOAT3 VoxelGridMaxPoint;
+	float Padding2;
+	XMFLOAT3 VoxelGridMinPoint;
+	float Padding3;
+	XMFLOAT3 VoxelGridCenter;
+	float Padding4;
+	XMFLOAT3 VoxelGridSize;
+	float Padding5;
+};
+
+//Reference: https://github.com/KolyaNaichuk/RenderSDK/blob/c176de53d1f0c08f7e5be6790229203da305bc65/Samples/DynamicGI/Source/DXApplication.cpp
+
+static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSize)
+{
+	VoxelParams output = {};
+	XMFLOAT3 corners[BoundingFrustum::CORNER_COUNT];
+	camera.Frustum.GetCorners(corners);
+	BoundingBox cameraAABB;
+	BoundingBox::CreateFromPoints(cameraAABB, camera.Frustum.CORNER_COUNT, corners, sizeof(XMFLOAT3));
+
+	XMVECTOR voxelGridCenter = XMLoadFloat3(&cameraAABB.Center);
+	XMVECTOR voxelWorldRadius = XMVectorSet(camera.FarZ, camera.FarZ, camera.FarZ, 0.f);
+	XMVECTOR numVoxelsInGrid = XMVectorSet(CVoxelSize, CVoxelSize, CVoxelSize, 0.f);
+
+	XMVECTOR voxelWorldGridSize = 2.f * voxelWorldRadius;
+
+	XMStoreFloat3(&output.VoxelGridMinPoint, voxelGridCenter - voxelWorldRadius);
+	XMStoreFloat3(&output.VoxelGridMaxPoint, voxelGridCenter + voxelWorldRadius);
+	XMStoreFloat3(&output.VoxelRCPSize, numVoxelsInGrid / voxelWorldGridSize);
+	XMStoreFloat3(&output.VoxelGridCenter, voxelGridCenter);
+	XMStoreFloat3(&output.VoxelGridSize, voxelWorldGridSize);
+
+	return output;
+}
 
 void VoxelizationStage::Initialize()
 {
@@ -23,7 +65,7 @@ void VoxelizationStage::Initialize()
 	voxelGrid3dTextureSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
 	voxelRT = CreateSceneRenderTarget(GContext, renderer->GetScreenSize().Width, renderer->GetScreenSize().Width, DXGI_FORMAT_R8G8B8A8_UNORM);
-
+	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));
 	renderer->TransitionBarrier(renderer->GetDefaultCommandList(), voxelRT.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	GRenderStageManager.RegisterStage("VoxelizationStage", this);
 }
@@ -38,6 +80,13 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	auto rtManager = GContext->RenderTargetManager;
 	auto srManager = GContext->ShaderResourceManager;
 	auto resourceManager = GContext->ResourceManager;
+	auto shaderResourceManager = GContext->ShaderResourceManager;
+	uint32 count = 0;
+	auto cameras = GContext->EntityManager->GetComponents<CameraComponent>(count);
+
+	auto voxelParams = CreateVoxelParams(cameras[0].CameraInstance, CVoxelSize);
+	shaderResourceManager->CopyToCB(frameIndex, { &voxelParams, sizeof(VoxelParams) }, voxelParamsCBV);
+
 	D3D12_VIEWPORT viewport = {};
 	viewport.Width = (FLOAT)CVoxelSize;
 	viewport.Height = (FLOAT)CVoxelSize;
@@ -64,12 +113,13 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	const FLOAT clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	commandList->ClearUnorderedAccessViewFloat(
 		renderer->GetTextureGPUHandle(voxelGrid3dTextureUAV),
-		srManager->GetTextureCPUHandle(voxelGrid3dTextureUAV), 
+		srManager->GetTextureCPUHandle(voxelGrid3dTextureUAV),
 		resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
 
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
+	renderer->SetConstantBufferView(commandList, RootSigCBAll2, voxelParamsCBV);
 	renderer->SetShaderResourceView(commandList, RootSigUAV0, voxelGrid3dTextureUAV);
-	uint32 count = 0;
+
 	auto drawables = frameContext.EntityManager->GetComponents<DrawableComponent>(count);
 
 	for (uint32 i = 0; i < count; ++i)
