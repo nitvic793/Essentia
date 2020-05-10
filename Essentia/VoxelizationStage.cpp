@@ -23,6 +23,8 @@ struct DECLSPEC_ALIGN(16) VoxelParams
 	float Padding4;
 	XMFLOAT3 VoxelGridSize;
 	float Padding5;
+
+	XMFLOAT4X4 VoxelGridViewProjMatrices[3];
 };
 
 //Reference: https://github.com/KolyaNaichuk/RenderSDK/blob/c176de53d1f0c08f7e5be6790229203da305bc65/Samples/DynamicGI/Source/DXApplication.cpp
@@ -39,6 +41,10 @@ static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSiz
 	XMVECTOR voxelWorldRadius = XMVectorSet(camera.FarZ, camera.FarZ, camera.FarZ, 0.f);
 	XMVECTOR numVoxelsInGrid = XMVectorSet(CVoxelSize, CVoxelSize, CVoxelSize, 0.f);
 
+	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
+	XMVECTOR right = XMVectorSet(1, 0, 0, 0);
+	XMVECTOR forward = XMVectorSet(0, 0, 1, 0);
+
 	XMVECTOR voxelWorldGridSize = 2.f * voxelWorldRadius;
 
 	XMStoreFloat3(&output.VoxelGridMinPoint, voxelGridCenter - voxelWorldRadius);
@@ -46,6 +52,28 @@ static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSiz
 	XMStoreFloat3(&output.VoxelRCPSize, numVoxelsInGrid / voxelWorldGridSize);
 	XMStoreFloat3(&output.VoxelGridCenter, voxelGridCenter);
 	XMStoreFloat3(&output.VoxelGridSize, voxelWorldGridSize);
+
+
+	Camera voxelGridCameraAlongX(CVoxelSize, CVoxelSize, 0.001f, CVoxelSize);
+	voxelGridCameraAlongX.IsOrthographic = true;
+	XMStoreFloat3(&voxelGridCameraAlongX.Position, voxelGridCenter - voxelWorldRadius * right);
+	voxelGridCameraAlongX.Rotation.y = XM_PIDIV2;
+	voxelGridCameraAlongX.Update();
+
+	Camera voxelGridCameraAlongY(CVoxelSize, CVoxelSize, 0.001f, CVoxelSize);
+	voxelGridCameraAlongY.IsOrthographic = true;
+	XMStoreFloat3(&voxelGridCameraAlongY.Position, voxelGridCenter - voxelWorldRadius * up);
+	voxelGridCameraAlongY.Rotation.y = -XM_PIDIV2;
+	voxelGridCameraAlongY.Update();
+
+	Camera voxelGridCameraAlongZ(CVoxelSize, CVoxelSize, 0.001f, CVoxelSize);
+	voxelGridCameraAlongZ.IsOrthographic = true;
+	XMStoreFloat3(&voxelGridCameraAlongZ.Position, voxelGridCenter - voxelWorldRadius * forward);
+	voxelGridCameraAlongZ.Update();
+
+	XMStoreFloat4x4(&output.VoxelGridViewProjMatrices[0], XMLoadFloat4x4(&voxelGridCameraAlongX.View) * XMLoadFloat4x4(&voxelGridCameraAlongX.Projection));
+	XMStoreFloat4x4(&output.VoxelGridViewProjMatrices[1], XMLoadFloat4x4(&voxelGridCameraAlongY.View) * XMLoadFloat4x4(&voxelGridCameraAlongY.Projection));
+	XMStoreFloat4x4(&output.VoxelGridViewProjMatrices[2], XMLoadFloat4x4(&voxelGridCameraAlongZ.View) * XMLoadFloat4x4(&voxelGridCameraAlongZ.Projection));
 
 	return output;
 }
@@ -126,6 +154,7 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	{
 		auto mesh = drawables[i].Mesh;
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawables[i].CBView);
+		renderer->SetShaderResourceViewMaterial(commandList, RootSigSRVPixel1, drawables[i].Material);
 		renderer->DrawMesh(commandList, mesh);
 	}
 

@@ -75,6 +75,7 @@ public:
 	void						DrawScreenQuad(ID3D12GraphicsCommandList* commandList);
 	void						SetConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view);
 	void						SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture);
+	void						SetShaderResourceViewMaterial(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, MaterialHandle material);
 	void						SetShaderResourceViews(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID* textures, uint32 textureCount);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to);
 	void						TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionDesc* transitions, uint32 count);

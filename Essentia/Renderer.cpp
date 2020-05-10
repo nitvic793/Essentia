@@ -636,6 +636,13 @@ void Renderer::SetShaderResourceView(ID3D12GraphicsCommandList* commandList, Roo
 	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texture));
 }
 
+void Renderer::SetShaderResourceViewMaterial(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, MaterialHandle material)
+{
+	auto mat = shaderResourceManager->GetMaterial(material);
+	auto handle = frameManager->GetHandle(backBufferIndex, offsets.MaterialsOffset + mat.StartIndex);
+	commandList->SetGraphicsRootDescriptorTable(slot, handle);
+}
+
 void Renderer::SetShaderResourceViews(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID* textures, uint32 textureCount)
 {
 	auto handle = shaderResourceManager->AllocateTextures(textures, textureCount, backBufferIndex, frameManager.get());

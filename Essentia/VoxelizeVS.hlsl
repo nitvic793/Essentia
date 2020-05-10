@@ -24,7 +24,7 @@ GSInput main(VertexInput input)
     float4x4 shadowVP = mul(mul(World, ShadowView), ShadowProjection);
     float4 worldPos = mul(float4(input.Position, 1.0f), World);
 	
-    output.Position = mul(float4(input.Position, 1.f), WorldViewProjection);
+    output.Position = worldPos; // mul(float4(input.Position, 1.f), WorldViewProjection); //
     output.Normal = normalize(mul(input.Normal, (float3x3) World));
     output.UV = input.UV;
     output.Tangent = normalize(mul(input.Tangent, (float3x3) World));;

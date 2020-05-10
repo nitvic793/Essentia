@@ -12,19 +12,22 @@ cbuffer PerObject : register(b0)
     float4x4 PrevWorldViewProjection;
 };
 
-cbuffer VoxelParams : register(b2)
+//Reference: https://github.com/KolyaNaichuk/RenderSDK/blob/master/Shaders/VoxelizeGS.hlsl
+
+int FindViewDirectionWithLargestProjectedArea(float3 worldSpaceFaceNormal)
 {
-    float3 VoxelRCPSize;
-    float Padding;
-    float3 VoxelGridMaxPoint;
-    float Padding2;
-    float3 VoxelGridMinPoint;
-    float Padding3;
-    float3 VoxelGridCenter;
-    float Padding4;
-    float3 VoxelGridSize;
-    float Padding5;
-};
+    float3x3 viewDirectionMatrix =
+    {
+        1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f
+    };
+    float3 dotProducts = abs(mul(viewDirectionMatrix, worldSpaceFaceNormal));
+    float maxDotProduct = max(max(dotProducts.x, dotProducts.y), dotProducts.z);
+    int viewIndex = (maxDotProduct == dotProducts.x) ? 0 : 1;
+    viewIndex = (maxDotProduct == dotProducts.y) ? 1 : 2;
+    return viewIndex;
+}
 
 [maxvertexcount(CNumVertices)]
 void main(
@@ -32,26 +35,21 @@ void main(
 	inout TriangleStream< GSOutput > output
 )
 {
-    float3 worldSpaceFaceNormal = abs(input[0].Normal + input[1].Normal + input[2].Normal);
-    uint maxi = worldSpaceFaceNormal[1] > worldSpaceFaceNormal[0] ? 1 : 0;
-    maxi = worldSpaceFaceNormal[2] > worldSpaceFaceNormal[maxi] ? 2 : maxi;
+    float3 worldSpaceFaceNormal = normalize(input[0].Normal + input[1].Normal + input[2].Normal);
+    int viewIndex = FindViewDirectionWithLargestProjectedArea(worldSpaceFaceNormal);
     
+    float4x4 viewProjMatrix = VoxelGridViewProjMatrices[viewIndex];
+    
+    [unroll]
     for (uint i = 0; i < CNumVertices; i++)
 	{
 		GSOutput element;
-        element = input[i];
-        element.Position = float4((element.Position.xyz - VoxelGridCenter) / VoxelGridSize, 1.f);
-        if(maxi == 0)
-        {
-            element.Position.xyz = element.Position.zyx;
-        }
-        else if(maxi == 1)
-        {
-            element.Position.xyz = element.Position.xzy;
-        }
-        
-        element.Position.xy /= CVoxelGridSize;
-        element.Position.z = 1.f;
+        element.Normal = input[i].Normal;
+        element.Position = mul(float4(input[i].WorldPos, 1.f), viewProjMatrix);
+        element.WorldPos = input[i].WorldPos;
+        element.UV = input[i].UV;
+        element.ShadowPos = input[i].ShadowPos;
+        element.Tangent = input[i].Tangent;
         
 		output.Append(element);
 	}
