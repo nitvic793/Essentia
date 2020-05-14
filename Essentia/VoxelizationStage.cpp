@@ -5,6 +5,8 @@
 #include "Entity.h"
 #include "PipelineStates.h"
 #include "SceneResources.h"
+
+
 #include <DirectXCollision.h>
 using namespace DirectX;
 
@@ -127,13 +129,25 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 		renderer->DrawMesh(commandList, mesh);
 	}
 
+	auto meshManager = GContext->MeshManager;
 	auto drawableModels = frameContext.EntityManager->GetComponents<DrawableModelComponent>(count);
 	for (uint32 i = 0; i < count; ++i)
 	{
 		auto& model = modelManager->GetModel(drawableModels[i].Model);
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawableModels[i].CBView);
 		auto meshHandle = model.Mesh;
-		renderer->DrawMesh(commandList, meshHandle);
+		auto mesh = meshManager->GetMeshView(meshHandle);
+		int matIndex = 0;
+		commandList->IASetVertexBuffers(0, 1, &mesh.VertexBufferView);
+		commandList->IASetIndexBuffer(&mesh.IndexBufferView);
+		for (auto& m : mesh.MeshEntries)
+		{
+			auto materialHandle = model.Materials[matIndex]; //material maps to each mesh entry in model.
+			auto material = shaderResourceManager->GetMaterial(materialHandle);
+			renderer->SetShaderResourceViewMaterial(commandList, RootSigSRVPixel1, materialHandle);
+			commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
+			matIndex++;
+		}
 	}
 
 	TransitionDesc endTransitions[] = {

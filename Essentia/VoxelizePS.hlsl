@@ -22,7 +22,7 @@ void main(GSOutput input) //: SV_TARGET
     uint3 writecoord = floor(uvw * VoxelRadianceDataRes);
    
     
-    float4 result = AlbedoTexture.Sample(LinearWrapSampler, input.UV);
+    float4 result = float4(AlbedoTexture.Sample(LinearWrapSampler, input.UV).rgb, 1.f);
     
     VoxelGrid[writecoord] = result;
 }
