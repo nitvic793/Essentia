@@ -118,6 +118,8 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, voxelParamsCBV);
 	renderer->SetShaderResourceView(commandList, RootSigUAV0, voxelGrid3dTextureUAV);
+	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
+	renderer->SetShaderResourceView(commandList, RootSigSRVPixel2, GSceneResources.ShadowDepthTarget.Texture);
 
 	auto drawables = frameContext.EntityManager->GetComponents<DrawableComponent>(count);
 

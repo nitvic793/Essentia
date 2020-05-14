@@ -60,7 +60,7 @@ void main(
         output[j].UV = input[j].UV;
         output[j].Normal = input[j].Normal;
         output[j].WorldPos = input[j].Position.xyz;
-
+        output[j].ShadowPos = input[j].ShadowPos;
         outputStream.Append(output[j]);
     }
 

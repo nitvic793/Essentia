@@ -29,6 +29,6 @@ GSInput main(VertexInput input)
     output.UV = input.UV;
     output.Tangent = normalize(mul(input.Tangent, (float3x3) World));;
     output.WorldPos = worldPos.xyz;
-    output.ShadowPos = mul(float4(input.Position, 1.0f), shadowVP);
+    output.ShadowPos =  mul(float4(input.Position, 1.0f), shadowVP);
     return output;
 }
