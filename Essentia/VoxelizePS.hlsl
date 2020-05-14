@@ -15,13 +15,14 @@ void main(GSOutput input) //: SV_TARGET
 {
     uint3 dim;
     VoxelGrid.GetDimensions(dim.x, dim.y, dim.z);
-    float3 voxel = ScaleAndBias(input.WorldPos);
     VoxelGrid[uint3(1, 1, 1)] = float4(1.f.xxxx);
     
-    float3 gridSpacePos = input.WorldPos - VoxelGridMinPoint;
-    int3 voxelPos = floor(gridSpacePos * VoxelRCPSize);
+    float3 diff = (input.WorldPos - VoxelGridCenter) * VoxelRadianceDataResRCP * VoxelRadianceDataSizeRCP;
+    float3 uvw = diff * float3(0.5f, -0.5f, 0.5f) + 0.5f;
+    uint3 writecoord = floor(uvw * VoxelRadianceDataRes);
+   
     
     float4 result = AlbedoTexture.Sample(LinearWrapSampler, input.UV);
     
-    VoxelGrid[voxelPos] = result; 
+    VoxelGrid[writecoord] = result;
 }

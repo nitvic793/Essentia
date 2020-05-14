@@ -29,15 +29,10 @@ struct VertexInput
 
 cbuffer VoxelParams : register(b2)
 {
-    float3 VoxelRCPSize;
-    float Padding;
-    float3 VoxelGridMaxPoint;
-    float Padding2;
-    float3 VoxelGridMinPoint;
-    float Padding3;
     float3 VoxelGridCenter;
-    float Padding4;
-    float3 VoxelGridSize;
-    float Padding5;
-    float4x4 VoxelGridViewProjMatrices[3];
+    float VoxelRadianceDataSize; // voxel half-extent in world space units
+    float VoxelRadianceDataSizeRCP; // 1.0 / voxel-half extent
+    uint VoxelRadianceDataRes; // voxel grid resolution
+    float VoxelRadianceDataResRCP; // 1.0 / voxel grid resolution
+    float Padding;
 }

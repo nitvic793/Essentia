@@ -13,18 +13,12 @@ constexpr uint32 CVoxelSize = 128;
 
 struct DECLSPEC_ALIGN(16) VoxelParams
 {
-	XMFLOAT3 VoxelRCPSize;
-	float Padding;
-	XMFLOAT3 VoxelGridMaxPoint;
-	float Padding2;
-	XMFLOAT3 VoxelGridMinPoint;
-	float Padding3;
-	XMFLOAT3 VoxelGridCenter;
-	float Padding4;
-	XMFLOAT3 VoxelGridSize;
-	float Padding5;
-
-	XMFLOAT4X4 VoxelGridViewProjMatrices[3];
+	XMFLOAT3	VoxelGridCenter;
+	float		VoxelRadianceDataSize;				// voxel half-extent in world space units
+	float		VoxelRadianceDataSizeRCP;			// 1.0 / voxel-half extent
+	uint32		VoxelRadianceDataRes;				// voxel grid resolution
+	float		VoxelRadianceDataResRCP;			// 1.0 / voxel grid resolution
+	float		Padding;
 };
 
 //Reference: https://github.com/KolyaNaichuk/RenderSDK/blob/c176de53d1f0c08f7e5be6790229203da305bc65/Samples/DynamicGI/Source/DXApplication.cpp
@@ -38,42 +32,17 @@ static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSiz
 	BoundingBox::CreateFromPoints(cameraAABB, camera.Frustum.CORNER_COUNT, corners, sizeof(XMFLOAT3));
 
 	XMVECTOR voxelGridCenter = XMLoadFloat3(&cameraAABB.Center);
-	XMVECTOR voxelWorldRadius = XMVectorSet(camera.FarZ, camera.FarZ, camera.FarZ, 0.f);
-	XMVECTOR numVoxelsInGrid = XMVectorSet(CVoxelSize, CVoxelSize, CVoxelSize, 0.f);
 
-	XMVECTOR up = XMVectorSet(0, 1, 0, 0);
-	XMVECTOR right = XMVectorSet(1, 0, 0, 0);
-	XMVECTOR forward = XMVectorSet(0, 0, 1, 0);
-
-	XMVECTOR voxelWorldGridSize = 2.f * voxelWorldRadius;
-
-	XMStoreFloat3(&output.VoxelGridMinPoint, voxelGridCenter - voxelWorldRadius);
-	XMStoreFloat3(&output.VoxelGridMaxPoint, voxelGridCenter + voxelWorldRadius);
-	XMStoreFloat3(&output.VoxelRCPSize, numVoxelsInGrid / voxelWorldGridSize);
 	XMStoreFloat3(&output.VoxelGridCenter, voxelGridCenter);
-	XMStoreFloat3(&output.VoxelGridSize, voxelWorldGridSize);
+	output.VoxelRadianceDataSize = 1.f;
+	output.VoxelRadianceDataRes = CVoxelSize;
+	output.VoxelRadianceDataSizeRCP = 1.f / output.VoxelRadianceDataSize;
+	output.VoxelRadianceDataResRCP = 1.f / CVoxelSize;
 
+	const float f = 0.05f / output.VoxelRadianceDataSize;
+	XMFLOAT3 center = XMFLOAT3(floorf(camera.Position.x * f) / f, floorf(camera.Position.y * f) / f, floorf(camera.Position.z * f) / f);
 
-	Camera voxelGridCameraAlongX(CVoxelSize, CVoxelSize, 0.001f, CVoxelSize);
-	voxelGridCameraAlongX.IsOrthographic = true;
-	XMStoreFloat3(&voxelGridCameraAlongX.Position, voxelGridCenter - voxelWorldRadius * right);
-	voxelGridCameraAlongX.Rotation.y = XM_PIDIV2;
-	voxelGridCameraAlongX.Update();
-
-	Camera voxelGridCameraAlongY(CVoxelSize, CVoxelSize, 0.001f, CVoxelSize);
-	voxelGridCameraAlongY.IsOrthographic = true;
-	XMStoreFloat3(&voxelGridCameraAlongY.Position, voxelGridCenter - voxelWorldRadius * up);
-	voxelGridCameraAlongY.Rotation.y = -XM_PIDIV2;
-	voxelGridCameraAlongY.Update();
-
-	Camera voxelGridCameraAlongZ(CVoxelSize, CVoxelSize, 0.001f, CVoxelSize);
-	voxelGridCameraAlongZ.IsOrthographic = true;
-	XMStoreFloat3(&voxelGridCameraAlongZ.Position, voxelGridCenter - voxelWorldRadius * forward);
-	voxelGridCameraAlongZ.Update();
-
-	XMStoreFloat4x4(&output.VoxelGridViewProjMatrices[0], XMLoadFloat4x4(&voxelGridCameraAlongX.View) * XMLoadFloat4x4(&voxelGridCameraAlongX.Projection));
-	XMStoreFloat4x4(&output.VoxelGridViewProjMatrices[1], XMLoadFloat4x4(&voxelGridCameraAlongY.View) * XMLoadFloat4x4(&voxelGridCameraAlongY.Projection));
-	XMStoreFloat4x4(&output.VoxelGridViewProjMatrices[2], XMLoadFloat4x4(&voxelGridCameraAlongZ.View) * XMLoadFloat4x4(&voxelGridCameraAlongZ.Projection));
+	output.VoxelGridCenter = center;
 
 	return output;
 }
@@ -84,7 +53,7 @@ void VoxelizationStage::Initialize()
 	uint32 voxelGridSize = CVoxelSize;
 	Texture3DCreateProperties props = {};
 	auto renderer = GContext->RendererInstance;
-	props.Format = DXGI_FORMAT_R16G16B16A16_UNORM; //DXGI_FORMAT_R16G16B16A16_FLOAT; 
+	props.Format = DXGI_FORMAT_R16G16B16A16_FLOAT; //DXGI_FORMAT_R16G16B16A16_UNORM; //
 	props.Width = voxelGridSize;
 	props.Depth = voxelGridSize;
 	props.Height = voxelGridSize;

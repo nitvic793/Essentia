@@ -12,47 +12,58 @@ cbuffer PerObject : register(b0)
     float4x4 PrevWorldViewProjection;
 };
 
-//Reference: https://github.com/KolyaNaichuk/RenderSDK/blob/master/Shaders/VoxelizeGS.hlsl
-
-int FindViewDirectionWithLargestProjectedArea(float3 worldSpaceFaceNormal)
-{
-    float3x3 viewDirectionMatrix =
-    {
-        1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 1.0f
-    };
-    float3 dotProducts = abs(mul(viewDirectionMatrix, worldSpaceFaceNormal));
-    float maxDotProduct = max(max(dotProducts.x, dotProducts.y), dotProducts.z);
-    int viewIndex = (maxDotProduct == dotProducts.x) ? 0 : 1;
-    viewIndex = (maxDotProduct == dotProducts.y) ? 1 : 2;
-    return viewIndex;
-}
+//Reference: https://github.com/turanszkij/WickedEngine/blob/master/WickedEngine/objectPS_voxelizer.hlsl
 
 [maxvertexcount(CNumVertices)]
 void main(
 	triangle GSInput input[3],
-	inout TriangleStream< GSOutput > output
+	inout TriangleStream< GSOutput > outputStream
 )
 {
-    float3 worldSpaceFaceNormal = normalize(input[0].Normal + input[1].Normal + input[2].Normal);
-    int viewIndex = FindViewDirectionWithLargestProjectedArea(worldSpaceFaceNormal);
+    GSOutput output[CNumVertices];
+    output[0].Position = float4(0.f.xxxx);
+    output[1].Position = float4(0.f.xxxx);
+    output[2].Position = float4(0.f.xxxx);
     
-    float4x4 viewProjMatrix = VoxelGridViewProjMatrices[viewIndex];
+    float3 facenormal = abs(input[0].Normal + input[1].Normal + input[2].Normal);
+    uint maxi = facenormal[1] > facenormal[0] ? 1 : 0;
+    maxi = facenormal[2] > facenormal[maxi] ? 2 : maxi;
     
     [unroll]
-    for (uint i = 0; i < CNumVertices; i++)
-	{
-		GSOutput element;
-        element.Normal = input[i].Normal;
-        element.Position = mul(float4(input[i].WorldPos, 1.f), viewProjMatrix);
-        element.WorldPos = input[i].WorldPos;
-        element.UV = input[i].UV;
-        element.ShadowPos = input[i].ShadowPos;
-        element.Tangent = input[i].Tangent;
-        
-		output.Append(element);
-	}
+    for (uint i = 0; i < CNumVertices; ++i)
+    {
+		// World space -> Voxel grid space:
+        output[i].Position.xyz = (input[i].Position.xyz - VoxelGridCenter) * VoxelRadianceDataSizeRCP;
+
+		// Project onto dominant axis:
+		
+        (maxi == 0) ? (output[i].Position.xyz = output[i].Position.zyx) : 0.f;
+        (maxi == 1) ? (output[i].Position.xyz = output[i].Position.xzy) : 0.f;
+    } 
     
-    output.RestartStrip();
+    // Expand triangle to get fake Conservative Rasterization:
+    float2 side0N = normalize(output[1].Position.xy - output[0].Position.xy);
+    float2 side1N = normalize(output[2].Position.xy - output[1].Position.xy);
+    float2 side2N = normalize(output[0].Position.xy - output[2].Position.xy);
+    output[0].Position.xy += normalize(side2N - side0N);
+    output[1].Position.xy += normalize(side0N - side1N);
+    output[2].Position.xy += normalize(side1N - side2N);
+    
+    [unroll]
+    for (uint j = 0; j < CNumVertices; j++)
+    {
+		// Voxel grid space -> Clip space
+        output[j].Position.xy *= VoxelRadianceDataResRCP;
+        output[j].Position.zw = 1;
+
+		// Append the rest of the parameters as is:
+        output[j].UV = input[j].UV;
+        output[j].Normal = input[j].Normal;
+        output[j].WorldPos = input[j].Position.xyz;
+
+        outputStream.Append(output[j]);
+    }
+
+    outputStream.RestartStrip();
+   
 }
