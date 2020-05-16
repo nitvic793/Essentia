@@ -225,6 +225,7 @@
   <ItemGroup>
     <None Include="Common.hlsli" />
     <None Include="cpp.hint" />
+    <None Include="FrameCommon.hlsli" />
     <None Include="Lighting.hlsli" />
     <None Include="packages.config" />
     <None Include="VoxelCommon.hlsli" />

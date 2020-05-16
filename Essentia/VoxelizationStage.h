@@ -1,6 +1,31 @@
 #pragma once
 #include "RenderStage.h"
 
+static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSize)
+{
+	using namespace DirectX;
+
+	VoxelParams output = {};
+	XMFLOAT3 corners[BoundingFrustum::CORNER_COUNT];
+	camera.Frustum.GetCorners(corners);
+	BoundingBox cameraAABB;
+	BoundingBox::CreateFromPoints(cameraAABB, camera.Frustum.CORNER_COUNT, corners, sizeof(XMFLOAT3));
+
+	XMVECTOR voxelGridCenter = XMLoadFloat3(&cameraAABB.Center);
+
+	XMStoreFloat3(&output.VoxelGridCenter, voxelGridCenter);
+	output.VoxelRadianceDataSize = 1.f;
+	output.VoxelRadianceDataRes = CVoxelSize;
+	output.VoxelRadianceDataSizeRCP = 1.f / output.VoxelRadianceDataSize;
+	output.VoxelRadianceDataResRCP = 1.f / CVoxelSize;
+
+	const float f = 0.05f / output.VoxelRadianceDataSize;
+	XMFLOAT3 center = XMFLOAT3(floorf(camera.Position.x * f) / f, floorf(camera.Position.y * f) / f, floorf(camera.Position.z * f) / f);
+
+	output.VoxelGridCenter = center;
+
+	return output;
+}
 
 class VoxelizationStage :
 	public IRenderStage
@@ -14,5 +39,6 @@ private:
 	ResourceID			voxelGridResource;
 	SceneRenderTarget	voxelRT;
 	ConstantBufferView	voxelParamsCBV;
+	VoxelParams			voxelParams;
 };
 

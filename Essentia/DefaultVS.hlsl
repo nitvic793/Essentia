@@ -1,4 +1,5 @@
 #include "Common.hlsli"
+#include "FrameCommon.hlsli"
 
 cbuffer PerObject : register(b0)
 {
@@ -11,7 +12,7 @@ cbuffer PerObject : register(b0)
 
 cbuffer PerFrame : register(b1)
 {
-    float4x4 ViewProjectionTex;
+    PerFrameData FrameData;
 }
 
 cbuffer ShadowBuffer : register(b2)
@@ -33,6 +34,6 @@ PixelInput main(VertexInput input)
 	output.Tangent = normalize(mul(input.Tangent, (float3x3)World));;
     output.WorldPos = worldPos.xyz;
     output.ShadowPos = mul(float4(input.Position, 1.0f), shadowVP);
-    output.SSAOPos = mul(worldPos, ViewProjectionTex);
+    output.SSAOPos = mul(worldPos, FrameData.ViewProjectionTex);
 	return output;
 }

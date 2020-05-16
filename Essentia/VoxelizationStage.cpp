@@ -6,48 +6,10 @@
 #include "PipelineStates.h"
 #include "SceneResources.h"
 
-
 #include <DirectXCollision.h>
 using namespace DirectX;
 
-constexpr uint32 CVoxelSize = 128;
-
-
-struct DECLSPEC_ALIGN(16) VoxelParams
-{
-	XMFLOAT3	VoxelGridCenter;
-	float		VoxelRadianceDataSize;				// voxel half-extent in world space units
-	float		VoxelRadianceDataSizeRCP;			// 1.0 / voxel-half extent
-	uint32		VoxelRadianceDataRes;				// voxel grid resolution
-	float		VoxelRadianceDataResRCP;			// 1.0 / voxel grid resolution
-	float		Padding;
-};
-
 //Reference: https://github.com/KolyaNaichuk/RenderSDK/blob/c176de53d1f0c08f7e5be6790229203da305bc65/Samples/DynamicGI/Source/DXApplication.cpp
-
-static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSize)
-{
-	VoxelParams output = {};
-	XMFLOAT3 corners[BoundingFrustum::CORNER_COUNT];
-	camera.Frustum.GetCorners(corners);
-	BoundingBox cameraAABB;
-	BoundingBox::CreateFromPoints(cameraAABB, camera.Frustum.CORNER_COUNT, corners, sizeof(XMFLOAT3));
-
-	XMVECTOR voxelGridCenter = XMLoadFloat3(&cameraAABB.Center);
-
-	XMStoreFloat3(&output.VoxelGridCenter, voxelGridCenter);
-	output.VoxelRadianceDataSize = 1.f;
-	output.VoxelRadianceDataRes = CVoxelSize;
-	output.VoxelRadianceDataSizeRCP = 1.f / output.VoxelRadianceDataSize;
-	output.VoxelRadianceDataResRCP = 1.f / CVoxelSize;
-
-	const float f = 0.05f / output.VoxelRadianceDataSize;
-	XMFLOAT3 center = XMFLOAT3(floorf(camera.Position.x * f) / f, floorf(camera.Position.y * f) / f, floorf(camera.Position.z * f) / f);
-
-	output.VoxelGridCenter = center;
-
-	return output;
-}
 
 void VoxelizationStage::Initialize()
 {
@@ -63,6 +25,8 @@ void VoxelizationStage::Initialize()
 
 	voxelGrid3dTextureSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
+	GSceneResources.VoxelGridSRV = voxelGrid3dTextureSRV;
+
 	voxelRT = CreateSceneRenderTarget(GContext, renderer->GetScreenSize().Width, renderer->GetScreenSize().Width, DXGI_FORMAT_R8G8B8A8_UNORM);
 	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));
 	renderer->TransitionBarrier(renderer->GetDefaultCommandList(), voxelRT.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -83,8 +47,7 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	uint32 count = 0;
 	auto cameras = GContext->EntityManager->GetComponents<CameraComponent>(count);
 
-	auto voxelParams = CreateVoxelParams(cameras[0].CameraInstance, CVoxelSize);
-	shaderResourceManager->CopyToCB(frameIndex, { &voxelParams, sizeof(VoxelParams) }, voxelParamsCBV);
+	shaderResourceManager->CopyToCB(frameIndex, { &GSceneResources.FrameData.VoxelData, sizeof(VoxelParams) }, voxelParamsCBV);
 
 	D3D12_VIEWPORT viewport = {};
 	viewport.Width = (FLOAT)CVoxelSize;

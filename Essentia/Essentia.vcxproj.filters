@@ -85,6 +85,9 @@
     <Filter Include="Shaders\Voxelization">
       <UniqueIdentifier>{8b94897f-c292-4880-8fa9-bf1ab6a9c781}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\VolumetricLight">
+      <UniqueIdentifier>{f0eafb6f-3158-40a0-b957-e49010b0cf42}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -97,6 +100,9 @@
     </None>
     <None Include="VoxelCommon.hlsli">
       <Filter>Shaders\Voxelization</Filter>
+    </None>
+    <None Include="FrameCommon.hlsli">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -524,12 +530,6 @@
     <FxCompile Include="SSAO.hlsl">
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
-    <FxCompile Include="ShadowVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="DepthOnlyVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="AOQuadVS.hlsl">
       <Filter>Shaders\SSAO</Filter>
     </FxCompile>
@@ -539,21 +539,6 @@
     <FxCompile Include="SSAOBlurPS.hlsl">
       <Filter>Shaders\SSAO</Filter>
     </FxCompile>
-    <FxCompile Include="LightCullingCS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="AccumulateFogPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="ApplyVolumetricFogPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="WorldPosPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="BilateralBlurPS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="VoxelizeVS.hlsl">
       <Filter>Shaders\Voxelization</Filter>
     </FxCompile>
@@ -562,6 +547,27 @@
     </FxCompile>
     <FxCompile Include="VoxelizePS.hlsl">
       <Filter>Shaders\Voxelization</Filter>
+    </FxCompile>
+    <FxCompile Include="ApplyVolumetricFogPS.hlsl">
+      <Filter>Shaders\VolumetricLight</Filter>
+    </FxCompile>
+    <FxCompile Include="AccumulateFogPS.hlsl">
+      <Filter>Shaders\VolumetricLight</Filter>
+    </FxCompile>
+    <FxCompile Include="BilateralBlurPS.hlsl">
+      <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="DepthOnlyVS.hlsl">
+      <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="LightCullingCS.hlsl">
+      <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="ShadowVS.hlsl">
+      <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="WorldPosPS.hlsl">
+      <Filter>Shaders\Misc</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

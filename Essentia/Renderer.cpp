@@ -286,18 +286,18 @@ void Renderer::Render(const FrameContext& frameContext)
 	lightBuffer.FarZ = camera.FarZ;
 	shaderResourceManager->CopyToCB(imageIndex, { &lightBuffer, sizeof(LightBuffer) }, lightBufferView);
 
+	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
+
 	XMMATRIX T(
 		0.5f, 0.0f, 0.0f, 0.0f,
 		0.0f, -0.5f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.5f, 0.5f, 0.0f, 1.0f);
 	XMMATRIX viewProjTex = XMMatrixMultiply(XMMatrixMultiply(view, projection), T);
-	PerFrameConstantBuffer perFrameCb = {};
-	XMStoreFloat4x4(&perFrameCb.ViewProjectionTex, XMMatrixTranspose(viewProjTex));
-
-	shaderResourceManager->CopyToCB(imageIndex, { &perFrameCb, sizeof(perFrameCb) }, perFrameView);
-
-	offsets = shaderResourceManager->CopyDescriptorsToGPUHeap(imageIndex, frameManager.get()); //TO DO: Copy fixed resources to heap first and only copy dynamic resources per frame
+	//Update per frame data
+	XMStoreFloat4x4(&GSceneResources.FrameData.ViewProjectionTex, XMMatrixTranspose(viewProjTex));
+	GSceneResources.FrameData.VoxelData = CreateVoxelParams(camera, CVoxelSize);
+	shaderResourceManager->CopyToCB(imageIndex, { &GSceneResources.FrameData, sizeof(GSceneResources.FrameData) }, perFrameView);
 
 	auto rtId = renderTargets[backBufferIndex];
 	auto hdrRtId = hdrRenderTargets[backBufferIndex];
@@ -308,7 +308,6 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->RSSetScissorRects(1, &scissorRect);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 	
-
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
 
 	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
@@ -343,7 +342,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 
-	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture };
+	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture, GSceneResources.VoxelGridSRV };
 	SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	SetConstantBufferView(commandList, RootSigCBAll1, perFrameView);
 	SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
@@ -469,6 +468,7 @@ void Renderer::EndInitialization()
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
 	perFrameView = shaderResourceManager->CreateCBV(sizeof(PerFrameConstantBuffer));
 	GSceneResources.LightBufferCBV = lightBufferView;
+	GSceneResources.FrameDataCBV = perFrameView;
 
 	for (int i = 0; i < CFrameBufferCount; ++i)
 	{
