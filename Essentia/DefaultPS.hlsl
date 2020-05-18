@@ -1,4 +1,5 @@
 #include "Common.hlsli"
+#include "FrameCommon.hlsli"
 #include "Lighting.hlsli"
 
 cbuffer LightBuffer : register(b0)
@@ -14,6 +15,11 @@ cbuffer LightBuffer : register(b0)
     float Padding2;
 }
 
+cbuffer PerFrame : register(b1)
+{
+    PerFrameData FrameData;
+}
+
 SamplerState BasicSampler : register(s0);
 SamplerComparisonState ShadowSampler : register(s1);
 SamplerState LinearWrapSampler : register(s2);
@@ -25,9 +31,10 @@ Texture2D RoughnessTexture : register(t2);
 Texture2D MetalnessTexture : register(t3);
 
 //Shadow Buffer
-Texture2D ShadowMapDirLight : register(t8);
+Texture2D ShadowMapDirLight     : register(t8);
 //SSAO
-Texture2D AmbientOcclusionTex : register(t9);
+Texture2D AmbientOcclusionTex   : register(t9);
+Texture3D VoxelGrid             : register(t10);
 
 //IBL
 TextureCube skyIrradianceTexture : register(t16);
@@ -118,6 +125,106 @@ float SampleShadowMapOptimizedPCF(float4 shadowPos)
     return sum * 1.0f / 144;
 }
 
+inline bool is_saturated(float a) { return a == saturate(a); }
+inline bool is_saturated(float2 a) { return is_saturated(a.x) && is_saturated(a.y); }
+inline bool is_saturated(float3 a) { return is_saturated(a.x) && is_saturated(a.y) && is_saturated(a.z); }
+inline bool is_saturated(float4 a) { return is_saturated(a.x) && is_saturated(a.y) && is_saturated(a.z) && is_saturated(a.w); }
+static const float SQRT2 = 1.41421356237309504880;
+
+inline float4 ConeTrace(float3 worldPos, float3 normal, float3 coneDirection, float coneAperture)
+{
+    float3 color = 0.f;
+    float alpha = 0.f;
+    
+    float dist = FrameData.VoxelData.VoxelRadianceDataSize;
+    float3 startPos = worldPos + normal * FrameData.VoxelData.VoxelRadianceDataSize * 2 * SQRT2;
+    
+    while(dist < FrameData.VoxelData.VoxelRadianceMaxDistance && alpha < 1)
+    {
+        float diameter = max(FrameData.VoxelData.VoxelRadianceDataSize, 2 * coneAperture * dist);
+        
+        float3 uvw = startPos + coneDirection * dist;
+        uvw = (uvw - FrameData.VoxelData.VoxelGridCenter) * FrameData.VoxelData.VoxelRadianceDataSizeRCP;
+        uvw *= FrameData.VoxelData.VoxelRadianceDataResRCP;
+        uvw = uvw * float3(0.5f, -0.5f, 0.5f) + 0.5f;
+        
+        if (uvw.x >= 1.f && uvw.y >= 1.f && uvw.z > 1.f)
+            break;
+        //if (is_saturated(uvw))
+         //   break;
+        
+        float4 voxelSample = VoxelGrid.SampleLevel(LinearWrapSampler, uvw, 0.f);
+        
+        float a = 1 - alpha;
+        color += a * voxelSample.rgb;
+        alpha += a * voxelSample.a;
+        
+        dist += diameter * FrameData.VoxelData.VoxelRadianceRayStepSize;
+    }
+    
+    return float4(color, alpha);
+}
+
+static const float3 CONES[] =
+{
+    float3(0.57735, 0.57735, 0.57735),
+	float3(0.57735, -0.57735, -0.57735),
+	float3(-0.57735, 0.57735, -0.57735),
+	float3(-0.57735, -0.57735, 0.57735),
+	float3(-0.903007, -0.182696, -0.388844),
+	float3(-0.903007, 0.182696, 0.388844),
+	float3(0.903007, -0.182696, 0.388844),
+	float3(0.903007, 0.182696, -0.388844),
+	float3(-0.388844, -0.903007, -0.182696),
+	float3(0.388844, -0.903007, 0.182696),
+	float3(0.388844, 0.903007, -0.182696),
+	float3(-0.388844, 0.903007, 0.182696),
+	float3(-0.182696, -0.388844, -0.903007),
+	float3(0.182696, 0.388844, -0.903007),
+	float3(-0.182696, 0.388844, 0.903007),
+	float3(0.182696, -0.388844, 0.903007)
+};
+
+float4 ConeTraceRadiance(float3 worldPos, float3 normal)
+{
+    float4 radiance = 0.f;
+    
+    for (uint cone = 0; cone < FrameData.VoxelData.VoxelRadianceNumCones; ++cone)
+    {
+        float3 coneDirection = normalize(CONES[cone] + normal);
+        coneDirection *= dot(coneDirection, normal) < 0 ? -1.f : 1.f;
+        radiance += ConeTrace(worldPos, normal, coneDirection, tan(PI * 0.5f * 0.33f));
+    }
+    
+    radiance *= FrameData.VoxelData.VoxelRadianceNumConesRCP;
+    radiance.a = saturate(radiance.a);
+    
+    return max(0.f, radiance);
+}
+
+float3 VoxelGlobalDiffuse(float3 worldPos, float3 normal)
+{
+    //if (FrameData.VoxelData.VoxelRadianceDataRes != 0)
+    {
+        float3 voxelSpacePos = worldPos - FrameData.VoxelData.VoxelGridCenter;
+        voxelSpacePos *= FrameData.VoxelData.VoxelRadianceDataSizeRCP;
+        voxelSpacePos *= FrameData.VoxelData.VoxelRadianceDataResRCP;
+        voxelSpacePos = saturate(abs(voxelSpacePos));
+        float blend = 1 - pow(max(voxelSpacePos.x, max(voxelSpacePos.y, voxelSpacePos.z)), 4);
+        float4 radiance = ConeTraceRadiance(worldPos, normal);
+        
+        float3 diffuseContribution = radiance.a * blend;
+        float3 diffuse = 0.f;
+        diffuse = lerp(diffuse, radiance.rgb, diffuseContribution);
+        return diffuse;
+    }
+    //else
+    //{
+    //    return float4(0.f.xxxx);
+    //}
+
+}
+
 float4 main(PixelInput input) : SV_TARGET
 {
     float roughness = RoughnessTexture.Sample(LinearWrapSampler, input.UV).r;
@@ -134,16 +241,18 @@ float4 main(PixelInput input) : SV_TARGET
 
     float3 specColor = lerp(F0_NON_METAL.rrr, texColor.rgb, metal);
     float3 irradiance = skyIrradianceTexture.Sample(LinearWrapSampler, normal).rgb;
+    float shadowAmount = SampleShadowMapOptimizedPCF(input.ShadowPos);
+    
     
     input.SSAOPos /= input.SSAOPos.w;
     float ao = AmbientOcclusionTex.SampleLevel(BasicSampler, input.SSAOPos.xy, 0.0f).r;
 
     float3 finalColor = AmbientPBR(DirLights[CPrimaryDirLight], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,
-		specColor, irradiance, prefilter, brdf, ao);
+		specColor, irradiance, prefilter, brdf, ao); // * shadowAmount; // (0.1 * (shadowAmount + 0.1f));
     
-    float shadowAmount = SampleShadowMapOptimizedPCF(input.ShadowPos);
-
+    float3 globalRadiance = VoxelGlobalDiffuse(worldPos, normal);
+    
     uint i = 0;
     for (i = 0; i < DirLightCount; ++i)
     {
@@ -165,5 +274,5 @@ float4 main(PixelInput input) : SV_TARGET
     clip(texColor.a - 0.2f);
 
     float3 output = finalColor;
-    return float4(output, 1.0f);
+    return float4(output /*+ globalRadiance * texColor.rgb*/, 1.0f);
 }

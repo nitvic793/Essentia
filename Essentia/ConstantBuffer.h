@@ -14,6 +14,10 @@ struct DECLSPEC_ALIGN(16) VoxelParams
 	float				VoxelRadianceDataSizeRCP;			// 1.0 / voxel-half extent
 	uint32_t			VoxelRadianceDataRes;				// voxel grid resolution
 	float				VoxelRadianceDataResRCP;			// 1.0 / voxel grid resolution
+	uint32_t			VoxelRadianceNumCones;
+	float				VoxelRadianceNumConesRCP;
+	float				VoxelRadianceMaxDistance;
+	float				VoxelRadianceRayStepSize;
 	float				Padding;
 };
 

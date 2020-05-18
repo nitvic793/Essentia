@@ -23,6 +23,10 @@ static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSiz
 	XMFLOAT3 center = XMFLOAT3(floorf(camera.Position.x * f) / f, floorf(camera.Position.y * f) / f, floorf(camera.Position.z * f) / f);
 
 	output.VoxelGridCenter = center;
+	output.VoxelRadianceNumCones = 2;
+	output.VoxelRadianceMaxDistance = 20.f;
+	output.VoxelRadianceRayStepSize = 0.75f;
+	output.VoxelRadianceNumConesRCP = 1.f / (float)output.VoxelRadianceNumCones;
 
 	return output;
 }

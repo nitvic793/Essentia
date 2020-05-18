@@ -7,6 +7,10 @@ struct VoxelParams
     float VoxelRadianceDataSizeRCP; // 1.0 / voxel-half extent
     uint VoxelRadianceDataRes; // voxel grid resolution
     float VoxelRadianceDataResRCP; // 1.0 / voxel grid resolution
+    uint VoxelRadianceNumCones;
+    float VoxelRadianceNumConesRCP;
+    float VoxelRadianceMaxDistance;
+    float VoxelRadianceRayStepSize;
     float Padding;
 };
 

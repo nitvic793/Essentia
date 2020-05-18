@@ -58,7 +58,7 @@ void main(GSOutput input) //: SV_TARGET
     
     float4 shadowPos = mul(float4(input.WorldPos, 1), shadowViewProj);
     float3 materialColor = AlbedoTexture.Sample(LinearWrapSampler, input.UV).rgb;
-    float3 dirLight = CalculateDirectionalLight(input.Normal, DirLights[0]);// * ShadowAmount(shadowPos); <- Enable once GI is finished
+    float3 dirLight = CalculateDirectionalLight(normalize(input.Normal), DirLights[0]) * ShadowAmount(shadowPos); // <- Enable once GI is finished
     
     float4 result = float4(materialColor * dirLight, 1.f);
     

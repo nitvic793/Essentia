@@ -27,11 +27,13 @@ void VoxelizationStage::Initialize()
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
 	GSceneResources.VoxelGridSRV = voxelGrid3dTextureSRV;
 
-	voxelRT = CreateSceneRenderTarget(GContext, renderer->GetScreenSize().Width, renderer->GetScreenSize().Width, DXGI_FORMAT_R8G8B8A8_UNORM);
+	//voxelRT = CreateSceneRenderTarget(GContext, renderer->GetScreenSize().Width, renderer->GetScreenSize().Width, DXGI_FORMAT_R8G8B8A8_UNORM);
 	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));
-	renderer->TransitionBarrier(renderer->GetDefaultCommandList(), voxelRT.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	//renderer->TransitionBarrier(renderer->GetDefaultCommandList(), voxelRT.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	GRenderStageManager.RegisterStage("VoxelizationStage", this);
 }
+
+static bool done = false;
 
 void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
 {
