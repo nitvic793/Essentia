@@ -19,6 +19,7 @@ void PipelineStates::Initialize()
 	CreateScreenSpaceAOPSO();
 	CreateLightAccumPSO();
 	CreateVoxelizePSO();
+	CreateComputePSO();
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
@@ -247,4 +248,16 @@ void PipelineStates::CreateVoxelizePSO()
 	//psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
 
 	VoxelizePSO = resourceManager->CreatePSO(psoDesc);
+}
+
+void PipelineStates::CreateComputePSO()
+{
+	auto resourceManager = GContext->ResourceManager;
+	auto renderer = GContext->RendererInstance;
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.CS = ShaderManager::LoadShader(L"LightCullingCS.cso");
+	psoDesc.pRootSignature = renderer->GetDefaultComputeRootSignature();
+
+	TestCSPSO = resourceManager->CreateComputePSO(psoDesc);
 }

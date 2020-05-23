@@ -98,6 +98,7 @@ void Renderer::Initialize()
 	CreateDepthStencil();
 	computeContext = MakeScoped<ComputeContext>();
 	computeContext->Initialize(deviceResources.get());
+	computeContext->GetDefaultCommandList()->Close();
 
 	GPipelineStates.Initialize();
 	GPostProcess.Intitialize();
@@ -194,6 +195,13 @@ void Renderer::Clear()
 {
 	WaitForPreviousFrame();
 	auto imageIndex = backBufferIndex;
+
+	//Reset Compute Context
+	auto computeAllocator = computeContext->GetAllocator(backBufferIndex);
+	auto computeCList = computeContext->GetDefaultCommandList();
+	commandContext->ResetAllocator(computeAllocator);
+	commandContext->ResetCommandList(computeCList, computeAllocator);
+
 	auto commandAllocator = commandContext->GetAllocator(backBufferIndex);
 	auto commandList = commandContext->GetDefaultCommandList();
 
@@ -414,6 +422,14 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 	PIXEndEvent(commandList);
+
+	auto computeCList = computeContext->GetDefaultCommandList();
+	computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
+	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.TestCSPSO));
+
+	computeCList->Dispatch(1, 1, 1);
+
+	computeContext->SubmitCommands(computeCList);
 }
 
 void Renderer::Present()
@@ -558,6 +574,11 @@ TextureID Renderer::GetCurrentDepthStencilTexture() const
 ID3D12RootSignature* Renderer::GetDefaultRootSignature() const
 {
 	return resourceManager->GetRootSignature(mainRootSignatureID);
+}
+
+ID3D12RootSignature* Renderer::GetDefaultComputeRootSignature() const
+{
+	return computeContext->GetComputeRootSignature();
 }
 
 DXGI_FORMAT Renderer::GetRenderTargetFormat() const
@@ -883,6 +904,7 @@ void Renderer::WaitForPreviousFrame()
 	auto swapChain = deviceResources->GetSwapChain();
 	backBufferIndex = swapChain->GetCurrentBackBufferIndex();
 	commandContext->WaitForFrame();
+	computeContext->WaitForFrame();
 }
 
 void Renderer::UpdateLightBuffer()

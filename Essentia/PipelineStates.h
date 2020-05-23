@@ -22,12 +22,16 @@ public:
 	PipelineStateID HDRQuadPSO;
 	PipelineStateID BlurPSO;
 	PipelineStateID ApplyFogPSO;
+
+	//Compute PSOs
+	PipelineStateID TestCSPSO;
 private:
 	void CreateDefaultPSOs();
 	void CreateLightAccumPSO();
 	void CreateShadowPSO();
 	void CreateScreenSpaceAOPSO();
 	void CreateVoxelizePSO();
+	void CreateComputePSO();
 };
 
 extern PipelineStates GPipelineStates;

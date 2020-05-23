@@ -62,6 +62,7 @@ public:
 	DepthStencilID				GetCurrentDepthStencil() const;
 	TextureID					GetCurrentDepthStencilTexture() const;
 	ID3D12RootSignature*		GetDefaultRootSignature() const;
+	ID3D12RootSignature*		GetDefaultComputeRootSignature() const;
 	DXGI_FORMAT					GetRenderTargetFormat() const;
 	DXGI_FORMAT					GetDepthStencilFormat() const;
 	DXGI_FORMAT					GetHDRRenderTargetFormat() const;

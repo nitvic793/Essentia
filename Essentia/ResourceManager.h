@@ -10,6 +10,7 @@ public:
 	void Initialize(ID3D12Device* device);
 	RootSignatureID CreateRootSignature(const D3D12_ROOT_SIGNATURE_DESC& rootSigDesc, D3D_ROOT_SIGNATURE_VERSION version = D3D_ROOT_SIGNATURE_VERSION_1_0);
 	PipelineStateID CreatePSO(const D3D12_GRAPHICS_PIPELINE_STATE_DESC& psoDesc);
+	PipelineStateID CreateComputePSO(const D3D12_COMPUTE_PIPELINE_STATE_DESC& psoDesc);
 	ResourceID		CreateResource(D3D12_RESOURCE_DESC desc, D3D12_CLEAR_VALUE* clearVal, D3D12_RESOURCE_STATES initialResourceState,
 		D3D12_HEAP_FLAGS heapFlags = D3D12_HEAP_FLAG_NONE, 
 		CD3DX12_HEAP_PROPERTIES heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT));
