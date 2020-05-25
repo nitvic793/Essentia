@@ -305,7 +305,7 @@ TextureID ShaderResourceManager::CreateTextureUAV(ResourceID resourceId)
 	return texIndex;
 }
 
-TextureID ShaderResourceManager::CreateTexture3DUAV(ResourceID resourceId, uint32 depthSlices)
+TextureID ShaderResourceManager::CreateTexture3DUAV(ResourceID resourceId, uint32 depthSlices, uint32 mipSlice)
 {
 	auto texName = std::to_string(textureCount);
 	auto stringId = String::ID(texName.c_str());
@@ -316,7 +316,7 @@ TextureID ShaderResourceManager::CreateTexture3DUAV(ResourceID resourceId, uint3
 	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 	desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
 	desc.Format = desc.Format;
-	desc.Texture3D.MipSlice = 0;
+	desc.Texture3D.MipSlice = mipSlice;
 	desc.Texture3D.WSize = depthSlices;
 	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
 	

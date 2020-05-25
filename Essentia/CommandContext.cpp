@@ -54,7 +54,10 @@ void CommandContext::SubmitCommands(ID3D12GraphicsCommandList* commandList)
 	auto commandQueue = deviceResources->GetCommandQueue();
 	commandList->Close();
 	ID3D12CommandList* ppCommandLists[] = { commandList };
-	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);;
+	commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+	fenceValues[backBufferIndex]++;
+	auto hr = commandQueue->Signal(fences[backBufferIndex].Get(), fenceValues[backBufferIndex]);
 }
 
 void CommandContext::WaitForFrame()

@@ -54,13 +54,20 @@ void main(GSOutput input) //: SV_TARGET
     float3 uvw = diff * float3(0.5f, -0.5f, 0.5f) + 0.5f;
     uint3 writecoord = floor(uvw * VoxelRadianceDataRes);
     
+    float3 normal = normalize(input.Normal);
     float4x4 shadowViewProj = mul(ShadowView, ShadowProjection);
     
     float4 shadowPos = mul(float4(input.WorldPos, 1), shadowViewProj);
     float3 materialColor = AlbedoTexture.Sample(LinearWrapSampler, input.UV).rgb;
-    float3 dirLight = CalculateDirectionalLight(normalize(input.Normal), DirLights[0]) * ShadowAmount(shadowPos); // <- Enable once GI is finished
+    float3 dirLight = CalculateDirectionalLight(normal, DirLights[0]) * materialColor * ShadowAmount(shadowPos); // <- Enable once GI is finished
     
-    float4 result = float4(materialColor * dirLight, 1.f);
+    float3 pointLight = 0.f;
+    //for (uint i = 0; i < PointLightCount; ++i)
+    //{
+    //    pointLight += CalculatePointLight(normal, CameraPosition, input.WorldPos, PointLights[i]);
+    //}
+    
+    float4 result = float4(dirLight + pointLight, 1.f);
     
     VoxelGrid[writecoord] = result;
 }

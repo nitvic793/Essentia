@@ -21,9 +21,6 @@ void main(
 )
 {
     GSOutput output[CNumVertices];
-    output[0].Position = float4(0.f.xxxx);
-    output[1].Position = float4(0.f.xxxx);
-    output[2].Position = float4(0.f.xxxx);
     
     float3 facenormal = abs(input[0].Normal + input[1].Normal + input[2].Normal);
     uint maxi = facenormal[1] > facenormal[0] ? 1 : 0;
@@ -37,17 +34,18 @@ void main(
 
 		// Project onto dominant axis:
 		
-        (maxi == 0) ? (output[i].Position.xyz = output[i].Position.zyx) : 0.f;
-        (maxi == 1) ? (output[i].Position.xyz = output[i].Position.xzy) : 0.f;
+        output[i].Position.xyz = (maxi == 0) ? output[i].Position.zyx : (maxi == 1) ? output[i].Position.xzy : output[i].Position.xyz;
+        //(maxi == 0) ? (output[i].Position.xyz = output[i].Position.zyx) : 0.f;
+        //(maxi == 1) ? (output[i].Position.xyz = output[i].Position.xzy) : 0.f;
     } 
     
     // Expand triangle to get fake Conservative Rasterization:
-    float2 side0N = normalize(output[1].Position.xy - output[0].Position.xy);
-    float2 side1N = normalize(output[2].Position.xy - output[1].Position.xy);
-    float2 side2N = normalize(output[0].Position.xy - output[2].Position.xy);
-    output[0].Position.xy += normalize(side2N - side0N);
-    output[1].Position.xy += normalize(side0N - side1N);
-    output[2].Position.xy += normalize(side1N - side2N);
+    //float2 side0N = normalize(output[1].Position.xy - output[0].Position.xy);
+    //float2 side1N = normalize(output[2].Position.xy - output[1].Position.xy);
+    //float2 side2N = normalize(output[0].Position.xy - output[2].Position.xy);
+    //output[0].Position.xy += normalize(side2N - side0N);
+    //output[1].Position.xy += normalize(side0N - side1N);
+    //output[2].Position.xy += normalize(side1N - side2N);
     
     [unroll]
     for (uint j = 0; j < CNumVertices; j++)

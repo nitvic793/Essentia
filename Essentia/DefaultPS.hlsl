@@ -142,13 +142,14 @@ inline float4 ConeTrace(float3 worldPos, float3 normal, float3 coneDirection, fl
     while(dist < FrameData.VoxelData.VoxelRadianceMaxDistance && alpha < 1)
     {
         float diameter = max(FrameData.VoxelData.VoxelRadianceDataSize, 2 * coneAperture * dist);
+        float mip = log2(diameter * FrameData.VoxelData.VoxelRadianceDataSizeRCP);
         
         float3 uvw = startPos + coneDirection * dist;
         uvw = (uvw - FrameData.VoxelData.VoxelGridCenter) * FrameData.VoxelData.VoxelRadianceDataSizeRCP;
         uvw *= FrameData.VoxelData.VoxelRadianceDataResRCP;
         uvw = uvw * float3(0.5f, -0.5f, 0.5f) + 0.5f;
         
-        if (uvw.x >= 1.f && uvw.y >= 1.f && uvw.z > 1.f)
+        if (uvw.x >= 1.f && uvw.y >= 1.f && uvw.z > 1.f || mip >= 7)
             break;
         //if (is_saturated(uvw))
          //   break;
@@ -249,7 +250,7 @@ float4 main(PixelInput input) : SV_TARGET
 
     float3 finalColor = AmbientPBR(DirLights[CPrimaryDirLight], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,
-		specColor, irradiance, prefilter, brdf, ao); // * shadowAmount; // (0.1 * (shadowAmount + 0.1f));
+		specColor, irradiance, prefilter, brdf, ao) * shadowAmount; // (0.1 * (shadowAmount + 0.1f));
     
     float3 globalRadiance = VoxelGlobalDiffuse(worldPos, normal);
     
@@ -274,5 +275,5 @@ float4 main(PixelInput input) : SV_TARGET
     clip(texColor.a - 0.2f);
 
     float3 output = finalColor;
-    return float4(output /*+ globalRadiance * texColor.rgb*/, 1.0f);
+    return float4(output + globalRadiance * texColor.rgb, 1.0f);
 }

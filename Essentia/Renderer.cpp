@@ -239,6 +239,9 @@ void Renderer::Clear()
 
 void Renderer::Render(const FrameContext& frameContext)
 {
+	auto commandList = commandContext->GetDefaultCommandList();
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Begin Frame");
+
 	uint32 camCount;
 	const auto& camera = frameContext.EntityManager->GetComponents<CameraComponent>(camCount)[0].CameraInstance;
 	auto imageIndex = backBufferIndex;
@@ -309,21 +312,16 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	auto rtId = renderTargets[backBufferIndex];
 	auto hdrRtId = hdrRenderTargets[backBufferIndex];
-	auto commandList = commandContext->GetDefaultCommandList();
-
+	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
-	
 	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
-
-	std::array<ID3D12DescriptorHeap*, 1> heaps = { frameManager->GetGPUDescriptorHeap(imageIndex) };
 	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
+	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Render");
-
-	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"PrePass Stage");
 
@@ -346,10 +344,9 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
 	// Set textures for IBL. Here we are setting 3 textures, irradiance texture is at index 0 while 
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
-
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-
+	
 	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture, GSceneResources.VoxelGridSRV };
 	SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	SetConstantBufferView(commandList, RootSigCBAll1, perFrameView);
@@ -430,6 +427,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	computeCList->Dispatch(1, 1, 1);
 
 	computeContext->SubmitCommands(computeCList);
+
+	PIXEndEvent(commandList); // End Frame
 }
 
 void Renderer::Present()
