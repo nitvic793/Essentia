@@ -18,7 +18,7 @@ struct DECLSPEC_ALIGN(16) VoxelParams
 	float				VoxelRadianceNumConesRCP;
 	float				VoxelRadianceMaxDistance;
 	float				VoxelRadianceRayStepSize;
-	float				Padding;
+	uint32_t			VoxelRadianceMips;
 };
 
 struct PerObjectConstantBuffer

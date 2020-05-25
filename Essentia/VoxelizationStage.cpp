@@ -21,11 +21,12 @@ void VoxelizationStage::Initialize()
 	props.Width = voxelGridSize;
 	props.Depth = voxelGridSize;
 	props.Height = voxelGridSize;
-	props.MipLevels = 1;
+	props.MipLevels = 11;
 
 	voxelGrid3dTextureSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
 	GSceneResources.VoxelGridSRV = voxelGrid3dTextureSRV;
+	GSceneResources.VoxelGridResource = voxelGridResource;
 
 	//voxelRT = CreateSceneRenderTarget(GContext, renderer->GetScreenSize().Width, renderer->GetScreenSize().Width, DXGI_FORMAT_R8G8B8A8_UNORM);
 	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));

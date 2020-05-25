@@ -569,5 +569,8 @@
     <FxCompile Include="WorldPosPS.hlsl">
       <Filter>Shaders\Misc</Filter>
     </FxCompile>
+    <FxCompile Include="GenerateMips3DCS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

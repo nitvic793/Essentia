@@ -18,6 +18,7 @@ struct SceneResources
 	TextureID				NoiseTexture;
 	SceneRenderTarget		WorldPosTexture;
 	TextureID				VoxelGridSRV;
+	ResourceID				VoxelGridResource;
 	PerFrameConstantBuffer	FrameData;
 	ConstantBufferView		FrameDataCBV;
 };

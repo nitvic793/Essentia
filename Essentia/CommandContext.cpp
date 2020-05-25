@@ -111,9 +111,19 @@ void CommandContext::CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12Command
 	device->CreateCommandAllocator(type, IID_PPV_ARGS(allocator));
 }
 
-uint64& CommandContext::Fence(int index)
+uint64& CommandContext::FenceValue(int index)
 {
 	return fenceValues[index];
+}
+
+HANDLE CommandContext::GetFenceEvent()
+{
+	return fenceEvent[backBufferIndex];
+}
+
+ID3D12Fence* CommandContext::GetFence()
+{
+	return fences[backBufferIndex].Get();
 }
 
 void CommandContext::WaitForFrame(uint32 index)

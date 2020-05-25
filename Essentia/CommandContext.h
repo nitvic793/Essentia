@@ -19,7 +19,9 @@ public:
 	void							ResetAllocator(ID3D12CommandAllocator* allocator);
 	void							ResetCommandList(ID3D12GraphicsCommandList* commandList, ID3D12CommandAllocator* allocator);
 	void							CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12CommandAllocator** allocator);
-	uint64&							Fence(int index);
+	uint64&							FenceValue(int index);
+	HANDLE							GetFenceEvent();
+	ID3D12Fence*					GetFence();
 private:
 	uint32												backBufferIndex;
 	DeviceResources*									deviceResources;

@@ -16,8 +16,20 @@ RootSignatureID CreateComputeRootSignature()
 	rootParameters[1].InitAsDescriptorTable(1, &range[1], D3D12_SHADER_VISIBILITY_ALL);
 	rootParameters[2].InitAsDescriptorTable(1, &range[2], D3D12_SHADER_VISIBILITY_ALL);
 
+	CD3DX12_STATIC_SAMPLER_DESC StaticSamplers[2];
+
+	StaticSamplers[0].Init(0, D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+		D3D12_TEXTURE_ADDRESS_MODE_WRAP);
+
+	StaticSamplers[1].Init(1, D3D12_FILTER_MIN_MAG_MIP_POINT,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+		D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+
 	CD3DX12_ROOT_SIGNATURE_DESC descRootSignature;
-	descRootSignature.Init(3, rootParameters, 0, nullptr);
+	descRootSignature.Init(_countof(rootParameters), rootParameters, _countof(StaticSamplers), StaticSamplers);
 
 	return resourceManager->CreateRootSignature(descRootSignature);
 }
@@ -133,7 +145,7 @@ void ComputeContext::CreateAllocator(D3D12_COMMAND_LIST_TYPE type, ID3D12Command
 	device->CreateCommandAllocator(type, IID_PPV_ARGS(allocator));
 }
 
-uint64& ComputeContext::Fence(int index)
+uint64& ComputeContext::FenceValue(int index)
 {
 	return fenceValues[index];
 }
@@ -141,6 +153,16 @@ uint64& ComputeContext::Fence(int index)
 ID3D12RootSignature* ComputeContext::GetComputeRootSignature()
 {
 	return computeRootSignature;
+}
+
+HANDLE ComputeContext::GetFenceEvent()
+{
+	return fenceEvent[backBufferIndex];
+}
+
+ID3D12Fence* ComputeContext::GetFence()
+{
+	return fences[backBufferIndex].Get();
 }
 
 void ComputeContext::WaitForFrame(uint32 index)

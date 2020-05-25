@@ -24,14 +24,14 @@ public:
 	PipelineStateID ApplyFogPSO;
 
 	//Compute PSOs
-	PipelineStateID TestCSPSO;
+	PipelineStateID MipGen3DCSPSO;
 private:
 	void CreateDefaultPSOs();
 	void CreateLightAccumPSO();
 	void CreateShadowPSO();
 	void CreateScreenSpaceAOPSO();
 	void CreateVoxelizePSO();
-	void CreateComputePSO();
+	void CreateMipGen3DComputePSO();
 };
 
 extern PipelineStates GPipelineStates;

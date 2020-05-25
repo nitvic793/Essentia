@@ -19,7 +19,7 @@ void PipelineStates::Initialize()
 	CreateScreenSpaceAOPSO();
 	CreateLightAccumPSO();
 	CreateVoxelizePSO();
-	CreateComputePSO();
+	CreateMipGen3DComputePSO();
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
@@ -251,14 +251,14 @@ void PipelineStates::CreateVoxelizePSO()
 	VoxelizePSO = resourceManager->CreatePSO(psoDesc);
 }
 
-void PipelineStates::CreateComputePSO()
+void PipelineStates::CreateMipGen3DComputePSO()
 {
 	auto resourceManager = GContext->ResourceManager;
 	auto renderer = GContext->RendererInstance;
 
 	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
-	psoDesc.CS = ShaderManager::LoadShader(L"LightCullingCS.cso");
+	psoDesc.CS = ShaderManager::LoadShader(L"GenerateMips3DCS.cso");
 	psoDesc.pRootSignature = renderer->GetDefaultComputeRootSignature();
 
-	TestCSPSO = resourceManager->CreateComputePSO(psoDesc);
+	MipGen3DCSPSO = resourceManager->CreateComputePSO(psoDesc);
 }

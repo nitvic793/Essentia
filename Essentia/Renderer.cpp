@@ -175,7 +175,7 @@ void Renderer::Initialize()
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
 				renderTargetBuffers[i].Reset();
-				commandContext->Fence(i) = commandContext->Fence(bindex);
+				commandContext->FenceValue(i) = commandContext->FenceValue(bindex);
 			}
 
 			swapChain->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);
@@ -199,8 +199,8 @@ void Renderer::Clear()
 	//Reset Compute Context
 	auto computeAllocator = computeContext->GetAllocator(backBufferIndex);
 	auto computeCList = computeContext->GetDefaultCommandList();
-	commandContext->ResetAllocator(computeAllocator);
-	commandContext->ResetCommandList(computeCList, computeAllocator);
+	computeContext->ResetAllocator(computeAllocator);
+	computeContext->ResetCommandList(computeCList, computeAllocator);
 
 	auto commandAllocator = commandContext->GetAllocator(backBufferIndex);
 	auto commandList = commandContext->GetDefaultCommandList();
@@ -338,6 +338,42 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	PIXEndEvent(commandList);
 
+	commandContext->SubmitCommands(commandList);
+	commandContext->ResetCommandList(commandList, commandContext->GetAllocator(backBufferIndex));
+
+	/***COMPUTE**/
+	auto computeCList = computeContext->GetDefaultCommandList();
+	auto gfxFence = commandContext->GetFence();
+	auto gfxFenceValue = commandContext->FenceValue(backBufferIndex);
+
+	deviceResources->computeQueue->Wait(gfxFence, gfxFenceValue);
+
+	computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
+	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.MipGen3DCSPSO));
+
+	computeCList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
+
+	static constexpr uint32 CMipBlockSize = 4;
+	computeCList->SetComputeRootDescriptorTable(2, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + GSceneResources.VoxelGridSRV));
+	const uint32 dispatchThreadCount = CVoxelSize / CMipBlockSize;
+	computeCList->Dispatch(dispatchThreadCount, dispatchThreadCount, dispatchThreadCount);
+
+	computeContext->SubmitCommands(computeCList);
+
+	/***END COMPUTE**/
+
+	auto computeFence = computeContext->GetFence();
+	auto computeFenceValue = computeContext->FenceValue(backBufferIndex);
+
+	deviceResources->commandQueue->Wait(computeFence, computeFenceValue);
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
+	commandList->SetGraphicsRootSignature(resourceManager->GetRootSignature(mainRootSignatureID));
+	commandList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
+	commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Main Render Stage");
 
 	// Set constant buffer for lights in Pixel Shader
@@ -346,7 +382,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	
+
 	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture, GSceneResources.VoxelGridSRV };
 	SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	SetConstantBufferView(commandList, RootSigCBAll1, perFrameView);
@@ -419,14 +455,6 @@ void Renderer::Render(const FrameContext& frameContext)
 		}
 	}
 	PIXEndEvent(commandList);
-
-	auto computeCList = computeContext->GetDefaultCommandList();
-	computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
-	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.TestCSPSO));
-
-	computeCList->Dispatch(1, 1, 1);
-
-	computeContext->SubmitCommands(computeCList);
 
 	PIXEndEvent(commandList); // End Frame
 }
