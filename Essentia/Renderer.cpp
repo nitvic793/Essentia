@@ -30,6 +30,7 @@
 #include "VolumetricLightStage.h"
 #include "ApplyVolumetricFog.h"
 #include "VoxelizationStage.h"
+#include "GenerateMipsStage.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -137,6 +138,8 @@ void Renderer::Initialize()
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VoxelizationStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VolumetricLightStage>()));
+
+	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<GenerateMipsStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
@@ -350,21 +353,30 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
 	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.MipGen3DCSPSO));
-
 	computeCList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
 
-	static constexpr uint32 CMipBlockSize = 4;
-	computeCList->SetComputeRootDescriptorTable(2, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + GSceneResources.VoxelGridSRV));
-	const uint32 dispatchThreadCount = CVoxelSize / CMipBlockSize;
-	computeCList->Dispatch(dispatchThreadCount, dispatchThreadCount, dispatchThreadCount);
+	PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Pre Compute Stage");
+
+	for (auto& stage : renderStages[eRenderStageCompute])
+	{
+		PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Sub Compute Stage");
+		if (stage->Enabled)
+		{
+			stage->Render(backBufferIndex, frameContext);
+		}
+
+		PIXEndEvent(computeCList);
+	}
+
+	PIXEndEvent(computeCList);
 
 	computeContext->SubmitCommands(computeCList);
 
 	/***END COMPUTE**/
 
+	// Wait for compute work to be over
 	auto computeFence = computeContext->GetFence();
 	auto computeFenceValue = computeContext->FenceValue(backBufferIndex);
-
 	deviceResources->commandQueue->Wait(computeFence, computeFenceValue);
 
 	commandList->RSSetViewports(1, &viewport);
@@ -658,6 +670,11 @@ D3D12_GPU_DESCRIPTOR_HANDLE Renderer::GetTextureGPUHandle(TextureID textureId) c
 	return frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + textureId);
 }
 
+ComputeContext* Renderer::GetComputeContext() const
+{
+	return computeContext.Get();
+}
+
 void Renderer::DrawScreenQuad(ID3D12GraphicsCommandList* commandList)
 {
 	D3D12_INDEX_BUFFER_VIEW ibv;
@@ -679,9 +696,19 @@ void Renderer::SetConstantBufferView(ID3D12GraphicsCommandList* commandList, Roo
 	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + view.Index));
 }
 
+void Renderer::SetComputeConstantBufferView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, const ConstantBufferView& view)
+{
+	commandList->SetComputeRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.ConstantBufferOffset + view.Index));
+}
+
 void Renderer::SetShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture)
 {
 	commandList->SetGraphicsRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texture));
+}
+
+void Renderer::SetComputeShaderResourceView(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID texture)
+{
+	commandList->SetComputeRootDescriptorTable(slot, frameManager->GetHandle(backBufferIndex, offsets.TexturesOffset + texture));
 }
 
 void Renderer::SetShaderResourceViewMaterial(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, MaterialHandle material)
@@ -695,6 +722,12 @@ void Renderer::SetShaderResourceViews(ID3D12GraphicsCommandList* commandList, Ro
 {
 	auto handle = shaderResourceManager->AllocateTextures(textures, textureCount, backBufferIndex, frameManager.get());
 	commandList->SetGraphicsRootDescriptorTable(slot, handle);
+}
+
+void Renderer::SetComputeShaderResourceViews(ID3D12GraphicsCommandList* commandList, RootParameterSlot slot, TextureID* textures, uint32 textureCount)
+{
+	auto handle = shaderResourceManager->AllocateTextures(textures, textureCount, backBufferIndex, frameManager.get());
+	commandList->SetComputeRootDescriptorTable(slot, handle);
 }
 
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ResourceID resourceId, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)

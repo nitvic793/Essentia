@@ -1,6 +1,8 @@
 #pragma once
 #include "RenderStage.h"
 
+static constexpr uint32 CVoxelGridMips = 8;
+
 static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSize)
 {
 	using namespace DirectX;
@@ -24,9 +26,10 @@ static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSiz
 
 	output.VoxelGridCenter = center;
 	output.VoxelRadianceNumCones = 2;
-	output.VoxelRadianceMaxDistance = 20.f;
+	output.VoxelRadianceMaxDistance = 50.f;
 	output.VoxelRadianceRayStepSize = 0.75f;
 	output.VoxelRadianceNumConesRCP = 1.f / (float)output.VoxelRadianceNumCones;
+	output.VoxelRadianceMips = CVoxelGridMips;
 
 	return output;
 }

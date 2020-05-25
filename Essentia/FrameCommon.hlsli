@@ -11,7 +11,7 @@ struct VoxelParams
     float VoxelRadianceNumConesRCP;
     float VoxelRadianceMaxDistance;
     float VoxelRadianceRayStepSize;
-    float VoxelRadianceMips;
+    uint VoxelRadianceMips;
 };
 
 struct PerFrameData

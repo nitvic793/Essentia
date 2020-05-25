@@ -70,8 +70,11 @@ enum TextureType
 
 enum RootParameterSlot {
 	RootSigCBVertex0 = 0,
+	RootSigComputeCB = 0,
 	RootSigCBPixel0,
+	RootSigComputeUAV = 1,
 	RootSigSRVPixel1,
+	RootSigComputeSRV = 2,
 	RootSigSRVPixel2,
 	RootSigCBAll1,
 	RootSigCBAll2,

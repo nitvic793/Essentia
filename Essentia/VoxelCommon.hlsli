@@ -38,5 +38,5 @@ cbuffer VoxelParams : register(b2)
     float VoxelRadianceNumConesRCP;
     float VoxelRadianceMaxDistance;
     float VoxelRadianceRayStepSize;
-    float VoxelRadianceMips;
+    uint VoxelRadianceMips;
 }

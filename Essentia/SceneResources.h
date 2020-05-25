@@ -3,6 +3,12 @@
 #include "ConstantBuffer.h"
 #include "Declarations.h"
 
+struct VoxelRadiance
+{
+	TextureID* VoxelGridUAVMips;
+	uint32	   MipCount;
+};
+
 struct SceneResources
 {
 	void					Initalize();
@@ -21,6 +27,7 @@ struct SceneResources
 	ResourceID				VoxelGridResource;
 	PerFrameConstantBuffer	FrameData;
 	ConstantBufferView		FrameDataCBV;
+	VoxelRadiance			VoxelRadiance;
 };
 
 extern SceneResources GSceneResources;

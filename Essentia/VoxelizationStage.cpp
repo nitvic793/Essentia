@@ -21,7 +21,7 @@ void VoxelizationStage::Initialize()
 	props.Width = voxelGridSize;
 	props.Depth = voxelGridSize;
 	props.Height = voxelGridSize;
-	props.MipLevels = 11;
+	props.MipLevels = CVoxelGridMips;
 
 	voxelGrid3dTextureSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
@@ -32,6 +32,15 @@ void VoxelizationStage::Initialize()
 	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));
 	//renderer->TransitionBarrier(renderer->GetDefaultCommandList(), voxelRT.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	GRenderStageManager.RegisterStage("VoxelizationStage", this);
+
+	GSceneResources.VoxelRadiance.MipCount = CVoxelGridMips;
+	GSceneResources.VoxelRadiance.VoxelGridUAVMips = (TextureID*)Mem::Alloc(sizeof(TextureID) * CVoxelGridMips);
+	uint32 voxelGridMipSize = CVoxelSize;
+	for (uint32 i = 0; i < CVoxelGridMips; ++i)
+	{
+		GSceneResources.VoxelRadiance.VoxelGridUAVMips[i] = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridMipSize, i);
+		voxelGridMipSize /= 2;
+	}
 }
 
 static bool done = false;

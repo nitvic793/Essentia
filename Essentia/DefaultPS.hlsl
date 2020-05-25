@@ -149,12 +149,12 @@ inline float4 ConeTrace(float3 worldPos, float3 normal, float3 coneDirection, fl
         uvw *= FrameData.VoxelData.VoxelRadianceDataResRCP;
         uvw = uvw * float3(0.5f, -0.5f, 0.5f) + 0.5f;
         
-        if (uvw.x >= 1.f && uvw.y >= 1.f && uvw.z > 1.f || mip >= 7)
+        if (uvw.x >= 1.f && uvw.y >= 1.f && uvw.z > 1.f || mip >= (float)FrameData.VoxelData.VoxelRadianceMips)
             break;
         //if (is_saturated(uvw))
          //   break;
         
-        float4 voxelSample = VoxelGrid.SampleLevel(LinearWrapSampler, uvw, 0.f);
+        float4 voxelSample = VoxelGrid.SampleLevel(LinearWrapSampler, uvw, mip);
         
         float a = 1 - alpha;
         color += a * voxelSample.rgb;

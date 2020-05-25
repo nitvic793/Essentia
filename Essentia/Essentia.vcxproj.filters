@@ -88,6 +88,12 @@
     <Filter Include="Shaders\VolumetricLight">
       <UniqueIdentifier>{f0eafb6f-3158-40a0-b957-e49010b0cf42}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Renderer\ComputeStages">
+      <UniqueIdentifier>{5aed456f-07b8-4db6-9a0b-6c255256f986}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Renderer\ComputeStages">
+      <UniqueIdentifier>{69b7948c-71ff-4434-b214-8e788bd92a16}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -261,6 +267,9 @@
     </ClCompile>
     <ClCompile Include="VoxelizationStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
+    <ClCompile Include="GenerateMipsStage.cpp">
+      <Filter>Source Files\Renderer\ComputeStages</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -479,6 +488,9 @@
     </ClInclude>
     <ClInclude Include="VoxelizationStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="GenerateMipsStage.h">
+      <Filter>Header Files\Renderer\ComputeStages</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
