@@ -5,8 +5,8 @@ cbuffer MipGenData : register(b0)
     float CurrentMip;
 }
 
-Texture3D<float> input : register(t0);
-RWTexture3D<float> output : register(u0);
+Texture3D<float4> input : register(t0);
+RWTexture3D<float4> output : register(u0);
 
 SamplerState LinearWrapSampler : register(s0);
 
