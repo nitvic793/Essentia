@@ -31,6 +31,7 @@
 #include "ApplyVolumetricFog.h"
 #include "VoxelizationStage.h"
 #include "GenerateMipsStage.h"
+#include "VoxelRadiancePostProcess.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -139,7 +140,8 @@ void Renderer::Initialize()
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VoxelizationStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VolumetricLightStage>()));
 
-	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<GenerateMipsStage>()));
+	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelRadiancePostProcess>()));
+	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelMipGenStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
@@ -245,6 +247,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto commandList = commandContext->GetDefaultCommandList();
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Begin Frame");
 
+	auto renderStageMap = GRenderStageManager.GetRenderStageMap();
 	uint32 camCount;
 	const auto& camera = frameContext.EntityManager->GetComponents<CameraComponent>(camCount)[0].CameraInstance;
 	auto imageIndex = backBufferIndex;
@@ -310,7 +313,19 @@ void Renderer::Render(const FrameContext& frameContext)
 	XMMATRIX viewProjTex = XMMatrixMultiply(XMMatrixMultiply(view, projection), T);
 	//Update per frame data
 	XMStoreFloat4x4(&GSceneResources.FrameData.ViewProjectionTex, XMMatrixTranspose(viewProjTex));
-	GSceneResources.FrameData.VoxelData = CreateVoxelParams(camera, CVoxelSize);
+	auto voxelData = CreateVoxelParams(camera, CVoxelSize);
+	if (XMVector3Equal(XMLoadFloat3(&voxelData.VoxelGridCenter), (XMLoadFloat3(&GSceneResources.FrameData.VoxelData.VoxelGridCenter))))
+	{
+		renderStageMap["VoxelizationStage"]->Enabled = false;
+		renderStageMap["VoxelMipGenStage"]->Enabled = false;
+	}
+	else
+	{
+		renderStageMap["VoxelizationStage"]->Enabled = true;
+		renderStageMap["VoxelMipGenStage"]->Enabled = true;
+	}
+
+	GSceneResources.FrameData.VoxelData = voxelData;
 	shaderResourceManager->CopyToCB(imageIndex, { &GSceneResources.FrameData, sizeof(GSceneResources.FrameData) }, perFrameView);
 
 	auto rtId = renderTargets[backBufferIndex];
@@ -352,7 +367,6 @@ void Renderer::Render(const FrameContext& frameContext)
 	deviceResources->computeQueue->Wait(gfxFence, gfxFenceValue);
 
 	computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
-	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.MipGen3DCSPSO));
 	computeCList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
 
 	PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Pre Compute Stage");
@@ -378,6 +392,9 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto computeFence = computeContext->GetFence();
 	auto computeFenceValue = computeContext->FenceValue(backBufferIndex);
 	deviceResources->commandQueue->Wait(computeFence, computeFenceValue);
+
+	if (renderStageMap["VoxelizationStage"]->Enabled)
+		TransitionBarrier(commandList, GSceneResources.VoxelGridResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);

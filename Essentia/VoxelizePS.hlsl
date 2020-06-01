@@ -1,4 +1,5 @@
 #include "VoxelCommon.hlsli"
+#include "FrameCommon.hlsli"
 #include "Lighting.hlsli"
 
 cbuffer LightBuffer : register(b0)
@@ -68,6 +69,6 @@ void main(GSOutput input) //: SV_TARGET
     //}
     
     float4 result = float4(dirLight + pointLight, 1.f);
-    
+
     VoxelGrid[writecoord] = result;
 }

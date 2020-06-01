@@ -2,10 +2,11 @@
 #include "GenerateMipsStage.h"
 #include "Renderer.h"
 #include "SceneResources.h"
+#include "PipelineStates.h"
 
 using namespace DirectX;
 
-void GenerateMipsStage::Initialize()
+void VoxelMipGenStage::Initialize()
 {
 	auto shaderResourceManager = GContext->ShaderResourceManager;
 
@@ -13,16 +14,19 @@ void GenerateMipsStage::Initialize()
 	{
 		voxelMipGenCBV[i] = shaderResourceManager->CreateCBV(sizeof(MipGenParams));
 	}
+	GRenderStageManager.RegisterStage("VoxelMipGenStage", this);
 }
 
-void GenerateMipsStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
+void VoxelMipGenStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
 {
 	auto renderer = GContext->RendererInstance;
 	auto shaderResourceManager = GContext->ShaderResourceManager;
+	auto resourceManager = GContext->ResourceManager;
 	auto computeContext = renderer->GetComputeContext();
 	auto computeCList = computeContext->GetDefaultCommandList();
 
 	auto voxelSize = CVoxelSize;
+	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.MipGen3DCSPSO));
 
 	for (uint32 i = 0; i < GSceneResources.VoxelRadiance.MipCount; ++i)
 	{

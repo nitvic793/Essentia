@@ -271,6 +271,9 @@
     <ClCompile Include="GenerateMipsStage.cpp">
       <Filter>Source Files\Renderer\ComputeStages</Filter>
     </ClCompile>
+    <ClCompile Include="VoxelRadiancePostProcess.cpp">
+      <Filter>Source Files\Renderer\ComputeStages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -492,6 +495,9 @@
     <ClInclude Include="GenerateMipsStage.h">
       <Filter>Header Files\Renderer\ComputeStages</Filter>
     </ClInclude>
+    <ClInclude Include="VoxelRadiancePostProcess.h">
+      <Filter>Header Files\Renderer\ComputeStages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -582,6 +588,9 @@
       <Filter>Shaders\Misc</Filter>
     </FxCompile>
     <FxCompile Include="GenerateMips3DCS.hlsl">
+      <Filter>Shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="VoxelCopyCS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

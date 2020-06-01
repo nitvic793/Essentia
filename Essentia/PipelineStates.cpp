@@ -20,6 +20,7 @@ void PipelineStates::Initialize()
 	CreateLightAccumPSO();
 	CreateVoxelizePSO();
 	CreateMipGen3DComputePSO();
+	CreateVoxelCopyComputePSO();
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
@@ -261,4 +262,16 @@ void PipelineStates::CreateMipGen3DComputePSO()
 	psoDesc.pRootSignature = renderer->GetDefaultComputeRootSignature();
 
 	MipGen3DCSPSO = resourceManager->CreateComputePSO(psoDesc);
+}
+
+void PipelineStates::CreateVoxelCopyComputePSO()
+{
+	auto resourceManager = GContext->ResourceManager;
+	auto renderer = GContext->RendererInstance;
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.CS = ShaderManager::LoadShader(L"VoxelCopyCS.cso");
+	psoDesc.pRootSignature = renderer->GetDefaultComputeRootSignature();
+
+	VoxelCopyPSO = resourceManager->CreateComputePSO(psoDesc);
 }

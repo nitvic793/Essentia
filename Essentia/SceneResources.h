@@ -5,8 +5,12 @@
 
 struct VoxelRadiance
 {
-	TextureID* VoxelGridUAVMips;
-	uint32	   MipCount;
+	TextureID*	VoxelGridUAVMips;
+	uint32		MipCount;
+	TextureID	VoxelGridUAV;
+	TextureID	VoxelGridRawSRV;
+	TextureID	VoxelGridRawUAV;
+	ResourceID	VoxelGridRawResource;
 };
 
 struct SceneResources

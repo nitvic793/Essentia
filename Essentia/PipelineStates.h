@@ -25,6 +25,7 @@ public:
 
 	//Compute PSOs
 	PipelineStateID MipGen3DCSPSO;
+	PipelineStateID VoxelCopyPSO;
 private:
 	void CreateDefaultPSOs();
 	void CreateLightAccumPSO();
@@ -32,6 +33,7 @@ private:
 	void CreateScreenSpaceAOPSO();
 	void CreateVoxelizePSO();
 	void CreateMipGen3DComputePSO();
+	void CreateVoxelCopyComputePSO();
 };
 
 extern PipelineStates GPipelineStates;

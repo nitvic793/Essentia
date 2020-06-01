@@ -27,10 +27,15 @@ void VoxelizationStage::Initialize()
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
 	GSceneResources.VoxelGridSRV = voxelGrid3dTextureSRV;
 	GSceneResources.VoxelGridResource = voxelGridResource;
+	GSceneResources.VoxelRadiance.VoxelGridUAV = voxelGrid3dTextureUAV;
 
-	//voxelRT = CreateSceneRenderTarget(GContext, renderer->GetScreenSize().Width, renderer->GetScreenSize().Width, DXGI_FORMAT_R8G8B8A8_UNORM);
+	props.MipLevels = 1;
+	ResourceID voxelGridRawResource;
+	GSceneResources.VoxelRadiance.VoxelGridRawSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridRawResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	GSceneResources.VoxelRadiance.VoxelGridRawUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridRawResource, voxelGridSize);
+	GSceneResources.VoxelRadiance.VoxelGridRawResource = voxelGridRawResource;
+
 	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));
-	//renderer->TransitionBarrier(renderer->GetDefaultCommandList(), voxelRT.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	GRenderStageManager.RegisterStage("VoxelizationStage", this);
 
 	GSceneResources.VoxelRadiance.MipCount = CVoxelGridMips;
@@ -74,7 +79,8 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	scissorRect.bottom = sz.Height;
 
 	TransitionDesc transitions[] = {
-		{ voxelGridResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS }
+		//{ GSceneResources.VoxelRadiance.VoxelGridRawResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS }
+		{ GSceneResources.VoxelGridResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS }
 	};
 
 	renderer->TransitionBarrier(commandList, transitions, _countof(transitions));
@@ -85,14 +91,20 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	renderer->SetPipelineState(commandList, GPipelineStates.VoxelizePSO);
 	uint32 clearVal[] = { 0, 0, 0, 0 };
 	const FLOAT clearColor[] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	//commandList->ClearUnorderedAccessViewFloat(
+	//	renderer->GetTextureGPUHandle(GSceneResources.VoxelRadiance.VoxelGridRawUAV),
+	//	srManager->GetTextureCPUHandle(GSceneResources.VoxelRadiance.VoxelGridRawUAV),
+	//	resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
+
 	commandList->ClearUnorderedAccessViewFloat(
-		renderer->GetTextureGPUHandle(voxelGrid3dTextureUAV),
-		srManager->GetTextureCPUHandle(voxelGrid3dTextureUAV),
+		renderer->GetTextureGPUHandle(GSceneResources.VoxelRadiance.VoxelGridUAV),
+		srManager->GetTextureCPUHandle(GSceneResources.VoxelRadiance.VoxelGridUAV),
 		resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
 
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, voxelParamsCBV);
-	renderer->SetShaderResourceView(commandList, RootSigUAV0, voxelGrid3dTextureUAV);
+	renderer->SetShaderResourceView(commandList, RootSigUAV0, GSceneResources.VoxelRadiance.VoxelGridUAV);
+	//renderer->SetShaderResourceView(commandList, RootSigUAV0, GSceneResources.VoxelRadiance.VoxelGridRawUAV);
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
 	renderer->SetShaderResourceView(commandList, RootSigSRVPixel2, GSceneResources.ShadowDepthTarget.Texture);
 
@@ -127,11 +139,13 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 		}
 	}
 
-	TransitionDesc endTransitions[] = {
-		{ voxelGridResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,  D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE }
-	};
+	//TransitionDesc endTransitions[] = {
+	//	{ GSceneResources.VoxelGridResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,  D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE }
+	//	//{ GSceneResources.VoxelRadiance.VoxelGridRawResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS,  D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE },
+	//	//{ GSceneResources.VoxelGridResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS }
+	//};
 
-	renderer->TransitionBarrier(commandList, endTransitions, _countof(endTransitions));
+	//renderer->TransitionBarrier(commandList, endTransitions, _countof(endTransitions));
 }
 
 

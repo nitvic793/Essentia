@@ -34,7 +34,7 @@ Texture2D MetalnessTexture : register(t3);
 Texture2D ShadowMapDirLight     : register(t8);
 //SSAO
 Texture2D AmbientOcclusionTex   : register(t9);
-Texture3D VoxelGrid             : register(t10);
+Texture3D<float4> VoxelGrid             : register(t10);
 
 //IBL
 TextureCube skyIrradianceTexture : register(t16);
