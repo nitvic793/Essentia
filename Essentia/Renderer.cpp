@@ -140,21 +140,23 @@ void Renderer::Initialize()
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VoxelizationStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VolumetricLightStage>()));
 
+
 	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelRadiancePostProcess>()));
 	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelMipGenStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
+	
 
-
+	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<DebugDrawStage>()));
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
-	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<DebugDrawStage>()));
 
 	postProcessStages.Reserve(32);
+	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessTemporalAA>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<ApplyVolumetricFog>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
-	//postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessTemporalAA>()));
+	
 
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessMotionBlur>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
@@ -278,7 +280,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		perObject.PrevWorldViewProjection = drawables[i].PrevWorldViewProjection;
 		perObject.World = worlds[i];
 		perObject.WorldViewProjection = drawables[i].WorldViewProjection;
-		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView.Offset);
+		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawables[i].CBView);
 
 		auto bounding = meshManager->GetBoundingBox(drawables[i].Mesh);
 		bounding.Transform(bounding, world);
@@ -295,7 +297,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		perObject.World = modelWorlds[i];
 		perObject.PrevWorldViewProjection = drawableModels[i].PrevWorldViewProjection;
 		perObject.WorldViewProjection = drawableModels[i].WorldViewProjection;
-		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawableModels[i].CBView.Offset);
+		shaderResourceManager->CopyToCB(imageIndex, { &perObject, sizeof(perObject) }, drawableModels[i].CBView);
 		drawableModels[i].PrevWorldViewProjection = drawableModels[i].WorldViewProjection;
 	}
 
@@ -318,11 +320,13 @@ void Renderer::Render(const FrameContext& frameContext)
 	{
 		renderStageMap["VoxelizationStage"]->Enabled = false;
 		renderStageMap["VoxelMipGenStage"]->Enabled = false;
+		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = false;
 	}
 	else
 	{
 		renderStageMap["VoxelizationStage"]->Enabled = true;
 		renderStageMap["VoxelMipGenStage"]->Enabled = true;
+		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = true;
 	}
 
 	GSceneResources.FrameData.VoxelData = voxelData;

@@ -13,6 +13,7 @@ class FrameManager;
 class IAllocator;
 class ComponentReflector;
 class ComputeContext;
+class SystemManager;
 
 struct EngineContext;
 extern EngineContext* GContext;
@@ -20,7 +21,6 @@ extern EngineContext* GContext;
 struct EngineContext
 {
 	static EngineContext*	Context;
-	//bool					bIsPlaying = false;
 	Renderer*				RendererInstance = nullptr;
 	EntityManager*			EntityManager = nullptr;
 	MeshManager*			MeshManager = nullptr;
@@ -35,6 +35,8 @@ struct EngineContext
 	IAllocator*				DefaultAllocator = nullptr;
 	IAllocator*				FrameAllocator = nullptr;
 	ComponentReflector*		ComponentReflector = nullptr;
+	SystemManager*			CoreSystemManager = nullptr;
+	SystemManager*			GameSystemManager = nullptr;
 
 	EngineContext()
 	{

@@ -21,6 +21,7 @@ void PipelineStates::Initialize()
 	CreateVoxelizePSO();
 	CreateMipGen3DComputePSO();
 	CreateVoxelCopyComputePSO();
+	CreateWireframePSO();
 
 	DXGI_SAMPLE_DESC sampleDesc = {};
 	sampleDesc.Count = 1;
@@ -274,4 +275,35 @@ void PipelineStates::CreateVoxelCopyComputePSO()
 	psoDesc.pRootSignature = renderer->GetDefaultComputeRootSignature();
 
 	VoxelCopyPSO = resourceManager->CreateComputePSO(psoDesc);
+}
+
+void PipelineStates::CreateWireframePSO()
+{
+	auto resourceManager = GContext->ResourceManager;
+	auto renderer = GContext->RendererInstance;
+
+	DXGI_SAMPLE_DESC sampleDesc = {};
+	sampleDesc.Count = 1;
+
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::DefaultLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::DefaultLayout);
+	psoDesc.pRootSignature = renderer->GetDefaultRootSignature();
+	psoDesc.VS = ShaderManager::LoadShader(L"WireframeVS.cso");
+	psoDesc.GS = ShaderManager::LoadShader(L"WireframeGS.cso");
+	psoDesc.PS = ShaderManager::LoadShader(L"WireframePS.cso");
+	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
+	psoDesc.DepthStencilState.DepthEnable = false;
+	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+	psoDesc.RTVFormats[0] = renderer->GetRenderTargetFormat();
+	psoDesc.SampleDesc = sampleDesc;
+	psoDesc.SampleMask = 0xffffffff;
+	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.AntialiasedLineEnable = true;
+	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
+	psoDesc.NumRenderTargets = 1;
+	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
+
+	WireframePSO = resourceManager->CreatePSO(psoDesc);
 }

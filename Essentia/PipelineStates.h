@@ -16,6 +16,7 @@ public:
 	PipelineStateID LightAccumPSO;
 	PipelineStateID BilateralBlurPSO;
 	PipelineStateID VoxelizePSO;
+	PipelineStateID	WireframePSO;
 
 	//Post Process PSOs
 	PipelineStateID QuadPSO;
@@ -34,6 +35,7 @@ private:
 	void CreateVoxelizePSO();
 	void CreateMipGen3DComputePSO();
 	void CreateVoxelCopyComputePSO();
+	void CreateWireframePSO();
 };
 
 extern PipelineStates GPipelineStates;

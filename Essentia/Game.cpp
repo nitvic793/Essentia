@@ -19,6 +19,8 @@ void Game::Setup()
 	ec->DefaultAllocator = Mem::GetDefaultAllocator();
 	ec->FrameAllocator = &frameAllocator;
 	ec->ComponentReflector = &GComponentReflector;
+	ec->GameSystemManager = &gameSystemsManager;
+	ec->CoreSystemManager = &coreSystemsManager;
 
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);
