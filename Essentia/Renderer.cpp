@@ -243,6 +243,12 @@ void Renderer::Clear()
 	}
 }
 
+/***
+TODO:
+1. Use ambient IBL if Voxelization is disabled - Shader switching system
+2. Frustum & Occlusion Culling
+3. Fix Global Illumination
+*/
 void Renderer::Render(const FrameContext& frameContext)
 {
 	auto commandList = commandContext->GetDefaultCommandList();
