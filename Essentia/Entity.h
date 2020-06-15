@@ -10,12 +10,15 @@ class EntityManager
 {
 public:
 	EntityManager();
-	void				Initialize(IAllocator* allocator);
-	EntityHandle		CreateEntity(const Transform& transform = DefaultTransform, uint32 parentIndex = CRootParentEntityIndex);
-	bool				IsAlive(EntityHandle handle);
-	void				Destroy(EntityHandle handle);
-	ComponentManager*	GetComponentManager();
-	EntityHandle		GetParent(EntityHandle entity);
+	void					Initialize(IAllocator* allocator);
+	EntityHandle			CreateEntity(const Transform& transform = DefaultTransform, uint32 parentIndex = CRootParentEntityIndex, std::string_view entityName="");
+	bool					IsAlive(EntityHandle handle);
+	void					Destroy(EntityHandle handle);
+	bool					HasValidParent(EntityHandle handle);
+	ComponentManager*		GetComponentManager();
+	EntityHandle			GetParent(EntityHandle entity);
+	Vector<EntityHandle>	GetChildren(EntityHandle entity);
+	std::string_view		GetEntityName(EntityHandle entity);
 
 	template<typename T>
 	void				AddComponent(EntityHandle handle, const T& value = T());
@@ -37,11 +40,12 @@ public:
 	Vector<DirectX::XMFLOAT4X4>	GetTransposedWorldMatrices(EntityHandle* entities, uint32 count);
 	void						GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
 private:
-	std::vector<uint32> generations;
-	std::vector<uint32> freeIndices;
-	ComponentManager	componentManager;
-	TransformManager	transformManager;
-	IAllocator*			allocator;
+	std::vector<uint32>			generations;
+	std::vector<uint32>			freeIndices;
+	std::vector<std::string>	entityNames;
+	ComponentManager			componentManager;
+	TransformManager			transformManager;
+	IAllocator*					allocator;
 };
 
 template<typename T>

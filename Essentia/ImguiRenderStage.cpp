@@ -9,12 +9,37 @@
 #include "PostProcessDepthOfFieldStage.h"
 #include "Interface.h"
 #include "ComponentReflector.h"
+#include "ImGuizmo.h"
 
-using namespace DirectX;
+using namespace DirectX; 
+
+void DrawTree(EntityHandle entity, EntityHandle& selected)
+{
+	ImGuiTreeNodeFlags treeNodeFlags = 0;
+	auto children = GContext->EntityManager->GetChildren(entity);
+	if (children.size() == 0)
+	{
+		treeNodeFlags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Leaf | ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_NoTreePushOnOpen;
+		ImGui::TreeNodeEx(GContext->EntityManager->GetEntityName(entity).data(), treeNodeFlags);
+		if (ImGui::IsItemClicked())
+			selected = entity;
+	}
+	else if (ImGui::TreeNode(GContext->EntityManager->GetEntityName(entity).data()))
+	{
+		if (ImGui::IsItemClicked())
+			selected = entity;
+		for (auto child : children)
+		{
+			DrawTree(child, selected);
+		}
+
+		ImGui::TreePop();
+	}
+}
 
 class ImguiVisitor : public IVisitor
 {
-	std::vector<std::string> meshList; 
+	std::vector<std::string> meshList;
 	std::string meshName = ""; // Needs to be declared here to maintain state
 public:
 	ImguiVisitor()
@@ -81,7 +106,7 @@ public:
 
 	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) override
 	{
-		
+
 	}
 };
 
@@ -108,15 +133,20 @@ void ImguiRenderStage::Initialize()
 
 void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frameContext)
 {
+	uint32 count = 0;
 	auto em = EngineContext::Context->EntityManager;
 	auto cm = GContext->EntityManager->GetComponentManager();
 	auto commandList = EngineContext::Context->RendererInstance->GetDefaultCommandList();
+	const auto& camera = em->GetComponents<CameraComponent>(count)[0].CameraInstance;
 
 	ID3D12DescriptorHeap* heaps[] = { imguiHeap.pDescriptorHeap.Get() };
 	commandList->SetDescriptorHeaps(1, heaps);
 	ImGui_ImplDX12_NewFrame();
 	ImGui_ImplWin32_NewFrame();
+
 	ImGui::NewFrame();
+	ImGuizmo::SetOrthographic(camera.IsOrthographic);
+	ImGuizmo::BeginFrame();
 
 	{
 		static float f = 0.0f;
@@ -172,6 +202,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			auto entities = em->GetEntities<PositionComponent>(count);
 			for (uint32 i = 0; i < count; ++i)
 			{
+				auto children = em->GetChildren(entities[i]);
 				if (ImGui::Selectable(std::to_string(i).c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
 				{
 					selected = i;
@@ -189,11 +220,36 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			}
 		}
 
+		if (ImGui::CollapsingHeader("Entity Tree"))
+		{
+			uint32 count = 0;
+			auto entities = em->GetEntities<PositionComponent>(count);
+			static EntityHandle selected = { Handle{CRootParentEntityIndex} };
+			for (uint32 i = 0; i < count; ++i)
+			{
+				if (!em->HasValidParent(entities[i]))
+					DrawTree(entities[i], selected);
+			}
+
+			if (selected.Handle.Index != CRootParentEntityIndex)
+			{
+				uint32 selectCount;
+				auto selectedEntities = em->GetEntities<SelectedComponent>(selectCount);
+				if (selectCount > 0)
+				{
+					for (uint32 i = 0; i < selectCount; ++i)
+					{
+						em->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[i]);
+					}
+				}
+				em->AddComponent<SelectedComponent>(selected);
+			}
+		}
+
 		ImGui::End();
 		GContext->RendererInstance->SetVSync(vsync);
 	}
 
-	uint32 count = 0;
 	auto selectedEntities = em->GetEntities<SelectedComponent>(count);
 	static bool showEntity = false;
 	if (count > 0)
@@ -242,6 +298,34 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 
 		ImGui::End();
 	}
+
+	EntityHandle* entities = em->GetEntities<SelectedComponent>(count);
+	auto transform = em->GetTransform(entities[0]);
+	auto s = XMMatrixScalingFromVector(XMLoadFloat3(transform.Scale));
+	auto r = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(transform.Rotation));
+	auto t = XMMatrixTranslationFromVector(XMLoadFloat3(transform.Position));
+
+	auto srt = s * r * t;
+	XMFLOAT4X4 matrix;
+	XMStoreFloat4x4(&matrix, srt);
+
+	static const float identityMatrix[16] =
+	{ 1.f, 0.f, 0.f, 0.f,
+		0.f, 1.f, 0.f, 0.f,
+		0.f, 0.f, 1.f, 0.f,
+		0.f, 0.f, 0.f, 1.f };
+
+	ImGuizmo::SetRect(0.f, 0.f, camera.Width, camera.Height);
+
+	ImGuizmo::Enable(true);
+	static auto camProj = camera.GetProjection();
+	static auto camView = camera.GetView();
+
+	camProj = camera.GetProjection();
+	camView = camera.GetView();
+	
+	//ImGuizmo::DrawGrid(&camView.m[0][0], &camProj.m[0][0], identityMatrix, 100.f);
+	//ImGuizmo::DrawCubes(&camView.m[0][0], &camProj.m[0][0], &matrix.m[0][0], 1);
 
 
 	ImGui::Render();

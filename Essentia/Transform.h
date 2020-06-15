@@ -2,6 +2,7 @@
 #include <DirectXMath.h>
 #include "EntityBase.h"
 #include "Memory.h"
+#include "Utility.h"
 
 struct TransformRef
 {
@@ -46,12 +47,14 @@ class TransformManager
 {
 public:
 	TransformManager();
-	TransformHandle		CreateTransform(EntityHandle entity, TransformHandle parent = { -1 }, const Transform& transform = DefaultTransform);
-	void				SetLocal(EntityHandle entity, const Transform& transform);
-	EntityHandle		GetParent(EntityHandle entity);
-	DirectX::XMFLOAT4X4 GetTransposedWorldMatrix(EntityHandle entity);
-	DirectX::XMFLOAT4X4 GetWorldMatrix(EntityHandle entity);
-	const Transform		GetWorldTransform(EntityHandle entity);
+	TransformHandle			CreateTransform(EntityHandle entity, TransformHandle parent = { -1 }, const Transform& transform = DefaultTransform);
+	void					SetLocal(EntityHandle entity, const Transform& transform);
+	EntityHandle			GetParent(EntityHandle entity);
+	DirectX::XMFLOAT4X4		GetTransposedWorldMatrix(EntityHandle entity);
+	DirectX::XMFLOAT4X4		GetWorldMatrix(EntityHandle entity);
+	const Transform			GetWorldTransform(EntityHandle entity);
+	const bool				HasValidParent(EntityHandle entity);
+	Vector<EntityHandle>	GetChildren(EntityHandle entity);
 	~TransformManager();
 private:
 	void UpdateTransform(TransformHandle transform);

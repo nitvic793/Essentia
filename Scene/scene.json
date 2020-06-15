@@ -581,10 +581,13 @@
         },
         "Entities": [
             {
+                "Name": "SphereEntity",
                 "Entity": {
-                    "entity.ID": 0
+                    "entity.ID": 3
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
                     "PositionComponent",
                     "RotationComponent",
@@ -593,13 +596,13 @@
                     "SelectedComponent"
                 ],
                 "PositionComponent": {
-                    "X": 1.7056550979614258,
+                    "X": 1.9995123147964478,
                     "Y": 1.0,
                     "Z": 0.4000000059604645
                 },
                 "RotationComponent": {
                     "X": 0.0,
-                    "Y": 11.2509183883667,
+                    "Y": 0.38717806339263918,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
@@ -613,42 +616,48 @@
                 },
                 "SelectedComponent": {}
             },
-            {
-                "Entity": {
-                    "entity.ID": 1
-                },
-                "ParentIndex": -1,
-                "Components": [
-                    "PositionComponent",
-                    "RotationComponent",
-                    "ScaleComponent",
-                    "DrawableComponent"
-                ],
-                "PositionComponent": {
-                    "X": 0.0,
-                    "Y": 4.127591609954834,
-                    "Z": 5.0
-                },
-                "RotationComponent": {
-                    "X": 4.500367164611816,
-                    "Y": 4.500367164611816,
-                    "Z": 0.0
-                },
-                "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
-                },
-                "DrawableComponent": {
-                    "MeshName": "Assets/Models/cube.obj",
-                    "MaterialName": "0"
-                }
+          {
+            "Name": "CubeEntity",
+            "Entity": {
+              "entity.ID": 4
             },
+            "Parent": {
+              "entity.ID": 18446744073709551615
+            },
+            "Components": [
+              "PositionComponent",
+              "RotationComponent",
+              "ScaleComponent",
+              "DrawableComponent"
+            ],
+            "PositionComponent": {
+              "X": 0.0,
+              "Y": 5.714871406555176,
+              "Z": 5.0
+            },
+            "RotationComponent": {
+              "X": 0.15487122535705567,
+              "Y": 0.15487122535705567,
+              "Z": 0.0
+            },
+            "ScaleComponent": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            },
+            "DrawableComponent": {
+              "MeshName": "Assets/Models/cube.obj",
+              "MaterialName": "0"
+            }
+          },
             {
+                "Name": "Sponza Entity",
                 "Entity": {
-                    "entity.ID": 2
+                    "entity.ID": 5
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
                     "PositionComponent",
                     "RotationComponent",
@@ -675,10 +684,13 @@
                 }
             },
             {
+                "Name": "DirectionalLight",
                 "Entity": {
-                    "entity.ID": 3
+                    "entity.ID": 6
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
                     "PositionComponent",
                     "RotationComponent",
@@ -715,16 +727,34 @@
                 }
             },
             {
+                "Name": "PointLight1",
                 "Entity": {
-                    "entity.ID": 4
+                    "entity.ID": 7
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
-                    "PointLightComponent",
                     "PositionComponent",
                     "RotationComponent",
-                    "ScaleComponent"
+                    "ScaleComponent",
+                    "PointLightComponent"
                 ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 3.0,
+                    "Z": 6.992559432983398
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
                 "PointLightComponent": {
                     "Color": {
                         "X": 0.8999999761581421,
@@ -733,37 +763,22 @@
                     },
                     "Intensity": 2.744816780090332,
                     "Range": 8.979267120361329
-                },
-                "PositionComponent": {
-                    "X": 0.0,
-                    "Y": 3.0,
-                    "Z": -4.887777328491211
-                },
-                "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
-                    "Z": 0.0
-                },
-                "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
                 }
             },
             {
+                "Name": "Skybox",
                 "Entity": {
-                    "entity.ID": 5
+                    "entity.ID": 8
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
-                    "SkyboxComponent",
                     "PositionComponent",
                     "RotationComponent",
-                    "ScaleComponent"
+                    "ScaleComponent",
+                    "SkyboxComponent"
                 ],
-                "SkyboxComponent": {
-                    "CubeMapName": "Assets/Textures/SunnyCubeMap.dds"
-                },
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 0.0,
@@ -778,13 +793,19 @@
                     "X": 1.0,
                     "Y": 1.0,
                     "Z": 1.0
+                },
+                "SkyboxComponent": {
+                    "CubeMapName": "Assets/Textures/SunnyCubeMap.dds"
                 }
             },
             {
+                "Name": "SpotLight",
                 "Entity": {
-                    "entity.ID": 6
+                    "entity.ID": 9
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
                     "PositionComponent",
                     "RotationComponent",
@@ -815,118 +836,127 @@
                     "Intensity": 4.900000095367432,
                     "Range": 33.599998474121097,
                     "Direction": {
-                        "X": -2.799999952316284,
-                        "Y": -1.0,
-                        "Z": 3.5
+                        "X": 0.0,
+                        "Y": 0.0,
+                        "Z": 0.0
                     },
                     "SpotFalloff": 41.29999923706055
                 }
             },
+          {
+            "Name": "PointLight2",
+            "Entity": {
+              "entity.ID": 10
+            },
+            "Parent": {
+              "entity.ID": 18446744073709551615
+            },
+            "Components": [
+              "PositionComponent",
+              "RotationComponent",
+              "ScaleComponent",
+              "PointLightComponent"
+            ],
+            "PositionComponent": {
+              "X": -6.650000095367432,
+              "Y": 3.0,
+              "Z": 6.992559432983398
+            },
+            "RotationComponent": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "ScaleComponent": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            },
+            "PointLightComponent": {
+              "Color": {
+                "X": 0.7657010555267334,
+                "Y": 0.8578431606292725,
+                "Z": 0.23128125071525575
+              },
+              "Intensity": 2.744816780090332,
+              "Range": 8.979267120361329
+            }
+          },
+          {
+            "Name": "PointLight3",
+            "Entity": {
+              "entity.ID": 11
+            },
+            "Parent": {
+              "entity.ID": 18446744073709551615
+            },
+            "Components": [
+              "PositionComponent",
+              "RotationComponent",
+              "ScaleComponent",
+              "PointLightComponent"
+            ],
+            "PositionComponent": {
+              "X": -15.300000190734864,
+              "Y": 3.0,
+              "Z": 6.992559432983398
+            },
+            "RotationComponent": {
+              "X": 0.0,
+              "Y": 0.0,
+              "Z": 0.0
+            },
+            "ScaleComponent": {
+              "X": 1.0,
+              "Y": 1.0,
+              "Z": 1.0
+            },
+            "PointLightComponent": {
+              "Color": {
+                "X": 0.7657010555267334,
+                "Y": 0.5578431487083435,
+                "Z": 0.9312812685966492
+              },
+              "Intensity": 2.744816780090332,
+              "Range": 8.979267120361329
+            }
+          },
             {
+                "Name": "Camera",
                 "Entity": {
-                    "entity.ID": 7
+                    "entity.ID": 12
                 },
-                "ParentIndex": -1,
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
                 "Components": [
-                    "PointLightComponent",
                     "PositionComponent",
                     "RotationComponent",
-                    "ScaleComponent"
+                    "ScaleComponent",
+                    "CameraComponent"
                 ],
-                "PointLightComponent": {
-                    "Color": {
-                        "X": 0.7657010555267334,
-                        "Y": 0.8578431606292725,
-                        "Z": 0.23128125071525575
-                    },
-                    "Intensity": 2.744816780090332,
-                    "Range": 8.979267120361329
-                },
                 "PositionComponent": {
-                    "X": -6.650000095367432,
-                    "Y": 3.0,
-                    "Z": -4.887777328491211
+                    "X": -13.46590805053711,
+                    "Y": 8.35941219329834,
+                    "Z": 1.492830514907837
                 },
                 "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
+                    "X": 0.40500035881996157,
+                    "Y": 1.5199987888336182,
                     "Z": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
                     "Y": 1.0,
                     "Z": 1.0
-                }
-            },
-            {
-                "Entity": {
-                    "entity.ID": 8
                 },
-                "ParentIndex": -1,
-                "Components": [
-                    "PointLightComponent",
-                    "PositionComponent",
-                    "RotationComponent",
-                    "ScaleComponent"
-                ],
-                "PointLightComponent": {
-                    "Color": {
-                        "X": 0.7657010555267334,
-                        "Y": 0.5578431487083435,
-                        "Z": 0.9312812685966492
-                    },
-                    "Intensity": 2.744816780090332,
-                    "Range": 8.979267120361329
-                },
-                "PositionComponent": {
-                    "X": -15.300000190734864,
-                    "Y": 3.0,
-                    "Z": -4.887777328491211
-                },
-                "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
-                    "Z": 0.0
-                },
-                "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
-                }
-            },
-            {
-                "Entity": {
-                    "entity.ID": 9
-                },
-                "ParentIndex": -1,
-                "Components": [
-                    "CameraComponent",
-                    "PositionComponent",
-                    "RotationComponent",
-                    "ScaleComponent"
-                ],
                 "CameraComponent": {
                     "CameraInstance.Width": 1920.0,
                     "CameraInstance.Height": 1080.0,
-                    "CameraInstance.NearZ": 0.1,
+                    "CameraInstance.NearZ": 0.10000000149011612,
                     "CameraInstance.FarZ": 300.0,
                     "CameraInstance.FieldOfView": 45.0,
                     "CameraInstance.IsOrthographic": false
-                },
-                "PositionComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
-                    "Z": -5.0
-                },
-                "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
-                    "Z": 0.0
-                },
-                "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
                 }
             }
         ]

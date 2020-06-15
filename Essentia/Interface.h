@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cereal/types/vector.hpp>
 #include <cereal/types/map.hpp>
+#include <cereal/types/string.hpp>
 #include <cereal/archives/json.hpp>
 #include <fstream>
 #include <unordered_map>
@@ -29,8 +30,9 @@ struct MeshInterface
 
 struct EntityInterface
 {
+	std::string					Name;
 	EntityHandle				Entity;
-	int32						ParentIndex = -1;
+	EntityHandle				Parent;
 	std::vector<std::string>	Components;
 
 	template<typename Archive>
@@ -38,11 +40,15 @@ struct EntityInterface
 	{
 		auto ec = EngineContext::Context;
 		auto componentManager = ec->EntityManager->GetComponentManager();
+		auto name = ec->EntityManager->GetEntityName(Entity);
+		auto parent = ec->EntityManager->GetParent(Entity);
 		archive(
+			CEREAL_NVP(Name),
 			CEREAL_NVP(Entity),
-			CEREAL_NVP(ParentIndex),
+			cereal::make_nvp("Parent", parent),
 			CEREAL_NVP(Components)
 		);
+
 		for (auto component : Components)
 		{
 			auto pool = componentManager->GetPool(component.c_str());
@@ -55,8 +61,14 @@ struct EntityInterface
 	{
 		auto ec = EngineContext::Context;
 		auto componentManager = ec->EntityManager->GetComponentManager();
-		archive(CEREAL_NVP(Entity), CEREAL_NVP(Components));
-		Entity = ec->EntityManager->CreateEntity();
+		archive(
+			CEREAL_NVP(Name),
+			CEREAL_NVP(Entity),
+			CEREAL_NVP(Parent),
+			CEREAL_NVP(Components)
+		);
+
+		Entity = ec->EntityManager->CreateEntity(DefaultTransform, Parent.Handle.Index, Name);
 		for (auto component : Components)
 		{
 			auto pool = componentManager->GetPool(component.c_str());

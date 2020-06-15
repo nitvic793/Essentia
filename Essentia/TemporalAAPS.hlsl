@@ -13,6 +13,7 @@ cbuffer TemporalAAParams : register(b0)
 Texture2D<float4>		InputTexture		: register(t0);
 Texture2D<float4>		PrevFrameTexture	: register(t1);
 Texture2D<float4>		VelocityTexture		: register(t2);
+
 SamplerState			BasicSampler		: register(s0);
 SamplerState			LinearWrapSampler	: register(s1);
 
@@ -44,7 +45,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float2 histUv = input.uv + vel.xy;
     float3 histSample = clamp(PrevFrameTexture.Sample(LinearWrapSampler, histUv).xyz, nmin, nmax);
 	float blend = 0.05;
-
+	
 	bool a = (bool)(histUv > float2(1.0, 1.0));
 	bool b = (bool)(histUv < float2(0.0, 0.0));
 	blend = any(bool2(any(a), any(b))) ? 1.0 : blend;

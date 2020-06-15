@@ -8,6 +8,7 @@ using namespace DirectX;
 
 void DebugDrawStage::Initialize()
 {
+	cubeMesh = GContext->MeshManager->GetMeshView("Assets/Models/cube.obj");
 	GRenderStageManager.RegisterStage("DebugDrawStage", this);
 }
 
@@ -30,6 +31,7 @@ void DebugDrawStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 		auto drawable = frameContext.EntityManager->GetComponent<DrawableComponent>(entities[i]);
 		if (drawable)
 		{
+			GContext->MeshManager->GetBoundingBox(drawable->Mesh);
 			renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
 			renderer->DrawMesh(commandList, drawable->Mesh);
 		}

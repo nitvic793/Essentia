@@ -2,6 +2,8 @@
 #include "Transform.h"
 #include "Memory.h"
 
+constexpr int32 CRootNode = -1;
+
 using namespace DirectX;
 
 XMFLOAT4X4 GetTransformMatrix(const XMFLOAT4X4& local, const XMFLOAT4X4& parent)
@@ -94,6 +96,34 @@ const Transform TransformManager::GetWorldTransform(EntityHandle entity)
 	return outTransform;
 }
 
+const bool TransformManager::HasValidParent(EntityHandle entity)
+{
+	return transforms.Parent[entity.Handle.Index].Index != CRootNode;
+}
+
+Vector<EntityHandle> TransformManager::GetChildren(EntityHandle entity)
+{
+	uint32 childrenCount = 0;
+	for (uint32 i = 0; i < CMaxInitialEntityCount; ++i)
+	{
+		if (transforms.Parent[i].Index == entity.Handle.Index)
+		{
+			childrenCount++;
+		}
+	}
+
+	Vector<EntityHandle> children(childrenCount, Mem::GetFrameAllocator());
+	for (uint32 i = 0; i < CMaxInitialEntityCount; ++i)
+	{
+		if (transforms.Parent[i].Index == entity.Handle.Index)
+		{
+			children.Push(transforms.Entity[i]);
+		}
+	}
+
+	return children;
+}
+
 TransformManager::~TransformManager()
 {
 	CleanUp();
@@ -117,11 +147,16 @@ void TransformManager::Allocate(uint32 count)
 {
 	size_t totalSize = (size_t)count * (sizeof(XMFLOAT4X4) + sizeof(XMFLOAT4X4) + sizeof(TransformHandle) + sizeof(EntityHandle));
 	transforms.Buffer = (byte*)Mem::Alloc(totalSize);
+	memset(transforms.Buffer, 0, totalSize);
 	transforms.World = (XMFLOAT4X4*)transforms.Buffer;
 	transforms.Local = (XMFLOAT4X4*)(transforms.World + count);
 	transforms.Parent = (TransformHandle*)(transforms.Local + count);
 	transforms.Entity = (EntityHandle*)(transforms.Parent + count);
 	transforms.Capacity = count;
+	for (uint32 i = 0; i < count; ++i)
+	{
+		transforms.Parent[i].Index = CRootNode;
+	}
 }
 
 void TransformManager::CleanUp()

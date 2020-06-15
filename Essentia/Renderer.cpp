@@ -153,10 +153,9 @@ void Renderer::Initialize()
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<ImguiRenderStage>()));
 
 	postProcessStages.Reserve(32);
+	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessTemporalAA>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<ApplyVolumetricFog>()));
-	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<VelocityBufferStage>()));
-	
 
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessMotionBlur>()));
 	postProcessStages.Push(ScopedPtr<IPostProcessStage>((IPostProcessStage*)Mem::Alloc<PostProcessDepthOfFieldStage>()));
@@ -318,14 +317,14 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto voxelData = CreateVoxelParams(camera, CVoxelSize);
 	if (XMVector3Equal(XMLoadFloat3(&voxelData.VoxelGridCenter), (XMLoadFloat3(&GSceneResources.FrameData.VoxelData.VoxelGridCenter))))
 	{
-		renderStageMap["VoxelizationStage"]->Enabled = false;
-		renderStageMap["VoxelMipGenStage"]->Enabled = false;
+		//renderStageMap["VoxelizationStage"]->Enabled = true;
+		//renderStageMap["VoxelMipGenStage"]->Enabled = true;
 		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = false;
 	}
 	else
 	{
-		renderStageMap["VoxelizationStage"]->Enabled = true;
-		renderStageMap["VoxelMipGenStage"]->Enabled = true;
+		//renderStageMap["VoxelizationStage"]->Enabled = true;
+		//renderStageMap["VoxelMipGenStage"]->Enabled = true;
 		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = true;
 	}
 

@@ -22,7 +22,7 @@ void EntityManager::Initialize(IAllocator* allocator)
 //	return CreateEntity(transform, parent.Handle.Index);
 //}
 
-EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 parentIndex)
+EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 parentIndex, std::string_view entityName)
 {
 	HandleType handle;
 	if (freeIndices.size() > 0)
@@ -57,6 +57,21 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 pare
 	componentManager.AddComponent<PositionComponent>(entity, position);
 	componentManager.AddComponent<RotationComponent>(entity, rotation);
 	componentManager.AddComponent<ScaleComponent>(entity, scale);
+
+	std::string name;
+	if (entityName == "")
+	{
+		std::stringstream ss;
+		ss << "Entity ";
+		ss << std::to_string(entity.Handle.Index);
+		name = ss.str();
+	}
+	else
+	{
+		name = entityName;
+	}
+
+	entityNames.push_back(name);
 	return entity;
 }
 
@@ -72,6 +87,11 @@ void EntityManager::Destroy(EntityHandle handle)
 	freeIndices.push_back(index);
 }
 
+bool EntityManager::HasValidParent(EntityHandle handle)
+{
+	return transformManager.HasValidParent(handle);
+}
+
 ComponentManager* EntityManager::GetComponentManager()
 {
 	return &componentManager;
@@ -80,6 +100,16 @@ ComponentManager* EntityManager::GetComponentManager()
 EntityHandle EntityManager::GetParent(EntityHandle entity)
 {
 	return transformManager.GetParent(entity);
+}
+
+Vector<EntityHandle> EntityManager::GetChildren(EntityHandle entity)
+{
+	return transformManager.GetChildren(entity);
+}
+
+std::string_view EntityManager::GetEntityName(EntityHandle entity)
+{
+	return entityNames[entity.Handle.Index];
 }
 
 Vector<IComponent*> EntityManager::GetEntityComponents(EntityHandle handle)
@@ -99,9 +129,9 @@ TransformRef EntityManager::GetTransform(EntityHandle handle)
 	auto scale = componentManager.GetComponent<ScaleComponent>(handle);
 
 	TransformRef ref = {};
-	ref.Position = (DirectX::XMFLOAT3*)&pos->X;
-	ref.Rotation = (DirectX::XMFLOAT3*)&rot->X;
-	ref.Scale = (DirectX::XMFLOAT3*)&scale->X;
+	ref.Position = (DirectX::XMFLOAT3*) & pos->X;
+	ref.Rotation = (DirectX::XMFLOAT3*) & rot->X;
+	ref.Scale = (DirectX::XMFLOAT3*) & scale->X;
 	return ref;
 }
 
