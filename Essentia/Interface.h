@@ -43,7 +43,7 @@ struct EntityInterface
 		auto name = ec->EntityManager->GetEntityName(Entity);
 		auto parent = ec->EntityManager->GetParent(Entity);
 		archive(
-			CEREAL_NVP(Name),
+			cereal::make_nvp("Name", std::string(name)),
 			CEREAL_NVP(Entity),
 			cereal::make_nvp("Parent", parent),
 			CEREAL_NVP(Components)

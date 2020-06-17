@@ -4,6 +4,7 @@
 #include "System.h"
 #include "Engine.h"
 #include "imgui.h"
+#include "ImGuizmo.h"
 #include "Serialization.h"
 #include "Renderer.h"
 
@@ -130,7 +131,7 @@ public:
 #ifdef EDITOR
 		auto stages = GRenderStageManager.GetRenderStageMap();
 		ImGuiIO& io = ImGui::GetIO();
-		debugNav = io.NavActive && stages["ImguiRenderStage"]->Enabled;
+		debugNav = (io.NavActive || ImGuizmo::IsUsing()) && stages["ImguiRenderStage"]->Enabled;
 #else
 		debugNav = false;
 #endif

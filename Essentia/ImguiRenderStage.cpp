@@ -16,6 +16,8 @@ using namespace DirectX;
 void DrawTree(EntityHandle entity, EntityHandle& selected)
 {
 	ImGuiTreeNodeFlags treeNodeFlags = 0;
+	if (entity.ID == selected.ID)
+		treeNodeFlags |= ImGuiTreeNodeFlags_::ImGuiTreeNodeFlags_Selected;
 	auto children = GContext->EntityManager->GetChildren(entity);
 	if (children.size() == 0)
 	{
@@ -323,10 +325,74 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 
 	camProj = camera.GetProjection();
 	camView = camera.GetView();
-	
+
+	ImGui::Begin("Manipulate");
 	//ImGuizmo::DrawGrid(&camView.m[0][0], &camProj.m[0][0], identityMatrix, 100.f);
 	//ImGuizmo::DrawCubes(&camView.m[0][0], &camProj.m[0][0], &matrix.m[0][0], 1);
+	static ImGuizmo::OPERATION currentGizmoOperation(ImGuizmo::TRANSLATE);
+	static ImGuizmo::MODE currentGizmoMode(ImGuizmo::WORLD);
+	if (ImGui::IsKeyPressed(90))
+		currentGizmoOperation = ImGuizmo::TRANSLATE;
+	if (ImGui::IsKeyPressed(69))
+		currentGizmoOperation = ImGuizmo::ROTATE;
+	if (ImGui::IsKeyPressed(82)) // r Key
+		currentGizmoOperation = ImGuizmo::SCALE;
+	if (ImGui::RadioButton("Translate", currentGizmoOperation == ImGuizmo::TRANSLATE))
+		currentGizmoOperation = ImGuizmo::TRANSLATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Rotate", currentGizmoOperation == ImGuizmo::ROTATE))
+		currentGizmoOperation = ImGuizmo::ROTATE;
+	ImGui::SameLine();
+	if (ImGui::RadioButton("Scale", currentGizmoOperation == ImGuizmo::SCALE))
+		currentGizmoOperation = ImGuizmo::SCALE;
 
+	if (currentGizmoOperation != ImGuizmo::SCALE)
+	{
+		if (ImGui::RadioButton("Local", currentGizmoMode == ImGuizmo::LOCAL))
+			currentGizmoMode = ImGuizmo::LOCAL;
+		ImGui::SameLine();
+		if (ImGui::RadioButton("World", currentGizmoMode == ImGuizmo::WORLD))
+			currentGizmoMode = ImGuizmo::WORLD;
+	}
+
+	static bool useSnap(false);
+	if (ImGui::IsKeyPressed(83))
+		useSnap = !useSnap;
+	ImGui::Checkbox("", &useSnap);
+	ImGui::SameLine();
+	static XMFLOAT3 snapConfig(1.f, 1.f, 1.f);
+	XMFLOAT3 snap;
+	switch (currentGizmoOperation)
+	{
+	case ImGuizmo::TRANSLATE:
+		snap = snapConfig;
+		ImGui::InputFloat3("Snap", &snap.x);
+		break;
+	case ImGuizmo::ROTATE:
+		snap = snapConfig;
+		ImGui::InputFloat("Angle Snap", &snap.x);
+		break;
+	case ImGuizmo::SCALE:
+		snap = snapConfig;
+		ImGui::InputFloat("Scale Snap", &snap.x);
+		break;
+	}
+
+	ImGui::End();
+	ImGuizmo::Manipulate(&camView.m[0][0], &camProj.m[0][0], currentGizmoOperation, currentGizmoMode, &matrix.m[0][0], NULL, useSnap ? &snap.x : NULL);
+
+	XMVECTOR scale;
+	XMVECTOR rotation;
+	XMVECTOR translation;
+	XMMatrixDecompose(&scale, &rotation, &translation, XMLoadFloat4x4(&matrix));
+	XMFLOAT4 F;
+	XMStoreFloat3(transform.Position, translation);
+	XMStoreFloat3(transform.Scale, scale);
+	XMStoreFloat4(&F, rotation);
+
+	//transform.Rotation->x = atan2(2.0 * (F.x * F.y + F.z * F.w), 1 - 2 * (F.y * F.y + F.z * F.z)); //roll
+	//transform.Rotation->y = asin(2.0 * (F.x * F.z - F.w * F.y)); //pitch
+	//transform.Rotation->z = atan2(2.0 * (F.x * F.w + F.y * F.z), 1 - 2 * (F.y * F.y + F.z * F.z)); //yaw
 
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);
