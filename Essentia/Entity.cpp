@@ -9,6 +9,7 @@ EntityManager::EntityManager()
 {
 	freeIndices.reserve(CMaxInitialEntityCount);
 	generations.reserve(CMaxInitialEntityCount);
+	entityNames.resize(CMaxInitialEntityCount);
 }
 
 void EntityManager::Initialize(IAllocator* allocator)
@@ -36,8 +37,21 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 pare
 		handle.Index = (uint32)(generations.size() - 1);
 	}
 
-	handle.Version = generations[handle.Index];
+	std::string name;
+	if (entityName == "")
+	{
+		std::stringstream ss;
+		ss << "Entity ";
+		ss << std::to_string(handle.Index);
+		name = ss.str();
+	}
+	else
+	{
+		name = entityName;
+	}
 
+	entityNames[handle.Index] = name;
+	handle.Version = generations[handle.Index];
 	TransformHandle parentTransform = { -1 };
 
 	if (parentIndex != CRootParentEntityIndex)
@@ -58,20 +72,7 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 pare
 	componentManager.AddComponent<RotationComponent>(entity, rotation);
 	componentManager.AddComponent<ScaleComponent>(entity, scale);
 
-	std::string name;
-	if (entityName == "")
-	{
-		std::stringstream ss;
-		ss << "Entity ";
-		ss << std::to_string(entity.Handle.Index);
-		name = ss.str();
-	}
-	else
-	{
-		name = entityName;
-	}
 
-	entityNames.push_back(name);
 	return entity;
 }
 
