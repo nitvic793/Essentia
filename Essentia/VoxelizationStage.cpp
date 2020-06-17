@@ -75,8 +75,8 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	D3D12_RECT scissorRect = {};
 	scissorRect.left = 0;
 	scissorRect.top = 0;
-	scissorRect.right = sz.Width;
-	scissorRect.bottom = sz.Height;
+	scissorRect.right = CVoxelSize;
+	scissorRect.bottom = CVoxelSize;
 
 	TransitionDesc transitions[] = {
 		//{ GSceneResources.VoxelRadiance.VoxelGridRawResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_UNORDERED_ACCESS }

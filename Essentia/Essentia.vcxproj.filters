@@ -97,6 +97,9 @@
     <Filter Include="Imguizmo">
       <UniqueIdentifier>{d4732730-975d-461e-81f6-4bec127c2664}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\Wireframe">
+      <UniqueIdentifier>{cb6e092f-52d0-47a1-856d-beec3c90edbc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -620,14 +623,14 @@
     <FxCompile Include="VoxelCopyCS.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="WireframeVS.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
     <FxCompile Include="WireframeGS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Wireframe</Filter>
     </FxCompile>
     <FxCompile Include="WireframePS.hlsl">
-      <Filter>Shaders</Filter>
+      <Filter>Shaders\Wireframe</Filter>
+    </FxCompile>
+    <FxCompile Include="WireframeVS.hlsl">
+      <Filter>Shaders\Wireframe</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
