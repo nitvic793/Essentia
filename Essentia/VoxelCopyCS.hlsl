@@ -1,29 +1,32 @@
 #include "FrameCommon.hlsli"
 
-// flattened array index to 3D array index
-inline uint3 unflatten3D(uint idx, uint3 dim)
+
+cbuffer FrameDataBuffer : register(b0)
 {
-    const uint z = idx / (dim.x * dim.y);
-    idx -= (z * dim.x * dim.y);
-    const uint y = idx / dim.x;
-    const uint x = idx % dim.x;
-    return uint3(x, y, z);
+    PerFrameData FrameData;
 }
 
 //Texture3D<float4> InputVoxel : register(t0);
-RWTexture3D<float4> OutputVoxel : register(u0);
+RWStructuredBuffer<VoxelType> InputVoxel : register(u0);
+RWTexture3D<float4> OutputVoxel : register(u1);
 
 static const uint CBlockSize = 4;
 
 [numthreads(CBlockSize, CBlockSize, CBlockSize)]
 void main(uint3 DTid : SV_DispatchThreadID)
 {
-    //const float4 input = InputVoxel[DTid];
-    //const float4 color = DecodeColor(input.x);
-    //const float3 normal = DecodeNormal(input.y);
+    uint id = Flatten3D(DTid, FrameData.VoxelData.VoxelRadianceDataRes);
+    const VoxelType input = InputVoxel[id];
     
-    //float hasColor = float(input.a > 0);
+    const float4 color = DecodeColor(input.ColorMask);
+    const float3 normal = DecodeNormal(input.NormalMask);
+    
+    int hasColor = (color.a > 0.f);
     //float3 currentColor = OutputVoxel[DTid].rgb;
     //float3 resultColor = lerp(currentColor, input.rgb, 0.2f) * hasColor;
-    //OutputVoxel[DTid] = float4(input.rgb, 1.f);
+    //float4 currentColor = OutputVoxel.Load(int4(DTid.xyz, 0));
+    float3 result = color.rgb;//lerp(currentColor.rgb, color.rgb, 0.2f);
+    
+    OutputVoxel[DTid] = float4(result, 1.f) * hasColor;
+    InputVoxel[id].ColorMask = 0;
 }

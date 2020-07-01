@@ -296,7 +296,7 @@ TextureID ShaderResourceManager::CreateTextureUAV(ResourceID resourceId)
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 	desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
-	desc.Format = desc.Format;
+	desc.Format = rDesc.Format;
 	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
 	
 	textureMap[stringId] = texIndex;
@@ -315,11 +315,33 @@ TextureID ShaderResourceManager::CreateTexture3DUAV(ResourceID resourceId, uint3
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 	desc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
-	desc.Format = desc.Format;
+	desc.Format = rDesc.Format;
 	desc.Texture3D.MipSlice = mipSlice;
 	desc.Texture3D.WSize = depthSlices;
+	desc.Texture3D.FirstWSlice = 0;
 	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
 	
+	textureMap[stringId] = texIndex;
+	textureResources.push_back(resource);
+	textureNameMap[texIndex] = texName;
+	return texIndex;
+}
+
+TextureID ShaderResourceManager::CreateStructuredBufferUAV(ResourceID resourceId, uint32 stride)
+{
+	auto texName = std::to_string(textureCount);
+	auto stringId = String::ID(texName.c_str());
+	auto resource = GContext->ResourceManager->GetResource(resourceId);
+	auto rDesc = resource->GetDesc();
+	auto texIndex = GetNextTextureIndex();
+
+	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
+	desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+	desc.Buffer.NumElements = rDesc.Width / stride;
+	desc.Buffer.StructureByteStride = stride;
+	desc.Buffer.FirstElement = 0;
+	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
+
 	textureMap[stringId] = texIndex;
 	textureResources.push_back(resource);
 	textureNameMap[texIndex] = texName;

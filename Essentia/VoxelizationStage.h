@@ -26,7 +26,7 @@ static const VoxelParams CreateVoxelParams(const Camera& camera, uint32 voxelSiz
 
 	output.VoxelGridCenter = center;
 	output.VoxelRadianceNumCones = 2;
-	output.VoxelRadianceMaxDistance = 50.f;
+	output.VoxelRadianceMaxDistance = 100.f;
 	output.VoxelRadianceRayStepSize = 0.75f;
 	output.VoxelRadianceNumConesRCP = 1.f / (float)output.VoxelRadianceNumCones;
 	output.VoxelRadianceMips = CVoxelGridMips;

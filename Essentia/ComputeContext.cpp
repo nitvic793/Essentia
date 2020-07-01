@@ -8,7 +8,7 @@ RootSignatureID CreateComputeRootSignature()
 
 	CD3DX12_DESCRIPTOR_RANGE range[3];
 	range[0].Init(D3D12_DESCRIPTOR_RANGE_TYPE_CBV, 1, 0);
-	range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 1, 0);
+	range[1].Init(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 4, 0);
 	range[2].Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 
 	CD3DX12_ROOT_PARAMETER rootParameters[3];

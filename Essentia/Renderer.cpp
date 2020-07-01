@@ -323,8 +323,8 @@ void Renderer::Render(const FrameContext& frameContext)
 	auto voxelData = CreateVoxelParams(camera, CVoxelSize);
 	if (XMVector3Equal(XMLoadFloat3(&voxelData.VoxelGridCenter), (XMLoadFloat3(&GSceneResources.FrameData.VoxelData.VoxelGridCenter))))
 	{
-		//renderStageMap["VoxelizationStage"]->Enabled = true;
-		//renderStageMap["VoxelMipGenStage"]->Enabled = true;
+		//renderStageMap["VoxelizationStage"]->Enabled = false;
+		//renderStageMap["VoxelMipGenStage"]->Enabled = false;
 		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = false;
 	}
 	else

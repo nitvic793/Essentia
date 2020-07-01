@@ -6,6 +6,7 @@
 
 void VoxelRadiancePostProcess::Initialize()
 {
+	GRenderStageManager.RegisterStage("VoxelRadiancePostProcess", this);
 }
 
 void VoxelRadiancePostProcess::Render(const uint32 frameIndex, const FrameContext& frameContext)
@@ -26,10 +27,13 @@ void VoxelRadiancePostProcess::Render(const uint32 frameIndex, const FrameContex
 	//renderer->TransitionBarrier(computeCList, transitions, _countof(transitions));
 
 	uint32 voxelDispatchSize = CVoxelSize;
-
+	
 	computeCList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.VoxelCopyPSO));
-	renderer->SetComputeShaderResourceView(computeCList, RootSigComputeSRV, GSceneResources.VoxelGridSRV); 
-	renderer->SetComputeShaderResourceView(computeCList, RootSigComputeUAV, GSceneResources.VoxelRadiance.VoxelGridUAV);
+	//renderer->SetComputeShaderResourceView(computeCList, RootSigComputeSRV, GSceneResources.VoxelGridSRV); 
+
+	renderer->SetComputeConstantBufferView(computeCList, RootSigComputeCB, GSceneResources.FrameDataCBV);
+	TextureID textures[] = { GSceneResources.VoxelRadiance.VoxelGridRawUAV, GSceneResources.VoxelRadiance.VoxelGridUAV };
+	renderer->SetComputeShaderResourceViews(computeCList, RootSigComputeUAV, textures, _countof(textures));
 	computeCList->Dispatch(voxelDispatchSize, voxelDispatchSize, voxelDispatchSize);
 
 

@@ -240,10 +240,10 @@ void PipelineStates::CreateVoxelizePSO()
 
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	psoDesc.RasterizerState.FrontCounterClockwise = true;
-	psoDesc.RasterizerState.ForcedSampleCount = 0;
+	psoDesc.RasterizerState.ForcedSampleCount = 8;
 	psoDesc.RasterizerState.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_ON;
 	psoDesc.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-	psoDesc.RasterizerState.DepthClipEnable = true;
+	psoDesc.RasterizerState.DepthClipEnable = false;
 	psoDesc.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);

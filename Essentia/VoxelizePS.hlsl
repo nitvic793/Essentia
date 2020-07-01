@@ -21,7 +21,8 @@ cbuffer ShadowBuffer : register(b1)
     float4x4 ShadowProjection;
 }
 
-RWTexture3D<unorm float4> VoxelGrid : register(u0);
+RWStructuredBuffer<VoxelType> VoxelGrid : register(u0);
+//RWTexture3D<unorm float4> VoxelGrid : register(u0);
 Texture2D AlbedoTexture : register(t0);
 
 Texture2D ShadowMapDirLight : register(t8);
@@ -47,10 +48,7 @@ float3 ScaleAndBias(float3 p)
 
 void main(GSOutput input) //: SV_TARGET
 {
-    uint3 dim;
-    VoxelGrid.GetDimensions(dim.x, dim.y, dim.z);
-    VoxelGrid[uint3(1, 1, 1)] = float4(1.f.xxxx);
-    
+   
     float3 diff = (input.WorldPos - VoxelGridCenter) * VoxelRadianceDataResRCP * VoxelRadianceDataSizeRCP;
     float3 uvw = diff * float3(0.5f, -0.5f, 0.5f) + 0.5f;
     uint3 writecoord = floor(uvw * VoxelRadianceDataRes);
@@ -69,6 +67,11 @@ void main(GSOutput input) //: SV_TARGET
     //}
     
     float4 result = float4(dirLight + pointLight, 1.f);
-
-    VoxelGrid[writecoord] = result;
+    uint id = Flatten3D(writecoord, VoxelRadianceDataRes);
+    uint colorEncoded = EncodeColor(result);
+    uint normalEncoded = EncodeNormal(normal);
+    
+    InterlockedMax(VoxelGrid[id].ColorMask, colorEncoded);
+    InterlockedMax(VoxelGrid[id].NormalMask, normalEncoded);
+    //VoxelGrid[writecoord] = result;
 }

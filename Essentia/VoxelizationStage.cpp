@@ -23,16 +23,24 @@ void VoxelizationStage::Initialize()
 	props.Height = voxelGridSize;
 	props.MipLevels = CVoxelGridMips;
 
+	ResourceID voxelGridRawResource;
+	uint32 structureBufferStride = sizeof(uint32) * 2;
+	voxelGridRawResource = GContext->ResourceManager->CreateResource(
+		CD3DX12_RESOURCE_DESC::Buffer((uint64)voxelGridSize * voxelGridSize * voxelGridSize * structureBufferStride, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS),
+		nullptr, D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+
+
 	voxelGrid3dTextureSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 	voxelGrid3dTextureUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridResource, voxelGridSize);
+
 	GSceneResources.VoxelGridSRV = voxelGrid3dTextureSRV;
 	GSceneResources.VoxelGridResource = voxelGridResource;
 	GSceneResources.VoxelRadiance.VoxelGridUAV = voxelGrid3dTextureUAV;
 
 	props.MipLevels = 1;
-	ResourceID voxelGridRawResource;
-	GSceneResources.VoxelRadiance.VoxelGridRawSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridRawResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
-	GSceneResources.VoxelRadiance.VoxelGridRawUAV = shaderResourceManager->CreateTexture3DUAV(voxelGridRawResource, voxelGridSize);
+	
+	//GSceneResources.VoxelRadiance.VoxelGridRawSRV = shaderResourceManager->CreateTexture3D(props, &voxelGridRawResource, nullptr, D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
+	GSceneResources.VoxelRadiance.VoxelGridRawUAV = shaderResourceManager->CreateStructuredBufferUAV(voxelGridRawResource, structureBufferStride);
 	GSceneResources.VoxelRadiance.VoxelGridRawResource = voxelGridRawResource;
 
 	voxelParamsCBV = shaderResourceManager->CreateCBV(sizeof(VoxelParams));
@@ -96,15 +104,15 @@ void VoxelizationStage::Render(const uint32 frameIndex, const FrameContext& fram
 	//	srManager->GetTextureCPUHandle(GSceneResources.VoxelRadiance.VoxelGridRawUAV),
 	//	resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
 
-	commandList->ClearUnorderedAccessViewFloat(
-		renderer->GetTextureGPUHandle(GSceneResources.VoxelRadiance.VoxelGridUAV),
-		srManager->GetTextureCPUHandle(GSceneResources.VoxelRadiance.VoxelGridUAV),
-		resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
+	//commandList->ClearUnorderedAccessViewFloat(
+	//	renderer->GetTextureGPUHandle(GSceneResources.VoxelRadiance.VoxelGridUAV),
+	//	srManager->GetTextureCPUHandle(GSceneResources.VoxelRadiance.VoxelGridUAV),
+	//	resourceManager->GetResource(voxelGridResource), clearColor, 0, nullptr);
 
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.ShadowCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, voxelParamsCBV);
-	renderer->SetShaderResourceView(commandList, RootSigUAV0, GSceneResources.VoxelRadiance.VoxelGridUAV);
-	//renderer->SetShaderResourceView(commandList, RootSigUAV0, GSceneResources.VoxelRadiance.VoxelGridRawUAV);
+	//renderer->SetShaderResourceView(commandList, RootSigUAV0, GSceneResources.VoxelRadiance.VoxelGridUAV);
+	renderer->SetShaderResourceView(commandList, RootSigUAV0, GSceneResources.VoxelRadiance.VoxelGridRawUAV);
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
 	renderer->SetShaderResourceView(commandList, RootSigSRVPixel2, GSceneResources.ShadowDepthTarget.Texture);
 

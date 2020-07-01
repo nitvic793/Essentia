@@ -81,6 +81,7 @@ public:
 		D3D12_RESOURCE_STATES initialState = D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 	TextureID					CreateTextureUAV(ResourceID resourceId);
 	TextureID					CreateTexture3DUAV(ResourceID resourceId, uint32 depthSlices = 1, uint32 mipSlice = 0);
+	TextureID					CreateStructuredBufferUAV(ResourceID resourceId, uint32 stride);
 	MaterialHandle				CreateMaterial(TextureID* textures, uint32 textureCount, PipelineStateID psoID, Material& outMaterial, const char* name = nullptr);
 
 	void						CopyTexturesToHeap(TextureID* textures, uint32 textureCount, const DescriptorHeap& heap);
