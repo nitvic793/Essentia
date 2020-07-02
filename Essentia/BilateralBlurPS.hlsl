@@ -14,7 +14,7 @@ cbuffer BilaterBlurParams : register(b0)
 Texture2D<float4> DepthTexture : register(t0);
 Texture2D<float4> LightAccumTexture : register(t1);
 SamplerState BasicSampler : register(s0);
-SamplerState LinearWrapSampler : register(s1);
+SamplerState LinearWrapSampler : register(s2);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {

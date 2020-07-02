@@ -1,7 +1,7 @@
 
 TextureCube		Sky					: register(t0);
 SamplerState	BasicSampler		: register(s0);
-SamplerState	LinearWrapSampler	: register(s0);
+SamplerState	LinearWrapSampler	: register(s2);
 
 struct VertexToPixelSky
 {

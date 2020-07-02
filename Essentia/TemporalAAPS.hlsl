@@ -15,7 +15,7 @@ Texture2D<float4>		PrevFrameTexture	: register(t1);
 Texture2D<float4>		VelocityTexture		: register(t2);
 
 SamplerState			BasicSampler		: register(s0);
-SamplerState			LinearWrapSampler	: register(s1);
+SamplerState			LinearWrapSampler	: register(s2);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {

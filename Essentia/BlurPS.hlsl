@@ -17,8 +17,9 @@ static const float offset[] = { 0.0, 1.0, 2.0, 3.0, 4.0, 5.0 };
 Texture2D			InputTexture : register(t0);
 Texture2D<float>	DepthTexture : register(t1);
 SamplerState		BasicSampler : register(s0);
-SamplerState		LinearWrapSampler : register(s1);
-SamplerState		PontClampSampler : register(s2);
+SamplerState		LinearWrapSampler : register(s2);
+SamplerState		PontClampSampler : register(s3);
+SamplerState		LinearClampSampler : register(s4);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
@@ -33,7 +34,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	kernel[0] = 0.13425804976814;
 	float2 dir = Direction;
 
-    float3 texColor = InputTexture.Sample(LinearWrapSampler, input.uv).rgb;
+    float3 texColor = InputTexture.Sample(LinearClampSampler, input.uv).rgb;
 	float3 color = float3(0.f, 0.f, 0.f);
 	float hstep = dir.x / Width;
 	float vstep = dir.y / Height;
@@ -44,8 +45,8 @@ float4 main(VertexToPixel input) : SV_TARGET
 		float2 step = texelSize * offset[i];
 		float2 luv = clamp(input.uv + step, float2(0.f, 0.f), float2(1.f, 1.f));
 		float2 ruv = clamp(input.uv - step, float2(0.f, 0.f), float2(1.f, 1.f));
-        float3 lColor = InputTexture.Sample(LinearWrapSampler, luv).rgb * kernel[i];
-        float3 rColor = InputTexture.Sample(LinearWrapSampler, ruv).rgb * kernel[i];
+        float3 lColor = InputTexture.Sample(LinearClampSampler, luv).rgb * kernel[i];
+        float3 rColor = InputTexture.Sample(LinearClampSampler, ruv).rgb * kernel[i];
 		color = color + (lColor + rColor);
 	}
 

@@ -7,7 +7,7 @@ struct VertexToPixel
 
 Texture2D<float4>		InputTexture		: register(t0);
 SamplerState			BasicSampler		: register(s0);
-SamplerState			LinearWrapSampler	: register(s1);
+SamplerState			LinearWrapSampler	: register(s2);
 
 // linear white point
 static const float W = 1.2;

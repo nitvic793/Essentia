@@ -33,8 +33,8 @@ Texture2D			BlurTexture		: register(t1);
 Texture2D<float>	DepthTexture	: register(t2);
 
 SamplerState		BasicSampler	: register(s0);
-SamplerState		LinearWrapSampler : register(s1);
-SamplerState		PointClampSampler : register(s2);
+SamplerState		LinearWrapSampler : register(s2);
+SamplerState		PointClampSampler : register(s3);
 
 float4 main(VertexToPixel input) : SV_TARGET
 {

@@ -8,7 +8,7 @@ struct VertexToPixel
 
 Texture2D<float>		DepthTexture : register(t0);
 SamplerState			BasicSampler : register(s0);
-SamplerState			LinearWrapSampler : register(s1);
+SamplerState			LinearWrapSampler : register(s2);
 
 float3 NormalFromDepth(float depth, float2 uv)
 {
