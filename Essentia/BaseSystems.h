@@ -208,6 +208,14 @@ public:
 			components[i].CameraInstance.Rotation = *rotation;
 			components[i].CameraInstance.Update(deltaTime, totalTime);
 		}
+
+		// Assumption - Camera at index 0 is main camera
+		if (count > 0)
+		{
+			auto size = GContext->RendererInstance->GetScreenSize();
+			components[0].CameraInstance.Width = (float)size.Width;
+			components[0].CameraInstance.Height = (float)size.Height;
+		}
 	}
 };
 
