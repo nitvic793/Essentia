@@ -10,6 +10,7 @@
 #include "Interface.h"
 #include "ComponentReflector.h"
 #include "ImGuizmo.h"
+#include "GameStateManager.h"
 
 using namespace DirectX; 
 
@@ -158,20 +159,20 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Vsync", &vsync);
 
-		//if (!GContext->IsPlaying())
-		//{
-		//	if (ImGui::Button("Play"))
-		//	{
-		//		GContext->bIsPlaying = true;
-		//	}
-		//}
-		//else
-		//{
-		//	if (ImGui::Button("Pause"))
-		//	{
-		//		GContext->bIsPlaying = false;
-		//	}
-		//}
+		if (!GContext->GameStateManager->IsPlaying())
+		{
+			if (ImGui::Button("Play"))
+			{
+				GContext->GameStateManager->SetIsPlaying(true);
+			}
+		}
+		else
+		{
+			if (ImGui::Button("Pause"))
+			{
+				GContext->GameStateManager->SetIsPlaying(false);
+			}
+		}
 
 		if (ImGui::CollapsingHeader("Render Stages"))
 		{
@@ -301,21 +302,8 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::End();
 	}
 
-	EntityHandle* entities = em->GetEntities<SelectedComponent>(count);
-	auto transform = em->GetTransform(entities[0]);
-	auto s = XMMatrixScalingFromVector(XMLoadFloat3(transform.Scale));
-	auto r = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(transform.Rotation));
-	auto t = XMMatrixTranslationFromVector(XMLoadFloat3(transform.Position));
 
-	auto srt = s * r * t;
-	XMFLOAT4X4 matrix;
-	XMStoreFloat4x4(&matrix, srt);
 
-	static const float identityMatrix[16] =
-	{ 1.f, 0.f, 0.f, 0.f,
-		0.f, 1.f, 0.f, 0.f,
-		0.f, 0.f, 1.f, 0.f,
-		0.f, 0.f, 0.f, 1.f };
 
 	ImGuizmo::SetRect(0.f, 0.f, camera.Width, camera.Height);
 
@@ -379,7 +367,28 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	}
 
 	ImGui::End();
+
+	EntityHandle* entities = em->GetEntities<SelectedComponent>(count);
+	auto transform = em->GetTransform(entities[0]);
+	auto s = XMMatrixScalingFromVector(XMLoadFloat3(transform.Scale));
+	auto r = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(transform.Rotation));
+	auto t = XMMatrixTranslationFromVector(XMLoadFloat3(transform.Position));
+
+	auto srt = s * r * t;
+	auto parent = em->GetParent(entities[0]);
+	XMFLOAT4X4 matrix = em->GetWorldMatrix(entities[0]);
+	XMStoreFloat4x4(&matrix, srt);
+
 	ImGuizmo::Manipulate(&camView.m[0][0], &camProj.m[0][0], currentGizmoOperation, currentGizmoMode, &matrix.m[0][0], NULL, useSnap ? &snap.x : NULL);
+
+	//if (em->HasValidParent(entities[0])) {
+	//	auto parentMatrix = em->GetWorldMatrix(entities[0]);
+	//	auto p = XMLoadFloat4x4(&parentMatrix);
+	//	auto pInv = XMMatrixInverse(nullptr, p);
+	//	auto mat = XMLoadFloat4x4(&matrix);
+	//	mat = pInv * mat;
+	//	XMStoreFloat4x4(&matrix, mat);
+	//}
 
 	XMVECTOR scale;
 	XMVECTOR rotation;

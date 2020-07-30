@@ -240,6 +240,7 @@
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="DebugDrawStage.cpp" />
     <ClCompile Include="DepthOnlyStage.cpp" />
+    <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GenerateMipsStage.cpp" />
     <ClCompile Include="ImCurveEdit.cpp" />
     <ClCompile Include="ImGradient.cpp" />
@@ -301,6 +302,7 @@
     <ClInclude Include="DebugDrawStage.h" />
     <ClInclude Include="DepthOnlyStage.h" />
     <ClInclude Include="CMath.h" />
+    <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GenerateMipsStage.h" />
     <ClInclude Include="ImCurveEdit.h" />
     <ClInclude Include="ImGradient.h" />

@@ -295,6 +295,8 @@ inline Vector<EntityHandle> ComponentManager::GetEntities()
 
 	uint64 prevId = INT_MAX;
 	int count = 0;
+
+	//Find common entities between with given components 
 	for (auto& e : entityList)
 	{
 		if (e.ID == prevId)
@@ -307,7 +309,8 @@ inline Vector<EntityHandle> ComponentManager::GetEntities()
 			prevId = e.ID;
 		}
 
-		if (count == argCount)
+		// Add entity to list if same entity was repeated in list same as sizeof...(Args)
+		if (count == argCount) // If count of same entity repeated  == number of component args
 		{
 			commonEntities.Grow(1);
 			commonEntities.Push(e);

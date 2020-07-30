@@ -166,3 +166,13 @@ void EntityManager::GetWorldMatrices(EntityHandle* entities, uint32 count, std::
 		matrices.push_back(transformManager.GetWorldMatrix(entities[i]));
 	}
 }
+
+const DirectX::XMFLOAT4X4 EntityManager::GetWorldMatrix(EntityHandle entity)
+{
+	return transformManager.GetWorldMatrix(entity);
+}
+
+const DirectX::XMFLOAT4X4 EntityManager::GetLocalMatrix(EntityHandle entity)
+{
+	return transformManager.GetLocalMatrix(entity);
+}

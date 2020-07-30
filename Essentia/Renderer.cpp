@@ -415,7 +415,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Main Render Stage");
 
 	// Set constant buffer for lights in Pixel Shader
-	commandList->SetGraphicsRootDescriptorTable(RootSigCBPixel0, frameManager->GetHandle(imageIndex, offsets.ConstantBufferOffset + lightBufferView.Index));
+	SetConstantBufferView(commandList, RootSigCBPixel0, lightBufferView);
 	// Set textures for IBL. Here we are setting 3 textures, irradiance texture is at index 0 while 
 	commandList->SetGraphicsRootDescriptorTable(RootSigIBL, frameManager->GetHandle(imageIndex, offsets.TexturesOffset + irradianceTexture));
 	commandList->RSSetViewports(1, &viewport);

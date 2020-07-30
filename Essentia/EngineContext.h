@@ -14,6 +14,7 @@ class IAllocator;
 class ComponentReflector;
 class ComputeContext;
 class SystemManager;
+class GameStateManager;
 
 struct EngineContext;
 extern EngineContext* GContext;
@@ -37,6 +38,7 @@ struct EngineContext
 	ComponentReflector*		ComponentReflector = nullptr;
 	SystemManager*			CoreSystemManager = nullptr;
 	SystemManager*			GameSystemManager = nullptr;
+	GameStateManager*		GameStateManager = nullptr;
 
 	EngineContext()
 	{

@@ -9,6 +9,7 @@
 #include "Entity.h"
 #include "System.h"
 #include "Engine.h"
+#include "GameStateManager.h"
 #include <queue>
 #include <mutex>
 
@@ -36,6 +37,7 @@ protected:
 	ScopedPtr<DirectX::Keyboard>	keyboard;
 	ScopedPtr<DirectX::Mouse>		mouse;
 	ScopedPtr<Camera>				camera;
+	GameStateManager				gameStateManager;
 	EntityManager					entityManager;
 	SystemManager					coreSystemsManager;
 	SystemManager					gameSystemsManager;

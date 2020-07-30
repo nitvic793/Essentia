@@ -52,6 +52,7 @@ public:
 	EntityHandle			GetParent(EntityHandle entity);
 	DirectX::XMFLOAT4X4		GetTransposedWorldMatrix(EntityHandle entity);
 	DirectX::XMFLOAT4X4		GetWorldMatrix(EntityHandle entity);
+	const DirectX::XMFLOAT4X4 GetLocalMatrix(EntityHandle entity);
 	const Transform			GetWorldTransform(EntityHandle entity);
 	const bool				HasValidParent(EntityHandle entity);
 	Vector<EntityHandle>	GetChildren(EntityHandle entity);

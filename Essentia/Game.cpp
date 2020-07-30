@@ -21,6 +21,7 @@ void Game::Setup()
 	ec->ComponentReflector = &GComponentReflector;
 	ec->GameSystemManager = &gameSystemsManager;
 	ec->CoreSystemManager = &coreSystemsManager;
+	ec->GameStateManager = &gameStateManager;
 
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);
@@ -38,7 +39,7 @@ void Game::Setup()
 	coreSystemsManager.Initialize();
 
 	// This function also loads resources(textures, meshes) along with the scene entities.
-	LoadLevel("scene.json");
+	gameStateManager.LoadScene("scene.json");
 	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
@@ -57,8 +58,11 @@ void Game::Run()
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
 			coreSystemsManager.Update(kbState, mouseState, nullptr);
-			//if (GContext->IsPlaying())
-			gameSystemsManager.Update(kbState, mouseState, nullptr);
+			if (gameStateManager.IsPlaying())
+			{
+				gameSystemsManager.Update(kbState, mouseState, nullptr);
+			}
+
 			Update();
 			camera->Update();
 			Render();

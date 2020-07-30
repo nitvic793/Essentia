@@ -292,6 +292,9 @@
     <ClCompile Include="ImSequencer.cpp">
       <Filter>Imguizmo</Filter>
     </ClCompile>
+    <ClCompile Include="GameStateManager.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -527,6 +530,9 @@
     </ClInclude>
     <ClInclude Include="ImSequencer.h">
       <Filter>Imguizmo</Filter>
+    </ClInclude>
+    <ClInclude Include="GameStateManager.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

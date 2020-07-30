@@ -77,6 +77,11 @@ DirectX::XMFLOAT4X4 TransformManager::GetWorldMatrix(EntityHandle entity)
 	return transforms.World[entity.Handle.Index];
 }
 
+const DirectX::XMFLOAT4X4 TransformManager::GetLocalMatrix(EntityHandle entity)
+{
+	return transforms.Local[entity.Handle.Index];
+}
+
 const Transform TransformManager::GetWorldTransform(EntityHandle entity)
 {
 	int32 index = (int32)entity.Handle.Index;

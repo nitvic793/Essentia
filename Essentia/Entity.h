@@ -39,6 +39,8 @@ public:
 	void						GetTransposedWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
 	Vector<DirectX::XMFLOAT4X4>	GetTransposedWorldMatrices(EntityHandle* entities, uint32 count);
 	void						GetWorldMatrices(EntityHandle* entities, uint32 count, std::vector<DirectX::XMFLOAT4X4>& matrices);
+	const DirectX::XMFLOAT4X4	GetWorldMatrix(EntityHandle entity); 
+	const DirectX::XMFLOAT4X4	GetLocalMatrix(EntityHandle entity);
 private:
 	std::vector<uint32>			generations;
 	std::vector<uint32>			freeIndices;
