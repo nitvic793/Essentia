@@ -12,6 +12,8 @@ public:
 	void				SetIsPlaying(bool playing);
 
 private:
-	std::string currentScene;
+	std::string currentSceneName;
 	bool		isPlaying;
+	Scene		currentScene;
+
 };

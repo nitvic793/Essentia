@@ -48,7 +48,7 @@ void DepthOnlyStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
-	renderer->SetRenderTargets(&worldPosTarget.RenderTarget, 1, &depthTarget.DepthStencil);
+	renderer->SetRenderTargets(nullptr, 0, &depthTarget.DepthStencil);
 	commandList->SetPipelineState(depthOnlyPso);
 	commandList->ClearRenderTargetView(rtManager->GetRTVHandle(worldPosTarget.RenderTarget), ColorValues::ClearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(rtManager->GetDSVHandle(depthTarget.DepthStencil), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);

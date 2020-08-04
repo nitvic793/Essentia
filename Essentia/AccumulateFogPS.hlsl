@@ -47,7 +47,7 @@ Texture2D WorldPosMap		: register(t11);
 ///Credits: https://www.alexandre-pestana.com/volumetric-lights/
 
 static const float G_SCATTERING = -0.2f;
-static const int NB_STEPS = 16;
+static const int NB_STEPS = 32;
 
 float3 VSPositionFromDepth(float2 vTexCoord, float depth)
 {
@@ -96,9 +96,11 @@ float ShadowAmount(float4 shadowPos)
 
 float3 WorldPosFromDepth(float depth, float2 uv)
 {
-    float z = depth * 2.0 - 1.0;
+    float z = depth;// * 2.0 - 1.0;
+    float x = uv.x * 2.f - 1.f;
+    float y = (1.f - uv.y) * 2.f - 1.f;
 
-    float4 clipSpacePosition = float4(uv * 2.0 - 1.0, z, 1.0);
+    float4 clipSpacePosition = float4(x, y, z, 1.0);
     float4 viewSpacePosition = mul(clipSpacePosition, InvProjection);
 
     // Perspective division
@@ -130,10 +132,10 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
     float depth = SceneDepthTexture.SampleLevel(LinearWrapSampler, input.UV, 0).r;
 	float3 startPos = CameraPosition;
-    float3 endPos = WorldPosMap.Sample(LinearWrapSampler, input.UV).xyz; //WorldPosFromDepth(depth, input.UV); //
+    float3 endPos = WorldPosFromDepth(depth, input.UV); //
 	float3 rayVector = endPos - startPos;
 	float3 rayDirection = normalize(rayVector);
-	float rayLength = length(rayVector);
+    float rayLength = length(rayVector);
 	float3 sunDir = normalize(DirLights[0].Direction);
 	float stepLength = rayLength / NB_STEPS;
 	float3 step = rayDirection * stepLength;

@@ -7,13 +7,13 @@ GameStateManager::GameStateManager()
 
 void GameStateManager::LoadScene(const char* sceneFile)
 {
-    LoadLevel(sceneFile);
-    currentScene = sceneFile;
+    currentScene = LoadLevel(sceneFile);
+    currentSceneName = sceneFile;
 }
 
 std::string_view GameStateManager::GetCurrentScene()
 {
-    return currentScene;
+    return currentSceneName;
 }
 
 const bool GameStateManager::IsPlaying()
