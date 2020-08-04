@@ -161,6 +161,7 @@ void PipelineStates::CreateShadowPSO()
 	descPipelineState.pRootSignature = renderer->GetDefaultRootSignature();
 	descPipelineState.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	descPipelineState.DepthStencilState.DepthEnable = true;
+	descPipelineState.DepthStencilState.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 	descPipelineState.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 	descPipelineState.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
 	descPipelineState.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
@@ -169,7 +170,7 @@ void PipelineStates::CreateShadowPSO()
 	descPipelineState.RasterizerState.DepthClipEnable = true;
 	//descPipelineState.RasterizerState.DepthBias = 1000;
 	//descPipelineState.RasterizerState.DepthBiasClamp = 0.f;
-	//descPipelineState.RasterizerState.SlopeScaledDepthBias = 5.f;
+	descPipelineState.RasterizerState.SlopeScaledDepthBias = -5.f;
 	descPipelineState.SampleMask = UINT_MAX;
 	descPipelineState.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	descPipelineState.NumRenderTargets = 0;
