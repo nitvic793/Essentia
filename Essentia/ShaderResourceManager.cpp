@@ -22,16 +22,17 @@ using namespace DirectX;
 void FrameManager::Initialize(ID3D12Device* device)
 {
 	this->device = device;
-	for (uint32 i = 0; i < CFrameBufferCount; ++i)
+	//TODO: Remove loop to maintain only one GPU  side heap
+	for (uint32 i = 0; i < 1; ++i)
 	{
-		gpuHeap[i].Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CFrameMaxDescriptorHeapCount, true);
+		gpuHeap[i].Create(device, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, CFrameMaxDescriptorHeapCount * 3, true);
 		heapIndex[i] = 0;
 	}
 }
 
 ID3D12DescriptorHeap* FrameManager::GetGPUDescriptorHeap(uint32 frameIndex) const
 {
-	return gpuHeap[frameIndex].pDescriptorHeap.Get();
+	return gpuHeap[0].pDescriptorHeap.Get();
 }
 
 void FrameManager::Reset(uint32 frameIndex)
@@ -42,14 +43,14 @@ void FrameManager::Reset(uint32 frameIndex)
 uint32 FrameManager::Allocate(uint32 frameIndex, const DescriptorHeap& heap, uint32 numDescriptors, uint32 offset)
 {
 	auto index = heapIndex[frameIndex];
-	device->CopyDescriptorsSimple(numDescriptors, gpuHeap[frameIndex].handleCPU(index), heap.handleCPU(offset), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	device->CopyDescriptorsSimple(numDescriptors, gpuHeap[0].handleCPU(index + CFrameMaxDescriptorHeapCount * frameIndex), heap.handleCPU(offset), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	heapIndex[frameIndex] += numDescriptors;
 	return index;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE FrameManager::GetHandle(uint32 frameIndex, GPUHeapID index) const
 {
-	return gpuHeap[frameIndex].handleGPU(index);
+	return gpuHeap[0].handleGPU(index + CFrameMaxDescriptorHeapCount * frameIndex);
 }
 
 /// Shader Resource Manager
@@ -337,7 +338,7 @@ TextureID ShaderResourceManager::CreateStructuredBufferUAV(ResourceID resourceId
 
 	D3D12_UNORDERED_ACCESS_VIEW_DESC desc = {};
 	desc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
-	desc.Buffer.NumElements = rDesc.Width / stride;
+	desc.Buffer.NumElements = (uint32)rDesc.Width / stride;
 	desc.Buffer.StructureByteStride = stride;
 	desc.Buffer.FirstElement = 0;
 	deviceResources->GetDevice()->CreateUnorderedAccessView(resource, nullptr, &desc, textureHeap.handleCPU(texIndex));
@@ -447,6 +448,18 @@ std::string ShaderResourceManager::GetMaterialName(MaterialHandle handle)
 std::string ShaderResourceManager::GetTextureName(TextureID textureId)
 {
 	return textureNameMap[textureId];
+}
+
+std::vector<std::string> ShaderResourceManager::GetAllMaterialNames()
+{
+	std::vector<std::string> materialNames;
+	materialNames.reserve(materialNameMap.size());
+	for(auto mat : materialNameMap)
+	{	
+		materialNames.push_back(mat.second);
+	}
+
+	return materialNames;
 }
 
 std::vector<TextureProperties> ShaderResourceManager::GetAllTextures()

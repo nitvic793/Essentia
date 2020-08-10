@@ -95,6 +95,7 @@ public:
 	ID3D12Resource* GetResource(TextureID textureId);
 	std::string					GetMaterialName(MaterialHandle handle);
 	std::string					GetTextureName(TextureID textureId);
+	std::vector<std::string>	GetAllMaterialNames();
 
 	//Will only return textures created via files.
 	std::vector<TextureProperties>	GetAllTextures();

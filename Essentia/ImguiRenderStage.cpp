@@ -43,12 +43,15 @@ void DrawTree(EntityHandle entity, EntityHandle& selected)
 class ImguiVisitor : public IVisitor
 {
 	std::vector<std::string> meshList;
+	std::vector<std::string> matList;
 	std::string meshName = ""; // Needs to be declared here to maintain state
+	std::string matName = "";
 public:
 	ImguiVisitor()
 	{
 		auto meshManager = GContext->MeshManager;
 		meshList = meshManager->GetAllMeshNames();
+		matList = GContext->ShaderResourceManager->GetAllMaterialNames();
 	}
 
 	virtual void Visit(const char* compName, const char* name, float& val) override
@@ -109,7 +112,28 @@ public:
 
 	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) override
 	{
+		matName = GContext->ShaderResourceManager->GetMaterialName(val);
 
+		ImGui::PushID(compName);
+		if (ImGui::BeginCombo("##matCombo", matName.c_str()))
+		{
+			for (auto mat : matList)
+			{
+				bool isSelected = (strcmp(matName.c_str(), mat.c_str()) == 0);
+				if (ImGui::Selectable(mat.c_str(), isSelected))
+				{
+					matName = mat;
+				}
+
+				if (isSelected)
+				{
+					ImGui::SetItemDefaultFocus();
+				}
+			}
+			ImGui::EndCombo();
+		}
+		val = GContext->ShaderResourceManager->GetMaterialHandle(matName.c_str());
+		ImGui::PopID();
 	}
 };
 
