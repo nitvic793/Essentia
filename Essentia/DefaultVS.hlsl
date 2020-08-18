@@ -15,17 +15,11 @@ cbuffer PerFrame : register(b1)
     PerFrameData FrameData;
 }
 
-cbuffer ShadowBuffer : register(b2)
-{
-    float4x4 ShadowView;
-    float4x4 ShadowProjection;
-}
-
 PixelInput main(VertexInput input)
 {
 	PixelInput output;
 	
-    float4x4 shadowVP = mul(mul(World, ShadowView), ShadowProjection);
+    float4x4 shadowVP = mul(mul(World, FrameData.ShadowView), FrameData.ShadowProjection);
     float4 worldPos = mul(float4(input.Position, 1.0f), World);
 	
 	output.Position = mul(float4(input.Position, 1.f), WorldViewProjection);

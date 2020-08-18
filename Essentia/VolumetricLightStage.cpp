@@ -108,8 +108,8 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
-	renderer->SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
-	renderer->SetConstantBufferView(commandList, RootSigCBAll1, lightAccumCBV);
+	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.FrameDataCBV);
+	renderer->SetConstantBufferView(commandList, RootSigCBAll2, lightAccumCBV);
 
 	renderer->DrawScreenQuad(commandList);
 	//renderer->DrawMesh(commandList, cubeMesh);

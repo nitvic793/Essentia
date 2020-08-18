@@ -1,6 +1,7 @@
 
 #include "Common.hlsli"
 #include "Lighting.hlsli"
+#include "FrameCommon.hlsli"
 
 struct VertexToPixel
 {
@@ -21,18 +22,17 @@ cbuffer LightBuffer : register(b0)
 	float FarZ;
 }
 
-cbuffer LightAccumBuffer : register(b1)
+cbuffer PerFrame : register(b1)
+{
+    PerFrameData FrameData;
+}
+
+cbuffer LightAccumBuffer : register(b2)
 {
     float4x4 InvProjection;
     float4x4 InvView;
     float4x4 World;
-	uint2	 ScreenResolution;
-}
-
-cbuffer ShadowBuffer : register(b2)
-{
-	float4x4 ShadowView;
-	float4x4 ShadowProjection;
+    uint2 ScreenResolution;
 }
 
 SamplerState BasicSampler : register(s0);
@@ -144,7 +144,7 @@ float4 main(VertexToPixel input) : SV_TARGET
 	float ditherValue = ditherPattern[screenSpacePosition.x % 4][screenSpacePosition.y % 4];
 	startPos += step * ditherValue;
 	float3 currPos = startPos;
-    float4x4 shadowViewProj = mul(ShadowView, ShadowProjection);
+    float4x4 shadowViewProj = mul(FrameData.ShadowView, FrameData.ShadowProjection);
 
     float3 sunColor = DirLights[0].Color;
     float intensity = DirLights[0].Intensity;

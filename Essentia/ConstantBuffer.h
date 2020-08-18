@@ -40,6 +40,8 @@ struct PerFrameConstantBuffer
 {
 	DirectX::XMFLOAT4X4 ViewProjectionTex; //Required to get apply SSAO Position
 	VoxelParams			VoxelData;
+	DirectX::XMFLOAT4X4 ShadowView;
+	DirectX::XMFLOAT4X4 ShadowProjection;
 };
 
 struct DirectionalLight

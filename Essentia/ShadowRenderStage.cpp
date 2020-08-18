@@ -86,7 +86,11 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	XMStoreFloat4x4(&params.Projection, XMMatrixTranspose(shProj));
 
 	ShadowConstantBuffer shadowCB = { params.View, params.Projection };
+	GSceneResources.FrameData.ShadowView = params.View;
+	GSceneResources.FrameData.ShadowProjection = params.Projection;
+
 	shaderResourceManager->CopyToCB(frameIndex, { &shadowCB, sizeof(ShadowConstantBuffer) }, GSceneResources.ShadowCBV);
+	shaderResourceManager->CopyToCB(frameIndex, { &GSceneResources.FrameData, sizeof(GSceneResources.FrameData) }, GSceneResources.FrameDataCBV);
 
 	renderer->TransitionBarrier(commandList, shadowDepthTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 	commandList->ClearDepthStencilView(rtManager->GetDSVHandle(shadowDepthTarget.DepthStencil), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);

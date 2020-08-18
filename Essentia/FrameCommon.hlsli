@@ -14,10 +14,13 @@ struct VoxelParams
     uint VoxelRadianceMips;
 };
 
+// All per frame data
 struct PerFrameData
 {
     float4x4 ViewProjectionTex;
     VoxelParams VoxelData;
+    float4x4 ShadowView; // Global Directional Light Shadow View Matrix
+    float4x4 ShadowProjection; // Global Directional Light Shadow Projection Matrix
 };
 
 struct VoxelType
