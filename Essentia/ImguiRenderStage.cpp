@@ -12,7 +12,7 @@
 #include "ImGuizmo.h"
 #include "GameStateManager.h"
 
-using namespace DirectX; 
+using namespace DirectX;
 
 void DrawTree(EntityHandle entity, EntityHandle& selected)
 {
@@ -320,7 +320,8 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::SameLine();
 		if (ImGui::Button("Add Component"))
 		{
-			cm->AddComponent(currentItem, selectedEntities[0]);
+			if (currentItem != nullptr)
+				cm->AddComponent(currentItem, selectedEntities[0]);
 		}
 
 		ImGui::End();
