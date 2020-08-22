@@ -31,7 +31,7 @@ public:
 		Reserve(count, allocator);
 	}
 
-	Vector(Vector&& v)
+	Vector(Vector&& v) noexcept
 	{
 		buffer = v.buffer;
 		currentIndex = v.currentIndex;
@@ -49,8 +49,14 @@ public:
 		memset(&v, 0, sizeof(v));
 	}
 
-	Vector& operator=(Vector&& v)
+	Vector& operator=(Vector&& v) noexcept
 	{
+		if (this == &v)
+		{
+			return *this;
+		}
+		//Free();
+
 		buffer = v.buffer;
 		currentIndex = v.currentIndex;
 		capacity = v.capacity;
@@ -120,7 +126,7 @@ public:
 	//}
 
 	T& operator[](size_t index) const noexcept
-	{ 
+	{
 		return buffer[index];
 	}
 
@@ -152,20 +158,7 @@ public:
 
 	~Vector()
 	{
-		if (!buffer) return;
-		for (auto& val : *this)
-		{
-			val.~T();
-		}
-
-		if (allocator && buffer)
-		{
-			allocator->Free((byte*)buffer);
-		}
-		else if (buffer)
-		{
-			Mem::Free((void*)buffer);
-		}
+		Free();
 	}
 
 	T* begin()
@@ -210,6 +203,25 @@ private:
 		T temp = lhs;
 		lhs = rhs;
 		rhs = temp;
+	}
+
+	// Deallocate current Vector object
+	void Free()
+	{
+		if (!buffer) return;
+		for (auto& val : *this)
+		{
+			val.~T();
+		}
+
+		if (allocator && buffer)
+		{
+			allocator->Free((byte*)buffer);
+		}
+		else if (buffer)
+		{
+			Mem::Free((void*)buffer);
+		}
 	}
 
 	T* buffer = nullptr;
