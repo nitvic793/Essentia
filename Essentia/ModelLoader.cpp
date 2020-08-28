@@ -1,7 +1,15 @@
 #include "pch.h"
+
+
+
 #include "ModelLoader.h"
-#include <unordered_map>
 #include "DirectXMesh.h"
+#include "CMath.h"
+#include "Animation.h"
+#include "OGLMath.h"
+
+#include <unordered_map>
+#include <queue>
 
 using namespace DirectX;
 
@@ -68,6 +76,89 @@ void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT
 	delete[] tan1;
 }
 
+void TransformChannel(aiNodeAnim* animNode, AnimationChannel& channel)
+{
+	channel.NodeName = std::string(animNode->mNodeName.data);
+	channel.PositionKeys.resize(animNode->mNumPositionKeys);
+	channel.RotationKeys.resize(animNode->mNumRotationKeys);
+	channel.ScalingKeys.resize(animNode->mNumScalingKeys);
+
+	memcpy(&channel.PositionKeys[0], animNode->mPositionKeys, sizeof(aiVectorKey) * animNode->mNumPositionKeys);
+	memcpy(&channel.RotationKeys[0], animNode->mRotationKeys, sizeof(aiVectorKey) * animNode->mNumRotationKeys);
+	memcpy(&channel.ScalingKeys[0], animNode->mScalingKeys, sizeof(aiVectorKey) * animNode->mNumScalingKeys);
+}
+
+void LoadAnimations(const aiScene* scene, MeshAnimationDescriptor& descriptor)
+{
+	//Get global inverse
+	ogldev::Matrix4f m_GlobalInverseTransform = scene->mRootNode->mTransformation;
+	m_GlobalInverseTransform.Inverse();
+	auto GlobalInverse = XMMatrixTranspose(OGLtoXM(m_GlobalInverseTransform));
+	XMStoreFloat4x4(&descriptor.GlobalInverseTransform, GlobalInverse);
+
+	descriptor.RootNode = std::string(scene->mRootNode->mName.data);
+	descriptor.Animations.resize(scene->mNumAnimations);
+	std::queue<aiNode*> nodeQueue;
+	nodeQueue.push(scene->mRootNode);
+	XMFLOAT4X4 transform;
+
+	//Flatten Heirarchy and map node heirarchy 
+	while (!nodeQueue.empty())
+	{
+		auto node = nodeQueue.front();
+		auto name = std::string(node->mName.data);
+		ogldev::Matrix4f Transformation(node->mTransformation);
+		XMMATRIX NodeTransformation = XMMatrixTranspose(OGLtoXM(Transformation));
+		if (descriptor.NodeHeirarchy.find(name) == descriptor.NodeHeirarchy.end()) //If node not in heirarchy
+		{
+			std::vector<std::string> children;
+			children.resize(node->mNumChildren);
+			for (auto i = 0u; i < node->mNumChildren; ++i)
+			{
+				auto child = node->mChildren[i];
+				auto childName = std::string(child->mName.data);
+				children[i] = childName;
+				nodeQueue.push(child);
+			}
+
+			XMStoreFloat4x4(&transform, NodeTransformation);
+			descriptor.NodeTransformsMap.insert(std::pair<std::string, XMFLOAT4X4>(name, transform)); //Store node transform
+			descriptor.NodeHeirarchy.insert(std::pair<std::string, std::vector<std::string>>(name, children));
+		}
+
+		nodeQueue.pop();
+	}
+
+	//Load animations
+	auto& anims = descriptor.Animations;
+	for (auto i = 0u; i < scene->mNumAnimations; ++i)
+	{
+		Animation animation;
+
+		animation.Duration = scene->mAnimations[i]->mDuration;
+		animation.TicksPerSecond = scene->mAnimations[i]->mTicksPerSecond;
+		animation.Channels.resize(scene->mAnimations[i]->mNumChannels);
+		auto animName = std::string(scene->mAnimations[i]->mName.data);
+		for (auto cIndex = 0u; cIndex < animation.Channels.size(); ++cIndex)
+		{
+			TransformChannel(scene->mAnimations[i]->mChannels[cIndex], animation.Channels[cIndex]);
+		}
+
+		anims[i] = animation;
+		descriptor.AnimationIndexMap.insert(std::pair<std::string, uint32_t>(animName, i));
+	}
+
+	for (auto& anim : anims)
+	{
+		auto index = 0u;
+		for (auto& channel : anim.Channels)
+		{
+			anim.NodeChannelMap.insert(std::pair<std::string, uint32_t>(channel.NodeName, index));
+			index++;
+		}
+	}
+}
+
 void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Vertex>& vertices, std::vector<uint32>& indices)
 {
 	for (UINT i = 0; i < mesh->mNumVertices; i++)
@@ -126,6 +217,44 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 
 }
 
+void LoadBones(UINT index, const aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::map<std::string, uint32_t>& boneMapping, std::vector<BoneInfo>& boneInfoList, std::vector<VertexBoneData>& bones)
+{
+	if (mesh->HasBones())
+	{
+		auto globalTransform = MathHelper::aiMatrixToXMFloat4x4(&scene->mRootNode->mTransformation);
+		XMFLOAT4X4 invGlobalTransform;
+		XMStoreFloat4x4(&invGlobalTransform, XMMatrixInverse(nullptr, XMLoadFloat4x4(&globalTransform)));
+		uint32_t numBones = 0;
+		for (uint32_t i = 0; i < mesh->mNumBones; i++)
+		{
+			uint32_t boneIndex = 0;
+			std::string boneName(mesh->mBones[i]->mName.data);
+			if (boneMapping.find(boneName) == boneMapping.end()) //if bone not found
+			{
+				boneIndex = numBones;
+				numBones++;
+				BoneInfo bi = {};
+				boneInfoList.push_back(bi);
+			}
+			else
+			{
+				boneIndex = boneMapping[boneName];
+			}
+
+			boneMapping[boneName] = boneIndex;
+			boneInfoList[boneIndex].OffsetMatrix = MathHelper::aiMatrixToXMFloat4x4(&mesh->mBones[i]->mOffsetMatrix);
+			boneInfoList[boneIndex].Offset = mesh->mBones[i]->mOffsetMatrix;
+
+			for (uint32_t j = 0; j < mesh->mBones[i]->mNumWeights; j++)
+			{
+				uint32_t vertexID = meshEntries[index].BaseVertex + mesh->mBones[i]->mWeights[j].mVertexId;
+				float weight = mesh->mBones[i]->mWeights[j].mWeight;
+				bones[vertexID].AddBoneData(boneIndex, weight);
+			}
+		}
+	}
+}
+
 
 MeshData ModelLoader::Load(const std::string& filename)
 {
@@ -155,9 +284,22 @@ MeshData ModelLoader::Load(const std::string& filename)
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
 
+	std::map<std::string, uint32_t> boneMapping;
+	std::vector<BoneInfo> boneInfoList;
+	std::vector<VertexBoneData> bones;
+	bones.resize(NumVertices);
+	MeshAnimationDescriptor meshAnimations;
+
 	for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
 	{
 		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
+		LoadBones(i, pScene->mMeshes[i], pScene, meshEntries, boneMapping, boneInfoList, bones);
+	}
+
+	mesh.IsAnimated = pScene->HasAnimations();
+	if (pScene->HasAnimations())
+	{
+		LoadAnimations(pScene, meshAnimations);
 	}
 
 	mesh.Vertices = std::move(vertices);
@@ -186,7 +328,7 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 	std::vector<uint32> indices;
 	MeshData mesh;
 	std::vector<MeshMaterial> materials(pScene->mNumMeshes);
-
+	
 	std::vector<MeshEntry> meshEntries(pScene->mNumMeshes);
 	for (uint32 i = 0; i < meshEntries.size(); i++)
 	{

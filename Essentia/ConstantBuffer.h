@@ -6,6 +6,7 @@ constexpr uint32_t CVoxelSize = 128;
 constexpr uint32_t CMaxDirLights = 4;
 constexpr uint32_t CMaxPointLights = 64;
 constexpr uint32_t CMaxSpotLights = 16;
+constexpr uint32_t CMaxBones = 128;
 
 struct DECLSPEC_ALIGN(16) VoxelParams
 {
@@ -82,4 +83,9 @@ struct LightBuffer
 	uint32_t			PointLightCount;
 	uint32_t			SpotLightCount;
 	float				FarZ;
+};
+
+struct PerArmatureConstantBuffer
+{
+	DirectX::XMFLOAT4X4 Bones[CMaxBones];
 };

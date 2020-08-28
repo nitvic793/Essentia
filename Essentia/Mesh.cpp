@@ -19,6 +19,10 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 		auto meshData = ModelLoader::Load(filename);
 		handle = CreateMesh(meshData, meshView);
 		meshMap[meshStringID] = handle.Id;
+		if (meshData.IsAnimated) 
+		{
+			CreateBoneBuffers(handle, meshData.AnimationData);
+		}
 	}
 
 	meshNameMap[handle.Id] = filename;
@@ -174,6 +178,55 @@ std::vector<std::string> MeshManager::GetAllMeshNames()
 		meshNames.push_back(mesh.second);
 	}
 	return meshNames;
+}
+
+void MeshManager::CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animData)
+{
+	MeshView& meshView = views[meshHandle.Id];
+	MeshBuffer& meshBuffer = buffers[meshHandle.Id];
+	UINT vBufferSize = sizeof(VertexBoneData) * (UINT)animData.Bones.size();;
+
+	auto device = context->GetDevice();
+	ComPtr<ID3D12GraphicsCommandList> commandList;
+	ComPtr<ID3D12CommandAllocator> allocator;
+	ComPtr<ID3D12Resource> vBufferUploadHeap;
+
+	context->CreateAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.ReleaseAndGetAddressOf());
+	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
+
+	device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		D3D12_HEAP_FLAG_NONE, // no flags
+		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		D3D12_RESOURCE_STATE_COPY_DEST,
+		nullptr,
+		IID_PPV_ARGS(&meshBuffer.BoneVertexBuffer));
+
+	meshBuffer.BoneVertexBuffer->SetName(L"Vertex Buffer Resource Heap");
+
+	device->CreateCommittedResource(
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&vBufferUploadHeap));
+
+	vBufferUploadHeap->SetName(L"Vertex Buffer Upload Resource Heap");
+	D3D12_SUBRESOURCE_DATA vertexData = {};
+	vertexData.pData = reinterpret_cast<BYTE*>(animData.Bones.data());
+	vertexData.RowPitch = vBufferSize;
+	vertexData.SlicePitch = vBufferSize;
+
+	UpdateSubresources(commandList.Get(), meshBuffer.BoneVertexBuffer.Get(), vBufferUploadHeap.Get(), 0, 0, 1, &vertexData);
+
+	meshView.BoneVertexBufferView.BufferLocation = meshBuffer.BoneVertexBuffer->GetGPUVirtualAddress();
+	meshView.BoneVertexBufferView.StrideInBytes = sizeof(VertexBoneData);
+	meshView.BoneVertexBufferView.SizeInBytes = vBufferSize;
+
+	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(meshBuffer.BoneVertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+	context->SubmitCommands(commandList.Get());
+	context->WaitForGPU(GContext->DeviceResources->GetSwapChain()->GetCurrentBackBufferIndex());
 }
 
 void ModelManager::Initialize(ShaderResourceManager* srManager)

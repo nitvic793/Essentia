@@ -100,6 +100,12 @@
     <Filter Include="Shaders\Wireframe">
       <UniqueIdentifier>{cb6e092f-52d0-47a1-856d-beec3c90edbc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Animation">
+      <UniqueIdentifier>{b1b069dc-e7c2-4a40-8533-19fcbfa86586}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Animation">
+      <UniqueIdentifier>{2823fa1d-830f-495b-bd34-02ab97e80a32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -294,6 +300,9 @@
     </ClCompile>
     <ClCompile Include="GameStateManager.cpp">
       <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>Source Files\Animation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -533,6 +542,9 @@
     </ClInclude>
     <ClInclude Include="GameStateManager.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>Header Files\Animation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

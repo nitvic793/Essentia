@@ -367,4 +367,4 @@ namespace ogldev
 	OGL_Quaternion operator*(const OGL_Quaternion& q, const Vector3f& v);
 }
 
-
+DirectX::XMMATRIX OGLtoXM(const ogldev::Matrix4f& mat);

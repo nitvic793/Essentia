@@ -4,6 +4,7 @@
 #include <wrl.h>
 #include <DirectXCollision.h>
 #include "ShaderResourceManager.h"
+#include "Animation.h"
 
 struct MeshEntry
 {
@@ -12,23 +13,35 @@ struct MeshEntry
 	int BaseIndex;
 };
 
+struct AnimationData
+{
+	std::unordered_map<std::string, uint32_t>	BoneMapping;
+	std::vector<BoneInfo>						BoneInfoList;
+	std::vector<VertexBoneData>					Bones;
+	MeshAnimationDescriptor						Animations;
+};
+
 struct MeshData
 {
 	std::vector<Vertex>		Vertices;
 	std::vector<uint32>		Indices;
 	std::vector<MeshEntry>	MeshEntries;
+	AnimationData			AnimationData;
+	bool					IsAnimated;
 };
 
 struct MeshBuffer
 {
 	Microsoft::WRL::ComPtr<ID3D12Resource> VertexBuffer;
 	Microsoft::WRL::ComPtr<ID3D12Resource> IndexBuffer;
+	Microsoft::WRL::ComPtr<ID3D12Resource> BoneVertexBuffer;
 };
 
 struct MeshView
 {
 	D3D12_VERTEX_BUFFER_VIEW	VertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW		IndexBufferView;
+	D3D12_VERTEX_BUFFER_VIEW	BoneVertexBufferView;
 	uint32						IndexCount;
 	std::vector<MeshEntry>		MeshEntries;
 };
@@ -52,11 +65,15 @@ public:
 	std::vector<std::string>					GetAllMeshNames();
 private:
 	MeshManager() {};
+	void										CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animData);
+
 	CommandContext*								context = nullptr;
 	std::vector<MeshData>						meshes; 
 	std::vector<MeshBuffer>						buffers;
 	std::vector<MeshView>						views;
 	std::vector<DirectX::BoundingBox>			bounds;
+	std::unordered_map<uint32, AnimationData>	meshAnimMap; 
+
 	std::unordered_map<StringID, uint32>		meshMap;
 	std::unordered_map<uint32, std::string>		meshNameMap;
 	friend class Renderer;

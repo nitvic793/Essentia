@@ -21,6 +21,21 @@ public:
 		};
 	}
 
+	template<typename T, typename VisitorFuncT>
+	void RegisterComponent(VisitorFuncT vistorFunc)
+	{
+		componentVisitorMap[T::ComponentName] = [&](IComponent* component, IVisitor* visitor)
+		{
+			T* comp = (T*)component;
+			vistorFunc(comp, visitor);
+		};
+
+		componentFactoryMap[T::ComponentName] = [&](ComponentManager* componentManager)->ComponentPoolBase*
+		{
+			return componentManager->GetOrCreatePool<T>();
+		};
+	}
+
 	ComponentPoolBase* CreatePool(std::string_view componentName, ComponentManager* componentManager)
 	{
 		return componentFactoryMap[componentName](componentManager);
