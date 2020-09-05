@@ -4,6 +4,7 @@
 #include "imgui.h"
 #include "BaseSystems.h"
 #include "ComponentReflector.h"
+#include "AnimationSystem.h"
 
 void Game::Setup()
 {
@@ -32,6 +33,7 @@ void Game::Setup()
 	coreSystemsManager.RegisterSystem<UpdateCameraSystem>();
 	coreSystemsManager.RegisterSystem<EditorSaveSystem>();
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
+	coreSystemsManager.RegisterSystem<AnimationSystem>();
 
 	// Initialize renderer and core systems. gameSystemsManager is initialized through external invocation.
 	renderer->Initialize();

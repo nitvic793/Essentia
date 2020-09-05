@@ -232,6 +232,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="AnimationSystem.cpp" />
     <ClCompile Include="ApplyVolumetricFog.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CommandContext.cpp" />
@@ -294,6 +295,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />
+    <ClInclude Include="AnimationComponent.h" />
+    <ClInclude Include="AnimationSystem.h" />
     <ClInclude Include="ApplyVolumetricFog.h" />
     <ClInclude Include="BaseComponents.h" />
     <ClInclude Include="BaseSystems.h" />

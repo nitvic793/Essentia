@@ -304,6 +304,9 @@
     <ClCompile Include="Animation.cpp">
       <Filter>Source Files\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="AnimationSystem.cpp">
+      <Filter>Source Files\Animation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -544,6 +547,12 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="Animation.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationComponent.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimationSystem.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
   </ItemGroup>

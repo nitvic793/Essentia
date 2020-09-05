@@ -5,13 +5,6 @@
 
 constexpr int CMaxBonesPerVertex = 4;
 
-struct BoneInfo
-{
-	ogldev::Matrix4f  Offset;
-	DirectX::XMFLOAT4X4 OffsetMatrix;
-	DirectX::XMFLOAT4X4 FinalTransform;
-};
-
 struct VertexBoneData
 {
 	uint32_t	IDs[CMaxBonesPerVertex];

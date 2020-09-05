@@ -13,6 +13,15 @@ struct MeshEntry
 	int BaseIndex;
 };
 
+
+struct BoneInfo
+{
+	ogldev::Matrix4f  Offset;
+	DirectX::XMFLOAT4X4 OffsetMatrix;
+	DirectX::XMFLOAT4X4 FinalTransform;
+};
+
+
 struct AnimationData
 {
 	std::unordered_map<std::string, uint32_t>	BoneMapping;
@@ -41,8 +50,8 @@ struct MeshView
 {
 	D3D12_VERTEX_BUFFER_VIEW	VertexBufferView;
 	D3D12_INDEX_BUFFER_VIEW		IndexBufferView;
-	D3D12_VERTEX_BUFFER_VIEW	BoneVertexBufferView;
 	uint32						IndexCount;
+	D3D12_VERTEX_BUFFER_VIEW	BoneVertexBufferView;
 	std::vector<MeshEntry>		MeshEntries;
 };
 
@@ -63,6 +72,8 @@ public:
 	const DirectX::BoundingBox&					GetBoundingBox(MeshHandle handle);
 	std::string									GetName(MeshHandle handle);
 	std::vector<std::string>					GetAllMeshNames();
+	bool										IsAnimated(MeshHandle mesh) const;
+	const AnimationData&						GetAnimationData(MeshHandle mesh);
 private:
 	MeshManager() {};
 	void										CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animData);

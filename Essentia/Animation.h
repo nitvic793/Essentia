@@ -26,6 +26,7 @@ struct AnimationChannel
 
 struct Animation
 {
+	std::string AnimationName;
 	double TicksPerSecond;
 	double Duration;
 	std::vector<AnimationChannel> Channels;
@@ -54,6 +55,11 @@ struct MeshAnimationDescriptor
 	Animation* GetAnimation(uint32_t index)
 	{
 		return &Animations[index];
+	}
+
+	std::string GetAnimationName(uint32_t index) const
+	{
+		return Animations[index].AnimationName;
 	}
 
 	int32_t GetChannelIndex(uint32_t animationIndex, std::string node)

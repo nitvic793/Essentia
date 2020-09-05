@@ -180,6 +180,16 @@ std::vector<std::string> MeshManager::GetAllMeshNames()
 	return meshNames;
 }
 
+bool MeshManager::IsAnimated(MeshHandle mesh) const
+{
+	return meshes[mesh.Id].IsAnimated;
+}
+
+const AnimationData& MeshManager::GetAnimationData(MeshHandle mesh)
+{
+	return meshes[mesh.Id].AnimationData;
+}
+
 void MeshManager::CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animData)
 {
 	MeshView& meshView = views[meshHandle.Id];

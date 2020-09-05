@@ -76,7 +76,7 @@ void CalculateTangents(Vertex* vertices, UINT vertexCount, uint32* indices, UINT
 	delete[] tan1;
 }
 
-void TransformChannel(aiNodeAnim* animNode, AnimationChannel& channel)
+void CopyTransformChannel(aiNodeAnim* animNode, AnimationChannel& channel)
 {
 	channel.NodeName = std::string(animNode->mNodeName.data);
 	channel.PositionKeys.resize(animNode->mNumPositionKeys);
@@ -141,10 +141,11 @@ void LoadAnimations(const aiScene* scene, MeshAnimationDescriptor& descriptor)
 		auto animName = std::string(scene->mAnimations[i]->mName.data);
 		for (auto cIndex = 0u; cIndex < animation.Channels.size(); ++cIndex)
 		{
-			TransformChannel(scene->mAnimations[i]->mChannels[cIndex], animation.Channels[cIndex]);
+			CopyTransformChannel(scene->mAnimations[i]->mChannels[cIndex], animation.Channels[cIndex]);
 		}
 
 		anims[i] = animation;
+		animation.AnimationName = animName;
 		descriptor.AnimationIndexMap.insert(std::pair<std::string, uint32_t>(animName, i));
 	}
 
@@ -217,7 +218,7 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 
 }
 
-void LoadBones(UINT index, const aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::map<std::string, uint32_t>& boneMapping, std::vector<BoneInfo>& boneInfoList, std::vector<VertexBoneData>& bones)
+void LoadBones(UINT index, const aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::unordered_map<std::string, uint32_t>& boneMapping, std::vector<BoneInfo>& boneInfoList, std::vector<VertexBoneData>& bones)
 {
 	if (mesh->HasBones())
 	{
@@ -284,7 +285,7 @@ MeshData ModelLoader::Load(const std::string& filename)
 	std::vector<Vertex> vertices;
 	std::vector<uint32> indices;
 
-	std::map<std::string, uint32_t> boneMapping;
+	std::unordered_map<std::string, uint32_t> boneMapping;
 	std::vector<BoneInfo> boneInfoList;
 	std::vector<VertexBoneData> bones;
 	bones.resize(NumVertices);
@@ -302,9 +303,11 @@ MeshData ModelLoader::Load(const std::string& filename)
 		LoadAnimations(pScene, meshAnimations);
 	}
 
+	AnimationData animData = { boneMapping, boneInfoList, bones, meshAnimations };
 	mesh.Vertices = std::move(vertices);
 	mesh.Indices = std::move(indices);
 	mesh.MeshEntries = meshEntries;
+	mesh.AnimationData = animData;
 	return mesh;
 }
 
@@ -328,7 +331,7 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 	std::vector<uint32> indices;
 	MeshData mesh;
 	std::vector<MeshMaterial> materials(pScene->mNumMeshes);
-	
+
 	std::vector<MeshEntry> meshEntries(pScene->mNumMeshes);
 	for (uint32 i = 0; i < meshEntries.size(); i++)
 	{
@@ -385,7 +388,7 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 				mMat.Metalness = metalnessTexture.C_Str();
 			}
 
-		
+
 			materials[i] = mMat;
 		}
 
