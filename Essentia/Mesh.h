@@ -36,7 +36,7 @@ struct MeshData
 	std::vector<uint32>		Indices;
 	std::vector<MeshEntry>	MeshEntries;
 	AnimationData			AnimationData;
-	bool					IsAnimated;
+	bool					IsAnimated = false;
 };
 
 struct MeshBuffer

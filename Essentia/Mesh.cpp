@@ -9,7 +9,7 @@ using namespace Microsoft::WRL;
 MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshView)
 {
 	auto meshStringID = String::ID(filename.c_str());
-	MeshHandle handle;
+	MeshHandle handle = { (uint32)-1 }; // Default is invalid
 	if (meshMap.find(meshStringID) != meshMap.end())
 	{
 		handle.Id = meshMap[meshStringID];
@@ -17,6 +17,10 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 	else
 	{
 		auto meshData = ModelLoader::Load(filename);
+		if (meshData.Vertices.size() == 0)
+		{
+			return handle;
+		}
 		handle = CreateMesh(meshData, meshView);
 		meshMap[meshStringID] = handle.Id;
 		if (meshData.IsAnimated) 

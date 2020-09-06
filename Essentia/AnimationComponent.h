@@ -12,18 +12,23 @@ struct AnimationComponent : public IComponent
 
 	MeshHandle					Mesh; //Reference Mesh
 	PerArmatureConstantBuffer	ArmatureConstantBuffer;
-	std::vector<BoneInfo>		BoneInfoList;
+	ConstantBufferView			ArmatureCBV;
+	BoneInfo					BoneInfoList[CMaxBones];
+	uint32						BoneInfoSize = 0;
 	uint32						CurrentAnimationIndex = 0;
-	std::string					CurrentAnimation;
+	//std::string					CurrentAnimation;
 	float						TotalTime = 0.f;
 	float						AnimationSpeed = 1.f;
 
 	static AnimationComponent Create(MeshHandle mesh)
 	{
 		AnimationComponent component = {};
+		component.Mesh = mesh;
+		component.ArmatureCBV = es::CreateConstantBufferView(sizeof(PerArmatureConstantBuffer));
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(mesh);
-		component.BoneInfoList = animData.BoneInfoList;
-		component.CurrentAnimation = animData.Animations.GetAnimationName(component.CurrentAnimationIndex); // Default animation is 0
+		memcpy(&component.BoneInfoList[0], animData.BoneInfoList.data(), animData.BoneInfoList.size() * sizeof(BoneInfo));
+		component.BoneInfoSize = (uint32)animData.BoneInfoList.size();
+		//component.CurrentAnimation = animData.Animations.GetAnimationName(component.CurrentAnimationIndex); // Default animation is 0
 		return component;
 	}
 	

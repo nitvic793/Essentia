@@ -22,6 +22,7 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<PostProcessVolumeComponent>();
 	GComponentReflector.RegisterComponent<BaseDrawableComponent>();
 	GComponentReflector.RegisterComponent<CameraComponent>();
+	GComponentReflector.RegisterComponent<AnimationComponent>();
 }
 
 Scene LoadLevel(const char* fname)
@@ -155,4 +156,11 @@ void Visit(CameraComponent* component, IVisitor* visitor)
 	visitor->Visit(name, MField(Cam, FarZ));
 	visitor->Visit(name, MField(Cam, FieldOfView));
 	visitor->Visit(name, MField(Cam, IsOrthographic));
+}
+
+void Visit(AnimationComponent* component, IVisitor* visitor)
+{
+	auto comp = component;
+	auto name = comp->ComponentName;
+	visitor->Visit(name, MField(comp, CurrentAnimationIndex));
 }

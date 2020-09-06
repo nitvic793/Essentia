@@ -144,8 +144,8 @@ void LoadAnimations(const aiScene* scene, MeshAnimationDescriptor& descriptor)
 			CopyTransformChannel(scene->mAnimations[i]->mChannels[cIndex], animation.Channels[cIndex]);
 		}
 
-		anims[i] = animation;
 		animation.AnimationName = animName;
+		anims[i] = animation;
 		descriptor.AnimationIndexMap.insert(std::pair<std::string, uint32_t>(animName, i));
 	}
 
@@ -289,7 +289,7 @@ MeshData ModelLoader::Load(const std::string& filename)
 	std::vector<BoneInfo> boneInfoList;
 	std::vector<VertexBoneData> bones;
 	bones.resize(NumVertices);
-	MeshAnimationDescriptor meshAnimations;
+	MeshAnimationDescriptor meshAnimations = {};
 
 	for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
 	{
@@ -300,10 +300,10 @@ MeshData ModelLoader::Load(const std::string& filename)
 	mesh.IsAnimated = pScene->HasAnimations();
 	if (pScene->HasAnimations())
 	{
-		LoadAnimations(pScene, meshAnimations);
+		LoadAnimations(pScene, meshAnimations); 
 	}
 
-	AnimationData animData = { boneMapping, boneInfoList, bones, meshAnimations };
+	AnimationData animData = { std::move(boneMapping), std::move(boneInfoList), std::move(bones), std::move(meshAnimations) };
 	mesh.Vertices = std::move(vertices);
 	mesh.Indices = std::move(indices);
 	mesh.MeshEntries = meshEntries;

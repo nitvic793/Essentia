@@ -32,6 +32,7 @@
 #include "VoxelizationStage.h"
 #include "GenerateMipsStage.h"
 #include "VoxelRadiancePostProcess.h"
+#include "AnimationComponent.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -289,8 +290,8 @@ void Renderer::Render(const FrameContext& frameContext)
 
 		auto bounding = meshManager->GetBoundingBox(drawables[i].Mesh);
 		bounding.Transform(bounding, world);
-		if (camera.Frustum.Contains(bounding)) // TODO: Make Frustum Culling System 
-			renderBucket.Insert(drawables[i], 0);
+		if (camera.Frustum.Contains(bounding) && !drawables[i].IsAnimated()) // TODO: Make Frustum Culling System 
+			renderBucket.Insert(drawables[i], 0); 
 		drawables[i].PrevWorldViewProjection = drawables[i].WorldViewProjection;
 	}
 
@@ -428,6 +429,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	this->SetRenderTargets(&hdrRtId, 1, &depthStencilId);
 
 	Draw(commandList, renderBucket, &camera);
+	DrawAnimated(commandList);
 	Draw(commandList, drawableModels, drawableModelCount, &camera);
 
 	for (auto& stage : renderStages[eRenderStageMain]) //Main Render Pass
@@ -563,6 +565,17 @@ void Renderer::EndInitialization()
 void Renderer::DrawMesh(ID3D12GraphicsCommandList* commandList, const MeshView& meshView)
 {
 	commandList->IASetVertexBuffers(0, 1, &meshView.VertexBufferView);
+	commandList->IASetIndexBuffer(&meshView.IndexBufferView);
+	for (auto& m : meshView.MeshEntries)
+	{
+		commandList->DrawIndexedInstanced(m.NumIndices, 1, m.BaseIndex, m.BaseVertex, 0);
+	}
+}
+
+void Renderer::DrawAnimatedMesh(ID3D12GraphicsCommandList* commandList, const MeshView& meshView)
+{
+	const D3D12_VERTEX_BUFFER_VIEW views[] = { meshView.VertexBufferView , meshView.BoneVertexBufferView };
+	commandList->IASetVertexBuffers(0, _countof(views), views);
 	commandList->IASetIndexBuffer(&meshView.IndexBufferView);
 	for (auto& m : meshView.MeshEntries)
 	{
@@ -837,6 +850,25 @@ RenderTargetID Renderer::GetDefaultHDRRenderTarget()
 void Renderer::SetVSync(bool enabled)
 {
 	vsync = enabled;
+}
+
+void Renderer::DrawAnimated(ID3D12GraphicsCommandList* commandList)
+{
+	uint32 count = 0;
+	EntityHandle* entities = GContext->EntityManager->GetEntities<AnimationComponent>(count);
+
+	for (uint32 i = 0; i < count; ++i)
+	{
+		DrawableComponent* drawable = GContext->EntityManager->GetComponent<DrawableComponent>(entities[i]);
+		AnimationComponent* animComponent = GContext->EntityManager->GetComponent<AnimationComponent>(entities[i]);
+
+		commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.DefaultAnimatedPSO)); 
+		SetConstantBufferView(commandList, RootSigCBAll2, animComponent->ArmatureCBV); // Armature/Bones Constant Buffer
+		SetShaderResourceViewMaterial(commandList, RootSigSRVPixel1, drawable->Material); // Material
+		SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView); //World View Proj Constant Buffer
+		MeshView meshView = meshManager->GetMeshView(drawable->Mesh);
+		DrawAnimatedMesh(commandList, meshView);
+	}
 }
 
 void Renderer::Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, const Camera* camera)

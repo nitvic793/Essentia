@@ -11,6 +11,7 @@ typedef uint32 ComponentTypeID;
 
 struct IComponent
 {
+	virtual ~IComponent(){}
 };
 
 #define GComponent(name) \

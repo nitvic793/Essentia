@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Camera.h"
-#include "BaseComponents.h"
+#include "RenderComponents.h"
 #include "Utility.h"
+
 class Timer;
 
 struct FrameContext

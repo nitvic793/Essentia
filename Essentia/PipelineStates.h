@@ -8,6 +8,7 @@ struct PipelineStates
 public:
 	void Initialize();
 	PipelineStateID	DefaultPSO;
+	PipelineStateID	DefaultAnimatedPSO;
 	PipelineStateID DefaultNoAOPSO;
 	PipelineStateID DepthOnlyPSO;
 	PipelineStateID	ShadowDirPSO; // Directional Light Shadow Map PSO

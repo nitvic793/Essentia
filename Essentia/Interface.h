@@ -1,6 +1,7 @@
 #pragma once
 
 #include "BaseComponents.h"
+#include "RenderComponents.h"
 #include "Entity.h"
 #include <iostream>
 #include <cereal/types/vector.hpp>
@@ -11,6 +12,7 @@
 #include <unordered_map>
 #include "Math.h"
 #include "PostProcessComponents.h"
+#include "AnimationComponent.h"
 
 class IVisitor
 {
@@ -20,6 +22,7 @@ public:
 	virtual void Visit(const char* compName, const char* name, MeshHandle& val) { };
 	virtual void Visit(const char* compName, const char* name, MaterialHandle& val) { };
 	virtual void Visit(const char* compName, const char* name, bool& val) { };
+	virtual void Visit(const char* compName, const char* name, uint32& val) { };
 private:
 };
 
@@ -159,6 +162,7 @@ void Visit(SelectedComponent* component, IVisitor* visitor);
 void Visit(PostProcessVolumeComponent* component, IVisitor* visitor);
 void Visit(BaseDrawableComponent* component, IVisitor* visitor);
 void Visit(CameraComponent* component, IVisitor* visitor);
+void Visit(AnimationComponent* component, IVisitor* visitor);
 
 
 

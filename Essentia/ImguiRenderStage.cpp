@@ -61,6 +61,15 @@ public:
 		ImGui::PopID();
 	}
 
+	virtual void Visit(const char* compName, const char* name, uint32& val) override
+	{
+		int value = (int32)val;
+		ImGui::PushID(compName);
+		ImGui::DragInt(name, &value, 0.05f);
+		ImGui::PopID();
+		val = value;
+	}
+
 	virtual void Visit(const char* compName, const char* name, bool& val) override
 	{
 		ImGui::PushID(compName);

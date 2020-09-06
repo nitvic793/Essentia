@@ -52,17 +52,17 @@ struct MeshAnimationDescriptor
 		return &Animations[AnimationIndexMap[animName]];
 	}
 
-	Animation* GetAnimation(uint32_t index)
+	const Animation& GetAnimation(uint32_t index) const
 	{
-		return &Animations[index];
+		return Animations[index];
 	}
 
-	std::string GetAnimationName(uint32_t index) const
+	const std::string& GetAnimationName(uint32_t index) const
 	{
 		return Animations[index].AnimationName;
 	}
 
-	int32_t GetChannelIndex(uint32_t animationIndex, std::string node)
+	int32_t GetChannelIndex(uint32_t animationIndex, std::string node) const
 	{
 		auto& map = Animations[animationIndex].NodeChannelMap;
 		auto index = -1;
@@ -70,12 +70,12 @@ struct MeshAnimationDescriptor
 		{
 			return index;
 		}
-
-		index = map[node];
+		
+		index = map.find(node)->second;
 		return index;
 	}
 
-	AnimationChannel* GetChannel(uint32_t animIndex, std::string node)
+	const AnimationChannel* GetChannel(uint32_t animIndex, std::string node) const
 	{
 		auto channelIndex = GetChannelIndex(animIndex, node);
 		if (channelIndex == -1)
@@ -86,12 +86,28 @@ struct MeshAnimationDescriptor
 		return &Animations[animIndex].Channels[channelIndex];
 	}
 
+	std::vector<std::string> GetAnimationNames() const
+	{
+		std::vector<std::string> animNames;
+		for (auto anim : AnimationIndexMap) 
+		{
+			animNames.push_back(anim.first);
+		}
+		
+		return animNames;
+	}
+
+	uint32_t GetAnimationCount() const
+	{
+		return (uint32_t)Animations.size();
+	}
+
 };
 
-uint32_t FindPosition(float AnimationTime, AnimationChannel* channel);
-uint32_t FindScaling(float AnimationTime, AnimationChannel* channel);
-uint32_t FindRotation(float AnimationTime, AnimationChannel* channel);
+uint32_t FindPosition(float AnimationTime, const AnimationChannel* channel);
+uint32_t FindScaling(float AnimationTime, const AnimationChannel* channel);
+uint32_t FindRotation(float AnimationTime, const AnimationChannel* channel);
 
-DirectX::XMFLOAT3 InterpolatePosition(float animTime, AnimationChannel* channel);
-DirectX::XMFLOAT3 InterpolateScaling(float animTime, AnimationChannel* channel);
-DirectX::XMFLOAT4 InterpolateRotation(float animTime, AnimationChannel* channel);
+DirectX::XMFLOAT3 InterpolatePosition(float animTime, const AnimationChannel* channel);
+DirectX::XMFLOAT3 InterpolateScaling(float animTime, const AnimationChannel* channel);
+DirectX::XMFLOAT4 InterpolateRotation(float animTime, const AnimationChannel* channel);

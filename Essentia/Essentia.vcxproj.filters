@@ -555,6 +555,9 @@
     <ClInclude Include="AnimationSystem.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="RenderComponents.h">
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -658,6 +661,9 @@
     </FxCompile>
     <FxCompile Include="WireframeVS.hlsl">
       <Filter>Shaders\Wireframe</Filter>
+    </FxCompile>
+    <FxCompile Include="AnimatedDefaultVS.hlsl">
+      <Filter>Shaders\PBR</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

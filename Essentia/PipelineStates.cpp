@@ -110,6 +110,11 @@ void PipelineStates::CreateDefaultPSOs()
 	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
 
 	DefaultPSO = resourceManager->CreatePSO(psoDesc);
+
+	psoDesc.VS = ShaderManager::LoadShader(L"AnimatedDefaultVS.cso");
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::AnimationLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::AnimationLayout);
+	DefaultAnimatedPSO = resourceManager->CreatePSO(psoDesc);
 }
 
 void PipelineStates::CreateLightAccumPSO()

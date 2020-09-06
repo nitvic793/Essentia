@@ -188,6 +188,13 @@ public:
 	template<typename T>
 	T* GetComponent(EntityHandle entity);
 
+	/**
+	 * Try get component associated with entity. Will create component pool if not found
+	 * .
+	 */
+	template<typename T>
+	T* TryGetComponent(EntityHandle entity);
+
 	template<typename T>
 	T* GetAllComponents(uint32& count);
 
@@ -259,6 +266,13 @@ template<typename T>
 inline T* ComponentManager::GetComponent(EntityHandle entity)
 {
 	return (T*)pools[T::Type]->GetComponent(entity);
+}
+
+template<typename T>
+inline T* ComponentManager::TryGetComponent(EntityHandle entity)
+{
+	ComponentPool<T>* pool = GetOrCreatePool<T>();
+	return (T*)pool->GetComponent(entity);
 }
 
 template<typename T>

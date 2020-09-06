@@ -3,7 +3,7 @@
 
 using namespace DirectX;
 
-uint32_t FindPosition(float AnimationTime, AnimationChannel* channel)
+uint32_t FindPosition(float AnimationTime, const AnimationChannel* channel)
 {
 	for (uint32_t i = 0; i < channel->PositionKeys.size() - 1; i++) {
 		if (AnimationTime < (float)channel->PositionKeys[i + 1].Time) {
@@ -15,7 +15,7 @@ uint32_t FindPosition(float AnimationTime, AnimationChannel* channel)
 	return 0;
 }
 
-uint32_t FindScaling(float AnimationTime, AnimationChannel* channel)
+uint32_t FindScaling(float AnimationTime, const AnimationChannel* channel)
 {
 	for (uint32_t i = 0; i < channel->ScalingKeys.size() - 1; i++) {
 		if (AnimationTime < (float)channel->ScalingKeys[i + 1].Time) {
@@ -27,7 +27,7 @@ uint32_t FindScaling(float AnimationTime, AnimationChannel* channel)
 	return 0;
 }
 
-uint32_t FindRotation(float AnimationTime, AnimationChannel* channel)
+uint32_t FindRotation(float AnimationTime, const AnimationChannel* channel)
 {
 	for (uint32_t i = 0; i < channel->RotationKeys.size() - 1; i++) {
 		if (AnimationTime < (float)channel->RotationKeys[i + 1].Time) {
@@ -39,7 +39,7 @@ uint32_t FindRotation(float AnimationTime, AnimationChannel* channel)
 	return 0;
 }
 
-XMFLOAT3 InterpolatePosition(float animTime, AnimationChannel* channel)
+XMFLOAT3 InterpolatePosition(float animTime, const AnimationChannel* channel)
 {
 	auto outFloat3 = XMFLOAT3();
 	auto Out = XMVectorSet(0, 0, 0, 0);
@@ -65,7 +65,7 @@ XMFLOAT3 InterpolatePosition(float animTime, AnimationChannel* channel)
 }
 
 
-XMFLOAT3 InterpolateScaling(float animTime, AnimationChannel* channel)
+XMFLOAT3 InterpolateScaling(float animTime, const AnimationChannel* channel)
 {
 	auto outFloat3 = XMFLOAT3();
 	auto Out = XMVectorSet(0, 0, 0, 0);
@@ -90,7 +90,7 @@ XMFLOAT3 InterpolateScaling(float animTime, AnimationChannel* channel)
 	return outFloat3;
 }
 
-XMFLOAT4 InterpolateRotation(float animTime, AnimationChannel* channel)
+XMFLOAT4 InterpolateRotation(float animTime, const AnimationChannel* channel)
 {
 	auto outFloat4 = XMFLOAT4();
 	auto Out = XMVectorSet(0, 0, 0, 0);

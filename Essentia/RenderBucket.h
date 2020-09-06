@@ -5,8 +5,7 @@
 #include <unordered_map>
 #include "BaseComponents.h"
 #include "Engine.h"
-
-
+#include "PipelineStates.h"
 
 struct MeshBucket
 {
@@ -41,7 +40,6 @@ struct RenderBucket
 		auto meshView = es::GetMeshView(meshHandle);
 
 		ID3D12PipelineState* pso = es::GetPSO(material.PipelineID);
-
 		if (Pipelines.find(material.PipelineID) == Pipelines.end())
 		{
 			Pipelines[material.PipelineID] = { pso };

@@ -17,6 +17,7 @@
 #include "ShaderResourceManager.h"
 #include "Timer.h"
 #include "BaseComponents.h"
+#include "RenderComponents.h"
 #include "RenderBucket.h"
 #include "FrameContext.h"
 #include "RenderStage.h"
@@ -49,6 +50,7 @@ public:
 	void	CleanUp();
 	void	EndInitialization();
 	void	DrawMesh(ID3D12GraphicsCommandList* commandList, const MeshView& meshView);
+	void	DrawAnimatedMesh(ID3D12GraphicsCommandList* commandList, const MeshView& meshView);
 	void    DrawMesh(ID3D12GraphicsCommandList* commandList, MeshHandle mesh);
 	void	SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID* depthStencilId, bool singleHandleToRTsDescriptorRange = false);
 
@@ -92,6 +94,7 @@ public:
 	RenderTargetID				GetDefaultRenderTarget();
 	RenderTargetID				GetDefaultHDRRenderTarget();
 	void						SetVSync(bool enabled);
+	void						DrawAnimated(ID3D12GraphicsCommandList* commandList);
 	void						Draw(ID3D12GraphicsCommandList* commandList, const RenderBucket& bucket, const Camera* camera);
 	void						Draw(ID3D12GraphicsCommandList* commandList, DrawableModelComponent* drawableModels, uint32 count, const Camera* camera);
 	void						SetPipelineState(ID3D12GraphicsCommandList* commandList, PipelineStateID pipelineStateId);					
