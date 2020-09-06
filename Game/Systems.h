@@ -1,17 +1,36 @@
 #pragma once
 
 #include "System.h"
+#include "RenderComponents.h"
 #include <DirectXMath.h>
 
 using namespace DirectX;
+
+struct TestComponent : public IComponent
+{
+	GComponent(TestComponent)
+
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+	};
+};
+
+
 class RotationSystem : public ISystem
 {
 public:
 	virtual void Initialize()
 	{
 		cManager = entityManager->GetComponentManager();
-		//auto e = entityManager->CreateEntity(DefaultTransform, 1);
-		//entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
+		auto e = entityManager->CreateEntity(DefaultTransform, 1);
+		entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
+		//entityManager->AddComponent<TestComponent>(e);
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override

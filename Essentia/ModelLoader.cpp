@@ -218,17 +218,17 @@ void ProcessMesh(UINT index, aiMesh* mesh, const aiScene* scene, std::vector<Ver
 
 }
 
-void LoadBones(UINT index, const aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::unordered_map<std::string, uint32_t>& boneMapping, std::vector<BoneInfo>& boneInfoList, std::vector<VertexBoneData>& bones)
+void LoadBones(UINT index, const aiMesh* mesh, const aiScene* scene, std::vector<MeshEntry> meshEntries, std::unordered_map<std::string, uint32_t>& boneMapping, std::vector<BoneInfo>& boneInfoList, std::vector<VertexBoneData>& bones, uint32_t& numBones, uint32_t& boneIndex)
 {
 	if (mesh->HasBones())
 	{
 		auto globalTransform = MathHelper::aiMatrixToXMFloat4x4(&scene->mRootNode->mTransformation);
 		XMFLOAT4X4 invGlobalTransform;
 		XMStoreFloat4x4(&invGlobalTransform, XMMatrixInverse(nullptr, XMLoadFloat4x4(&globalTransform)));
-		uint32_t numBones = 0;
+		//uint32_t numBones = 0;
 		for (uint32_t i = 0; i < mesh->mNumBones; i++)
 		{
-			uint32_t boneIndex = 0;
+			//uint32_t boneIndex = 0;
 			std::string boneName(mesh->mBones[i]->mName.data);
 			if (boneMapping.find(boneName) == boneMapping.end()) //if bone not found
 			{
@@ -290,11 +290,12 @@ MeshData ModelLoader::Load(const std::string& filename)
 	std::vector<VertexBoneData> bones;
 	bones.resize(NumVertices);
 	MeshAnimationDescriptor meshAnimations = {};
-
+	uint32_t numBones = 0;
+	uint32_t boneIndex = 0;
 	for (uint32 i = 0; i < pScene->mNumMeshes; ++i)
 	{
 		ProcessMesh(i, pScene->mMeshes[i], pScene, vertices, indices);
-		LoadBones(i, pScene->mMeshes[i], pScene, meshEntries, boneMapping, boneInfoList, bones);
+		LoadBones(i, pScene->mMeshes[i], pScene, meshEntries, boneMapping, boneInfoList, bones, numBones, boneIndex);
 	}
 
 	mesh.IsAnimated = pScene->HasAnimations();

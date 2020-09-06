@@ -70,7 +70,7 @@ struct DrawableComponent : public IDrawable
 		component.CBView = es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
 		component.Mesh = mesh;
 		component.Material = material;
-		component.Flags = kDrawableShadowCaster | GContext->MeshManager->IsAnimated(mesh) ? kDrawableAnimatedMesh : kDrawableNoneFlag;
+		component.Flags = kDrawableShadowCaster | (GContext->MeshManager->IsAnimated(mesh) ? kDrawableAnimatedMesh : kDrawableNoneFlag);
 		return component;
 	}
 
