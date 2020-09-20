@@ -40,7 +40,7 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 	for (uint32 i = 0; i < count; ++i)
 	{
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(animComponents[i].Mesh);
-		//animComponents[i].CurrentAnimation = animData.Animations.GetAnimationName(animComponents[i].CurrentAnimationIndex);
+		animComponents[i].CurrentAnimation = animData.Animations.GetAnimationName(animComponents[i].CurrentAnimationIndex);
 		const Animation& animation = animData.Animations.GetAnimation(animComponents[i].CurrentAnimationIndex);
 		animComponents[i].TotalTime = totalTime;
 		BoneTransform(animComponents[i], animation);

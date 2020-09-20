@@ -163,4 +163,5 @@ void Visit(AnimationComponent* component, IVisitor* visitor)
 	auto comp = component;
 	auto name = comp->ComponentName;
 	visitor->Visit(name, MField(comp, CurrentAnimationIndex));
+	visitor->Visit(name, MField(comp, CurrentAnimation));
 }

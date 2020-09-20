@@ -16,7 +16,7 @@ struct AnimationComponent : public IComponent
 	BoneInfo					BoneInfoList[CMaxBones];
 	uint32						BoneInfoSize = 0;
 	uint32						CurrentAnimationIndex = 0;
-	//std::string					CurrentAnimation;
+	std::string_view			CurrentAnimation;
 	float						TotalTime = 0.f;
 	float						AnimationSpeed = 1.f;
 
@@ -28,7 +28,7 @@ struct AnimationComponent : public IComponent
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(mesh);
 		memcpy(&component.BoneInfoList[0], animData.BoneInfoList.data(), animData.BoneInfoList.size() * sizeof(BoneInfo));
 		component.BoneInfoSize = (uint32)animData.BoneInfoList.size();
-		//component.CurrentAnimation = animData.Animations.GetAnimationName(component.CurrentAnimationIndex); // Default animation is 0
+		component.CurrentAnimation = animData.Animations.GetAnimationName(component.CurrentAnimationIndex); // Default animation is 0
 		return component;
 	}
 	

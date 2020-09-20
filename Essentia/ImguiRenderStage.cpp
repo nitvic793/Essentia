@@ -70,6 +70,13 @@ public:
 		val = value;
 	}
 
+	virtual void Visit(const char* compName, const char* name, std::string_view& val) override
+	{
+		ImGui::PushID(compName);
+		ImGui::Text("%s: %s",name, val.data());
+		ImGui::PopID();
+	}
+
 	virtual void Visit(const char* compName, const char* name, int32& val) override
 	{
 		int value = (int32)val;

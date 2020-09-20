@@ -24,6 +24,7 @@ public:
 	virtual void Visit(const char* compName, const char* name, bool& val) { };
 	virtual void Visit(const char* compName, const char* name, uint32& val) { };
 	virtual void Visit(const char* compName, const char* name, int32& val) { };
+	virtual void Visit(const char* compName, const char* name, std::string_view& val) { };
 
 	template<typename T>
 	void Visit(const char* compName, const char* name, T& val) {};
