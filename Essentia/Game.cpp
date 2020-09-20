@@ -114,6 +114,7 @@ Game::~Game()
 	coreSystemsManager.Destroy();
 	gameSystemsManager.Destroy();
 	renderer->CleanUp();
+	GComponentReflector.CleanUp();
 }
 
 void Game::Render()

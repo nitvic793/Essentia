@@ -10,6 +10,8 @@ struct TestComponent : public IComponent
 {
 	GComponent(TestComponent)
 
+	float	TestValue = 1.f;
+	int32	TestInt = 10;
 	template<class Archive>
 	void save(Archive& archive) const
 	{
@@ -30,7 +32,7 @@ public:
 		cManager = entityManager->GetComponentManager();
 		auto e = entityManager->CreateEntity(DefaultTransform, 1);
 		entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
-		//entityManager->AddComponent<TestComponent>(e);
+		entityManager->AddComponent<TestComponent>(e);
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override

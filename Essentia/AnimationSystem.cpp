@@ -47,7 +47,7 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 
 		GContext->ShaderResourceManager->CopyToCB(GContext->RendererInstance->GetCurrentBackbufferIndex(),
 			{ &animComponents[i].ArmatureConstantBuffer, sizeof(PerArmatureConstantBuffer) },
-			animComponents[i].ArmatureCBV); 
+			animComponents[i].ArmatureCBV);
 	}
 }
 

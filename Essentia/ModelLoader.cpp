@@ -304,6 +304,43 @@ MeshData ModelLoader::Load(const std::string& filename)
 		LoadAnimations(pScene, meshAnimations); 
 	}
 
+	std::vector<MeshMaterial> materials(pScene->mNumMeshes);
+	if (pScene->HasMaterials())
+	{
+		for (uint32 i = 0; i < pScene->mNumMeshes; i++)
+		{
+			auto matId = pScene->mMeshes[i]->mMaterialIndex;
+			auto mat = pScene->mMaterials[matId];
+			auto c = mat->mNumProperties;
+			aiString diffuseTexture;
+			aiString normalTexture;
+			aiString roughnessTexture;
+			aiString metalnessTexture;
+			MeshMaterial mMat;
+			if (mat->GetTexture(aiTextureType_DIFFUSE, 0, &diffuseTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Diffuse = diffuseTexture.C_Str();
+			}
+
+			if (mat->GetTexture(aiTextureType_NORMALS, 0, &normalTexture) == aiReturn_SUCCESS || mat->GetTexture(aiTextureType_HEIGHT, 0, &normalTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Normal = normalTexture.C_Str();
+			}
+
+			if (mat->GetTexture(aiTextureType_SPECULAR, 0, &roughnessTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Roughness = roughnessTexture.C_Str();
+			}
+
+			if (mat->GetTexture(aiTextureType_AMBIENT, 0, &metalnessTexture) == aiReturn_SUCCESS)
+			{
+				mMat.Metalness = metalnessTexture.C_Str();
+			}
+
+			materials[i] = mMat;
+		}
+	}
+
 	AnimationData animData = { std::move(boneMapping), std::move(boneInfoList), std::move(bones), std::move(meshAnimations) };
 	mesh.Vertices = std::move(vertices);
 	mesh.Indices = std::move(indices);
@@ -392,7 +429,6 @@ ModelData  ModelLoader::LoadModel(const std::string& filename)
 
 			materials[i] = mMat;
 		}
-
 	}
 
 	return ModelData{ mesh, materials };
