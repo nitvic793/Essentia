@@ -10,6 +10,7 @@ void GameLoader::LoadSystems(Game* game, IAllocator* allocator)
 {
 	auto manager = game->GetGameSystemsManager();
 	manager->Destroy();
+	initializeFunc(EngineContext::Context);
 	loadSystemsFunc(manager, allocator);
 	manager->Initialize();
 }
