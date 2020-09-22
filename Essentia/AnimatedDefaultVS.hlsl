@@ -29,7 +29,7 @@ PixelInput main(VertexAnimatedInput input)
     float4 position = float4(input.Position, 1.f);
     if(input.SkinWeights.x !=0)
     {
-        SkinVertex(position, input.Normal, skinTransform);
+        SkinVertex(position, input.Normal, input.Tangent, skinTransform);
     }
     
     float4x4 shadowVP = mul(mul(World, FrameData.ShadowView), FrameData.ShadowProjection);

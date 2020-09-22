@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "AnimationSystem.h"
-
+#include "Trace.h"
 void AnimationSystem::Initialize()
 {
 }
@@ -40,6 +40,12 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 	for (uint32 i = 0; i < count; ++i)
 	{
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(animComponents[i].Mesh);
+		if (!animData.Animations.IsAnimationIndexValid(animComponents[i].CurrentAnimationIndex))
+		{
+			es::Log("[error] Animation index: %d is invalid.", animComponents[i].CurrentAnimationIndex);
+			continue;
+		}
+
 		animComponents[i].CurrentAnimation = animData.Animations.GetAnimationName(animComponents[i].CurrentAnimationIndex);
 		const Animation& animation = animData.Animations.GetAnimation(animComponents[i].CurrentAnimationIndex);
 		animComponents[i].TotalTime = totalTime;

@@ -11,8 +11,11 @@
 #include "ComponentReflector.h"
 #include "ImGuizmo.h"
 #include "GameStateManager.h"
+#include "ImguiConsole.h"
 
 using namespace DirectX;
+
+ImguiConsole* GConsole = nullptr;
 
 void DrawTree(EntityHandle entity, EntityHandle& selected)
 {
@@ -201,12 +204,22 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	ImGuizmo::BeginFrame();
 
 	{
+		static bool showConsole = true;
 		static float f = 0.0f;
 		static int counter = 0;
 		static bool vsync = false;
+		static ImguiConsole console;
+		GConsole = &console;
+
 		ImGui::Begin("Essentia");
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Vsync", &vsync);
+		ImGui::Checkbox("Console", &showConsole);
+
+		if (showConsole)
+		{
+			console.Draw("Console", &showConsole);
+		}
 
 		if (!GContext->GameStateManager->IsPlaying())
 		{

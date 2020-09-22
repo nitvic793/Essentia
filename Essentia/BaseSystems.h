@@ -149,7 +149,7 @@ public:
 #ifdef EDITOR
 		auto stages = GRenderStageManager.GetRenderStageMap();
 		ImGuiIO& io = ImGui::GetIO();
-		debugNav = (io.NavActive || ImGuizmo::IsUsing()) && stages["ImguiRenderStage"]->Enabled;
+		debugNav = (io.NavActive || ImGuizmo::IsUsing() || ImGui::IsAnyItemFocused()) && stages["ImguiRenderStage"]->Enabled;
 #else
 		debugNav = false;
 #endif
@@ -195,7 +195,8 @@ public:
 			yDiff = (float)(mouse.y - prevPos.y) * 0.005f;
 		}
 
-		XMStoreFloat3(transform.Position, pos);
+		if (!debugNav)
+			XMStoreFloat3(transform.Position, pos);
 
 		transform.Rotation->x += yDiff;
 		transform.Rotation->y += xDiff;

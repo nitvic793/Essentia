@@ -11,8 +11,9 @@ float4x4 SkinTransform(float4 weights, uint4 boneIndices, matrix bones[CMaxBones
     return skinTransform;
 }
 
-void SkinVertex(inout float4 position, inout float3 normal, float4x4 skinTransform)
+void SkinVertex(inout float4 position, inout float3 normal, inout float3 tangent, float4x4 skinTransform)
 {
     position = mul(position, skinTransform);
     normal = mul(normal, (float3x3) skinTransform);
+    tangent = mul(tangent, (float3x3) skinTransform);
 }

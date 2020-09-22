@@ -102,6 +102,11 @@ struct MeshAnimationDescriptor
 		return (uint32_t)Animations.size();
 	}
 
+	bool IsAnimationIndexValid(uint32_t animationIndex) const
+	{
+		return (animationIndex <= Animations.size() - 1 && animationIndex >= 0);
+	}
+
 };
 
 uint32_t FindPosition(float AnimationTime, const AnimationChannel* channel);

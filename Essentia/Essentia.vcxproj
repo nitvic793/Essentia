@@ -313,6 +313,7 @@
     <ClInclude Include="GenerateMipsStage.h" />
     <ClInclude Include="ImCurveEdit.h" />
     <ClInclude Include="ImGradient.h" />
+    <ClInclude Include="ImguiConsole.h" />
     <ClInclude Include="ImGuizmo.h" />
     <ClInclude Include="ImSequencer.h" />
     <ClInclude Include="PipelineStates.h" />
@@ -371,6 +372,7 @@
     <ClInclude Include="StringHash.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Timer.h" />
+    <ClInclude Include="Trace.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="Utility.h" />
     <ClInclude Include="VelocityBufferStage.h" />

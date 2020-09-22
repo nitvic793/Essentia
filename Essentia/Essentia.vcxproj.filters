@@ -106,6 +106,9 @@
     <Filter Include="Source Files\Animation">
       <UniqueIdentifier>{2823fa1d-830f-495b-bd34-02ab97e80a32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Editor">
+      <UniqueIdentifier>{0168ef82-7816-49dd-8329-88bbe4d4ab32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -563,6 +566,12 @@
     </ClInclude>
     <ClInclude Include="RenderComponents.h">
       <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="ImguiConsole.h">
+      <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Trace.h">
+      <Filter>Header Files\Editor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
