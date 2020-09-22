@@ -97,8 +97,9 @@ public:
 	std::string					GetTextureName(TextureID textureId);
 	std::vector<std::string>	GetAllMaterialNames();
 
+	const std::vector<MaterialData>&	GetAllMaterialData();
 	//Will only return textures created via files.
-	std::vector<TextureProperties>	GetAllTextures();
+	std::vector<TextureProperties>		GetAllTextures();
 
 	D3D12_GPU_DESCRIPTOR_HANDLE GetTextureGPUHandle(TextureID texID);
 	D3D12_CPU_DESCRIPTOR_HANDLE GetTextureCPUHandle(TextureID texID);
@@ -118,6 +119,7 @@ private:
 	uint64					currentCBufferOffset = 0;
 	std::vector<Material>	materials;
 
+	std::vector<MaterialData>						materialDataList;
 	std::unordered_map<uint32, std::string>			materialNameMap;
 	std::unordered_map<uint32, std::string>			textureNameMap;
 	std::vector<std::string>						textureFiles;

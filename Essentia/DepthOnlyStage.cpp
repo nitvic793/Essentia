@@ -5,6 +5,7 @@
 #include "PipelineStates.h"
 #include "Mesh.h"
 #include "SceneResources.h"
+#include "AnimationComponent.h"
 
 void DepthOnlyStage::Initialize()
 {
@@ -57,6 +58,7 @@ void DepthOnlyStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 
 	for (uint32 i = 0; i < count; ++i)
 	{
+		if (drawables[i].IsAnimated())continue;
 		auto mesh = drawables[i].Mesh;
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawables[i].CBView);
 		renderer->DrawMesh(commandList, mesh);
@@ -69,6 +71,17 @@ void DepthOnlyStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawableModels[i].CBView);
 		auto meshHandle = model.Mesh;
 		renderer->DrawMesh(commandList, meshHandle);
+	}
+
+	renderer->SetPipelineState(commandList, GPipelineStates.DepthOnlyAnimatedPSO);
+	auto entites = frameContext.EntityManager->GetEntities<AnimationComponent>(count);
+	for (uint32 i = 0; i < count; ++i)
+	{
+		auto drawable = GContext->EntityManager->GetComponent<DrawableComponent>(entites[i]);
+		auto animComponent = GContext->EntityManager->GetComponent<AnimationComponent>(entites[i]);
+		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
+		renderer->SetConstantBufferView(commandList, RootSigCBAll1, animComponent->ArmatureCBV);
+		renderer->DrawAnimatedMesh(commandList, GContext->MeshManager->GetMeshView(drawable->Mesh));
 	}
 
 	TransitionDesc endTransitions[] = {

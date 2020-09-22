@@ -11,7 +11,7 @@ struct TestComponent : public IComponent
 	GComponent(TestComponent)
 
 	float	TestValue = 1.f;
-	int32	TestInt = 10;
+	int32	TestInt = 10;  
 	template<class Archive>
 	void save(Archive& archive) const
 	{
@@ -30,9 +30,9 @@ public:
 	virtual void Initialize()
 	{
 		cManager = entityManager->GetComponentManager();
-		auto e = entityManager->CreateEntity(DefaultTransform, 1);
-		entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
-		entityManager->AddComponent<TestComponent>(e);
+		//auto e = entityManager->CreateEntity(DefaultTransform, 1);
+		//entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
+		//entityManager->AddComponent<TestComponent>(e);
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override
@@ -41,7 +41,7 @@ public:
 
 		auto transform = GetTransform(entities[0]);
 		transform.Rotation->y = totalTime / 2;
-		transform.Position->x = 2 * sin(totalTime * 2);
+		transform.Position->x = 9.1f * sin(totalTime * 2);
 		transform.Position->y = 1;
 
 		transform = GetTransform(entities[1]);

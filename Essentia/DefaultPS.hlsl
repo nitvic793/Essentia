@@ -250,7 +250,7 @@ float4 main(PixelInput input) : SV_TARGET
 
     float3 finalColor = AmbientPBR(DirLights[CPrimaryDirLight], normalize(normal), worldPos,
 		CameraPosition, roughness, metal, texColor.rgb,
-		specColor, irradiance, prefilter, brdf, ao) * shadowAmount; // (0.1 * (shadowAmount + 0.1f));
+		specColor, irradiance, prefilter, brdf, ao) * 0.5f;// * shadowAmount; // (0.1 * (shadowAmount + 0.1f));
     
     float3 globalRadiance = VoxelGlobalDiffuse(worldPos, normal);
     
@@ -275,5 +275,5 @@ float4 main(PixelInput input) : SV_TARGET
     clip(texColor.a - 0.2f);
 
     float3 output = finalColor;
-    return float4(output + globalRadiance * texColor.rgb, 1.0f);
+    return float4(output /*+ globalRadiance * texColor.rgb*/, 1.0f);
 }

@@ -68,6 +68,7 @@ TextureID VelocityBufferStage::RenderPostProcess(uint32 backbufferIndex, Texture
 	auto drawables = ec->EntityManager->GetComponents<DrawableComponent>(count);
 	for (uint32 i = 0; i < count; ++i)
 	{
+		if (drawables[i].IsAnimated()) continue;
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawables[i].CBView);
 		renderer->DrawMesh(commandList, drawables[i].Mesh);
 	}

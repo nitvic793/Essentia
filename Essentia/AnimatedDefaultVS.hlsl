@@ -1,7 +1,6 @@
 #include "Common.hlsli"
 #include "FrameCommon.hlsli"
-
-#define CMaxBones 128
+#include "AnimationCommon.hlsli"
 
 cbuffer PerObject : register(b0)
 {
@@ -22,27 +21,10 @@ cbuffer PerArmature : register(b2)
     matrix Bones[CMaxBones];
 };
 
-float4x4 SkinTransform(float4 weights, uint4 boneIndices)
-{
-	// Calculate the skin transform from up to four bones and weights
-    float4x4 skinTransform =
-			Bones[boneIndices.x] * weights.x +
-			Bones[boneIndices.y] * weights.y +
-			Bones[boneIndices.z] * weights.z +
-			Bones[boneIndices.w] * weights.w;
-    return skinTransform;
-}
-
-void SkinVertex(inout float4 position, inout float3 normal, float4x4 skinTransform)
-{
-    position = mul(position, skinTransform);
-    normal = mul(normal, (float3x3) skinTransform);
-}
-
 PixelInput main(VertexAnimatedInput input)
 {
     PixelInput output;
-    float4x4 skinTransform = SkinTransform(input.SkinWeights, input.SkinIndices);
+    float4x4 skinTransform = SkinTransform(input.SkinWeights, input.SkinIndices, Bones);
     
     float4 position = float4(input.Position, 1.f);
     if(input.SkinWeights.x !=0)

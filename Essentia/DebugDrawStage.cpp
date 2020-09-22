@@ -31,6 +31,7 @@ void DebugDrawStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 		auto drawable = frameContext.EntityManager->GetComponent<DrawableComponent>(entities[i]);
 		if (drawable)
 		{
+			if (drawable->IsAnimated())continue;
 			GContext->MeshManager->GetBoundingBox(drawable->Mesh);
 			renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
 			renderer->DrawMesh(commandList, drawable->Mesh);

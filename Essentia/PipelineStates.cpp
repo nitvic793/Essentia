@@ -47,6 +47,11 @@ void PipelineStates::Initialize()
 	psoDesc.DSVFormat = renderer->GetDepthStencilFormat();
 	
 	DepthOnlyPSO = resourceManager->CreatePSO(psoDesc);
+
+	psoDesc.VS = ShaderManager::LoadShader(L"DepthOnlyAnimatedVS.cso");
+	psoDesc.InputLayout.pInputElementDescs = InputLayout::AnimationLayout;
+	psoDesc.InputLayout.NumElements = _countof(InputLayout::AnimationLayout);
+	DepthOnlyAnimatedPSO = resourceManager->CreatePSO(psoDesc);
 	
 	psoDesc.VS = ShaderManager::LoadShader(L"DefaultVS.cso");
 	psoDesc.InputLayout.pInputElementDescs = nullptr;

@@ -11,6 +11,7 @@ public:
 	PipelineStateID	DefaultAnimatedPSO;
 	PipelineStateID DefaultNoAOPSO;
 	PipelineStateID DepthOnlyPSO;
+	PipelineStateID DepthOnlyAnimatedPSO;
 	PipelineStateID	ShadowDirPSO; // Directional Light Shadow Map PSO
 	PipelineStateID ScreenSpaceAOPSO;
 	PipelineStateID SSAOBlurPSO;

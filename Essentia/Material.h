@@ -28,3 +28,9 @@ enum MaterialTextureType
 	MetalnessID = 3,
 	MaterialTextureCount = 4
 };
+
+struct MaterialData
+{
+	TextureID*	Textures;
+	uint32		TextureCount;
+};

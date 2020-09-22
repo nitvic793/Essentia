@@ -110,6 +110,7 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	commandList->ClearDepthStencilView(rtManager->GetDSVHandle(shadowDepthTarget.DepthStencil), D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 	for (size_t i = 0; i < drawableCount; ++i)
 	{
+		if (drawables[i].IsAnimated()) continue;
 		params.World = worlds[i];
 		auto cbv = cbvStack.Pop();
 		shaderResourceManager->CopyToCB(frameIndex, DataPack{ &params, sizeof(params) }, cbv);

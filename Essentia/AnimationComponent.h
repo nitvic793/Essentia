@@ -35,10 +35,21 @@ struct AnimationComponent : public IComponent
 	template<class Archive>
 	void save(Archive& archive) const
 	{
+		archive(
+			CEREAL_NVP(CurrentAnimationIndex),
+			CEREAL_NVP(Mesh.Id)
+		);
 	};
 
 	template<class Archive>
 	void load(Archive& archive)
 	{
+		archive(
+			CEREAL_NVP(CurrentAnimationIndex),
+			CEREAL_NVP(Mesh.Id)
+		);
+		AnimationComponent component = Create(Mesh);
+		component.CurrentAnimationIndex = CurrentAnimationIndex;
+		*this = component;
 	};
 };

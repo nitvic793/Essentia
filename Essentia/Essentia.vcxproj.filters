@@ -122,6 +122,12 @@
     <None Include="FrameCommon.hlsli">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Constants.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="AnimationCommon.hlsli">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DeviceResources.cpp">
@@ -664,6 +670,9 @@
     </FxCompile>
     <FxCompile Include="AnimatedDefaultVS.hlsl">
       <Filter>Shaders\PBR</Filter>
+    </FxCompile>
+    <FxCompile Include="DepthOnlyAnimatedVS.hlsl">
+      <Filter>Shaders\Misc</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

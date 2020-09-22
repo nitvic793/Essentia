@@ -52,6 +52,8 @@ private:
 		auto meshes = ec->MeshManager->GetAllMeshNames();
 		auto models = ec->ModelManager->GetAllModelNames();
 		auto textures = ec->ShaderResourceManager->GetAllTextures();
+		auto materialData = ec->ShaderResourceManager->GetAllMaterialData();
+		auto materialNames = ec->ShaderResourceManager->GetAllMaterialNames();
 		for (auto mesh : meshes)
 		{
 			resources.Meshes.push_back(mesh);
@@ -66,6 +68,8 @@ private:
 		{
 			resources.Textures.push_back(texture);
 		}
+
+
 
 		auto componentManager = entityManager->GetComponentManager();
 		flip ? componentManager->RemoveComponent<SelectedComponent>({ 0 }) : componentManager->AddComponent<SelectedComponent>({ 0 });
@@ -86,7 +90,21 @@ private:
 			entityList.push_back(eInterface);
 		}
 
-		::SaveScene({ resources, entityList }, "../../Scene/scene.json");
+		std::vector<MaterialInterface> materials;
+		uint32 index = 0;
+		for (auto& matName : materialNames)
+		{
+			MaterialInterface material{ matName };
+			for (uint32 i = 0; i < materialData[index].TextureCount; ++i)
+			{
+				auto name = GContext->ShaderResourceManager->GetTextureName(materialData[index].Textures[i]);
+				material.Textures.push_back(name);
+			}
+			materials.push_back(material);
+			index++;
+		}
+
+		::SaveScene({ resources, materials, entityList }, "../../Scene/scene.json");
 	}
 
 	float currentTime = 0.f;
@@ -240,7 +258,7 @@ public:
 		auto transform = entityManager->GetTransform(entities[0]);
 		transform.Position->x;
 		auto projection = XMLoadFloat4x4(&camera.Projection);
-		auto view = XMLoadFloat4x4(&camera.View); 
+		auto view = XMLoadFloat4x4(&camera.View);
 
 		PerObjectConstantBuffer perObject;
 		XMStoreFloat4x4(&perObject.View, XMMatrixTranspose(view));

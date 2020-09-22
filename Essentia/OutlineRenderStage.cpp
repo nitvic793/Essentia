@@ -54,6 +54,7 @@ void OutlineRenderStage::Render(const uint32 frameIndex, const FrameContext& fra
 		auto drawable = frameContext.EntityManager->GetComponent<DrawableComponent>(entities[i]);
 		if (drawable)
 		{
+			if (drawable->IsAnimated())continue;
 			renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
 			renderer->DrawMesh(commandList, drawable->Mesh);
 		}

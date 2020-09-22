@@ -13,6 +13,7 @@
 #include "Math.h"
 #include "PostProcessComponents.h"
 #include "AnimationComponent.h"
+#include "PipelineStates.h"
 
 class IVisitor
 {
@@ -88,7 +89,40 @@ struct EntityInterface
 
 struct MaterialInterface
 {
-	std::vector<std::string> Textures;
+	std::string					MaterialName;
+	std::vector<std::string>	Textures;
+
+	template<typename Archive>
+	void save(Archive& archive) const
+	{
+		archive(
+			CEREAL_NVP(MaterialName),
+			CEREAL_NVP(Textures)
+		);
+	}
+
+	template<typename Archive>
+	void load(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(MaterialName),
+			CEREAL_NVP(Textures)
+		);
+
+		std::vector<TextureID> textureIds;
+		for (auto& texture : Textures)
+		{
+			auto extension = texture.substr(texture.size() - 3, 3);
+			std::transform(extension.begin(), extension.end(), extension.begin(),
+				[](unsigned char c) { return std::tolower(c); });
+			TextureType type = (extension == "dds" ? TextureType::DDS : TextureType::WIC);
+			TextureID textureId = GContext->ShaderResourceManager->CreateTexture(texture, type);
+			textureIds.push_back(textureId);
+		}
+
+		Material mat;
+		GContext->ShaderResourceManager->CreateMaterial(textureIds.data(), (uint32)textureIds.size(), GPipelineStates.DefaultPSO, mat, MaterialName.c_str());
+	}
 };
 
 struct ResourcePack
@@ -139,12 +173,16 @@ struct ResourcePack
 struct Scene
 {
 	ResourcePack					Resources;
+	std::vector<MaterialInterface>	Materials;
 	std::vector<EntityInterface>	Entities;
 
 	template<typename Archive>
 	void serialize(Archive& archive)
 	{
-		archive(CEREAL_NVP(Resources), CEREAL_NVP(Entities));
+		archive(
+			CEREAL_NVP(Resources),
+			CEREAL_NVP(Materials),
+			CEREAL_NVP(Entities));
 	}
 };
 
