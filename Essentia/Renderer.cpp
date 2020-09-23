@@ -46,6 +46,10 @@ void Renderer::Initialize()
 	hdrRenderTargetFormat = DXGI_FORMAT_R32G32B32A32_FLOAT;
 	width = 1920;
 	height = 1080;
+
+	internalWidth = 1920;
+	internalHeight = 1080;
+
 	depthFormat = DXGI_FORMAT_D32_FLOAT;
 
 	window = ScopedPtr<Window>(Allocate<Window>());
@@ -56,7 +60,7 @@ void Renderer::Initialize()
 	shaderResourceManager = ScopedPtr<ShaderResourceManager>(Allocate<ShaderResourceManager>());
 	frameManager = ScopedPtr<FrameManager>(Allocate<FrameManager>());
 
-	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
+	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", false);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
 
 	device = deviceResources->GetDevice();
@@ -121,7 +125,7 @@ void Renderer::Initialize()
 
 	for (size_t i = 0; i < CFrameBufferCount; ++i)
 	{
-		TextureCreateProperties props = { (uint32)width, (uint32)height, DXGI_FORMAT_R32G32B32A32_FLOAT };
+		TextureCreateProperties props = { (uint32)internalWidth, (uint32)internalHeight, DXGI_FORMAT_R32G32B32A32_FLOAT };
 		ResourceID resourceId;
 		auto textureId = shaderResourceManager->CreateTexture2D(props, &resourceId);
 		hdrRenderTargets[i] = renderTargetManager->CreateRenderTargetView(resourceManager->GetResource(resourceId), hdrRenderTargetFormat);
@@ -178,11 +182,11 @@ void Renderer::Initialize()
 			auto swapChain = deviceResources->GetSwapChain();
 			if (!commandContext.Get()) return;
 			auto bindex = swapChain->GetCurrentBackBufferIndex();
-			commandContext->WaitForGPU(bindex);
+			commandContext->WaitForFrame();
 			for (int i = 0; i < CFrameBufferCount; ++i)
 			{
 				renderTargetBuffers[i].Reset();
-				commandContext->FenceValue(i) = commandContext->FenceValue(bindex);
+				//commandContext->FenceValue(i) = commandContext->FenceValue(bindex);
 			}
 
 			swapChain->ResizeBuffers(CFrameBufferCount, width, height, renderTargetFormat, 0);

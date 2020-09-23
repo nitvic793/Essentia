@@ -39,6 +39,7 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 	AnimationComponent* animComponents = GContext->EntityManager->GetComponents<AnimationComponent>(count);
 	for (uint32 i = 0; i < count; ++i)
 	{
+		if (!animComponents[i].IsPlaying)break;
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(animComponents[i].Mesh);
 		if (!animData.Animations.IsAnimationIndexValid(animComponents[i].CurrentAnimationIndex))
 		{
@@ -48,7 +49,7 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 
 		animComponents[i].CurrentAnimation = animData.Animations.GetAnimationName(animComponents[i].CurrentAnimationIndex);
 		const Animation& animation = animData.Animations.GetAnimation(animComponents[i].CurrentAnimationIndex);
-		animComponents[i].TotalTime = totalTime;
+		animComponents[i].TotalTime += deltaTime * animComponents[i].AnimationSpeed;
 		BoneTransform(animComponents[i], animation);
 
 		GContext->ShaderResourceManager->CopyToCB(GContext->RendererInstance->GetCurrentBackbufferIndex(),

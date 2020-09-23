@@ -19,6 +19,7 @@ struct AnimationComponent : public IComponent
 	std::string_view			CurrentAnimation;
 	float						TotalTime = 0.f;
 	float						AnimationSpeed = 1.f;
+	bool						IsPlaying = true;
 
 	static AnimationComponent Create(MeshHandle mesh)
 	{

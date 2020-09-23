@@ -164,4 +164,6 @@ void Visit(AnimationComponent* component, IVisitor* visitor)
 	auto name = comp->ComponentName;
 	visitor->Visit(name, MField(comp, CurrentAnimationIndex));
 	visitor->Visit(name, MField(comp, CurrentAnimation));
+	visitor->Visit(name, MField(comp, IsPlaying));
+	visitor->Visit(name, MField(comp, AnimationSpeed));
 }

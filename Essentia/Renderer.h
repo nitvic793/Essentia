@@ -111,6 +111,8 @@ private:
 
 	int32			width;
 	int32			height;
+	int32			internalWidth;
+	int32			internalHeight;
 	uint32			backBufferIndex;
 	uint32			prevBackBufferIndex = CFrameBufferCount - 1;
 	RootSignatureID mainRootSignatureID;
