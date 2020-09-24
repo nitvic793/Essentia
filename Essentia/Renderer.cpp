@@ -86,7 +86,7 @@ void Renderer::Initialize()
 	InitializeCommandContext();
 	CreateRootSignatures();
 
-
+	gpuMemory = MakeScopedArgs<GraphicsMemory>(device);
 	meshManager->Initialize(commandContext.get());
 	shaderResourceManager->Initialize(resourceManager.get(), deviceResources.get());
 	frameManager->Initialize(device);

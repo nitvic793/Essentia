@@ -24,6 +24,7 @@
 #include "MainPassRenderStage.h"
 #include "Utility.h"
 #include "PostProcess.h"
+#include "GraphicsMemory.h"
 
 struct TransitionDesc
 {
@@ -166,6 +167,7 @@ private:
 
 	ScopedPtr<CommandContext>				commandContext;
 	ScopedPtr<ComputeContext>				computeContext;
+	ScopedPtr<DirectX::GraphicsMemory>		gpuMemory;
 };
 
 template<typename T>

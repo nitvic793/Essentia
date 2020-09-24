@@ -39,7 +39,13 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 	AnimationComponent* animComponents = GContext->EntityManager->GetComponents<AnimationComponent>(count);
 	for (uint32 i = 0; i < count; ++i)
 	{
-		if (!animComponents[i].IsPlaying)break;
+		if (!animComponents[i].IsPlaying)
+		{
+			GContext->ShaderResourceManager->CopyToCB(GContext->RendererInstance->GetCurrentBackbufferIndex(),
+				{ &animComponents[i].ArmatureConstantBuffer, sizeof(PerArmatureConstantBuffer) },
+				animComponents[i].ArmatureCBV);
+			break;
+		}
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(animComponents[i].Mesh);
 		if (!animData.Animations.IsAnimationIndexValid(animComponents[i].CurrentAnimationIndex))
 		{
