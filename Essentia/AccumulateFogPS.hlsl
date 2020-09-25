@@ -81,7 +81,7 @@ float LinearZ(float depth)
 float ComputeScattering(float lightDotView)
 {
 	float result = 1.0f - G_SCATTERING * G_SCATTERING;
-	result /= (4.0f * PI * pow(1.0f + G_SCATTERING * G_SCATTERING - (2.0f * G_SCATTERING) * lightDotView, 1.5f));
+    result /= (4.0f * PI * pow(abs(1.0f + G_SCATTERING * G_SCATTERING - (2.0f * G_SCATTERING) * lightDotView), 1.5f));
 	return result;
 }
 
