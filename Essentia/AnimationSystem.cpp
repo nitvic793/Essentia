@@ -22,7 +22,7 @@ void AnimationSystem::Update(float deltaTime, float totalTime)
 				auto comp = AnimationComponent::Create(component->Mesh);
 				entityManager->AddComponent(entity, comp);
 			}
-			component->Flags |= kDrawableAnimatedMesh;
+			component->Flags = component->Flags | kDrawableAnimatedMesh;
 		}
 		else
 		{

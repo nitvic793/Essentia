@@ -17,10 +17,15 @@ cbuffer PerObject : register(b0)
 [maxvertexcount(CNumVertices)]
 void main(
 	triangle GSInput input[3],
-	inout TriangleStream< GSOutput > outputStream
+	inout TriangleStream<GSOutput> outputStream
 )
 {
-    GSOutput output[CNumVertices];
+    GSOutput output[CNumVertices] = 
+        { 
+            { 0.f.xxxx, 0.f.xx, 0.f.xxx, 0.f.xxx, 0.f.xxx, 0.f.xxxx }, 
+            { 0.f.xxxx, 0.f.xx, 0.f.xxx, 0.f.xxx, 0.f.xxx, 0.f.xxxx }, 
+            { 0.f.xxxx, 0.f.xx, 0.f.xxx, 0.f.xxx, 0.f.xxx, 0.f.xxxx } 
+        };
     
     float3 facenormal = abs(input[0].Normal + input[1].Normal + input[2].Normal);
     uint maxi = facenormal[1] > facenormal[0] ? 1 : 0;
@@ -37,7 +42,7 @@ void main(
         output[i].Position.xyz = (maxi == 0) ? output[i].Position.zyx : (maxi == 1) ? output[i].Position.xzy : output[i].Position.xyz;
         //(maxi == 0) ? (output[i].Position.xyz = output[i].Position.zyx) : 0.f;
         //(maxi == 1) ? (output[i].Position.xyz = output[i].Position.xzy) : 0.f;
-    } 
+    }
     
     // Expand triangle to get fake Conservative Rasterization:
     //float2 side0N = normalize(output[1].Position.xy - output[0].Position.xy);
