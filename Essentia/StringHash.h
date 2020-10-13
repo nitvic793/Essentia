@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string_view>
+
 static constexpr uint32_t crc_table[256] =
 {
  0, 0x77073096, 0xEE0E612C, 0x990951BA,
@@ -86,4 +88,27 @@ namespace String
 	}
 
     bool HasSuffix(const std::string& str, const std::string& suffix);
+}
+
+//https://stackoverflow.com/questions/81870/is-it-possible-to-print-a-variables-type-in-standard-c/58331141#58331141
+
+template <typename T>
+constexpr auto TypeName() noexcept {
+	std::string_view name, prefix, suffix;
+#ifdef __clang__
+	name = __PRETTY_FUNCTION__;
+	prefix = "auto type_name() [T = ";
+	suffix = "]";
+#elif defined(__GNUC__)
+	name = __PRETTY_FUNCTION__;
+	prefix = "constexpr auto type_name() [with T = ";
+	suffix = "]";
+#elif defined(_MSC_VER)
+	name = __FUNCSIG__;
+	prefix = "auto __cdecl type_name<";
+	suffix = ">(void) noexcept";
+#endif
+	name.remove_prefix(prefix.size() - 1);
+	name.remove_suffix(suffix.size());
+	return name;
 }

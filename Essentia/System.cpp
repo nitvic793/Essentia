@@ -39,6 +39,11 @@ void SystemManager::Destroy()
 	systems.clear();
 }
 
+const char* ISystem::GetName() const
+{
+	return systemName.c_str();
+}
+
 TransformRef ISystem::GetTransform(EntityHandle entity)
 {
 	return entityManager->GetTransform(entity);

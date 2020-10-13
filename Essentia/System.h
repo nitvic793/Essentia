@@ -4,16 +4,22 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 #include "Camera.h"
+#include "StringHash.h"
 
 class EntityManager;
 
 class ISystem
 {
 public:
+	ISystem() {};
+	ISystem(const char* sysName) :
+		systemName(sysName) {};
 	virtual void Initialize() {};
 	virtual void Update(float deltaTime, float totalTime) {};
 	virtual void Destroy() {};
 	virtual ~ISystem() {};
+
+	const char* GetName() const;
 protected:
 	template<typename T>
 	T*							GetComponents(uint32& outCount);
@@ -28,7 +34,7 @@ protected:
 	EntityManager*				entityManager;
 	DirectX::Keyboard::State	keyboard;
 	DirectX::Mouse::State		mouse;
-	Camera*						camera;
+	std::string					systemName;
 private:
 	
 	friend class SystemManager;
@@ -68,7 +74,11 @@ private:
 template<typename SystemType>
 inline void SystemManager::RegisterSystem()
 {
-	systems.push_back(ScopedPtr<ISystem>((ISystem*)Mem::Alloc<SystemType>()));
+	std::string_view typeName = TypeName<SystemType>();
+	ISystem* system = (ISystem*)Mem::Alloc<SystemType>();
+	system->systemName = TypeName<SystemType>();
+	system->systemName.erase(0, sizeof("class"));
+	systems.push_back(ScopedPtr<ISystem>(system));
 }
 
 template<typename SystemType>
@@ -76,6 +86,8 @@ inline void SystemManager::RegisterSystem(IAllocator* allocator)
 {
 	auto buffer = allocator->Alloc(sizeof(SystemType));
 	ISystem* system = new(buffer) SystemType();
+	system->systemName = TypeName<SystemType>();
+	system->systemName.erase(0, sizeof("class"));
 	systems.push_back(ScopedPtr<ISystem>(system));
 }
 
