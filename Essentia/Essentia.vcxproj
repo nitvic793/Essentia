@@ -250,6 +250,7 @@
     <ClCompile Include="ImGradient.cpp" />
     <ClCompile Include="ImGuizmo.cpp" />
     <ClCompile Include="ImSequencer.cpp" />
+    <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="PipelineStates.cpp" />
     <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="PostProcessDepthOfFieldStage.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="ImguiConsole.h" />
     <ClInclude Include="ImGuizmo.h" />
     <ClInclude Include="ImSequencer.h" />
+    <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PipelineStates.h" />
     <ClInclude Include="PostProcess.h" />
     <ClInclude Include="PostProcessComponents.h" />

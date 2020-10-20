@@ -23,6 +23,7 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<BaseDrawableComponent>();
 	GComponentReflector.RegisterComponent<CameraComponent>();
 	GComponentReflector.RegisterComponent<AnimationComponent>();
+	GComponentReflector.RegisterComponent<BoundingOrientedBoxComponent>();
 }
 
 Scene LoadLevel(const char* fname)
@@ -166,4 +167,8 @@ void Visit(AnimationComponent* component, IVisitor* visitor)
 	visitor->Visit(name, MField(comp, CurrentAnimation));
 	visitor->Visit(name, MField(comp, IsPlaying));
 	visitor->Visit(name, MField(comp, AnimationSpeed));
+}
+
+void Visit(BoundingOrientedBoxComponent* component, IVisitor* visitor)
+{
 }

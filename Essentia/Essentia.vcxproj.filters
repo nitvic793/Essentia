@@ -109,6 +109,9 @@
     <Filter Include="Header Files\Editor">
       <UniqueIdentifier>{0168ef82-7816-49dd-8329-88bbe4d4ab32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Physics">
+      <UniqueIdentifier>{ab83f7e2-db6e-4381-aea0-209235e45a5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -316,6 +319,9 @@
     <ClCompile Include="AnimationSystem.cpp">
       <Filter>Source Files\Animation</Filter>
     </ClCompile>
+    <ClCompile Include="PhysicsHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -495,9 +501,6 @@
     <ClInclude Include="CMath.h">
       <Filter>Header Files\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Utility.h">
-      <Filter>Header Files\DataStructures</Filter>
-    </ClInclude>
     <ClInclude Include="StringHash.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
@@ -572,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="Trace.h">
       <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="Utility.h">
+      <Filter>Header Files\DataStructures</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsHelper.h">
+      <Filter>Header Files\Physics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

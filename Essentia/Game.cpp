@@ -29,6 +29,7 @@ void Game::Setup()
 
 	RegisterComponents();
 	coreSystemsManager.RegisterSystem<TransformUpdateSystem>();
+	coreSystemsManager.RegisterSystem<BoundingBoxUpdateSystem>();
 	coreSystemsManager.RegisterSystem<UpdateBaseDrawablesSystem>();
 	coreSystemsManager.RegisterSystem<UpdateCameraSystem>();
 	coreSystemsManager.RegisterSystem<EditorSaveSystem>();

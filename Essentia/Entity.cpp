@@ -72,7 +72,6 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 pare
 	componentManager.AddComponent<RotationComponent>(entity, rotation);
 	componentManager.AddComponent<ScaleComponent>(entity, scale);
 
-
 	return entity;
 }
 

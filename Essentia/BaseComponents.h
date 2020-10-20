@@ -112,9 +112,15 @@ struct ScaleComponent : public IComponent
 	};
 };
 
+struct BoundingOrientedBoxComponent : public IComponent
+{
+	DirectX::BoundingOrientedBox BoundingOrientedBox;
+	template<class Archive>
+	void serialize(Archive& archive){}
+	GComponent(BoundingOrientedBoxComponent)
+};
 
 
-//TODO: Make camera part of Component System 
 struct CameraComponent : public IComponent
 {
 	Camera CameraInstance;

@@ -131,6 +131,34 @@ public:
 	}
 };
 
+class BoundingBoxUpdateSystem : public ISystem
+{
+public:
+	virtual void Update(float dt, float totalTime) override
+	{
+		EntityManager* entityManager = GContext->EntityManager;
+		ComponentManager* componentManager = entityManager->GetComponentManager();
+		Vector<EntityHandle> entities = componentManager->GetEntities<DrawableComponent>();
+		for (EntityHandle entity : entities)
+		{
+			BoundingOrientedBoxComponent* component = componentManager->TryGetComponent<BoundingOrientedBoxComponent>(entity);
+			DrawableComponent* drawable = entityManager->GetComponent<DrawableComponent>(entity);
+			auto boundBox = GContext->MeshManager->GetBoundingBox(drawable->Mesh);
+			BoundingOrientedBoxComponent initComponent;
+			DirectX::BoundingOrientedBox::CreateFromBoundingBox(initComponent.BoundingOrientedBox, boundBox);
+			if (component == nullptr)
+			{
+				entityManager->AddComponent(entity, initComponent);
+				component = componentManager->GetComponent<BoundingOrientedBoxComponent>(entity);
+			}
+
+			*component = initComponent;
+			auto world = entityManager->GetWorldMatrix(entity);
+			component->BoundingOrientedBox.Transform(component->BoundingOrientedBox, XMLoadFloat4x4(&world));
+		}
+	}
+};
+
 class FreeCameraSystem : public ISystem
 {
 public:

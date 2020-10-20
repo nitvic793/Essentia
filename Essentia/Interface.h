@@ -207,6 +207,7 @@ void Visit(PostProcessVolumeComponent* component, IVisitor* visitor);
 void Visit(BaseDrawableComponent* component, IVisitor* visitor);
 void Visit(CameraComponent* component, IVisitor* visitor);
 void Visit(AnimationComponent* component, IVisitor* visitor);
+void Visit(BoundingOrientedBoxComponent* component, IVisitor* visitor);
 
 
 

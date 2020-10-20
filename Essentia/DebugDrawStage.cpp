@@ -39,7 +39,7 @@ void DebugDrawStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 	auto sz = renderer->GetScreenSize();
 	auto rtManager = GContext->RenderTargetManager;
 	auto entityManager = GContext->EntityManager;
-	static BoundingBox box;
+	static BoundingOrientedBox box;
 	renderer->SetPipelineState(commandList, GPipelineStates.WireframePSO);
 
 	uint32 count = 0;
@@ -50,9 +50,7 @@ void DebugDrawStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 		auto drawable = frameContext.EntityManager->GetComponent<DrawableComponent>(entities[i]);
 		if (drawable)
 		{
-			auto world = GContext->EntityManager->GetWorldMatrix(entities[i]);
-			box = GContext->MeshManager->GetBoundingBox(drawable->Mesh);
-			box.Transform(box, XMLoadFloat4x4(&world));
+			box = GContext->EntityManager->GetComponent<BoundingOrientedBoxComponent>(entities[i])->BoundingOrientedBox;
 			if (drawable->IsAnimated())continue;
 			GContext->MeshManager->GetBoundingBox(drawable->Mesh);
 			renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView);
@@ -67,7 +65,7 @@ void DebugDrawStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 				auto mesh = ec->ModelManager->GetModel(model->Model);
 				renderer->DrawMesh(commandList, mesh.Mesh);
 				auto world = GContext->EntityManager->GetWorldMatrix(entities[i]);
-				box = GContext->MeshManager->GetBoundingBox(mesh.Mesh);
+				BoundingOrientedBox::CreateFromBoundingBox(box, GContext->MeshManager->GetBoundingBox(mesh.Mesh));
 				box.Transform(box, XMLoadFloat4x4(&world));
 			}
 		}

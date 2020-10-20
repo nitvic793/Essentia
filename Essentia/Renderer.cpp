@@ -246,6 +246,8 @@ void Renderer::Clear()
 			stage->Clear();
 		}
 	}
+
+	gpuMemory->Commit(deviceResources->GetCommandQueue());
 }
 
 /***
