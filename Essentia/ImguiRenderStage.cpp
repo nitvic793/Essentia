@@ -12,6 +12,7 @@
 #include "ImGuizmo.h"
 #include "GameStateManager.h"
 #include "ImguiConsole.h"
+#include "System.h"
 
 using namespace DirectX;
 
@@ -165,6 +166,20 @@ public:
 	}
 };
 
+void ShowSystemsWindow(bool* showWindow)
+{
+	auto& coreSystems = GContext->CoreSystemManager->GetSystems();
+	auto& gameSystems = GContext->GameSystemManager->GetSystems();
+	static bool showOpen = true;
+	ImGui::Begin("Systems", showWindow);
+	for (auto& system : coreSystems)
+	{
+		ImGui::Text(system->GetName());
+	}
+
+	ImGui::End();
+}
+
 void ImguiRenderStage::Initialize()
 {
 	auto window = EngineContext::Context->RendererInstance->GetWindow();
@@ -205,6 +220,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 
 	{
 		static bool showConsole = true;
+		static bool showSystemWindow = true;
 		static float f = 0.0f;
 		static int counter = 0;
 		static bool vsync = false;
@@ -215,10 +231,16 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 		ImGui::Checkbox("Vsync", &vsync);
 		ImGui::Checkbox("Console", &showConsole);
+		ImGui::Checkbox("Systems", &showSystemWindow);
 
 		if (showConsole)
 		{
 			console.Draw("Console", &showConsole);
+		}
+
+		if (showSystemWindow)
+		{
+			ShowSystemsWindow(&showSystemWindow);
 		}
 
 		if (!GContext->GameStateManager->IsPlaying())
@@ -257,31 +279,6 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			for (auto stage : postProcesssMap)
 			{
 				ImGui::Checkbox(stage.first.data(), &stage.second->Enabled);
-			}
-		}
-
-		if (ImGui::CollapsingHeader("Entities"))
-		{
-			static int selected = -1;
-			uint32 count = 0;
-			auto entities = em->GetEntities<PositionComponent>(count);
-			for (uint32 i = 0; i < count; ++i)
-			{
-				auto children = em->GetChildren(entities[i]);
-				if (ImGui::Selectable(std::to_string(i).c_str(), selected == i, ImGuiSelectableFlags_AllowDoubleClick))
-				{
-					selected = i;
-					uint32 selectedEntityCount = 0;
-					auto selectedEntities = em->GetEntities<SelectedComponent>(selectedEntityCount);
-					if (selectedEntityCount > 0)
-					{
-						for (uint32 i = 0; i < selectedEntityCount; ++i)
-						{
-							em->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[i]);
-						}
-					}
-					em->AddComponent<SelectedComponent>(entities[i]);
-				}
 			}
 		}
 
@@ -359,14 +356,13 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		if (ImGui::Button("Add Component"))
 		{
 			if (currentItem != nullptr)
+			{
 				cm->AddComponent(currentItem, selectedEntities[0]);
+			}
 		}
 
 		ImGui::End();
 	}
-
-
-
 
 	ImGuizmo::SetRect(0.f, 0.f, camera.Width, camera.Height);
 

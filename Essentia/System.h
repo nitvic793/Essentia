@@ -66,6 +66,7 @@ public:
 	void Initialize();
 	void Update(const DirectX::Keyboard::State& kbState, const DirectX::Mouse::State& mouseState, Camera* camera);
 	void Destroy();
+	const std::vector<ScopedPtr<ISystem>> &GetSystems();
 private:
 	std::vector<ScopedPtr<ISystem>> systems;
 	EntityManager* entityManager = nullptr;

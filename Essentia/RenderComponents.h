@@ -10,8 +10,9 @@ typedef
 enum DrawableRenderFlags
 {
 	kDrawableNoneFlag = 0,
-	kDrawableShadowCaster =  1 << 0,
-	kDrawableAnimatedMesh = 1 << 1
+	kDrawableShadowCaster = 1 << 0,
+	kDrawableAnimatedMesh = 1 << 1,
+	kDrawableInitialized = 1 << 2
 } DrawableRenderFlags;
 
 inline DrawableRenderFlags operator|(DrawableRenderFlags a, DrawableRenderFlags b)
@@ -70,13 +71,18 @@ struct DrawableComponent : public IDrawable
 		component.CBView = es::CreateConstantBufferView(sizeof(PerObjectConstantBuffer));
 		component.Mesh = mesh;
 		component.Material = material;
-		component.Flags = kDrawableShadowCaster | (GContext->MeshManager->IsAnimated(mesh) ? kDrawableAnimatedMesh : kDrawableNoneFlag);
+		component.Flags = kDrawableInitialized | kDrawableShadowCaster | (GContext->MeshManager->IsAnimated(mesh) ? kDrawableAnimatedMesh : kDrawableNoneFlag);
 		return component;
 	}
 
 	bool IsAnimated() const
 	{
 		return Flags & kDrawableAnimatedMesh;
+	}
+
+	constexpr bool IsInitialized() const
+	{
+		return Flags & kDrawableInitialized;
 	}
 
 	template<class Archive>

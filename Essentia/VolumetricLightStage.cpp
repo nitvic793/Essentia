@@ -81,7 +81,7 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	params.InvProjection = camera.GetInverseProjectionTransposed();
 	auto postProcessEntities = compManager->GetEntities<BaseDrawableComponent, PostProcessVolumeComponent>();
 	auto baseDrawable = compManager->GetComponent<BaseDrawableComponent>(postProcessEntities[0]);
-	params.World = baseDrawable->World;
+	//params.World = baseDrawable->World;
 	shaderResourceManager->CopyToCB(frameIndex, { &params, sizeof(params) }, lightAccumCBV);
 	renderer->TransitionBarrier(commandList, intermediatelightAccumTarget.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
@@ -107,7 +107,7 @@ void VolumetricLightStage::Render(const uint32 frameIndex, const FrameContext& f
 	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture, GSceneResources.DepthPrePass.Texture, GSceneResources.NoiseTexture, GSceneResources.WorldPosTexture.Texture };
 	renderer->SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	renderer->SetConstantBufferView(commandList, RootSigCBPixel0, GSceneResources.LightBufferCBV);
-	renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
+	//renderer->SetConstantBufferView(commandList, RootSigCBVertex0, baseDrawable->CBView);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll1, GSceneResources.FrameDataCBV);
 	renderer->SetConstantBufferView(commandList, RootSigCBAll2, lightAccumCBV);
 

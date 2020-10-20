@@ -39,6 +39,11 @@ void SystemManager::Destroy()
 	systems.clear();
 }
 
+const std::vector<ScopedPtr<ISystem>>& SystemManager::GetSystems()
+{
+	return systems;
+}
+
 const char* ISystem::GetName() const
 {
 	return systemName.c_str();
