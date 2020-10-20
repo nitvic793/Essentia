@@ -4,6 +4,8 @@
 #include "RenderComponents.h"
 #include <DirectXMath.h>
 #include "PhysicsHelper.h"
+#include "EventTypes.h"
+#include "Trace.h"
 
 using namespace DirectX;
 
@@ -34,6 +36,7 @@ public:
 		//auto e = entityManager->CreateEntity(DefaultTransform, 1);
 		//entityManager->AddComponent<DrawableComponent>(e, DrawableComponent::Create({ 0 }, { 0 }));
 		//entityManager->AddComponent<TestComponent>(e);
+		es::GEventBus->Subscribe(this, &RotationSystem::OnGameStart);
 	}
 
 	virtual void Update(float deltaTime, float totalTime) override
@@ -74,6 +77,11 @@ public:
 			//component->Intensity = 1 + factor * 2.f;
 			//component->Range = 2 + factor * 8.f;
 		}
+	}
+
+	void OnGameStart(GameStartEvent* event)
+	{
+		es::Log("Game start at %d", event->totalTime);
 	}
 
 private:

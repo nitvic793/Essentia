@@ -15,6 +15,12 @@ class ComponentReflector;
 class ComputeContext;
 class SystemManager;
 class GameStateManager;
+struct ImguiConsole;
+namespace es
+{
+	class EventBus;
+}
+
 
 struct EngineContext;
 extern EngineContext* GContext;
@@ -39,6 +45,8 @@ struct EngineContext
 	SystemManager*			CoreSystemManager = nullptr;
 	SystemManager*			GameSystemManager = nullptr;
 	GameStateManager*		GameStateManager = nullptr;
+	es::EventBus*			EventBus = nullptr;
+	ImguiConsole*			Console = nullptr;
 
 	EngineContext()
 	{

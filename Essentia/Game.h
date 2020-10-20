@@ -10,6 +10,7 @@
 #include "System.h"
 #include "Engine.h"
 #include "GameStateManager.h"
+#include "EventSystem.h"
 #include <queue>
 #include <mutex>
 
@@ -44,6 +45,7 @@ protected:
 	Callback						systemLoadCallback;
 	StackAllocator					frameAllocator;
 	std::queue<Callback>			eventCallbacks;
+	es::EventBus					eventBus;
 private:
 	EngineContext					engineContext;
 };

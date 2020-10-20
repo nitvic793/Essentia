@@ -5,6 +5,7 @@
 #include "BaseSystems.h"
 #include "ComponentReflector.h"
 #include "AnimationSystem.h"
+#include "EventTypes.h"
 
 void Game::Setup()
 {
@@ -23,6 +24,8 @@ void Game::Setup()
 	ec->GameSystemManager = &gameSystemsManager;
 	ec->CoreSystemManager = &coreSystemsManager;
 	ec->GameStateManager = &gameStateManager;
+	ec->EventBus = &eventBus;
+	es::GEventBus = &eventBus;
 
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);
@@ -54,6 +57,11 @@ void Game::Run()
 	float localCounter = 0.f;
 	auto window = renderer->GetWindow();
 	timer.Start();
+
+	GameStartEvent gameStart;
+	gameStart.totalTime = timer.TotalTime;
+	es::GEventBus->Publish(&gameStart);
+
 	window->StartMessagePump([&]
 		{
 			timer.Tick();

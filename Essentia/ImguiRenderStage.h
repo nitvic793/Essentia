@@ -1,5 +1,6 @@
 #pragma once
 #include "RenderStage.h"
+#include "ImguiConsole.h"
 
 class ImguiRenderStage : public IRenderStage
 {
@@ -10,5 +11,6 @@ public:
 private:
 	DescriptorHeap	imguiHeap;
 	bool			show = false;
+	ImguiConsole	console;
 };
 

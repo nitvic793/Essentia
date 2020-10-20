@@ -244,6 +244,7 @@
     <ClCompile Include="DebugDraw.cpp" />
     <ClCompile Include="DebugDrawStage.cpp" />
     <ClCompile Include="DepthOnlyStage.cpp" />
+    <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GenerateMipsStage.cpp" />
     <ClCompile Include="ImCurveEdit.cpp" />
@@ -310,6 +311,8 @@
     <ClInclude Include="DebugDrawStage.h" />
     <ClInclude Include="DepthOnlyStage.h" />
     <ClInclude Include="CMath.h" />
+    <ClInclude Include="EventSystem.h" />
+    <ClInclude Include="EventTypes.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GenerateMipsStage.h" />
     <ClInclude Include="ImCurveEdit.h" />

@@ -13,6 +13,8 @@ void Initialize(EngineContext* context)
 {
 	EngineContext::Context = context;
 	GContext = context;
+	es::GEventBus = context->EventBus;
+	GConsole = context->Console;
 	InitializeResources();
 	GComponentReflector = *context->ComponentReflector;
 }
