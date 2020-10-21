@@ -7,7 +7,7 @@
 #include "AnimationSystem.h"
 #include "EventTypes.h"
 
-void Game::Setup()
+void Game::Setup(Callback gameSystemsInitCallback)
 {
 	renderer = MakeScoped<Renderer>();
 	keyboard = MakeScoped<DirectX::Keyboard>();
@@ -39,10 +39,16 @@ void Game::Setup()
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
 	coreSystemsManager.RegisterSystem<AnimationSystem>();
 
-	// Initialize renderer and core systems. gameSystemsManager is initialized through external invocation.
+	// Initialize renderer and core systems. 
 	renderer->Initialize();
 	renderer->EndInitialization();
 	coreSystemsManager.Initialize();
+
+	// gameSystemsManager is initialized through this external invocation.
+	if (gameSystemsInitCallback) 
+	{
+		gameSystemsInitCallback();
+	}
 
 	// This function also loads resources(textures, meshes) along with the scene entities.
 	gameStateManager.LoadScene("scene.json");

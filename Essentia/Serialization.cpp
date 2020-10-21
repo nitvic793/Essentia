@@ -24,6 +24,7 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<CameraComponent>();
 	GComponentReflector.RegisterComponent<AnimationComponent>();
 	GComponentReflector.RegisterComponent<BoundingOrientedBoxComponent>();
+	GComponentReflector.RegisterComponent<TerrainComponent>();
 }
 
 Scene LoadLevel(const char* fname)
@@ -170,5 +171,9 @@ void Visit(AnimationComponent* component, IVisitor* visitor)
 }
 
 void Visit(BoundingOrientedBoxComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(TerrainComponent* component, IVisitor* visitor)
 {
 }

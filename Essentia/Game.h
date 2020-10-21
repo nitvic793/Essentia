@@ -20,7 +20,7 @@ class Game
 {
 public:
 	Game() {};
-	void			Setup();
+	void			Setup(Callback gameSystemInitCallback);
 	void			Run();
 	void			ReloadSystems();
 	void			SetSystemReloadCallback(Callback callback);

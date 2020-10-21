@@ -120,6 +120,13 @@ struct BoundingOrientedBoxComponent : public IComponent
 	GComponent(BoundingOrientedBoxComponent)
 };
 
+struct TerrainComponent : public IComponent
+{
+	template<class Archive>
+	void serialize(Archive& archive) {}
+	GComponent(TerrainComponent)
+};
+
 
 struct CameraComponent : public IComponent
 {

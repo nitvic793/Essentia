@@ -6,5 +6,5 @@
 
 namespace es
 {
-	bool IsIntersecting(DirectX::BoundingOrientedBox boundingBox, Camera* camera, int mouseX, int mouseY, float& distance);
+	bool IsIntersecting(DirectX::BoundingOrientedBox boundingBox, Camera* camera, int mouseX, int mouseY, float& distance, DirectX::XMFLOAT3& intersectionPoint);
 }

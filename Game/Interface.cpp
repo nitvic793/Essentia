@@ -6,8 +6,24 @@
 #include "EngineContext.h"
 #include "MyGame.h"
 #include "ComponentReflector.h"
+#include "MoveableUnitComponent.h"
 
+struct TestComponent : public IComponent
+{
+	GComponent(TestComponent)
 
+		float	TestValue = 1.f;
+	int32	TestInt = 10;
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+	};
+};
 
 void Initialize(EngineContext* context)
 {
@@ -27,11 +43,17 @@ void* CreateGame(IAllocator* allocator)
 void LoadSystems(SystemManager* systemManager, IAllocator* allocator)
 {
 	systemManager->RegisterSystem<RotationSystem>(allocator);
+	systemManager->RegisterSystem<MoveObjectSystem>(allocator);
 
 	GContext->ComponentReflector->RegisterComponent<TestComponent>(
 		{
-			Field{kFieldTypeFloat, 0, "TestValue", "float"},
-			Field{kFieldTypeInt32, sizeof(float), "TestInt", "int32"}
+			Field{FieldTypes::kFieldTypeFloat, 0, "TestValue", "float"},
+			Field{FieldTypes::kFieldTypeInt32, sizeof(float), "TestInt", "int32"}
 		});
 
+	GContext->ComponentReflector->RegisterComponent<MoveableUnitComponent>(
+		{
+			Field{ FieldTypes::kFieldTypeFloat3, 0, "TargetPos", "XMFLOAT3" },
+			Field{ FieldTypes::kFieldTypeFloat, sizeof(DirectX::XMFLOAT3), "MoveSpeed", "float" },
+		});
 }

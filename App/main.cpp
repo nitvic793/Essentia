@@ -16,6 +16,7 @@ static const char* buildCommandLineStr = "msbuild.exe ../../Essentia.sln /target
 #else
 static const char* buildCommandLineStr = "msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64 /property:Configuration=Release";
 #endif
+
 int main()
 {
 #if defined(DEBUG) | defined(_DEBUG)
@@ -42,9 +43,13 @@ int main()
 		{
 			FileWatcher fw{ "../../Game", std::chrono::milliseconds(2000) };
 			ScopedPtr<Game> game = MakeScoped<Game>();
-			game->Setup();
-			gameLoader.InitializeLoader(EngineContext::Context);
-			gameLoader.LoadSystems(game.get(), &allocator);
+			game->Setup([&]()
+				{
+					gameLoader.InitializeLoader(EngineContext::Context);
+					gameLoader.LoadSystems(game.get(), &allocator);
+				}
+			);
+
 			game->SetSystemReloadCallback([&]()
 				{
 					gameLoader.FreeGameLibrary();
@@ -53,7 +58,7 @@ int main()
 					gameLoader.LoadSystems(game.get(), &allocator);
 				});
 
-			std::thread th([&]()
+			std::thread th([&game, &fw]()
 				{
 					fw.start([&game](auto file, auto status)
 						{

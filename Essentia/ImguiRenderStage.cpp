@@ -13,6 +13,7 @@
 #include "GameStateManager.h"
 #include "ImguiConsole.h"
 #include "System.h"
+#include "Trace.h"
 
 using namespace DirectX;
 
@@ -200,6 +201,7 @@ void ImguiRenderStage::Initialize()
 		imguiHeap.hGPUHeapStart);
 	GConsole = &console;
 	GContext->Console = &console;
+	es::GEventBus->Subscribe(this, &ImguiRenderStage::OnSelectEntity);
 	GRenderStageManager.RegisterStage("ImguiRenderStage", this);
 }
 
@@ -286,14 +288,13 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		{
 			uint32 count = 0;
 			auto entities = em->GetEntities<PositionComponent>(count);
-			static EntityHandle selected = { Handle{CRootParentEntityIndex} };
 			for (uint32 i = 0; i < count; ++i)
 			{
 				if (!em->HasValidParent(entities[i]))
-					DrawTree(entities[i], selected);
+					DrawTree(entities[i], selectedEntity);
 			}
 
-			if (selected.Handle.Index != CRootParentEntityIndex)
+			if (selectedEntity.Handle.Index != CRootParentEntityIndex)
 			{
 				uint32 selectCount;
 				auto selectedEntities = em->GetEntities<SelectedComponent>(selectCount);
@@ -304,7 +305,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 						em->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[i]);
 					}
 				}
-				em->AddComponent<SelectedComponent>(selected);
+				em->AddComponent<SelectedComponent>(selectedEntity);
 			}
 		}
 
@@ -471,4 +472,25 @@ void ImguiRenderStage::CleanUp()
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+}
+
+void ImguiRenderStage::OnSelectEntity(SelectEntityEvent* event)
+{
+	auto entityManager = GContext->EntityManager;
+	selectedEntity = event->entity;
+	es::Log("Selected entity '%s'", entityManager->GetEntityName(selectedEntity).data());
+
+	if (selectedEntity.Handle.Index != CRootParentEntityIndex)
+	{
+		uint32 selectCount;
+		auto selectedEntities = entityManager->GetEntities<SelectedComponent>(selectCount);
+		if (selectCount > 0)
+		{
+			for (uint32 i = 0; i < selectCount; ++i)
+			{
+				entityManager->GetComponentManager()->RemoveComponent<SelectedComponent>(selectedEntities[i]);
+			}
+		}
+		entityManager->AddComponent<SelectedComponent>(selectedEntity);
+	}
 }

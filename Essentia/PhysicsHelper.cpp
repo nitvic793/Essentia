@@ -5,7 +5,7 @@
 
 using namespace DirectX;
 
-bool es::IsIntersecting(DirectX::BoundingOrientedBox boundingBox, Camera* camera, int mouseX, int mouseY, float& distance)
+bool es::IsIntersecting(DirectX::BoundingOrientedBox boundingBox, Camera* camera, int mouseX, int mouseY, float& distance, XMFLOAT3& intersectionPoint)
 {
 	auto screenSize = GContext->RendererInstance->GetScreenSize();
 	uint16_t screenWidth = screenSize.Width;
@@ -40,5 +40,9 @@ bool es::IsIntersecting(DirectX::BoundingOrientedBox boundingBox, Camera* camera
 	auto direction = dest - orig;
 	direction = XMVector3Normalize(direction);
 	bool intersecting = boundingBox.Intersects(orig, direction, distance);
+
+	auto point = orig + direction * distance;
+	XMStoreFloat3(&intersectionPoint, point);
+
 	return intersecting;
 }

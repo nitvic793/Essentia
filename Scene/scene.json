@@ -976,7 +976,8 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "DrawableComponent"
+                    "DrawableComponent",
+                    "MoveableUnitComponent"
                 ],
                 "PositionComponent": {
                     "X": 10.0,
@@ -996,7 +997,44 @@
                 "DrawableComponent": {
                     "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
-                }
+                },
+                "MoveableUnitComponent": {}
+            },
+            {
+                "Name": "QuadPlane",
+                "Entity": {
+                    "entity.ID": 12
+                },
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "DrawableComponent",
+                    "TerrainComponent"
+                ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "DrawableComponent": {
+                    "MeshName": "Assets/Models/plane.obj",
+                    "MaterialName": "0"
+                },
+                "TerrainComponent": {}
             },
             {
                 "Name": "AnimEntity",

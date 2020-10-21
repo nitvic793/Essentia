@@ -4,7 +4,7 @@
 #include "Interface.h"
 
 
-enum FieldTypes
+enum class FieldTypes
 {
 	kFieldTypeInt32,
 	kFieldTypeInt64,
@@ -41,7 +41,7 @@ public:
 	}
 
 	template<typename T>
-	void RegisterComponent(std::function<void(T*, IVisitor*)> &&vistorFunc)
+	void RegisterComponent(std::function<void(T*, IVisitor*)>&& vistorFunc)
 	{
 		componentVisitorMap[T::ComponentName] = [&](IComponent* component, IVisitor* visitor)
 		{
@@ -89,10 +89,10 @@ public:
 
 	~ComponentReflector()
 	{
- 	}
+	}
 private:
 	std::unordered_map<std::string, std::function<void(IComponent*, IVisitor*)>> componentVisitorMap;
-	std::unordered_map<std::string, std::function<ComponentPoolBase * (ComponentManager*)>> componentFactoryMap;
+	std::unordered_map<std::string, std::function<ComponentPoolBase* (ComponentManager*)>> componentFactoryMap;
 
 	template<typename T>
 	void VisitFields(T* component, IVisitor* visitor, std::vector<Field> fields)
@@ -101,14 +101,17 @@ private:
 		{
 			switch (field.FieldType)
 			{
-				case kFieldTypeFloat:
-					visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(float*)(component + field.Offset));
-					break;
-				case kFieldTypeInt32:
-					visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(int32*)((char*)component + field.Offset));
-					break;
-				default:
-					break;
+			case FieldTypes::kFieldTypeFloat:
+				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(float*)((char*)component + field.Offset));
+				break;
+			case FieldTypes::kFieldTypeInt32:
+				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(int32*)((char*)component + field.Offset));
+				break;
+			case FieldTypes::kFieldTypeFloat3:
+				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(DirectX::XMFLOAT3*)((char*)component + field.Offset));
+				break;
+			default:
+				break;
 			}
 		}
 	}
