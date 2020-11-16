@@ -130,6 +130,32 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	return mesh;
 }
 
+MeshHandle MeshManager::CreateMesh(MeshData& meshData, MeshView& meshView, const char* meshName)
+{
+	auto meshStringID = String::ID(meshName);
+	MeshHandle handle = { (uint32)-1 }; // Default is invalid
+	if (meshMap.find(meshStringID) != meshMap.end())
+	{
+		return handle;
+	}
+	else
+	{
+		if (meshData.Vertices.size() == 0)
+		{
+			return handle;
+		}
+		handle = CreateMesh(meshData, meshView);
+		meshMap[meshStringID] = handle.Id;
+		if (meshData.IsAnimated)
+		{
+			CreateBoneBuffers(handle, meshData.AnimationData);
+		}
+	}
+
+	meshNameMap[handle.Id] = meshName;
+	return handle;
+}
+
 void MeshManager::Initialize(CommandContext* commandContext)
 {
 	context = commandContext;

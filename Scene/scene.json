@@ -1073,7 +1073,7 @@
                 },
                 "AnimationComponent": {
                     "CurrentAnimationIndex": 1,
-                    "Mesh.Id": 2
+                    "MeshName": "Assets/Models/male.fbx"
                 },
                 "SelectedComponent": {}
             },

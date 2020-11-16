@@ -65,6 +65,7 @@ class MeshManager
 public:
 	MeshHandle									CreateMesh(const std::string& filename, MeshView& meshView);
 	MeshHandle									CreateMesh(const MeshData& meshData, MeshView& meshView);
+	MeshHandle									CreateMesh(MeshData& meshData, MeshView& meshView, const char* meshName);
 	void										Initialize(CommandContext* commandContext);
 	const MeshView&								GetMeshView(MeshHandle handle);
 	const MeshView&								GetMeshView(const char* filename); //WARNING: Lazy loads the mesh

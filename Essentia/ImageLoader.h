@@ -2,7 +2,10 @@
 #include <vector>
 #include "Declarations.h"
 
-namespace es::image
+namespace es
 {
-	static std::vector<unsigned char> LoadPngImage(const char* imageFile, uint32& outWidth, uint32& outHeight);
+	namespace image
+	{
+		std::vector<unsigned char> LoadPngImage(const char* imageFile, uint32& outWidth, uint32& outHeight);
+	}
 }
