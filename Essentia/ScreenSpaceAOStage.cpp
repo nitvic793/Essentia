@@ -41,7 +41,7 @@ void ScreenSpaceAOStage::Initialize()
 	aoBlurDir1 = shaderResourceManager->CreateCBV(sizeof(SSAOBlurParams));
 	aoBlurDir2 = shaderResourceManager->CreateCBV(sizeof(SSAOBlurParams));
 
-	BuildOffsetVectors(); 
+	BuildOffsetVectors();
 	memcpy(aoParams.OffsetVectors, mOffsets, sizeof(XMFLOAT4) * 14);
 
 	Vector<float> weights = CalcGaussWeights(2.5f);
@@ -139,7 +139,7 @@ void ScreenSpaceAOStage::BlurSSAO(uint32 frameIndex)
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->DrawInstanced(6, 1, 0, 0);
 
-	renderer->TransitionBarrier(commandList, aoBlurIntermediate.Resource,  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	renderer->TransitionBarrier(commandList, aoBlurIntermediate.Resource, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	renderer->TransitionBarrier(commandList, aoBlurFinal.Resource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
 
@@ -207,12 +207,15 @@ void ScreenSpaceAOStage::BuildRandomVectorTexture(ID3D12GraphicsCommandList* com
 	subResourceData.RowPitch = 256 * sizeof(PackedVector::XMCOLOR);
 	subResourceData.SlicePitch = subResourceData.RowPitch * 256;
 
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(randomVectorMap,
-		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST));
+	auto transitionToCopyDest = CD3DX12_RESOURCE_BARRIER::Transition(randomVectorMap,
+		D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_COPY_DEST);
+	auto transitionToPixelShaderResource = CD3DX12_RESOURCE_BARRIER::Transition(randomVectorMap,
+		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+	commandList->ResourceBarrier(1, &transitionToCopyDest);
 	UpdateSubresources(commandList, randomVectorMap, mRandomVectorMapUploadBuffer,
 		0, 0, num2DSubresources, &subResourceData);
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(randomVectorMap,
-		D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE));
+	commandList->ResourceBarrier(1, &transitionToPixelShaderResource);
 
 	randomVecTextureId = shaderResourceManager->CreateTexture(randomVectorMap);
 	GSceneResources.NoiseTexture = randomVecTextureId;

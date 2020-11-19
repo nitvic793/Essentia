@@ -151,7 +151,7 @@ void Renderer::Initialize()
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
-	
+
 
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<DebugDrawStage>()));
 	renderStages[eRenderStageGUI].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<OutlineRenderStage>()));
@@ -297,7 +297,7 @@ void Renderer::Render(const FrameContext& frameContext)
 		auto bounding = meshManager->GetBoundingBox(drawables[i].Mesh);
 		bounding.Transform(bounding, world);
 		if (camera.Frustum.Contains(bounding) && !drawables[i].IsAnimated()) // TODO: Make Frustum Culling System 
-			renderBucket.Insert(drawables[i], 0); 
+			renderBucket.Insert(drawables[i], 0);
 		drawables[i].PrevWorldViewProjection = drawables[i].WorldViewProjection;
 	}
 
@@ -510,7 +510,8 @@ void Renderer::Present()
 	auto commandList = commandContext->GetDefaultCommandList();
 	auto swapChain = deviceResources->GetSwapChain();
 
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	TransitionBarrier(commandList, renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+	//commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(renderTargetBuffers[backBufferIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
 	commandContext->SubmitCommands(commandList);
 	auto hr = swapChain->Present(vsync ? 1 : 0, 0);
 	if (FAILED(hr))
@@ -605,7 +606,14 @@ void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, Dept
 		handles.Push(renderTargetManager->GetRTVHandle(renderTargets[i]));
 	}
 
-	auto* dsvHandle = depthStencilId == nullptr ? (D3D12_CPU_DESCRIPTOR_HANDLE*)nullptr : &renderTargetManager->GetDSVHandle(*depthStencilId);
+	D3D12_CPU_DESCRIPTOR_HANDLE* dsvHandle = nullptr;
+	D3D12_CPU_DESCRIPTOR_HANDLE handle;
+	if (depthStencilId != nullptr)
+	{
+		handle = renderTargetManager->GetDSVHandle(*depthStencilId);
+		dsvHandle = &handle;
+	}
+
 	auto commandList = GetDefaultCommandList();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE* handleList = rtCount == 0 ? nullptr : handles.GetData();
@@ -811,7 +819,8 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const T
 
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, ID3D12Resource* resource, D3D12_RESOURCE_STATES from, D3D12_RESOURCE_STATES to)
 {
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to));
+	auto transitionResource = CD3DX12_RESOURCE_BARRIER::Transition(resource, from, to);
+	commandList->ResourceBarrier(1, &transitionResource);
 }
 
 void Renderer::SetTargetSize(ID3D12GraphicsCommandList* commandList, ScreenSize screenSize)
@@ -870,7 +879,7 @@ void Renderer::DrawAnimated(ID3D12GraphicsCommandList* commandList)
 		DrawableComponent* drawable = GContext->EntityManager->GetComponent<DrawableComponent>(entities[i]);
 		AnimationComponent* animComponent = GContext->EntityManager->GetComponent<AnimationComponent>(entities[i]);
 
-		commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.DefaultAnimatedPSO)); 
+		commandList->SetPipelineState(resourceManager->GetPSO(GPipelineStates.DefaultAnimatedPSO));
 		SetConstantBufferView(commandList, RootSigCBAll2, animComponent->ArmatureCBV); // Armature/Bones Constant Buffer
 		SetShaderResourceViewMaterial(commandList, RootSigSRVPixel1, drawable->Material); // Material
 		SetConstantBufferView(commandList, RootSigCBVertex0, drawable->CBView); //World View Proj Constant Buffer
