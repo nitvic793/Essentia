@@ -30,8 +30,11 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 	int textInc = 40;
 	std::vector<byte> imageData = es::image::LoadPngImage(heightMapFile, width, height);
 
-	float incx = abs(-STARTX * 2) / (width - 1);
-	float incz = abs(STARTZ * 2) / (height - 1);
+	float incx = 1.f;// abs(STARTX * 2) / (width - 1);
+	float incz = 1.f;// abs(STARTZ * 2) / (height - 1);
+
+	float startXPos = width * incx / 2.f;
+	float startZPos = height * incz / 2.f;
 
 	std::vector<Vertex> vertices;
 
@@ -47,9 +50,9 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 		{
 			Vertex v;
 			XMFLOAT3 pos = {};
-			pos.x = STARTX + col * incx;
-			pos.y = GetHeight(col, row, width, imageData, minY, maxY);
-			pos.z = STARTZ + row * incx;
+			pos.x = 0 + col * incx;
+			pos.y = -GetHeight(col, row, width, imageData, minY, maxY);
+			pos.z = 0 + row * incx;
 
 			XMFLOAT2 uv;
 			uv.x = (float)textInc * (float)col / (float)width;
@@ -69,13 +72,16 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 				int rightBottom = (row + 1) * width + col + 1;
 				int rightTop = row * width + col + 1;
 
-				indices.push_back(rightTop);
-				indices.push_back(leftBottom);
 				indices.push_back(leftTop);
-
-				indices.push_back(rightBottom);
 				indices.push_back(leftBottom);
 				indices.push_back(rightTop);
+				
+
+				indices.push_back(rightTop);
+				indices.push_back(leftBottom);
+				indices.push_back(rightBottom);
+				
+				
 			}
 		}
 	}

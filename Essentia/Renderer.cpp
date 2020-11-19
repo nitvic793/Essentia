@@ -553,7 +553,7 @@ void Renderer::EndInitialization()
 	brdfLutTexture = shaderResourceManager->CreateTexture("Assets/IBL/envBrdf.dds", DDS, false);
 	prefilterTexture = shaderResourceManager->CreateTexture("Assets/IBL/envSpecularHDR.dds", DDS, false);
 
-	terrainManager.CreateTerrainMesh("Assets/Terrain/heightmap.png");
+	terrainManager.CreateTerrainMesh("Assets/Terrain/heightmap.png", -10.f, 10.f);
 
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));
