@@ -25,6 +25,7 @@
 #include "Utility.h"
 #include "PostProcess.h"
 #include "GraphicsMemory.h"
+#include "Terrain.h"
 
 struct TransitionDesc
 {
@@ -144,6 +145,7 @@ private:
 	TextureID			brdfLutTexture;
 	TextureID			prefilterTexture;
 
+	TerrainManager							terrainManager;
 	ModelManager							modelManager;
 	std::map<RenderStageType, Vector<ScopedPtr<IRenderStage>>> renderStages;
 	Vector<ScopedPtr<IPostProcessStage>>	postProcessStages;

@@ -50,10 +50,14 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 
 	uint32 vBufferSize = sizeof(Vertex) * (uint32)meshData.Vertices.size();
 
+	auto defaultHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	auto uploadHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto vBufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vBufferSize);
+
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		&defaultHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		&vBufferResourceDesc,
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
 		IID_PPV_ARGS(&buffer.VertexBuffer));
@@ -61,9 +65,9 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	buffer.VertexBuffer->SetName(L"Vertex Buffer Resource Heap");
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		&uploadHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		&vBufferResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&vBufferUploadHeap));
@@ -76,13 +80,16 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 
 	UpdateSubresources(commandList.Get(), buffer.VertexBuffer.Get(), vBufferUploadHeap.Get(), 0, 0, 1, &vertexData);
 
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(buffer.VertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+	auto transitionVBuffer = CD3DX12_RESOURCE_BARRIER::Transition(buffer.VertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->ResourceBarrier(1, &transitionVBuffer);
+
 	uint32 iBufferSize = sizeof(uint32) * (uint32)meshData.Indices.size();
+	auto iBufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(iBufferSize);
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		&defaultHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(iBufferSize),
+		&iBufferResourceDesc,
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
 		IID_PPV_ARGS(&buffer.IndexBuffer));
@@ -90,9 +97,9 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	buffer.IndexBuffer->SetName(L"Index Buffer Resource Heap");
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		&uploadHeapProperties,
 		D3D12_HEAP_FLAG_NONE, // no flags
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		&iBufferResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&iBufferUploadHeap));
@@ -104,7 +111,8 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	indexData.SlicePitch = iBufferSize;
 
 	UpdateSubresources(commandList.Get(), buffer.IndexBuffer.Get(), iBufferUploadHeap.Get(), 0, 0, 1, &indexData);
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(buffer.IndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+	auto transitionIBuffer = CD3DX12_RESOURCE_BARRIER::Transition(buffer.IndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->ResourceBarrier(1, &transitionIBuffer);
 
 	meshView.VertexBufferView.BufferLocation = buffer.VertexBuffer->GetGPUVirtualAddress();
 	meshView.VertexBufferView.StrideInBytes = sizeof(Vertex);
@@ -128,6 +136,32 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	views.push_back(meshView);
 
 	return mesh;
+}
+
+MeshHandle MeshManager::CreateMesh(MeshData& meshData, MeshView& meshView, const char* meshName)
+{
+	auto meshStringID = String::ID(meshName);
+	MeshHandle handle = { (uint32)-1 }; // Default is invalid
+	if (meshMap.find(meshStringID) != meshMap.end())
+	{
+		return handle;
+	}
+	else
+	{
+		if (meshData.Vertices.size() == 0)
+		{
+			return handle;
+		}
+		handle = CreateMesh(meshData, meshView);
+		meshMap[meshStringID] = handle.Id;
+		if (meshData.IsAnimated)
+		{
+			CreateBoneBuffers(handle, meshData.AnimationData);
+		}
+	}
+
+	meshNameMap[handle.Id] = meshName;
+	return handle;
 }
 
 void MeshManager::Initialize(CommandContext* commandContext)
@@ -205,13 +239,17 @@ void MeshManager::CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animDa
 	ComPtr<ID3D12CommandAllocator> allocator;
 	ComPtr<ID3D12Resource> vBufferUploadHeap;
 
+	auto defaultHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
+	auto uploadHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto vBufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vBufferSize);
+
 	context->CreateAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.ReleaseAndGetAddressOf());
 	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT),
+		&defaultHeapProperties,
 		D3D12_HEAP_FLAG_NONE, // no flags
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		&vBufferResourceDesc,
 		D3D12_RESOURCE_STATE_COPY_DEST,
 		nullptr,
 		IID_PPV_ARGS(&meshBuffer.BoneVertexBuffer));
@@ -219,9 +257,9 @@ void MeshManager::CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animDa
 	meshBuffer.BoneVertexBuffer->SetName(L"Vertex Buffer Resource Heap");
 
 	device->CreateCommittedResource(
-		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
+		&uploadHeapProperties,
 		D3D12_HEAP_FLAG_NONE,
-		&CD3DX12_RESOURCE_DESC::Buffer(vBufferSize),
+		&vBufferResourceDesc,
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&vBufferUploadHeap));
@@ -238,7 +276,8 @@ void MeshManager::CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animDa
 	meshView.BoneVertexBufferView.StrideInBytes = sizeof(VertexBoneData);
 	meshView.BoneVertexBufferView.SizeInBytes = vBufferSize;
 
-	commandList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(meshBuffer.BoneVertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER));
+	auto transitionResource = CD3DX12_RESOURCE_BARRIER::Transition(meshBuffer.BoneVertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->ResourceBarrier(1, &transitionResource);
 	context->SubmitCommands(commandList.Get());
 	context->WaitForGPU(GContext->DeviceResources->GetSwapChain()->GetCurrentBackBufferIndex());
 }

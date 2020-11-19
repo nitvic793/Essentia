@@ -139,12 +139,12 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -161,12 +161,12 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -207,12 +207,12 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <PrecompiledHeader>Create</PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
@@ -247,6 +247,7 @@
     <ClCompile Include="EventSystem.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GenerateMipsStage.cpp" />
+    <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="ImCurveEdit.cpp" />
     <ClCompile Include="ImGradient.cpp" />
     <ClCompile Include="ImGuizmo.cpp" />
@@ -289,6 +290,7 @@
     <ClCompile Include="SkyBoxRenderStage.cpp" />
     <ClCompile Include="StringHash.cpp" />
     <ClCompile Include="System.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="Timer.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="VelocityBufferStage.cpp" />
@@ -315,6 +317,7 @@
     <ClInclude Include="EventTypes.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GenerateMipsStage.h" />
+    <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="ImCurveEdit.h" />
     <ClInclude Include="ImGradient.h" />
     <ClInclude Include="ImguiConsole.h" />
@@ -376,6 +379,7 @@
     <ClInclude Include="SkyBoxRenderStage.h" />
     <ClInclude Include="StringHash.h" />
     <ClInclude Include="System.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Trace.h" />
     <ClInclude Include="Transform.h" />
@@ -814,6 +818,7 @@
     <Import Project="..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets" Condition="Exists('..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets')" />
     <Import Project="..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets" Condition="Exists('..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" />
     <Import Project="..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets" Condition="Exists('..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets')" />
+    <Import Project="..\packages\LodePNG.1.2.0\build\native\lodepng.targets" Condition="Exists('..\packages\LodePNG.1.2.0\build\native\lodepng.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -824,5 +829,6 @@
     <Error Condition="!Exists('..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxmesh_desktop_win10.2019.5.31.2\build\native\directxmesh_desktop_win10.targets'))" />
     <Error Condition="!Exists('..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets'))" />
     <Error Condition="!Exists('..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets'))" />
+    <Error Condition="!Exists('..\packages\LodePNG.1.2.0\build\native\lodepng.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\LodePNG.1.2.0\build\native\lodepng.targets'))" />
   </Target>
 </Project>
