@@ -20,7 +20,7 @@ float GetHeight(int x, int y, int width, const std::vector<byte>& image, float m
 
 	int argb = ((0xFF & a) << 24) | ((0xFF & r) << 16)
 		| ((0xFF & g) << 8) | (0xFF & b);
-	return minY + abs(maxY - minY) * ((float)r / (float)MAX_COLOR);
+	return minY + abs(maxY - minY) * ((float)argb / (float)MAX_COLOR);
 }
 
 MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float minY, float maxY)
@@ -88,8 +88,8 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 		uvs.push_back(v.UV);
 	}
 
-	DirectX::ComputeNormals(indices.data(), (size_t)width * height * 2, pos.data(), pos.size(), CNORM_DEFAULT, normals.data());
-	DirectX::ComputeTangentFrame(indices.data(), (size_t)width * height * 2, pos.data(), normals.data(), uvs.data(), pos.size(), tangents.data(), nullptr);
+	DirectX::ComputeNormals(indices.data(), indices.size() / 3, pos.data(), pos.size(), CNORM_DEFAULT, normals.data());
+	DirectX::ComputeTangentFrame(indices.data(), indices.size() / 3, pos.data(), normals.data(), uvs.data(), pos.size(), tangents.data(), nullptr);
 
 	for (int i = 0; i < vertices.size(); ++i)
 	{
