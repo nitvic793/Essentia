@@ -37,13 +37,14 @@ void TerrainUpdateSystem::Update(float dt, float totalTime)
 
 	auto entities = entityManager->GetEntities<TerrainComponent>(count);
 	uint32 frameIndex = GContext->RendererInstance->GetCurrentBackbufferIndex();
+
+	// Update constant buffer values
 	for (uint32 i = 0; i < count; ++i)
 	{
 		XMFLOAT4X4 worldMatrix = entityManager->GetWorldMatrix(entities[i]);
 		auto world = XMLoadFloat4x4(&worldMatrix);
 		TerrainComponent* terrain = entityManager->GetComponent<TerrainComponent>(entities[i]);
 
-		//Update Constant Buffer Values
 		terrain->ConstantBuffer.PrevWorldViewProjection = terrain->ConstantBuffer.WorldViewProjection;
 		XMStoreFloat4x4(&terrain->ConstantBuffer.WorldViewProjection, XMMatrixTranspose(world * view * projection));
 		XMStoreFloat4x4(&terrain->ConstantBuffer.World, XMMatrixTranspose(world));

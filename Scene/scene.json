@@ -852,15 +852,24 @@
                     "Assets/Textures/Dielectric_metallic.DDS"
                 ]
             },
-            {
-                "MaterialName": "Casual_Male",
-                "Textures": [
-                    "Assets/Textures/Casual_male_Albedo.dds",
-                    "Assets/Textures/Casual_male_Normal.dds",
-                    "Assets/Textures/Casual_male_Roughness.dds",
-                    "Assets/Textures/Casual_male_Metalness.dds"
-                ]
-            }
+          {
+            "MaterialName": "Casual_Male",
+            "Textures": [
+              "Assets/Textures/Casual_male_Albedo.dds",
+              "Assets/Textures/Casual_male_Normal.dds",
+              "Assets/Textures/Casual_male_Roughness.dds",
+              "Assets/Textures/Casual_male_Metalness.dds"
+            ]
+          },
+          {
+            "MaterialName": "TerrainGrass",
+            "Textures": [
+              "Assets/Terrain/Grass/Grass_005_BaseColor.DDS",
+              "Assets/Terrain/Grass/Grass_005_Normal.DDS",
+              "Assets/Terrain/Grass/Grass_005_Roughness.DDS",
+              "Assets/Textures/defaultMetal.DDS"
+            ]
+          }
         ],
         "Entities": [
             {
@@ -1001,7 +1010,7 @@
                 "MoveableUnitComponent": {}
             },
             {
-                "Name": "QuadPlane",
+                "Name": "Terrain",
                 "Entity": {
                     "entity.ID": 12
                 },
@@ -1017,7 +1026,7 @@
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 30.0
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -1031,10 +1040,10 @@
                 },
 
               "TerrainComponent": {
-                "ScaleMaxY": 10.0,
-                "ScaleMinY": -10.0,
+                "ScaleMaxY": 30.0,
+                "ScaleMinY": 0.0,
                 "TerrainName": "Assets/Terrain/heightmap.png",
-                "MaterialName": "0"
+                "MaterialName": "TerrainGrass"
               }
             },
             {
