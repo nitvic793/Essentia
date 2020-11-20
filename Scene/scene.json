@@ -1034,7 +1034,11 @@
                     "MeshName": "Assets/Models/plane.obj",
                     "MaterialName": "0"
                 },
-                "TerrainComponent": {}
+              "TerrainComponent": {
+                "ScaleMaxY": 10.0,
+                "ScaleMinY": -10.0,
+                "TerrainName": "Assets/Terrain/heightmap.png"
+              }
             },
             {
                 "Name": "AnimEntity",

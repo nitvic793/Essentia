@@ -176,4 +176,10 @@ void Visit(BoundingOrientedBoxComponent* component, IVisitor* visitor)
 
 void Visit(TerrainComponent* component, IVisitor* visitor)
 {
+	auto comp = component;
+	auto name = comp->ComponentName;
+	std::string_view terrainName = std::string_view(comp->TerrainName.c_str());
+	visitor->Visit(name, MField(comp, ScaleMaxY));
+	visitor->Visit(name, MField(comp, ScaleMinY));
+	visitor->Visit(name, "TerrainName", terrainName);
 }

@@ -380,6 +380,7 @@
     <ClInclude Include="StringHash.h" />
     <ClInclude Include="System.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TerrainComponent.h" />
     <ClInclude Include="Timer.h" />
     <ClInclude Include="Trace.h" />
     <ClInclude Include="Transform.h" />

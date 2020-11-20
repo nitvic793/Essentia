@@ -2,6 +2,14 @@
 
 #include "Mesh.h"
 
+struct TerrainData
+{
+	MeshData	TerrainMeshData;
+	MeshHandle	TerrainMeshHandle;
+	uint32		Width;
+	uint32		Height;
+};
+
 class TerrainManager
 {
 public:
@@ -9,6 +17,6 @@ public:
 	static constexpr float STARTZ = -0.5f;
 	MeshHandle CreateTerrainMesh(const char* heightMapFile, float minY = -0.1f, float maxY = 0.1f);
 private:
-
+	std::unordered_map<std::string, TerrainData> terrains;
 };
 

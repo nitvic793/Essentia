@@ -14,7 +14,7 @@
 #include "PostProcessComponents.h"
 #include "AnimationComponent.h"
 #include "PipelineStates.h"
-
+#include "TerrainComponent.h"
 
 class IVisitor
 {
@@ -209,7 +209,3 @@ void Visit(CameraComponent* component, IVisitor* visitor);
 void Visit(AnimationComponent* component, IVisitor* visitor);
 void Visit(BoundingOrientedBoxComponent* component, IVisitor* visitor);
 void Visit(TerrainComponent* component, IVisitor* visitor);
-
-
-
-

@@ -101,6 +101,7 @@ void Renderer::Initialize()
 	ec->RenderTargetManager = renderTargetManager.get();
 	ec->ModelManager = &modelManager;
 	ec->FrameManager = frameManager.get();
+	ec->TerrainManager = &terrainManager;
 
 	CreateDepthStencil();
 	computeContext = MakeScoped<ComputeContext>();
@@ -553,8 +554,6 @@ void Renderer::EndInitialization()
 	irradianceTexture = shaderResourceManager->CreateTexture("Assets/IBL/envDiffuseHDR.dds", DDS, false);
 	brdfLutTexture = shaderResourceManager->CreateTexture("Assets/IBL/envBrdf.dds", DDS, false);
 	prefilterTexture = shaderResourceManager->CreateTexture("Assets/IBL/envSpecularHDR.dds", DDS, false);
-
-	terrainManager.CreateTerrainMesh("Assets/Terrain/heightmap.png", -10.f, 10.f);
 
 	perObjectView = shaderResourceManager->CreateCBV(sizeof(PerObjectConstantBuffer));
 	lightBufferView = shaderResourceManager->CreateCBV(sizeof(LightBuffer));

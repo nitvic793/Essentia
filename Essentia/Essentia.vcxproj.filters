@@ -612,6 +612,9 @@
     <ClInclude Include="Terrain.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainComponent.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">

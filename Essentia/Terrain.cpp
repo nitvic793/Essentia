@@ -25,6 +25,11 @@ float GetHeight(int x, int y, int width, const std::vector<byte>& image, float m
 
 MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float minY, float maxY)
 {
+	if (terrains.find(heightMapFile) != terrains.end())
+	{
+		return terrains[heightMapFile].TerrainMeshHandle;
+	}
+
 	uint32 width;
 	uint32 height;
 	int textInc = 40;
@@ -116,6 +121,14 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 
 	MeshView view;
 	MeshHandle handle = GContext->MeshManager->CreateMesh(meshData, view, heightMapFile);
+
+	TerrainData terrainData = {};
+	terrainData.TerrainMeshData = std::move(meshData);
+	terrainData.TerrainMeshHandle = handle;
+	terrainData.Width = width;
+	terrainData.Height = height;
+
+	terrains[heightMapFile] = terrainData;
 
 	return handle;
 }

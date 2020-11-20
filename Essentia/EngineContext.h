@@ -15,7 +15,9 @@ class ComponentReflector;
 class ComputeContext;
 class SystemManager;
 class GameStateManager;
+class TerrainManager;
 struct ImguiConsole;
+
 namespace es
 {
 	class EventBus;
@@ -45,6 +47,7 @@ struct EngineContext
 	SystemManager*			CoreSystemManager = nullptr;
 	SystemManager*			GameSystemManager = nullptr;
 	GameStateManager*		GameStateManager = nullptr;
+	TerrainManager*			TerrainManager = nullptr;
 	es::EventBus*			EventBus = nullptr;
 	ImguiConsole*			Console = nullptr;
 
