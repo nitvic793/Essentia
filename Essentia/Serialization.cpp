@@ -181,5 +181,6 @@ void Visit(TerrainComponent* component, IVisitor* visitor)
 	std::string_view terrainName = std::string_view(comp->TerrainName.c_str());
 	visitor->Visit(name, MField(comp, ScaleMaxY));
 	visitor->Visit(name, MField(comp, ScaleMinY));
+	visitor->Visit(name, MField(comp, Material));
 	visitor->Visit(name, "TerrainName", terrainName);
 }

@@ -10,6 +10,7 @@ public:
 	PipelineStateID	DefaultPSO;
 	PipelineStateID	DefaultAnimatedPSO;
 	PipelineStateID DefaultNoAOPSO;
+	PipelineStateID TerrainPSO;
 	PipelineStateID DepthOnlyPSO;
 	PipelineStateID DepthOnlyAnimatedPSO;
 	PipelineStateID	ShadowDirPSO; // Directional Light Shadow Map PSO

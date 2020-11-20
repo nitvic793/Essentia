@@ -26,6 +26,7 @@
 #include "PostProcess.h"
 #include "GraphicsMemory.h"
 #include "Terrain.h"
+#include "ConstantBufferViewPool.h"
 
 struct TransitionDesc
 {
@@ -147,6 +148,7 @@ private:
 
 	TerrainManager							terrainManager;
 	ModelManager							modelManager;
+	ConstantBufferViewPool					cbvPools;
 	std::map<RenderStageType, Vector<ScopedPtr<IRenderStage>>> renderStages;
 	Vector<ScopedPtr<IPostProcessStage>>	postProcessStages;
 	::DescriptorHeap						imguiHeap;

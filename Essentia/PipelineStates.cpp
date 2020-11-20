@@ -116,6 +116,10 @@ void PipelineStates::CreateDefaultPSOs()
 
 	DefaultPSO = resourceManager->CreatePSO(psoDesc);
 
+	psoDesc.VS = ShaderManager::LoadShader(L"TerrainVS.cso");
+	psoDesc.PS = ShaderManager::LoadShader(L"TerrainPS.cso");
+	TerrainPSO = resourceManager->CreatePSO(psoDesc);
+
 	psoDesc.VS = ShaderManager::LoadShader(L"AnimatedDefaultVS.cso");
 	psoDesc.InputLayout.pInputElementDescs = InputLayout::AnimationLayout;
 	psoDesc.InputLayout.NumElements = _countof(InputLayout::AnimationLayout);

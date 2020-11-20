@@ -16,6 +16,7 @@ class ComputeContext;
 class SystemManager;
 class GameStateManager;
 class TerrainManager;
+class ConstantBufferViewPool;
 struct ImguiConsole;
 
 namespace es
@@ -48,6 +49,7 @@ struct EngineContext
 	SystemManager*			GameSystemManager = nullptr;
 	GameStateManager*		GameStateManager = nullptr;
 	TerrainManager*			TerrainManager = nullptr;
+	ConstantBufferViewPool* ConstantBufferViewPool = nullptr;
 	es::EventBus*			EventBus = nullptr;
 	ImguiConsole*			Console = nullptr;
 

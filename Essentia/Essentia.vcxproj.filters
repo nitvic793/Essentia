@@ -118,6 +118,12 @@
     <Filter Include="Source Files\Terrain">
       <UniqueIdentifier>{12812462-e0e7-4cef-b5c2-11adb2940b0e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Physics">
+      <UniqueIdentifier>{e7321211-54b0-40e9-b35b-13c234c62d96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders\Terrain">
+      <UniqueIdentifier>{9ad45292-d3ca-4573-95ac-53df443ac7df}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -325,9 +331,6 @@
     <ClCompile Include="AnimationSystem.cpp">
       <Filter>Source Files\Animation</Filter>
     </ClCompile>
-    <ClCompile Include="PhysicsHelper.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="EventSystem.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
@@ -340,7 +343,16 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TerrainRenderStage.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
     <ClCompile Include="TerrainUpdateSystem.cpp">
+      <Filter>Source Files\Terrain</Filter>
+    </ClCompile>
+    <ClCompile Include="PhysicsHelper.cpp">
+      <Filter>Source Files\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="ConstantBufferViewPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -621,6 +633,12 @@
     <ClInclude Include="TerrainUpdateSystem.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainRenderStage.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="ConstantBufferViewPool.h">
+      <Filter>Header Files\Renderer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -730,6 +748,12 @@
     </FxCompile>
     <FxCompile Include="DepthOnlyAnimatedVS.hlsl">
       <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="TerrainPS.hlsl">
+      <Filter>Shaders\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="TerrainVS.hlsl">
+      <Filter>Shaders\Terrain</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

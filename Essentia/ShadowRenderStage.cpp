@@ -9,6 +9,7 @@
 #include "ResourceManager.h"
 #include "PipelineStates.h"
 #include "SceneResources.h"
+#include "TerrainComponent.h"
 
 using namespace DirectX;
 
@@ -126,6 +127,17 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, cbv);
 		auto model = GContext->ModelManager->GetModel(drawableModels[i].Model);
 		renderer->DrawMesh(commandList, model.Mesh);
+	}
+
+	auto terrains = entityManager->GetComponents<TerrainComponent>(count);
+	for (uint32 i = 0; i < count; ++i)
+	{
+		MeshHandle mesh = terrains[i].TerrainMesh;
+		params.World = terrains[i].ConstantBuffer.World;
+		auto cbv = cbvStack.Pop();
+		shaderResourceManager->CopyToCB(frameIndex, DataPack{ &params, sizeof(params) }, cbv);
+		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, cbv);
+		renderer->DrawMesh(commandList, mesh);
 	}
 
 	renderer->TransitionBarrier(commandList, shadowDepthTarget.Resource, D3D12_RESOURCE_STATE_DEPTH_WRITE, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);

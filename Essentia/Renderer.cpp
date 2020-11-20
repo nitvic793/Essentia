@@ -32,6 +32,7 @@
 #include "VoxelizationStage.h"
 #include "GenerateMipsStage.h"
 #include "VoxelRadiancePostProcess.h"
+#include "TerrainRenderStage.h"
 #include "AnimationComponent.h"
 
 #include "PipelineStates.h"
@@ -102,6 +103,9 @@ void Renderer::Initialize()
 	ec->ModelManager = &modelManager;
 	ec->FrameManager = frameManager.get();
 	ec->TerrainManager = &terrainManager;
+	ec->ConstantBufferViewPool = &cbvPools;
+
+	cbvPools.InitializePool<PerObjectConstantBuffer>(CMaxInitialEntityCount);
 
 	CreateDepthStencil();
 	computeContext = MakeScoped<ComputeContext>();
@@ -151,6 +155,7 @@ void Renderer::Initialize()
 	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelMipGenStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
+	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<TerrainRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<SkyBoxRenderStage>()));
 
 

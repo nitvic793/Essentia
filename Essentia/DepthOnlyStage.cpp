@@ -6,6 +6,7 @@
 #include "Mesh.h"
 #include "SceneResources.h"
 #include "AnimationComponent.h"
+#include "TerrainComponent.h"
 
 void DepthOnlyStage::Initialize()
 {
@@ -71,6 +72,14 @@ void DepthOnlyStage::Render(const uint32 frameIndex, const FrameContext& frameCo
 		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, drawableModels[i].CBView);
 		auto meshHandle = model.Mesh;
 		renderer->DrawMesh(commandList, meshHandle);
+	}
+
+	auto terrains = frameContext.EntityManager->GetComponents<TerrainComponent>(count);
+	for (uint32 i = 0; i < count; ++i)
+	{
+		MeshHandle mesh = terrains[i].TerrainMesh;
+		renderer->SetConstantBufferView(commandList, RootSigCBVertex0, terrains[i].ConstantBufferView);
+		renderer->DrawMesh(commandList, mesh);
 	}
 
 	renderer->SetPipelineState(commandList, GPipelineStates.DepthOnlyAnimatedPSO);

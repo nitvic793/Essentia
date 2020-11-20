@@ -1012,7 +1012,6 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "DrawableComponent",
                     "TerrainComponent"
                 ],
                 "PositionComponent": {
@@ -1030,14 +1029,12 @@
                     "Y": 1.0,
                     "Z": 1.0
                 },
-                "DrawableComponent": {
-                    "MeshName": "Assets/Models/plane.obj",
-                    "MaterialName": "0"
-                },
+
               "TerrainComponent": {
                 "ScaleMaxY": 10.0,
                 "ScaleMinY": -10.0,
-                "TerrainName": "Assets/Terrain/heightmap.png"
+                "TerrainName": "Assets/Terrain/heightmap.png",
+                "MaterialName": "0"
               }
             },
             {
