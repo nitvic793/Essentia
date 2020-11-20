@@ -6,6 +6,7 @@
 #include "ComponentReflector.h"
 #include "AnimationSystem.h"
 #include "EventTypes.h"
+#include "TerrainUpdateSystem.h"
 
 void Game::Setup(Callback gameSystemsInitCallback)
 {
@@ -38,6 +39,7 @@ void Game::Setup(Callback gameSystemsInitCallback)
 	coreSystemsManager.RegisterSystem<EditorSaveSystem>();
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
 	coreSystemsManager.RegisterSystem<AnimationSystem>();
+	coreSystemsManager.RegisterSystem<TerrainUpdateSystem>();
 
 	// Initialize renderer and core systems. 
 	renderer->Initialize();

@@ -127,8 +127,26 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 	terrainData.TerrainMeshHandle = handle;
 	terrainData.Width = width;
 	terrainData.Height = height;
+	terrainData.HeightMapData = imageData;
 
 	terrains[heightMapFile] = terrainData;
 
 	return handle;
+}
+
+void TerrainManager::UpdateTerrainMesh(const char* terrainName, float scaleMinY, float scaleMaxY)
+{
+	auto terrainData = terrains[terrainName];
+	MeshData& meshData = terrainData.TerrainMeshData;
+	auto& imageData = terrainData.HeightMapData;
+
+	for (uint32 i = 0; i < meshData.Vertices.size(); ++i)
+	{
+		Vertex& vertex = meshData.Vertices[i];
+		uint32 col = i % terrainData.Height;
+		uint32 row = i / terrainData.Width;
+		vertex.Position.y = -GetHeight(col, row, terrainData.Width, imageData, scaleMinY, scaleMaxY);
+	}
+
+	GContext->MeshManager->UpdateMeshData(terrainData.TerrainMeshHandle, meshData);
 }

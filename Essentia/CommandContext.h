@@ -22,6 +22,7 @@ public:
 	uint64&							FenceValue(int index);
 	HANDLE							GetFenceEvent();
 	ID3D12Fence*					GetFence();
+	uint32							GetBackbufferIndex() const;
 private:
 	uint32												backBufferIndex;
 	DeviceResources*									deviceResources;

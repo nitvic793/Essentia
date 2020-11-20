@@ -9,6 +9,8 @@
 
 struct TerrainComponent : public IComponent
 {
+	float		PrevMaxY;
+	float		PrevMinY;
 	float		ScaleMinY;
 	float		ScaleMaxY;
 	std::string TerrainName;

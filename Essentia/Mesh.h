@@ -75,6 +75,7 @@ public:
 	std::vector<std::string>					GetAllMeshNames();
 	bool										IsAnimated(MeshHandle mesh) const;
 	const AnimationData&						GetAnimationData(MeshHandle mesh);
+	void										UpdateMeshData(MeshHandle mesh, const MeshData& meshData);
 private:
 	MeshManager() {};
 	void										CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animData);

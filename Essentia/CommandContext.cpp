@@ -126,6 +126,11 @@ ID3D12Fence* CommandContext::GetFence()
 	return fences[backBufferIndex].Get();
 }
 
+uint32 CommandContext::GetBackbufferIndex() const
+{
+	return backBufferIndex;
+}
+
 void CommandContext::WaitForFrame(uint32 index)
 {
 	auto commandQueue = deviceResources->GetCommandQueue();

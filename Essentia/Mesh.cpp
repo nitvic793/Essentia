@@ -23,7 +23,7 @@ MeshHandle MeshManager::CreateMesh(const std::string& filename, MeshView& meshVi
 		}
 		handle = CreateMesh(meshData, meshView);
 		meshMap[meshStringID] = handle.Id;
-		if (meshData.IsAnimated) 
+		if (meshData.IsAnimated)
 		{
 			CreateBoneBuffers(handle, meshData.AnimationData);
 		}
@@ -226,6 +226,77 @@ bool MeshManager::IsAnimated(MeshHandle mesh) const
 const AnimationData& MeshManager::GetAnimationData(MeshHandle mesh)
 {
 	return meshes[mesh.Id].AnimationData;
+}
+
+void MeshManager::UpdateMeshData(MeshHandle mesh, const MeshData& meshData)
+{
+	MeshBuffer& buffer = buffers[mesh.Id];
+	auto device = context->GetDevice();
+	ComPtr<ID3D12GraphicsCommandList> commandList;
+	ComPtr<ID3D12CommandAllocator> allocator;
+	context->CreateAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.ReleaseAndGetAddressOf());
+	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, allocator.Get(), nullptr, IID_PPV_ARGS(&commandList));
+
+	uint32 vBufferSize = sizeof(Vertex) * (uint32)meshData.Vertices.size();
+	uint32 iBufferSize = sizeof(uint32) * (uint32)meshData.Indices.size();
+
+	ComPtr<ID3D12Resource> vBufferUploadHeap;
+	ComPtr<ID3D12Resource> iBufferUploadHeap;
+	auto uploadHeapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	auto vBufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(vBufferSize);
+	auto iBufferResourceDesc = CD3DX12_RESOURCE_DESC::Buffer(iBufferSize);
+
+	device->CreateCommittedResource(
+		&uploadHeapProperties,
+		D3D12_HEAP_FLAG_NONE,
+		&vBufferResourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&vBufferUploadHeap));
+	vBufferUploadHeap->SetName(L"Terrain Vertex Buffer Upload Resource Heap");
+
+	device->CreateCommittedResource(
+		&uploadHeapProperties,
+		D3D12_HEAP_FLAG_NONE, // no flags
+		&iBufferResourceDesc,
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&iBufferUploadHeap));
+	iBufferUploadHeap->SetName(L"Terrain Index Buffer Upload Resource Heap");
+
+	D3D12_SUBRESOURCE_DATA vertexData = {};
+	vertexData.pData = reinterpret_cast<const BYTE*>(meshData.Vertices.data());
+	vertexData.RowPitch = vBufferSize;
+	vertexData.SlicePitch = vBufferSize;
+
+	auto transitionVBufferCopyDest = CD3DX12_RESOURCE_BARRIER::Transition(buffer.VertexBuffer.Get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_STATE_COPY_DEST);
+	commandList->ResourceBarrier(1, &transitionVBufferCopyDest);
+	UpdateSubresources(commandList.Get(), buffer.VertexBuffer.Get(), vBufferUploadHeap.Get(), 0, 0, 1, &vertexData);
+	auto transitionVBuffer = CD3DX12_RESOURCE_BARRIER::Transition(buffer.VertexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->ResourceBarrier(1, &transitionVBuffer);
+
+	D3D12_SUBRESOURCE_DATA indexData = {};
+	indexData.pData = reinterpret_cast<const BYTE*>(meshData.Indices.data());
+	indexData.RowPitch = iBufferSize;
+	indexData.SlicePitch = iBufferSize;
+
+	auto transitionIBufferCopyDest = CD3DX12_RESOURCE_BARRIER::Transition(buffer.IndexBuffer.Get(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER, D3D12_RESOURCE_STATE_COPY_DEST);
+	commandList->ResourceBarrier(1, &transitionIBufferCopyDest);
+	UpdateSubresources(commandList.Get(), buffer.IndexBuffer.Get(), iBufferUploadHeap.Get(), 0, 0, 1, &indexData);
+	auto transitionIBuffer = CD3DX12_RESOURCE_BARRIER::Transition(buffer.IndexBuffer.Get(), D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+	commandList->ResourceBarrier(1, &transitionIBuffer);
+
+	BoundingBox meshBounds;
+	BoundingBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)&meshData.Vertices.data()->Position, sizeof(Vertex));
+
+	this->meshes[mesh.Id] = meshData;
+	this->bounds[mesh.Id] = meshBounds;
+
+	auto commandQueue = GContext->DeviceResources->GetCommandQueue();
+	auto backbufferIndex = context->GetBackbufferIndex();
+	context->SubmitCommands(commandList.Get());
+	context->WaitForGPU(backbufferIndex);
+	//context->WaitForFrame();
 }
 
 void MeshManager::CreateBoneBuffers(MeshHandle meshHandle, AnimationData& animData)

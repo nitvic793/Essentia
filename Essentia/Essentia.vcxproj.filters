@@ -340,6 +340,9 @@
     <ClCompile Include="$(MSBuildThisFileDirectory)..\..\lib\native\src\lodepng.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="TerrainUpdateSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -613,6 +616,9 @@
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
     <ClInclude Include="TerrainComponent.h">
+      <Filter>Header Files\Terrain</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainUpdateSystem.h">
       <Filter>Header Files\Terrain</Filter>
     </ClInclude>
   </ItemGroup>
