@@ -111,13 +111,13 @@ void AnimationSystem::ReadNodeHeirarchy(AnimationComponent& animComponent, const
 		if (anim != nullptr)
 		{
 			auto s = InterpolateScaling(animationTime, anim);
-			auto scaling = XMMatrixScaling(s.x, s.y, s.z);
+			auto scaling = XMMatrixScalingFromVector(s);
 
 			auto r = InterpolateRotation(animationTime, anim);
 			auto rotation = XMMatrixRotationQuaternion(XMVectorSet(r.y, r.z, r.w, r.x));
 
 			auto t = InterpolatePosition(animationTime, anim);
-			auto translation = XMMatrixTranslation(t.x, t.y, t.z);
+			auto translation = XMMatrixTranslationFromVector(t);
 
 			nodeTransformation += scaling * rotation * translation;
 		}

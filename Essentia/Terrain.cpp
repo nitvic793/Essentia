@@ -56,7 +56,7 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 			Vertex v;
 			XMFLOAT3 pos = {};
 			pos.x = 0 + col * incx;
-			pos.y = -GetHeight(col, row, width, imageData, minY, maxY);
+			pos.y = GetHeight(col, row, width, imageData, minY, maxY);
 			pos.z = 0 + row * incx;
 
 			XMFLOAT2 uv;
@@ -85,8 +85,7 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 				indices.push_back(rightTop);
 				indices.push_back(leftBottom);
 				indices.push_back(rightBottom);
-				
-				
+
 			}
 		}
 	}
@@ -99,7 +98,7 @@ MeshHandle TerrainManager::CreateTerrainMesh(const char* heightMapFile, float mi
 		uvs.push_back(v.UV);
 	}
 
-	DirectX::ComputeNormals(indices.data(), indices.size() / 3, pos.data(), pos.size(), CNORM_DEFAULT, normals.data());
+	DirectX::ComputeNormals(indices.data(), indices.size() / 3, pos.data(), pos.size(), CNORM_WEIGHT_EQUAL, normals.data());
 	DirectX::ComputeTangentFrame(indices.data(), indices.size() / 3, pos.data(), normals.data(), uvs.data(), pos.size(), tangents.data(), nullptr);
 
 	for (int i = 0; i < vertices.size(); ++i)
@@ -145,7 +144,7 @@ void TerrainManager::UpdateTerrainMesh(const char* terrainName, float scaleMinY,
 		Vertex& vertex = meshData.Vertices[i];
 		uint32 col = i % terrainData.Height;
 		uint32 row = i / terrainData.Width;
-		vertex.Position.y = -GetHeight(col, row, terrainData.Width, imageData, scaleMinY, scaleMaxY);
+		vertex.Position.y = GetHeight(col, row, terrainData.Width, imageData, scaleMinY, scaleMaxY);
 	}
 
 	GContext->MeshManager->UpdateMeshData(terrainData.TerrainMeshHandle, meshData);

@@ -113,6 +113,6 @@ uint32_t FindPosition(float AnimationTime, const AnimationChannel* channel);
 uint32_t FindScaling(float AnimationTime, const AnimationChannel* channel);
 uint32_t FindRotation(float AnimationTime, const AnimationChannel* channel);
 
-DirectX::XMFLOAT3 InterpolatePosition(float animTime, const AnimationChannel* channel);
-DirectX::XMFLOAT3 InterpolateScaling(float animTime, const AnimationChannel* channel);
+DirectX::XMVECTOR InterpolatePosition(float animTime, const AnimationChannel* channel);
+DirectX::XMVECTOR InterpolateScaling(float animTime, const AnimationChannel* channel);
 DirectX::XMFLOAT4 InterpolateRotation(float animTime, const AnimationChannel* channel);

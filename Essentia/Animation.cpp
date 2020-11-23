@@ -39,13 +39,13 @@ uint32_t FindRotation(float AnimationTime, const AnimationChannel* channel)
 	return 0;
 }
 
-XMFLOAT3 InterpolatePosition(float animTime, const AnimationChannel* channel)
+XMVECTOR InterpolatePosition(float animTime, const AnimationChannel* channel)
 {
 	auto outFloat3 = XMFLOAT3();
 	auto Out = XMVectorSet(0, 0, 0, 0);
 	if (channel->PositionKeys.size() == 1) {
-		//Out = XMLoadFloat3(&channel->PositionKeys[0].Value);
-		return channel->PositionKeys[0].Value;
+		Out = XMLoadFloat3(&channel->PositionKeys[0].Value);
+		return Out;
 	}
 
 	uint32_t PositionIndex = FindPosition(animTime, channel);
@@ -60,18 +60,17 @@ XMFLOAT3 InterpolatePosition(float animTime, const AnimationChannel* channel)
 	auto End = XMLoadFloat3(&channel->PositionKeys[NextPositionIndex].Value);
 	auto Delta = End - Start;
 	Out = Start + Factor * Delta;
-	XMStoreFloat3(&outFloat3, Out);
-	return outFloat3;
+	return Out;
 }
 
 
-XMFLOAT3 InterpolateScaling(float animTime, const AnimationChannel* channel)
+XMVECTOR InterpolateScaling(float animTime, const AnimationChannel* channel)
 {
 	auto outFloat3 = XMFLOAT3();
 	auto Out = XMVectorSet(0, 0, 0, 0);
 	if (channel->ScalingKeys.size() == 1) {
-		//Out = XMLoadFloat3(&channel->ScalingKeys[0].Value);
-		return channel->ScalingKeys[0].Value;
+		Out = XMLoadFloat3(&channel->ScalingKeys[0].Value);
+		return Out;
 	}
 
 	uint32_t ScaleIndex = FindScaling(animTime, channel);
@@ -86,8 +85,8 @@ XMFLOAT3 InterpolateScaling(float animTime, const AnimationChannel* channel)
 	auto End = XMLoadFloat3(&channel->ScalingKeys[NextScaleIndex].Value);
 	auto Delta = End - Start;
 	Out = Start + Factor * Delta;
-	XMStoreFloat3(&outFloat3, Out);
-	return outFloat3;
+	//XMStoreFloat3(&outFloat3, Out);
+	return Out;
 }
 
 XMFLOAT4 InterpolateRotation(float animTime, const AnimationChannel* channel)

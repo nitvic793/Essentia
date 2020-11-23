@@ -353,7 +353,7 @@
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
     <ClCompile Include="ConstantBufferViewPool.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Renderer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

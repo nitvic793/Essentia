@@ -30,6 +30,7 @@ struct TerrainComponent : public IComponent
 		component.ScaleMaxY = scaleMaxY;
 		component.ScaleMinY = scaleMinY;
 		component.ConstantBufferView = GContext->ConstantBufferViewPool->RequestConstantBufferView<PerObjectConstantBuffer>();
+		component.Material = material;
 		return component;
 	}
 
