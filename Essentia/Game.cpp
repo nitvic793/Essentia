@@ -7,6 +7,7 @@
 #include "AnimationSystem.h"
 #include "EventTypes.h"
 #include "TerrainUpdateSystem.h"
+#include "PhysicsSystem.h"
 
 void Game::Setup(Callback gameSystemsInitCallback)
 {
@@ -32,6 +33,7 @@ void Game::Setup(Callback gameSystemsInitCallback)
 	gameSystemsManager.Setup(&entityManager);
 
 	RegisterComponents();
+	coreSystemsManager.RegisterSystem<PhysicsSystem>();
 	coreSystemsManager.RegisterSystem<TransformUpdateSystem>();
 	coreSystemsManager.RegisterSystem<BoundingBoxUpdateSystem>();
 	coreSystemsManager.RegisterSystem<UpdateBaseDrawablesSystem>();

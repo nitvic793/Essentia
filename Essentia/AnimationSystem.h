@@ -7,8 +7,6 @@
 #include "Renderer.h"
 #include "AnimationComponent.h"
 
-using namespace DirectX;
-
 
 class AnimationSystem : public ISystem
 {

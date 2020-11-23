@@ -144,7 +144,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -166,7 +166,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -212,9 +212,9 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
-      <PreprocessorDefinitions>EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -254,6 +254,7 @@
     <ClCompile Include="ImGuizmo.cpp" />
     <ClCompile Include="ImSequencer.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
+    <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PipelineStates.cpp" />
     <ClCompile Include="PostProcess.cpp" />
     <ClCompile Include="PostProcessDepthOfFieldStage.cpp" />
@@ -328,6 +329,7 @@
     <ClInclude Include="ImGuizmo.h" />
     <ClInclude Include="ImSequencer.h" />
     <ClInclude Include="PhysicsHelper.h" />
+    <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="PipelineStates.h" />
     <ClInclude Include="PostProcess.h" />
     <ClInclude Include="PostProcessComponents.h" />

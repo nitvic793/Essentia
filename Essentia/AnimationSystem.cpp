@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "AnimationSystem.h"
 #include "Trace.h"
+
+using namespace DirectX;
+
 void AnimationSystem::Initialize()
 {
 }

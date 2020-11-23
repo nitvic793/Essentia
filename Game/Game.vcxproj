@@ -129,6 +129,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion)Game.pdb</ProgramDataBaseFileName>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
