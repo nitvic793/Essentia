@@ -49,6 +49,7 @@ public:
 	TransformManager();
 	TransformHandle			CreateTransform(EntityHandle entity, TransformHandle parent = { -1 }, const Transform& transform = DefaultTransform);
 	void					SetLocal(EntityHandle entity, const Transform& transform);
+	void					SetWorldMatrix(EntityHandle entity, const DirectX::XMFLOAT4X4& world);
 	EntityHandle			GetParent(EntityHandle entity);
 	DirectX::XMFLOAT4X4		GetTransposedWorldMatrix(EntityHandle entity);
 	DirectX::XMFLOAT4X4		GetWorldMatrix(EntityHandle entity);

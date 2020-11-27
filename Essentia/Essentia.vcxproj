@@ -253,6 +253,7 @@
     <ClCompile Include="ImGradient.cpp" />
     <ClCompile Include="ImGuizmo.cpp" />
     <ClCompile Include="ImSequencer.cpp" />
+    <ClCompile Include="PhysicsContext.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
     <ClCompile Include="PipelineStates.cpp" />
@@ -328,6 +329,8 @@
     <ClInclude Include="ImguiConsole.h" />
     <ClInclude Include="ImGuizmo.h" />
     <ClInclude Include="ImSequencer.h" />
+    <ClInclude Include="PhysicsComponents.h" />
+    <ClInclude Include="PhysicsContext.h" />
     <ClInclude Include="PhysicsHelper.h" />
     <ClInclude Include="PhysicsSystem.h" />
     <ClInclude Include="PipelineStates.h" />

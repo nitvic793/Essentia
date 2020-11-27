@@ -58,6 +58,11 @@ void TransformManager::SetLocal(EntityHandle entity, const Transform& transform)
 	UpdateTransform(handle);
 }
 
+void TransformManager::SetWorldMatrix(EntityHandle entity, const DirectX::XMFLOAT4X4& world)
+{
+	transforms.World[entity.Handle.Index] = world;
+}
+
 EntityHandle TransformManager::GetParent(EntityHandle entity)
 {
 	auto parentIndex = transforms.Parent[entity.Handle.Index];
