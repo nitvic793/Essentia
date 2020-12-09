@@ -74,9 +74,9 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	auto lights = GContext->EntityManager->GetComponents<DirectionalLightComponent>(count);
 
 	XMVECTOR center = XMLoadFloat3(&camera->Position);
-
+	float skyHeight = CSkyHeight; //50.f; // 
 	auto dir = -XMVector3Normalize(XMLoadFloat3(&lights[0].Direction));
-	auto eyePosV = center + CSkyHeight * dir;
+	auto eyePosV = center + skyHeight * dir;
 
 	//Create Shadow CBVs
 	XMMATRIX shView = XMMatrixLookAtLH(
@@ -90,12 +90,12 @@ void ShadowRenderStage::Render(const uint32 frameIndex, const FrameContext& fram
 	XMStoreFloat3(&sphereCenterLS, XMVector3TransformCoord(center, shView));
 
 	// Ortho frustum in light space encloses scene.
-	float l = sphereCenterLS.x - CSkyHeight;
-	float b = sphereCenterLS.y - CSkyHeight;
-	float n = sphereCenterLS.z - CSkyHeight;
-	float r = sphereCenterLS.x + CSkyHeight;
-	float t = sphereCenterLS.y + CSkyHeight;
-	float f = sphereCenterLS.z + CSkyHeight;
+	float l = sphereCenterLS.x - skyHeight;
+	float b = sphereCenterLS.y - skyHeight;
+	float n = sphereCenterLS.z - skyHeight;
+	float r = sphereCenterLS.x + skyHeight;
+	float t = sphereCenterLS.y + skyHeight;
+	float f = sphereCenterLS.z + skyHeight;
 	XMMATRIX shProj = XMMatrixOrthographicOffCenterLH(l, r, b, t, n, f); //XMMatrixOrthographicLH(200.0f, 200.0f, camera->NearZ, camera->FarZ);
 
 	XMStoreFloat4x4(&params.Projection, XMMatrixTranspose(shProj));

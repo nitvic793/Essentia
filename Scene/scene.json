@@ -604,6 +604,42 @@
                     "IsCubeMap": false,
                     "HasMips": true,
                     "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Terrain/Grass/Grass_005_BaseColor.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Terrain/Grass/Grass_005_Normal.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Terrain/Grass/Grass_005_Roughness.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 71,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/defaultMetal.DDS",
+                    "Width": 128,
+                    "Height": 128,
+                    "Format": 29,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
                 }
             ],
             "CubeMaps": [],
@@ -852,24 +888,24 @@
                     "Assets/Textures/Dielectric_metallic.DDS"
                 ]
             },
-          {
-            "MaterialName": "Casual_Male",
-            "Textures": [
-              "Assets/Textures/Casual_male_Albedo.dds",
-              "Assets/Textures/Casual_male_Normal.dds",
-              "Assets/Textures/Casual_male_Roughness.dds",
-              "Assets/Textures/Casual_male_Metalness.dds"
-            ]
-          },
-          {
-            "MaterialName": "TerrainGrass",
-            "Textures": [
-              "Assets/Terrain/Grass/Grass_005_BaseColor.DDS",
-              "Assets/Terrain/Grass/Grass_005_Normal.DDS",
-              "Assets/Terrain/Grass/Grass_005_Roughness.DDS",
-              "Assets/Textures/defaultMetal.DDS"
-            ]
-          }
+            {
+                "MaterialName": "Casual_Male",
+                "Textures": [
+                    "Assets/Textures/Casual_male_Albedo.dds",
+                    "Assets/Textures/Casual_male_Normal.dds",
+                    "Assets/Textures/Casual_male_Roughness.dds",
+                    "Assets/Textures/Casual_male_Metalness.dds"
+                ]
+            },
+            {
+                "MaterialName": "TerrainGrass",
+                "Textures": [
+                    "Assets/Terrain/Grass/Grass_005_BaseColor.DDS",
+                    "Assets/Terrain/Grass/Grass_005_Normal.DDS",
+                    "Assets/Terrain/Grass/Grass_005_Roughness.DDS",
+                    "Assets/Textures/defaultMetal.DDS"
+                ]
+            }
         ],
         "Entities": [
             {
@@ -895,7 +931,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "PostProcessVolumeComponent": {},
                 "ScaleComponent": {
@@ -917,7 +954,8 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "DrawableComponent"
+                    "DrawableComponent",
+                    "BoundingOrientedBoxComponent"
                 ],
                 "PositionComponent": {
                     "X": 1.9995123147964478,
@@ -925,9 +963,10 @@
                     "Z": 0.38768160343170168
                 },
                 "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.38717806339263918,
-                    "Z": 0.0
+                    "X": -0.0,
+                    "Y": 0.0,
+                    "Z": -0.0,
+                    "W": 1.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -937,46 +976,13 @@
                 "DrawableComponent": {
                     "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
-                }
+                },
+                "BoundingOrientedBoxComponent": {}
             },
             {
                 "Name": "SphereEntity2",
                 "Entity": {
-                    "entity.ID": 10
-                },
-                "Parent": {
-                    "entity.ID": 18446744073709551615
-                },
-                "Components": [
-                    "PositionComponent",
-                    "RotationComponent",
-                    "ScaleComponent",
-                    "DrawableComponent"
-                ],
-                "PositionComponent": {
-                    "X": 5.0,
-                    "Y": 1.0,
-                    "Z": 0.0
-                },
-                "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
-                    "Z": 0.0
-                },
-                "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
-                },
-                "DrawableComponent": {
-                    "MeshName": "Assets/Models/sphere.obj",
-                    "MaterialName": "0"
-                }
-            },
-            {
-                "Name": "SphereEntity3",
-                "Entity": {
-                    "entity.ID": 10
+                    "entity.ID": 3
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -986,17 +992,18 @@
                     "RotationComponent",
                     "ScaleComponent",
                     "DrawableComponent",
-                    "MoveableUnitComponent"
+                    "BoundingOrientedBoxComponent"
                 ],
                 "PositionComponent": {
-                    "X": 10.0,
+                    "X": 5.0,
                     "Y": 1.0,
                     "Z": 0.0
                 },
                 "RotationComponent": {
-                    "X": 0.0,
+                    "X": -0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": -0.0,
+                    "W": 1.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1007,12 +1014,53 @@
                     "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
                 },
-                "MoveableUnitComponent": {}
+                "BoundingOrientedBoxComponent": {}
+            },
+            {
+                "Name": "SphereEntity3",
+                "Entity": {
+                    "entity.ID": 4
+                },
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "MoveableUnitComponent",
+                    "DrawableComponent",
+                    "SelectedComponent",
+                    "BoundingOrientedBoxComponent"
+                ],
+                "PositionComponent": {
+                    "X": 10.0,
+                    "Y": 1.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": -0.0,
+                    "Y": 0.0,
+                    "Z": -0.0,
+                    "W": 1.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "MoveableUnitComponent": {},
+                "DrawableComponent": {
+                    "MeshName": "Assets/Models/sphere.obj",
+                    "MaterialName": "0"
+                },
+                "SelectedComponent": {},
+                "BoundingOrientedBoxComponent": {}
             },
             {
                 "Name": "Terrain",
                 "Entity": {
-                    "entity.ID": 12
+                    "entity.ID": 5
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1031,25 +1079,25 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
                     "Y": 1.0,
                     "Z": 1.0
                 },
-
-              "TerrainComponent": {
-                "ScaleMaxY": 30.0,
-                "ScaleMinY": 0.0,
-                "TerrainName": "Assets/Terrain/heightmap.png",
-                "MaterialName": "TerrainGrass"
-              }
+                "TerrainComponent": {
+                    "ScaleMinY": 0.0,
+                    "ScaleMaxY": 30.0,
+                    "TerrainName": "Assets/Terrain/heightmap.png",
+                    "MaterialName": "TerrainGrass"
+                }
             },
             {
                 "Name": "AnimEntity",
                 "Entity": {
-                    "entity.ID": 3
+                    "entity.ID": 6
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1059,8 +1107,8 @@
                     "RotationComponent",
                     "ScaleComponent",
                     "DrawableComponent",
-                    "AnimationComponent",
-                    "SelectedComponent"
+                    "BoundingOrientedBoxComponent",
+                    "AnimationComponent"
                 ],
                 "PositionComponent": {
                     "X": -6.554737567901611,
@@ -1068,29 +1116,30 @@
                     "Z": 7.450000762939453
                 },
                 "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 1.1549999713897706,
-                    "Z": 0.0
+                    "X": -0.0,
+                    "Y": 0.5076736807823181,
+                    "Z": -0.0,
+                    "W": 0.861549437046051
                 },
                 "ScaleComponent": {
-                    "X": 0.05000000819563866,
+                    "X": 0.05000004917383194,
                     "Y": 0.04999995231628418,
-                    "Z": 0.05000000819563866
+                    "Z": 0.05000004917383194
                 },
                 "DrawableComponent": {
                     "MeshName": "Assets/Models/male.fbx",
                     "MaterialName": "Casual_Male"
                 },
+                "BoundingOrientedBoxComponent": {},
                 "AnimationComponent": {
                     "CurrentAnimationIndex": 1,
                     "MeshName": "Assets/Models/male.fbx"
-                },
-                "SelectedComponent": {}
+                }
             },
             {
                 "Name": "Sponza Entity",
                 "Entity": {
-                    "entity.ID": 4
+                    "entity.ID": 7
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1109,7 +1158,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 0.05000000074505806,
@@ -1123,7 +1173,7 @@
             {
                 "Name": "DirectionalLight",
                 "Entity": {
-                    "entity.ID": 5
+                    "entity.ID": 8
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1142,7 +1192,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1166,7 +1217,7 @@
             {
                 "Name": "PointLight1",
                 "Entity": {
-                    "entity.ID": 6
+                    "entity.ID": 9
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1185,7 +1236,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1205,7 +1257,7 @@
             {
                 "Name": "Skybox",
                 "Entity": {
-                    "entity.ID": 7
+                    "entity.ID": 10
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1224,7 +1276,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1238,7 +1291,7 @@
             {
                 "Name": "SpotLight",
                 "Entity": {
-                    "entity.ID": 8
+                    "entity.ID": 11
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1257,7 +1310,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1283,7 +1337,7 @@
             {
                 "Name": "PointLight2",
                 "Entity": {
-                    "entity.ID": 9
+                    "entity.ID": 12
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1302,7 +1356,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1322,7 +1377,7 @@
             {
                 "Name": "PointLight3",
                 "Entity": {
-                    "entity.ID": 10
+                    "entity.ID": 13
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1341,7 +1396,8 @@
                 "RotationComponent": {
                     "X": 0.0,
                     "Y": 0.0,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1361,7 +1417,7 @@
             {
                 "Name": "Camera",
                 "Entity": {
-                    "entity.ID": 11
+                    "entity.ID": 14
                 },
                 "Parent": {
                     "entity.ID": 18446744073709551615
@@ -1373,14 +1429,15 @@
                     "CameraComponent"
                 ],
                 "PositionComponent": {
-                    "X": -19.038494110107423,
-                    "Y": 9.736653327941895,
-                    "Z": 7.3794097900390629
+                    "X": -19.08647918701172,
+                    "Y": 10.0302734375,
+                    "Z": 4.561089992523193
                 },
                 "RotationComponent": {
                     "X": 0.25500038266181948,
                     "Y": 1.6649969816207886,
-                    "Z": 0.0
+                    "Z": 0.0,
+                    "W": 0.0
                 },
                 "ScaleComponent": {
                     "X": 1.0,

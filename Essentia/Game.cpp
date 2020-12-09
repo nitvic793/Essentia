@@ -85,7 +85,7 @@ void Game::Run()
 			}
 
 			Update();
-			camera->Update();
+			//camera->Update();
 			Render();
 
 			if (kbState.IsKeyDown(DirectX::Keyboard::Escape))

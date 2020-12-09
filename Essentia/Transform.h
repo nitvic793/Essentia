@@ -7,18 +7,18 @@
 struct TransformRef
 {
 	DirectX::XMFLOAT3* Position;
-	DirectX::XMFLOAT3* Rotation;
+	DirectX::XMFLOAT4* Rotation;
 	DirectX::XMFLOAT3* Scale;
 };
 
 struct Transform
 {
 	DirectX::XMFLOAT3 Position;
-	DirectX::XMFLOAT3 Rotation;
+	DirectX::XMFLOAT4 Rotation;
 	DirectX::XMFLOAT3 Scale;
 };
 
-constexpr Transform DefaultTransform = { {0,0,0}, {0,0,0}, {1,1,1} };
+constexpr Transform DefaultTransform = { {0,0,0}, {0,0,0,0}, {1,1,1} };
 
 struct TransformHandle
 {

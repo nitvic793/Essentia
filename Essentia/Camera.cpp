@@ -14,8 +14,8 @@ Camera::Camera(float width, float height, float nearZ, float farZ, float fovInAn
 	Position = XMFLOAT3(0, 0, -5);
 	Direction = XMFLOAT3(0, 0, 1);
 	Rotation = {};
-	UpdateProjection(width, height, nearZ, farZ, fovInAngles);
-	UpdateView();
+	//UpdateProjection(width, height, nearZ, farZ, fovInAngles);
+	//UpdateView();
 	BoundingFrustum::CreateFromMatrix(Frustum, XMLoadFloat4x4(&Projection));
 }
 

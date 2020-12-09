@@ -172,7 +172,7 @@ public:
 		auto camEntity = entityManager->GetEntities<CameraComponent>(count);
 		auto transform = entityManager->GetTransform(camEntity[0]);
 		auto cameras = entityManager->GetComponents<CameraComponent>(count);
-		auto camera = cameras[0].CameraInstance;
+		auto& camera = cameras[0].CameraInstance;
 		bool debugNav = false;
 #ifdef EDITOR
 		auto stages = GRenderStageManager.GetRenderStageMap();
@@ -184,6 +184,11 @@ public:
 		auto up = XMVectorSet(0, 1, 0, 0); // Y is up!
 		auto dir = XMLoadFloat3(&camera.Direction);
 		auto pos = XMLoadFloat3(transform.Position);
+		auto rot = XMLoadFloat4(transform.Rotation);
+
+		XMVECTOR rotation = XMVectorSet(0, 0, 0, 0);
+		float angle = 0.f;
+		XMQuaternionToAxisAngle(&rotation, &angle, rot);
 
 		float Speed = this->Speed;
 
@@ -225,9 +230,15 @@ public:
 
 		if (!debugNav)
 			XMStoreFloat3(transform.Position, pos);
+		
+		//if (xDiff != 0.f || yDiff != 0.f)
+		//{
+		//	rotation = XMVectorAdd(rotation, XMVectorSet(yDiff, xDiff, 0, 0));
+		//	XMStoreFloat4(transform.Rotation, XMQuaternionRotationRollPitchYawFromVector(rotation));
+		//}
 
-		transform.Rotation->x += yDiff;
-		transform.Rotation->y += xDiff;
+		camera.Rotation.x += yDiff;
+		camera.Rotation.y += xDiff;
 		prevPos.x = (float)mouse.x;
 		prevPos.y = (float)mouse.y;
 	}
@@ -252,7 +263,7 @@ public:
 			auto position = entityManager->GetComponent<PositionComponent>(entities[i]);
 			auto rotation = entityManager->GetComponent<RotationComponent>(entities[i]);
 			components[i].CameraInstance.Position = *position;
-			components[i].CameraInstance.Rotation = *rotation;
+			//components[i].CameraInstance.Rotation = *rotation;
 			components[i].CameraInstance.Update(deltaTime, totalTime);
 		}
 

@@ -20,11 +20,11 @@ XMFLOAT4X4 GetTransformMatrix(const XMFLOAT4X4& local, const XMFLOAT4X4& parent)
 XMFLOAT4X4 GetTransformMatrix(const Transform& transform)
 {
 	auto pos = XMLoadFloat3(&transform.Position);
-	auto rot = XMLoadFloat3(&transform.Rotation);
+	auto rot = XMLoadFloat4(&transform.Rotation);
 	auto scaleV = XMLoadFloat3(&transform.Scale);
 
 	auto translation = XMMatrixTranslationFromVector(pos);
-	auto rotation = XMMatrixRotationRollPitchYawFromVector(rot);
+	auto rotation = XMMatrixRotationQuaternion(rot); 
 	auto scale = XMMatrixScalingFromVector(scaleV);
 	auto transformation = scale * rotation * translation;
 
@@ -96,13 +96,10 @@ const Transform TransformManager::GetWorldTransform(EntityHandle entity)
 	XMVECTOR scale;
 	XMMatrixDecompose(&scale, &rot, &pos, XMLoadFloat4x4(&world));
 	Transform outTransform;
-	XMVECTOR rotation = XMVectorSet(0, 0, 0, 0);
-	float angle = 0.f;
-	XMQuaternionToAxisAngle(&rotation, &angle, rot);
 
 	XMStoreFloat3(&outTransform.Position, pos);
 	XMStoreFloat3(&outTransform.Scale, scale);
-	XMStoreFloat3(&outTransform.Rotation, rotation);
+	XMStoreFloat4(&outTransform.Rotation, rot);
 	return outTransform;
 }
 

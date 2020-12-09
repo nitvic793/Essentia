@@ -8,42 +8,54 @@
 enum RigidBodyType
 {
 	kRigidBodySphere,
-	kRIgidBodyBox
+	kRigidBodyBox
 };
+
+struct SphereCollider : public IComponent
+{
+	float Radius = 1.f;
+
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(Radius)
+		);
+	}
+
+	GComponent(SphereCollider);
+};
+
+struct BoxCollider : public IComponent
+{
+	float HalfExtentX = 0.5f;
+	float HalfExtentY = 0.5f;
+	float HalfExtentZ = 0.5f;
+
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(HalfExtentX),
+			CEREAL_NVP(HalfExtentY),
+			CEREAL_NVP(HalfExtentZ)
+		);
+	}
+
+	GComponent(BoxCollider);
+};
+
 
 struct RigidBodyComponent : public IComponent
 {
-	float Radius = 1.f;
-	RigidBodyType RigidBodyType = kRigidBodySphere;
+	float Mass = 10.f;
 	physx::PxRigidDynamic* RigidBody = nullptr;
-
-	static RigidBodyComponent Create(float radius, EntityHandle handle)
-	{
-		RigidBodyComponent component = {};
-		auto physics = GPhysicsContext->GetPhysicsFactory();
-		auto scene = GPhysicsContext->GetPhysicsScene();
-		auto sphere = physx::PxSphereGeometry(radius);
-		physx::PxShape* shape = physics->createShape(sphere, *GPhysicsContext->GetDefaultMaterial());
-		DirectX::XMFLOAT4X4 worldMatrix = GContext->EntityManager->GetWorldMatrix(handle);
-
-		physx::PxTransform transform(physx::PxMat44(&worldMatrix.m[0][0]));
-
-		component.RigidBody = physics->createRigidDynamic(transform);
-		component.RigidBody->attachShape(*shape);
-		physx::PxRigidBodyExt::updateMassAndInertia(*component.RigidBody, 10.0f);
-		scene->addActor(*component.RigidBody);
-
-		component.Radius = radius;
-		
-		shape->release();
-	}
 
 	template<class Archive>
 	void save(Archive& archive) const
 	{
 		archive(
-			CEREAL_NVP(Radius),
-			CEREAL_NVP(RigidBodyType)
+			CEREAL_NVP(Mass)
 		);
 	};
 
@@ -51,8 +63,7 @@ struct RigidBodyComponent : public IComponent
 	void load(Archive& archive)
 	{
 		archive(
-			CEREAL_NVP(Radius),
-			CEREAL_NVP(RigidBodyType)
+			CEREAL_NVP(Mass)
 		);
 	};
 

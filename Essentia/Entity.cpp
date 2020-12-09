@@ -130,7 +130,7 @@ TransformRef EntityManager::GetTransform(EntityHandle handle)
 
 	TransformRef ref = {};
 	ref.Position = (DirectX::XMFLOAT3*) & pos->X;
-	ref.Rotation = (DirectX::XMFLOAT3*) & rot->X;
+	ref.Rotation = (DirectX::XMFLOAT4*) & rot->X;
 	ref.Scale = (DirectX::XMFLOAT3*) & scale->X;
 	return ref;
 }
@@ -164,6 +164,11 @@ void EntityManager::GetWorldMatrices(EntityHandle* entities, uint32 count, std::
 	{
 		matrices.push_back(transformManager.GetWorldMatrix(entities[i]));
 	}
+}
+
+void EntityManager::SetWorldMatrix(EntityHandle entity, const DirectX::XMFLOAT4X4& world)
+{
+	transformManager.SetWorldMatrix(entity, world);
 }
 
 const DirectX::XMFLOAT4X4 EntityManager::GetWorldMatrix(EntityHandle entity)

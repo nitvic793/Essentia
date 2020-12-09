@@ -52,22 +52,23 @@ struct PositionComponent : public IComponent
 
 struct RotationComponent : public IComponent
 {
-	GComponent(RotationComponent)
-		float X;
+	float X;
 	float Y;
 	float Z;
+	float W;
 
-	const RotationComponent& operator=(const DirectX::XMFLOAT3& position)
+	const RotationComponent& operator=(const DirectX::XMFLOAT4& quaternion)
 	{
-		this->X = position.x;
-		this->Y = position.y;
-		this->Z = position.z;
+		this->X = quaternion.x;
+		this->Y = quaternion.y;
+		this->Z = quaternion.z;
+		this->W = quaternion.w;
 		return *this;
 	}
 
-	operator DirectX::XMFLOAT3()
+	operator DirectX::XMFLOAT4()
 	{
-		return DirectX::XMFLOAT3(X, Y, Z);
+		return DirectX::XMFLOAT4(X, Y, Z, W);
 	}
 
 	template<class Archive>
@@ -76,9 +77,12 @@ struct RotationComponent : public IComponent
 		archive(
 			CEREAL_NVP(X),
 			CEREAL_NVP(Y),
-			CEREAL_NVP(Z)
+			CEREAL_NVP(Z),
+			CEREAL_NVP(W)
 		);
 	};
+
+	GComponent(RotationComponent)
 };
 
 struct ScaleComponent : public IComponent

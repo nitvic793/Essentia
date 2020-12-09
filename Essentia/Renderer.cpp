@@ -1080,8 +1080,13 @@ void Renderer::UpdateLightBuffer()
 	{
 		for (uint32 i = 0; i < spotLightCount; ++i)
 		{
-			auto direction = (DirectX::XMFLOAT3) * ec->EntityManager->GetComponent<RotationComponent>(entities[i]);
-			spotLights[i].Direction = direction;
+			auto direction = (DirectX::XMFLOAT4) * ec->EntityManager->GetComponent<RotationComponent>(entities[i]);
+			auto rotationQ = XMLoadFloat4(&direction);
+			XMVECTOR rotation = XMVectorSet(0, 0, 0, 0);
+			float angle = 0.f;
+			XMQuaternionToAxisAngle(&rotation, &angle, rotationQ);
+
+			XMStoreFloat3(&spotLights[i].Direction, rotation);
 			lightBuffer.SpotLights[i] = spotLights[i].GetLight();
 			lightBuffer.SpotLights[i].Position = (DirectX::XMFLOAT3) * ec->EntityManager->GetComponent<PositionComponent>(entities[i]);
 		}

@@ -79,6 +79,7 @@ void Visit(RotationComponent* component, IVisitor* visitor)
 	visitor->Visit(name, MField(comp, X));
 	visitor->Visit(name, MField(comp, Y));
 	visitor->Visit(name, MField(comp, Z));
+	visitor->Visit(name, MField(comp, W));
 }
 
 void Visit(ScaleComponent* component, IVisitor* visitor)

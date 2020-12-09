@@ -24,6 +24,7 @@ struct AnimationComponent : public IComponent
 	static AnimationComponent Create(std::string meshName)
 	{
 		AnimationComponent component = {};
+		component.MeshName = meshName;
 		component.Mesh = GContext->MeshManager->GetMeshHandle(meshName.c_str());
 		component.ArmatureCBV = es::CreateConstantBufferView(sizeof(PerArmatureConstantBuffer));
 		const AnimationData& animData = GContext->MeshManager->GetAnimationData(component.Mesh);

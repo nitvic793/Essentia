@@ -431,7 +431,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	EntityHandle* entities = em->GetEntities<SelectedComponent>(count);
 	auto transform = em->GetTransform(entities[0]);
 	auto s = XMMatrixScalingFromVector(XMLoadFloat3(transform.Scale));
-	auto r = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(transform.Rotation));
+	auto r = XMMatrixRotationQuaternion(XMLoadFloat4(transform.Rotation));
 	auto t = XMMatrixTranslationFromVector(XMLoadFloat3(transform.Position));
 
 	auto srt = s * r * t;
@@ -457,7 +457,7 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	XMFLOAT4 F;
 	XMStoreFloat3(transform.Position, translation);
 	XMStoreFloat3(transform.Scale, scale);
-	XMStoreFloat4(&F, rotation);
+	XMStoreFloat4(transform.Rotation, rotation);
 
 	//transform.Rotation->x = atan2(2.0 * (F.x * F.y + F.z * F.w), 1 - 2 * (F.y * F.y + F.z * F.z)); //roll
 	//transform.Rotation->y = asin(2.0 * (F.x * F.z - F.w * F.y)); //pitch
