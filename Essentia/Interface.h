@@ -15,6 +15,7 @@
 #include "AnimationComponent.h"
 #include "PipelineStates.h"
 #include "TerrainComponent.h"
+#include "PhysicsComponents.h"
 
 class IVisitor
 {
@@ -209,3 +210,9 @@ void Visit(CameraComponent* component, IVisitor* visitor);
 void Visit(AnimationComponent* component, IVisitor* visitor);
 void Visit(BoundingOrientedBoxComponent* component, IVisitor* visitor);
 void Visit(TerrainComponent* component, IVisitor* visitor);
+void Visit(SphereCollider* component, IVisitor* visitor);
+void Visit(PlaneCollider* component, IVisitor* visitor);
+void Visit(BoxCollider* component, IVisitor* visitor);
+void Visit(RigidBodyComponent* component, IVisitor* visitor);
+void Visit(RigidBodyStaticComponent* component, IVisitor* visitor);
+

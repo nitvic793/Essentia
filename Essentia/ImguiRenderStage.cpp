@@ -324,13 +324,21 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 		{
 			if (ImGui::CollapsingHeader(comp.ComponentName.data(), ImGuiTreeNodeFlags_DefaultOpen))
 			{
-				GComponentReflector.VisitFields(comp.ComponentName.data(), comp.Data, &visitor);
+				bool hasChanged = GComponentReflector.VisitFields(comp.ComponentName.data(), comp.Data, &visitor);
 				ImGui::PushID(comp.ComponentName.data());
 				if (ImGui::Button("Remove"))
 				{
 					cm->RemoveComponent(comp.ComponentName.data(), selectedEntities[0]);
 				}
 				ImGui::PopID();
+
+				if (hasChanged)
+				{
+					IComponentUpdateEvent compUpdateEvent;
+					compUpdateEvent.componentData = comp;
+					compUpdateEvent.entity = selectedEntities[0];
+					es::GEventBus->Publish(&compUpdateEvent);
+				}
 			}
 		}
 
@@ -430,17 +438,27 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 
 	EntityHandle* entities = em->GetEntities<SelectedComponent>(count);
 	auto transform = em->GetTransform(entities[0]);
-	auto s = XMMatrixScalingFromVector(XMLoadFloat3(transform.Scale));
-	auto r = XMMatrixRotationQuaternion(XMLoadFloat4(transform.Rotation));
-	auto t = XMMatrixTranslationFromVector(XMLoadFloat3(transform.Position));
 
-	auto srt = s * r * t;
-	auto parent = em->GetParent(entities[0]);
+	auto origScale = XMLoadFloat3(transform.Scale);
+	auto origRot = XMLoadFloat4(transform.Rotation);
+	auto origPos = XMLoadFloat3(transform.Position);
+	//auto s = XMMatrixScalingFromVector(origScale);
+	//auto r = XMMatrixRotationQuaternion(origRot);
+	//auto t = XMMatrixTranslationFromVector(origPos);
+	//auto srt = s * r * t;
+	//XMStoreFloat4x4(&matrix, srt);
+
 	XMFLOAT4X4 matrix = em->GetWorldMatrix(entities[0]);
-	XMStoreFloat4x4(&matrix, srt);
+	if (em->HasValidParent(entities[0]))
+	{
+		auto parent = em->GetParent(entities[0]);
+		XMFLOAT4X4 parentMatrix = em->GetWorldMatrix(parent);
+		auto srt = XMMatrixMultiply(XMLoadFloat4x4(&matrix), XMLoadFloat4x4(&parentMatrix));
+		XMStoreFloat4x4(&matrix, srt);
+	}
 
+	auto origMatrix = matrix;
 	ImGuizmo::Manipulate(&camView.m[0][0], &camProj.m[0][0], currentGizmoOperation, currentGizmoMode, &matrix.m[0][0], NULL, useSnap ? &snap.x : NULL);
-
 	//if (em->HasValidParent(entities[0])) {
 	//	auto parentMatrix = em->GetWorldMatrix(entities[0]);
 	//	auto p = XMLoadFloat4x4(&parentMatrix);
@@ -454,14 +472,21 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 	XMVECTOR rotation;
 	XMVECTOR translation;
 	XMMatrixDecompose(&scale, &rotation, &translation, XMLoadFloat4x4(&matrix));
-	XMFLOAT4 F;
-	XMStoreFloat3(transform.Position, translation);
-	XMStoreFloat3(transform.Scale, scale);
-	XMStoreFloat4(transform.Rotation, rotation);
 
-	//transform.Rotation->x = atan2(2.0 * (F.x * F.y + F.z * F.w), 1 - 2 * (F.y * F.y + F.z * F.z)); //roll
-	//transform.Rotation->y = asin(2.0 * (F.x * F.z - F.w * F.y)); //pitch
-	//transform.Rotation->z = atan2(2.0 * (F.x * F.w + F.y * F.z), 1 - 2 * (F.y * F.y + F.z * F.z)); //yaw
+	bool scaleEqual = XMVector3Equal(origScale, scale);
+	bool rotEqual = XMVector3Equal(origRot, rotation);
+	bool posEqual = XMVector3Equal(origPos, translation);
+
+	TransformUpdateEvent transformUpdateEvent;
+	if (!scaleEqual || !rotEqual || !posEqual)
+	{
+		XMStoreFloat3(transform.Position, translation);
+		XMStoreFloat3(transform.Scale, scale);
+		XMStoreFloat4(transform.Rotation, rotation);
+
+		transformUpdateEvent.entity = entities[0];
+		es::GEventBus->Publish(&transformUpdateEvent);
+	}
 
 	ImGui::Render();
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), commandList);

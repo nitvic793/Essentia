@@ -7,6 +7,7 @@
 #include "ImGuizmo.h"
 #include "Serialization.h"
 #include "Renderer.h"
+#include "EventTypes.h"
 
 using namespace DirectX;
 
@@ -113,6 +114,11 @@ private:
 class TransformUpdateSystem : public ISystem
 {
 public:
+	virtual void Initialize() override
+	{
+		es::GEventBus->Subscribe(this, &TransformUpdateSystem::OnComponentUpdate);
+	}
+
 	virtual void Update(float dt, float totalTime) override
 	{
 		uint32 count;
@@ -127,6 +133,20 @@ public:
 			auto Scale = scale[i];
 			Transform transform = { Pos, Rot, Scale };
 			entityManager->UpdateTransform(entities[i], transform);
+		}
+	}
+
+	void OnComponentUpdate(IComponentUpdateEvent* event)
+	{
+		auto em = GContext->EntityManager;
+		auto& compName = event->componentData.ComponentName;
+		if (compName == "PositionComponent" || compName == "RotationComponent" || compName == "ScaleComponent")
+		{
+			auto Pos = em->GetComponent<PositionComponent>(event->entity);
+			auto Rot = em->GetComponent<RotationComponent>(event->entity);
+			auto Scale = em->GetComponent<ScaleComponent>(event->entity);
+			Transform transform = { *Pos, *Rot, *Scale };
+			entityManager->UpdateTransform(event->entity, transform);
 		}
 	}
 };
@@ -262,8 +282,10 @@ public:
 		{
 			auto position = entityManager->GetComponent<PositionComponent>(entities[i]);
 			auto rotation = entityManager->GetComponent<RotationComponent>(entities[i]);
+			auto scale = entityManager->GetComponent<ScaleComponent>(entities[i]);
+			memset(scale, 0, sizeof(ScaleComponent));
+			memset(rotation, 0, sizeof(RotationComponent));
 			components[i].CameraInstance.Position = *position;
-			//components[i].CameraInstance.Rotation = *rotation;
 			components[i].CameraInstance.Update(deltaTime, totalTime);
 		}
 

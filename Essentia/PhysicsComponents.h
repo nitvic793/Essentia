@@ -45,6 +45,27 @@ struct BoxCollider : public IComponent
 	GComponent(BoxCollider);
 };
 
+struct PlaneCollider : public IComponent
+{
+	float NormalX = 0.f;
+	float NormalY = 1.f;
+	float NormalZ = 0.f;
+	float Distance = 10.f;
+
+	template<class Archive>
+	void serialize(Archive& archive)
+	{
+		archive(
+			CEREAL_NVP(NormalX),
+			CEREAL_NVP(NormalY),
+			CEREAL_NVP(NormalZ),
+			CEREAL_NVP(Distance)
+		);
+	}
+
+	GComponent(PlaneCollider);
+};
+
 
 struct RigidBodyComponent : public IComponent
 {
@@ -67,5 +88,22 @@ struct RigidBodyComponent : public IComponent
 		);
 	};
 
-	GComponent(RigidBodySphereComponent);
+	GComponent(RigidBodyComponent);
+};
+
+struct RigidBodyStaticComponent : public IComponent
+{
+	physx::PxRigidStatic* RigidBodyStatic = nullptr;
+
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+	};
+
+	GComponent(RigidBodyStaticComponent);
 };

@@ -3,7 +3,6 @@
 #include "Component.h"
 #include "Interface.h"
 
-
 enum class FieldTypes
 {
 	kFieldTypeInt32,
@@ -31,7 +30,9 @@ public:
 		componentVisitorMap[T::ComponentName] = [&](IComponent* component, IVisitor* visitor)
 		{
 			T* comp = (T*)component;
+			T origComp = *comp;
 			Visit(comp, visitor);
+			return HasComponentChanged(comp, &origComp);
 		};
 
 		componentFactoryMap[T::ComponentName] = [&](ComponentManager* componentManager)->ComponentPoolBase*
@@ -46,7 +47,9 @@ public:
 		componentVisitorMap[T::ComponentName] = [&](IComponent* component, IVisitor* visitor)
 		{
 			T* comp = (T*)component;
+			T origComp = *comp;
 			vistorFunc(comp, visitor);
+			return HasComponentChanged(comp, &origComp);
 		};
 
 		componentFactoryMap[T::ComponentName] = [](ComponentManager* componentManager)->ComponentPoolBase*
@@ -61,7 +64,9 @@ public:
 		componentVisitorMap[T::ComponentName] = [=](IComponent* component, IVisitor* visitor)
 		{
 			T* comp = (T*)component;
+			T origComp = *comp;
 			VisitFields(comp, visitor, fields);
+			return HasComponentChanged(comp, &origComp);
 		};
 
 		componentFactoryMap[T::ComponentName] = [](ComponentManager* componentManager)->ComponentPoolBase*
@@ -75,10 +80,14 @@ public:
 		return componentFactoryMap[std::string(componentName)](componentManager);
 	}
 
-	void VisitFields(const char* componentName, IComponent* component, IVisitor* visitor)
+	bool VisitFields(const char* componentName, IComponent* component, IVisitor* visitor)
 	{
 		if (componentVisitorMap.find(componentName) != componentVisitorMap.end())
-			componentVisitorMap[componentName](component, visitor);
+		{
+			return componentVisitorMap[componentName](component, visitor);
+		}
+
+		return false;
 	}
 
 	void CleanUp()
@@ -91,7 +100,7 @@ public:
 	{
 	}
 private:
-	std::unordered_map<std::string, std::function<void(IComponent*, IVisitor*)>> componentVisitorMap;
+	std::unordered_map<std::string, std::function<bool(IComponent*, IVisitor*)>> componentVisitorMap;
 	std::unordered_map<std::string, std::function<ComponentPoolBase* (ComponentManager*)>> componentFactoryMap;
 
 	template<typename T>
@@ -114,6 +123,18 @@ private:
 				break;
 			}
 		}
+	}
+
+	template<typename T>
+	bool HasComponentChanged(T* comp1, T* comp2)
+	{
+		int result = memcmp(comp1, comp2, sizeof(T));
+		if (result != 0 && strcmp(T::ComponentName, "SelectedComponent") != 0)
+		{
+			return true;
+		}
+
+		return false;
 	}
 };
 

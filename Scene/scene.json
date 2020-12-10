@@ -955,11 +955,13 @@
                     "RotationComponent",
                     "ScaleComponent",
                     "DrawableComponent",
-                    "BoundingOrientedBoxComponent"
+                    "BoundingOrientedBoxComponent",
+                    "SphereCollider",
+                    "RigidBodyComponent"
                 ],
                 "PositionComponent": {
                     "X": 1.9995123147964478,
-                    "Y": 1.0,
+                    "Y": 10.0,
                     "Z": 0.38768160343170168
                 },
                 "RotationComponent": {
@@ -977,7 +979,13 @@
                     "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
                 },
-                "BoundingOrientedBoxComponent": {}
+                "BoundingOrientedBoxComponent": {},
+                "SphereCollider": {
+                    "Radius": 0.5
+                },
+                "RigidBodyComponent": {
+                    "Mass": 10.0
+                }
             },
             {
                 "Name": "SphereEntity2",
@@ -1452,6 +1460,45 @@
                     "CameraInstance.FieldOfView": 45.0,
                     "CameraInstance.IsOrthographic": false
                 }
+            },
+            {
+                "Name": "Plane",
+                "Entity": {
+                    "entity.ID": 15
+                },
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "ScaleComponent",
+                    "PlaneCollider",
+                    "RigidBodyStaticComponent"
+                ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0,
+                    "W": 0.0
+                },
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "PlaneCollider": {
+                    "NormalX": 0.0,
+                    "NormalY": 1.0,
+                    "NormalZ": 0.0,
+                    "Distance": 0.0
+                },
+                "RigidBodyStaticComponent": {}
             }
         ]
     }

@@ -4,6 +4,7 @@
 #include <cereal/cereal.hpp>
 #include "ComponentReflector.h"
 #include "PostProcessComponents.h"
+#include "PhysicsComponents.h"
 
 ComponentReflector GComponentReflector;
 
@@ -25,6 +26,11 @@ void RegisterComponents()
 	GComponentReflector.RegisterComponent<AnimationComponent>();
 	GComponentReflector.RegisterComponent<BoundingOrientedBoxComponent>();
 	GComponentReflector.RegisterComponent<TerrainComponent>();
+	GComponentReflector.RegisterComponent<SphereCollider>();
+	GComponentReflector.RegisterComponent<BoxCollider>();
+	GComponentReflector.RegisterComponent<PlaneCollider>();
+	GComponentReflector.RegisterComponent<RigidBodyComponent>();
+	GComponentReflector.RegisterComponent<RigidBodyStaticComponent>();
 }
 
 Scene LoadLevel(const char* fname)
@@ -184,4 +190,24 @@ void Visit(TerrainComponent* component, IVisitor* visitor)
 	visitor->Visit(name, MField(comp, ScaleMinY));
 	visitor->Visit(name, MField(comp, Material));
 	visitor->Visit(name, "TerrainName", terrainName);
+}
+
+void Visit(SphereCollider* component, IVisitor* visitor)
+{
+}
+
+void Visit(PlaneCollider* component, IVisitor* visitor)
+{
+}
+
+void Visit(BoxCollider* component, IVisitor* visitor)
+{
+}
+
+void Visit(RigidBodyComponent* component, IVisitor* visitor)
+{
+}
+
+void Visit(RigidBodyStaticComponent* component, IVisitor* visitor)
+{
 }
