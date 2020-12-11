@@ -7,6 +7,9 @@
 #include "Memory.h"
 #include "EventTypes.h"
 
+struct SphereCollider;
+struct BoxCollider;
+
 class PhysicsSystem : public ISystem
 {
 public:
@@ -21,4 +24,6 @@ private:
 
 	void OnTransformUpdate(TransformUpdateEvent* event);
 	void OnComponentUpdate(IComponentUpdateEvent* event);
+	void OnSphereColliderAdd(ComponentAddEvent<SphereCollider>* event);
+	void OnBoxColliderAdd(ComponentAddEvent<BoxCollider>* event);
 };

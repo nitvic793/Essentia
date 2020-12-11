@@ -7,6 +7,7 @@
 #include "MyGame.h"
 #include "ComponentReflector.h"
 #include "MoveableUnitComponent.h"
+#include "ObjectInferenceSystem.h"
 
 struct TestComponent : public IComponent
 {
@@ -44,6 +45,7 @@ void LoadSystems(SystemManager* systemManager, IAllocator* allocator)
 {
 	systemManager->RegisterSystem<RotationSystem>(allocator);
 	systemManager->RegisterSystem<MoveObjectSystem>(allocator);
+	systemManager->RegisterSystem<ObjectInferenceSystem>(allocator);
 
 	GContext->ComponentReflector->RegisterComponent<TestComponent>(
 		{

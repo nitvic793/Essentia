@@ -647,7 +647,10 @@
                 "Assets/Models/cube.obj",
                 "Assets/Models/sphere.obj",
                 "Assets/Models/male.fbx",
-                "Assets/Models/plane.obj"
+                "Assets/Models/plane.obj",
+                "Assets/Models/cat.obj",
+                "Assets/Models/helmet.obj",
+                "Assets/Models/basketball.obj"
             ],
             "Models": [
                 "Assets/Models/Sponza.fbx"
@@ -839,7 +842,7 @@
                 "Textures": [
                     "Assets/Textures/Sponza_Curtain_Green_diffuse.DDS",
                     "Assets/Textures/Sponza_Curtain_Green_normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/Sponza_Curtain_metallic.DDS"
                 ]
             },
@@ -848,7 +851,7 @@
                 "Textures": [
                     "Assets/Textures/ChainTexture_Albedo.DDS",
                     "Assets/Textures/ChainTexture_Normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/ChainTexture_Metallic.DDS"
                 ]
             },
@@ -857,7 +860,7 @@
                 "Textures": [
                     "Assets/Textures/VaseHanging_diffuse.DDS",
                     "Assets/Textures/VaseHanging_normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/Metallic_metallic.DDS"
                 ]
             },
@@ -866,7 +869,7 @@
                 "Textures": [
                     "Assets/Textures/Vase_diffuse.DDS",
                     "Assets/Textures/Vase_normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/Dielectric_metallic.DDS"
                 ]
             },
@@ -875,7 +878,7 @@
                 "Textures": [
                     "Assets/Textures/Lion_Albedo.DDS",
                     "Assets/Textures/Lion_Normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/Dielectric_metallic.DDS"
                 ]
             },
@@ -884,7 +887,7 @@
                 "Textures": [
                     "Assets/Textures/Sponza_Roof_diffuse.DDS",
                     "Assets/Textures/Sponza_Roof_normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/Dielectric_metallic.DDS"
                 ]
             },
@@ -903,6 +906,33 @@
                     "Assets/Terrain/Grass/Grass_005_BaseColor.DDS",
                     "Assets/Terrain/Grass/Grass_005_Normal.DDS",
                     "Assets/Terrain/Grass/Grass_005_Roughness.DDS",
+                    "Assets/Textures/defaultMetal.DDS"
+                ]
+            },
+            {
+                "MaterialName": "basketball",
+                "Textures": [
+                    "Assets/Textures/basketball_diffuse.jpg",
+                    "Assets/Textures/basketball_bump.DDS",
+                    "Assets/Textures/basketbal_Roughness.DDS",
+                    "Assets/Textures/basketbal_Metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "cat",
+                "Textures": [
+                    "Assets/Textures/Cat_diffuse.DDS",
+                    "Assets/Textures/Cat_bump.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/defaultMetal.DDS"
+                ]
+            },
+            {
+                "MaterialName": "helmet",
+                "Textures": [
+                    "Assets/Textures/helmet_diffuse.DDS",
+                    "Assets/Textures/defaultNormal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
                     "Assets/Textures/defaultMetal.DDS"
                 ]
             }
@@ -988,7 +1018,7 @@
                 }
             },
             {
-                "Name": "SphereEntity2",
+                "Name": "CubeEntity",
                 "Entity": {
                     "entity.ID": 3
                 },
@@ -1000,11 +1030,13 @@
                     "RotationComponent",
                     "ScaleComponent",
                     "DrawableComponent",
-                    "BoundingOrientedBoxComponent"
+                    "BoundingOrientedBoxComponent",
+                    "BoxCollider",
+                    "RigidBodyComponent"
                 ],
                 "PositionComponent": {
                     "X": 5.0,
-                    "Y": 1.0,
+                    "Y": 6.0,
                     "Z": 0.0
                 },
                 "RotationComponent": {
@@ -1019,10 +1051,18 @@
                     "Z": 1.0
                 },
                 "DrawableComponent": {
-                    "MeshName": "Assets/Models/sphere.obj",
+                    "MeshName": "Assets/Models/cube.obj",
                     "MaterialName": "0"
                 },
-                "BoundingOrientedBoxComponent": {}
+                "BoundingOrientedBoxComponent": {},
+                "BoxCollider": {
+                    "HalfExtentX": 0.5,
+                    "HalfExtentY": 0.5,
+                    "HalfExtentZ": 0.5
+                },
+                "RigidBodyComponent": {
+                    "Mass": 10.0
+                }
             },
             {
                 "Name": "SphereEntity3",

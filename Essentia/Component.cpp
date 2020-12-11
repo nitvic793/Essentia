@@ -75,7 +75,7 @@ void ComponentManager::AddComponent(const char* name, EntityHandle entity, IComp
 		auto component = pool->GetComponent(entity);
 		memcpy(component, initValue, pool->GetTypeSize());
 	}
-
+	pool->EmitAddComponentEvent(entity);
 }
 
 

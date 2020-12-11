@@ -29,3 +29,10 @@ struct IComponentUpdateEvent : public es::IEvent
 	ComponentData	componentData;
 	EntityHandle	entity;
 };
+
+template<typename T>
+struct ComponentAddEvent : public es::IEvent
+{
+	T* component;
+	EntityHandle entity;
+};

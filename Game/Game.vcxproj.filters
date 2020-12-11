@@ -42,6 +42,9 @@
     <ClInclude Include="MoveableUnitComponent.h">
       <Filter>Components</Filter>
     </ClInclude>
+    <ClInclude Include="ObjectInferenceSystem.h">
+      <Filter>Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

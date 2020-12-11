@@ -9,6 +9,7 @@
 #include <cereal/archives/json.hpp>
 #include "Utility.h"
 #include "EngineContext.h"
+#include "EventTypes.h"
 
 class ComponentPoolBase
 {
@@ -25,6 +26,8 @@ public:
 	virtual void			Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) = 0;
 	virtual const size_t	GetTypeSize() = 0;
 	virtual const char*		GetTypeName() = 0 ;
+	virtual void			EmitAddComponentEvent(EntityHandle entity) {};
+	virtual void			EmitRemoveComponentEvent(EntityHandle entity) {};
 	virtual ~ComponentPoolBase() {}
 };
 
@@ -156,6 +159,15 @@ public:
 	virtual const char* GetTypeName() override
 	{
 		return T::ComponentName;
+	}
+
+	virtual void EmitAddComponentEvent(EntityHandle entity)
+	{
+		T* component = (T*)this->GetComponent(entity);
+		ComponentAddEvent<T> event = {};
+		event.component = component;
+		event.entity = entity;
+		es::GEventBus->Publish(&event);
 	}
 
 	~ComponentPool() {}
