@@ -29,7 +29,7 @@ public:
 	virtual void Initialize() override
 	{
 		objectMap = std::map<std::string_view, ObjectData>{
-			{"soccer" , { "Assets/Models/sphere.obj", "0", XMFLOAT3(1.f,1.f,1.f)}},
+			{"soccer" , { "Assets/Models/soccer.obj", "soccer", XMFLOAT3(0.5f,0.5f,0.5f)}},
 			{"helmet" , { "Assets/Models/helmet.obj", "helmet", XMFLOAT3(0.05f,0.05f,0.05f), XMFLOAT3(90.f, 0.f, 0.f)}},
 			{"cat" , { "Assets/Models/cat.obj", "cat", XMFLOAT3(0.05f,0.05f,0.05f), XMFLOAT3(90.f, 0.f, 0.f)}},
 			{"basketball" , { "Assets/Models/basketball.obj", "basketball", XMFLOAT3(0.04f,0.04f,0.04f)}}

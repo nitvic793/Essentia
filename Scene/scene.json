@@ -650,7 +650,8 @@
                 "Assets/Models/plane.obj",
                 "Assets/Models/cat.obj",
                 "Assets/Models/helmet.obj",
-                "Assets/Models/basketball.obj"
+                "Assets/Models/basketball.obj",
+                "Assets/Models/soccer.obj"
             ],
             "Models": [
                 "Assets/Models/Sponza.fbx"
@@ -933,6 +934,15 @@
                     "Assets/Textures/helmet_diffuse.DDS",
                     "Assets/Textures/defaultNormal.DDS",
                     "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/defaultMetal.DDS"
+                ]
+            },
+            {
+                "MaterialName": "soccer",
+                "Textures": [
+                    "Assets/Textures/soccer_diffuse.DDS",
+                    "Assets/Textures/soccer_normal.DDS",
+                    "Assets/Textures/soccer_roughness.DDS",
                     "Assets/Textures/defaultMetal.DDS"
                 ]
             }
