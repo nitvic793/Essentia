@@ -1,3 +1,4 @@
+// Credits/Reference: https://gist.github.com/Erkaman/f24ef6bd7499be363e6c99d116d8734d
 
 struct VertexToPixel
 {
