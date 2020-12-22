@@ -61,7 +61,9 @@ static void ConsolidateRigidBodyStatic(EntityHandle entity)
 
 	if (!comp->RigidBodyStatic)
 	{
-		auto plane = GContext->EntityManager->GetComponent<PlaneCollider>(entity);
+		auto plane = GContext->EntityManager->GetComponentManager()->TryGetComponent<PlaneCollider>(entity);
+		auto sphereCollider = GContext->EntityManager->GetComponentManager()->TryGetComponent<SphereCollider>(entity);
+		auto boxCollider = GContext->EntityManager->GetComponentManager()->TryGetComponent<BoxCollider>(entity);
 		physx::PxShape* shape = nullptr;
 
 		if (plane)
@@ -72,9 +74,31 @@ static void ConsolidateRigidBodyStatic(EntityHandle entity)
 				*GPhysicsContext->GetDefaultMaterial()
 			);
 		}
+		else if (sphereCollider)
+		{
+			auto sphere = physx::PxSphereGeometry(sphereCollider->Radius);
+			shape = physics->createShape(sphere, *GPhysicsContext->GetDefaultMaterial());
+		}
+		else if (boxCollider)
+		{
+			auto box = physx::PxBoxGeometry(boxCollider->HalfExtentX, boxCollider->HalfExtentY, boxCollider->HalfExtentZ);
+			shape = physics->createShape(box, *GPhysicsContext->GetDefaultMaterial());
+		}
 		else
 		{
 			return; // Don't instantiate Rigid Body if collider is not present
+		}
+
+		if (shape)
+		{
+			DirectX::XMFLOAT4X4 worldMatrix = GContext->EntityManager->GetWorldMatrix(entity);
+			auto transformRef = GContext->EntityManager->GetTransform(entity);
+			physx::PxTransform transform;// (physx::PxMat44(&worldMatrix.m[0][0]));
+			transform.p = PxVec3(transformRef.Position->x, transformRef.Position->y, transformRef.Position->z);
+			transform.q = PxQuat(transformRef.Rotation->x, transformRef.Rotation->y, transformRef.Rotation->z, transformRef.Rotation->w);
+			bool sane = transform.q.isSane();
+			bool finite = transform.p.isFinite();
+			comp->RigidBodyStatic = PxCreateStatic(*physics, transform, *shape);
 		}
 
 		DirectX::XMFLOAT4X4 worldMatrix = GContext->EntityManager->GetWorldMatrix(entity);
