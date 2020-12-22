@@ -161,7 +161,7 @@ void Window::StartMessagePump(std::function<void()> callback)
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
-		//else
+		else
 		{
 			callback();
 		}

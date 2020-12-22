@@ -4,7 +4,7 @@
 #include "PhysicsComponents.h"
 
 using namespace physx;
-
+using namespace DirectX;
 /**
  * Instantiate PhysX rigid body for given entity if a Collider is present.
  *
@@ -42,7 +42,8 @@ static void ConsolidateRigidBody(EntityHandle entity)
 		physx::PxTransform transform;// (physx::PxMat44(&worldMatrix.m[0][0]));
 		transform.p = PxVec3(transformRef.Position->x, transformRef.Position->y, transformRef.Position->z);
 		transform.q = PxQuat(transformRef.Rotation->x, transformRef.Rotation->y, transformRef.Rotation->z, transformRef.Rotation->w);
-
+		bool sane = transform.q.isSane();
+		bool finite = transform.p.isFinite();
 		rigidBodyComponent->RigidBody = physics->createRigidDynamic(transform);
 		rigidBodyComponent->RigidBody->attachShape(*shape);
 		PxRigidBodyExt::updateMassAndInertia(*rigidBodyComponent->RigidBody, rigidBodyComponent->Mass);
@@ -60,7 +61,9 @@ static void ConsolidateRigidBodyStatic(EntityHandle entity)
 
 	if (!comp->RigidBodyStatic)
 	{
-		auto plane = GContext->EntityManager->GetComponent<PlaneCollider>(entity);
+		auto plane = GContext->EntityManager->GetComponentManager()->TryGetComponent<PlaneCollider>(entity);
+		auto sphereCollider = GContext->EntityManager->GetComponentManager()->TryGetComponent<SphereCollider>(entity);
+		auto boxCollider = GContext->EntityManager->GetComponentManager()->TryGetComponent<BoxCollider>(entity);
 		physx::PxShape* shape = nullptr;
 
 		if (plane)
@@ -71,9 +74,31 @@ static void ConsolidateRigidBodyStatic(EntityHandle entity)
 				*GPhysicsContext->GetDefaultMaterial()
 			);
 		}
+		else if (sphereCollider)
+		{
+			auto sphere = physx::PxSphereGeometry(sphereCollider->Radius);
+			shape = physics->createShape(sphere, *GPhysicsContext->GetDefaultMaterial());
+		}
+		else if (boxCollider)
+		{
+			auto box = physx::PxBoxGeometry(boxCollider->HalfExtentX, boxCollider->HalfExtentY, boxCollider->HalfExtentZ);
+			shape = physics->createShape(box, *GPhysicsContext->GetDefaultMaterial());
+		}
 		else
 		{
 			return; // Don't instantiate Rigid Body if collider is not present
+		}
+
+		if (shape)
+		{
+			DirectX::XMFLOAT4X4 worldMatrix = GContext->EntityManager->GetWorldMatrix(entity);
+			auto transformRef = GContext->EntityManager->GetTransform(entity);
+			physx::PxTransform transform;// (physx::PxMat44(&worldMatrix.m[0][0]));
+			transform.p = PxVec3(transformRef.Position->x, transformRef.Position->y, transformRef.Position->z);
+			transform.q = PxQuat(transformRef.Rotation->x, transformRef.Rotation->y, transformRef.Rotation->z, transformRef.Rotation->w);
+			bool sane = transform.q.isSane();
+			bool finite = transform.p.isFinite();
+			comp->RigidBodyStatic = PxCreateStatic(*physics, transform, *shape);
 		}
 
 		DirectX::XMFLOAT4X4 worldMatrix = GContext->EntityManager->GetWorldMatrix(entity);
@@ -110,6 +135,8 @@ void PhysicsSystem::Initialize()
 
 	es::GEventBus->Subscribe(this, &PhysicsSystem::OnTransformUpdate);
 	es::GEventBus->Subscribe(this, &PhysicsSystem::OnComponentUpdate);
+	es::GEventBus->Subscribe(this, &PhysicsSystem::OnSphereColliderAdd);
+	es::GEventBus->Subscribe(this, &PhysicsSystem::OnBoxColliderAdd);
 }
 
 void PhysicsSystem::Update(float deltaTime, float totalTime)
@@ -179,4 +206,24 @@ void PhysicsSystem::OnComponentUpdate(IComponentUpdateEvent* event)
 		PxTransform transform(PxVec3(p->x, p->y, p->z), PxQuat(q->x, q->y, q->z, q->w));
 		comp->RigidBody->setGlobalPose(transform);
 	}
+}
+
+void PhysicsSystem::OnSphereColliderAdd(ComponentAddEvent<SphereCollider>* event)
+{
+	auto drawable = GContext->EntityManager->GetComponent<DrawableComponent>(event->entity);
+	auto world = GContext->EntityManager->GetWorldMatrix(event->entity);
+	auto box = GContext->MeshManager->GetBoundingBox(drawable->Mesh);
+	box.Transform(box, XMLoadFloat4x4(&world));
+	event->component->Radius = box.Extents.x;
+}
+
+void PhysicsSystem::OnBoxColliderAdd(ComponentAddEvent<BoxCollider>* event)
+{
+	auto drawable = GContext->EntityManager->GetComponent<DrawableComponent>(event->entity);
+	auto world = GContext->EntityManager->GetWorldMatrix(event->entity);
+	auto box = GContext->MeshManager->GetBoundingBox(drawable->Mesh);
+	box.Transform(box, XMLoadFloat4x4(&world));
+	event->component->HalfExtentX = box.Extents.x;
+	event->component->HalfExtentY = box.Extents.y;
+	event->component->HalfExtentZ = box.Extents.z;
 }

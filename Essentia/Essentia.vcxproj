@@ -144,7 +144,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -166,7 +166,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -212,7 +212,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>NDEBUG;EDITOR;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>

@@ -24,7 +24,7 @@ void PhysicsContext::Initialize()
 	sceneDesc.gravity = PxVec3(0.0f, -9.81f, 0.0f);
 	mDispatcher = PxDefaultCpuDispatcherCreate(2);
 	sceneDesc.cpuDispatcher = mDispatcher;
-	sceneDesc.filterShader = PxDefaultSimulationFilterShader;
+	sceneDesc.filterShader = PxDefaultSimulationFilterShader; 
 	mScene = mPhysics->createScene(sceneDesc);
 
 	PxPvdSceneClient* pvdClient = mScene->getScenePvdClient();

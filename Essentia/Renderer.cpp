@@ -545,9 +545,9 @@ void Renderer::EndInitialization()
 {
 	//Load Default Textures
 	Default::DefaultDiffuse = shaderResourceManager->CreateTexture("Assets/Textures/floor_albedo.png");
-	Default::DefaultNormals = shaderResourceManager->CreateTexture("Assets/Textures/floor_normals.png");
-	Default::DefaultRoughness = shaderResourceManager->CreateTexture("Assets/Textures/defaultRoughness.png");
-	Default::DefaultMetalness = shaderResourceManager->CreateTexture("Assets/Textures/defaultMetal.png");
+	Default::DefaultNormals = shaderResourceManager->CreateTexture("Assets/Textures/defaultNormal.DDS", DDS);
+	Default::DefaultRoughness = shaderResourceManager->CreateTexture("Assets/Textures/defaultRoughness.DDS", DDS);
+	Default::DefaultMetalness = shaderResourceManager->CreateTexture("Assets/Textures/defaultMetal.DDS", DDS);
 
 	TextureID textures[MaterialTextureCount];
 	textures[DiffuseID] = shaderResourceManager->CreateTexture("Assets/Textures/floor_albedo.png");

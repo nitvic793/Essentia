@@ -341,3 +341,4 @@ healthchecksdb
 
 !Assets/Models/*.obj
 !external/PhysX-4.1/**/
+!external/rpclib/**/

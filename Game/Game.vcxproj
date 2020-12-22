@@ -125,7 +125,7 @@
       <PreprocessorDefinitions>_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)Essentia;$(SolutionDir)include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion)Game.pdb</ProgramDataBaseFileName>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -135,7 +135,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;rpc.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)external\rpclib\lib\Debug;$(SolutionDir)external\PhysX-4.1\bin\win.x86_64.vc142.mt\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -163,7 +164,7 @@
       <PreprocessorDefinitions>_DEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)Essentia;$(SolutionDir)include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion)Game.pdb</ProgramDataBaseFileName>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -238,7 +239,7 @@
       <PreprocessorDefinitions>NDEBUG;GAME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)Essentia;$(SolutionDir)include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion)Game.pdb</ProgramDataBaseFileName>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
@@ -249,7 +250,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;rpc.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)external\rpclib\lib\Release;$(SolutionDir)external\PhysX-4.1\bin\win.x86_64.vc142.mt\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -257,6 +259,7 @@
     <ClInclude Include="Interface.h" />
     <ClInclude Include="MoveableUnitComponent.h" />
     <ClInclude Include="MyGame.h" />
+    <ClInclude Include="ObjectInferenceSystem.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Systems.h" />
   </ItemGroup>
