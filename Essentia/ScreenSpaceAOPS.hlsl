@@ -15,6 +15,7 @@ cbuffer AOParams : register(b0)
     float4x4 InvProjection;
     float4x4 ProjectionTex;
     float4x4 InvView;
+    float4x4 InvViewProj;
     float4 OffsetVectors[14];
     float4 BlurWeights[3];
     float2 ScreenSize;
@@ -68,48 +69,99 @@ float3 ReconstructNormal(float2 uv)
 {
     float2 stc = uv;
     float depth = DepthTexture.Sample(LinearWrapSampler, stc).x;
-    float3 Pos = VSPositionFromDepth(uv, depth);
-    int bestZV;
-    int bestZH;
+    //float3 Pos = VSPositionFromDepth(uv, depth);
+    //int bestZV;
+    //int bestZH;
     float4 H;
     H.x = DepthTexture.Sample(LinearWrapSampler, stc - float2(1 / ScreenSize.x, 0)).x;
     H.y = DepthTexture.Sample(LinearWrapSampler, stc + float2(1 / ScreenSize.x, 0)).x;
     H.z = DepthTexture.Sample(LinearWrapSampler, stc - float2(2 / ScreenSize.x, 0)).x;
     H.w = DepthTexture.Sample(LinearWrapSampler, stc + float2(2 / ScreenSize.x, 0)).x;
     
-    float3 HPos[4];
-    HPos[0] = VSPositionFromDepth(stc - float2(1 / ScreenSize.x, 0), H.x);
-    HPos[1] = VSPositionFromDepth(stc + float2(1 / ScreenSize.x, 0), H.y);
-    HPos[2] = VSPositionFromDepth(stc - float2(2 / ScreenSize.x, 0), H.z);
-    HPos[3] = VSPositionFromDepth(stc + float2(2 / ScreenSize.x, 0), H.w);
+    //float3 HPos[4];
+    //HPos[0] = VSPositionFromDepth(stc - float2(1 / ScreenSize.x, 0), H.x);
+    //HPos[1] = VSPositionFromDepth(stc + float2(1 / ScreenSize.x, 0), H.y);
+    //HPos[2] = VSPositionFromDepth(stc - float2(2 / ScreenSize.x, 0), H.z);
+    //HPos[3] = VSPositionFromDepth(stc + float2(2 / ScreenSize.x, 0), H.w);
     float2 he = abs(H.xy * H.zw * rcp(2 * H.zw - H.xy) - depth);
     float3 hDeriv;
-    
-    if (he.x > he.y)
-        hDeriv = ddx(HPos[2]);
-    else
-        hDeriv = ddx(HPos[3]);
 
+    if (he.x > he.y)
+    {
+        float2 uvz = stc - float2(2 / ScreenSize.x, 0);
+        float2 uvx = stc - float2(1 / ScreenSize.x, 0);
+        float3 posZ = WorldPosFromDepth(uvz, H.z);
+        float3 posX = WorldPosFromDepth(uvx, H.x);
+        hDeriv = posX - posZ;
+    }
+    else
+    {
+        float2 uvw = stc - float2(2 / ScreenSize.x, 0);
+        float2 uvy = stc - float2(1 / ScreenSize.x, 0);
+        float3 posW = WorldPosFromDepth(uvw, H.w);
+        float3 posY = WorldPosFromDepth(uvy, H.y);
+        hDeriv = posW - posY;
+    }
+        
     float4 V;
     V.x = DepthTexture.Sample(LinearWrapSampler, stc - float2(0, 1 / ScreenSize.y)).x;
     V.y = DepthTexture.Sample(LinearWrapSampler, stc + float2(0, 1 / ScreenSize.y)).x;
     V.z = DepthTexture.Sample(LinearWrapSampler, stc - float2(0, 2 / ScreenSize.y)).x;
     V.w = DepthTexture.Sample(LinearWrapSampler, stc + float2(0, 2 / ScreenSize.y)).x;
     
-    float3 VPos[4];
-    VPos[0] = VSPositionFromDepth(stc - float2(0, 1 / ScreenSize.y), V.x);
-    VPos[1] = VSPositionFromDepth(stc + float2(0, 1 / ScreenSize.y), V.y);
-    VPos[2] = VSPositionFromDepth(stc - float2(0, 2 / ScreenSize.y), V.z);
-    VPos[3] = VSPositionFromDepth(stc + float2(0, 2 / ScreenSize.y), V.w);
+    //float3 VPos[4];
+    //VPos[0] = VSPositionFromDepth(stc - float2(0, 1 / ScreenSize.y), V.x);
+    //VPos[1] = VSPositionFromDepth(stc + float2(0, 1 / ScreenSize.y), V.y);
+    //VPos[2] = VSPositionFromDepth(stc - float2(0, 2 / ScreenSize.y), V.z);
+    //VPos[3] = VSPositionFromDepth(stc + float2(0, 2 / ScreenSize.y), V.w);
     
     float2 ve = abs(V.xy * V.zw * rcp(2 * V.zw - V.xy) - depth);
     float3 vDeriv;
     if (ve.x > ve.y)
-        vDeriv = ddy(VPos[0]);
+    {
+        float2 uvz = stc - float2(0, 2 / ScreenSize.y);
+        float2 uvx = stc - float2(0, 1 / ScreenSize.y);
+        float3 posZ = WorldPosFromDepth(uvz, V.z);
+        float3 posX = WorldPosFromDepth(uvx, V.x);
+        vDeriv = posX - posZ;
+    }
     else
-        vDeriv = ddy(VPos[3]);
+    {
+        float2 uvy = stc - float2(0, 1 / ScreenSize.y);
+        float2 uvw = stc - float2(0, 2 / ScreenSize.y);
+        float3 posY = WorldPosFromDepth(uvy, V.w);
+        float3 posW = WorldPosFromDepth(uvw, V.y);
+        vDeriv = posW - posY;
+    }
     
     return normalize(cross(hDeriv, vDeriv));
+}
+
+float3 ReconstructPosition(in float2 uv, in float z, in float4x4 InvVP)
+{
+    float x = uv.x * 2.0f - 1.0f;
+    float y = (1.0 - uv.y) * 2.0f - 1.0f;
+    float4 position_s = float4(x, y, z, 1.0f);
+    float4 position_v = mul(InvVP, position_s);
+    return position_v.xyz / position_v.w;
+}
+
+float3 ReconstructNormalV2(float2 uv)
+{
+    float2 uv0 = uv; // center
+    float2 uv1 = uv + float2(1, 0) / ScreenSize; // right 
+    float2 uv2 = uv + float2(0, 1) / ScreenSize; // top
+
+    float depth0 = DepthTexture.SampleLevel(PointClampSampler, uv0, 0).r;
+    float depth1 = DepthTexture.SampleLevel(PointClampSampler, uv1, 0).r;
+    float depth2 = DepthTexture.SampleLevel(PointClampSampler, uv2, 0).r;
+
+    float3 P0 = ReconstructPosition(uv0, depth0, InvProjection);
+    float3 P1 = ReconstructPosition(uv1, depth1, InvProjection);
+    float3 P2 = ReconstructPosition(uv2, depth2, InvProjection);
+
+    float3 normal = normalize(cross(P2 - P0, P1 - P0));
+    return normal;
 }
 
 
@@ -137,12 +189,21 @@ float OcclusionFunction(float distZ)
     return occlusion;
 }
 
+inline float rand(inout float seed, in float2 uv)
+{
+    float result = frac(sin(seed * dot(uv, float2(12.9898, 78.233))) * 43758.5453);
+    seed += 1;
+    return result;
+}
+
 float4 main(VertexOut input) : SV_TARGET
 {
     float2 texelSize = 1.f / ScreenSize;
     float depth = DepthTexture.SampleLevel(LinearWrapSampler, input.UV, 0.f).r;
     float3 vsPos = VSPositionFromDepth(input.UV, depth);
     float3 normal = ReconstructNormal(vsPos);
+    //float3 normal = ReconstructNormal(input.UV);
+    float2 uv = input.UV;
     float3 n = normal;
     
     float pz = depth;

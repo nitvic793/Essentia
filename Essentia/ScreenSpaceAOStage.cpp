@@ -73,6 +73,11 @@ void ScreenSpaceAOStage::Render(const uint32 frameIndex, const FrameContext& fra
 	//sz = halfSz;
 	auto camera = &entityManager->GetComponents<CameraComponent>(count)[0].CameraInstance;
 	auto projTransposed = camera->GetProjectionTransposed();
+
+	auto viewProj = XMMatrixMultiply(XMLoadFloat4x4(&camera->View), XMLoadFloat4x4(&camera->Projection));
+	auto invViewProj = XMMatrixTranspose(XMMatrixInverse(nullptr, viewProj));
+
+	XMStoreFloat4x4(&aoParams.InvViewProj, invViewProj);
 	aoParams.InvView = camera->GetInverseViewTransposed();
 	aoParams.Projection = projTransposed;
 	aoParams.InvProjection = camera->GetInverseProjectionTransposed();
