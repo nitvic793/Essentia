@@ -361,6 +361,9 @@
     <ClCompile Include="PhysicsContext.cpp">
       <Filter>Source Files\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="ReconstructNormals.cpp">
+      <Filter>Source Files\Renderer\RenderStages</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -654,6 +657,9 @@
     <ClInclude Include="PhysicsContext.h">
       <Filter>Header Files\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="ReconstructNormals.h">
+      <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
@@ -769,6 +775,9 @@
     </FxCompile>
     <FxCompile Include="TerrainVS.hlsl">
       <Filter>Shaders\Terrain</Filter>
+    </FxCompile>
+    <FxCompile Include="ReconstructNormalsPS.hlsl">
+      <Filter>Shaders\Misc</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

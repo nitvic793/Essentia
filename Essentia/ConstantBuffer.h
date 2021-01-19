@@ -43,6 +43,11 @@ struct PerFrameConstantBuffer
 	VoxelParams			VoxelData;
 	DirectX::XMFLOAT4X4 ShadowView;
 	DirectX::XMFLOAT4X4 ShadowProjection;
+	DirectX::XMFLOAT4X4 CamView;
+	DirectX::XMFLOAT4X4 CamProjection;
+	DirectX::XMFLOAT4X4 CamInvView;
+	DirectX::XMFLOAT4X4 CamInvProjection;
+	DirectX::XMFLOAT2	ScreenSize;
 };
 
 struct DirectionalLight

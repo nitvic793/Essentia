@@ -21,6 +21,11 @@ struct PerFrameData
     VoxelParams VoxelData;
     float4x4 ShadowView; // Global Directional Light Shadow View Matrix
     float4x4 ShadowProjection; // Global Directional Light Shadow Projection Matrix
+    float4x4 CamView; // Main Camera View Matrix
+    float4x4 CamProjection; // Main Camera Projection Matrix
+    float4x4 CamInvView; // Main Camera Inverse View Matrix  
+    float4x4 CamInvProjection; // Main Camera Inverse Projection Matrix
+    float2 ScreenSize; // Screen Width and Height
 };
 
 struct VoxelType

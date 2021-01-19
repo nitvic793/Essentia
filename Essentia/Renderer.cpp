@@ -265,7 +265,7 @@ TODO:
 void Renderer::Render(const FrameContext& frameContext)
 {
 	auto commandList = commandContext->GetDefaultCommandList();
-	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Begin Frame");
+	PIXBeginEvent(commandList, PIX_COLOR_DEFAULT, L"Frame");
 
 	auto renderStageMap = GRenderStageManager.GetRenderStageMap();
 	uint32 camCount;
@@ -348,6 +348,11 @@ void Renderer::Render(const FrameContext& frameContext)
 	}
 
 	GSceneResources.FrameData.VoxelData = voxelData;
+	XMStoreFloat4x4(&GSceneResources.FrameData.CamView, XMMatrixTranspose(view));
+	XMStoreFloat4x4(&GSceneResources.FrameData.CamProjection, XMMatrixTranspose(projection));
+	XMStoreFloat4x4(&GSceneResources.FrameData.CamInvView, XMMatrixTranspose(XMMatrixInverse(nullptr, view)));
+	XMStoreFloat4x4(&GSceneResources.FrameData.CamInvProjection, XMMatrixTranspose(XMMatrixInverse(nullptr, projection)));
+	GSceneResources.FrameData.ScreenSize = XMFLOAT2((float)width, (float)height);
 	shaderResourceManager->CopyToCB(imageIndex, { &GSceneResources.FrameData, sizeof(GSceneResources.FrameData) }, perFrameView);
 
 	auto rtId = renderTargets[backBufferIndex];
@@ -1061,9 +1066,24 @@ void Renderer::UpdateLightBuffer()
 	auto pointLights = ec->EntityManager->GetComponents<PointLightComponent>(pointLightCount);
 	auto spotLights = ec->EntityManager->GetComponents<SpotLightComponent>(spotLightCount);
 	lightBuffer.DirLightCount = dirLightCount;
-	lightBuffer.DirLights[0] = dirLights[0].GetLight();
 
-	auto entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
+	auto entities = ec->EntityManager->GetEntities<DirectionalLightComponent>(dirLightCount);
+	for (uint32 i = 0; i < dirLightCount; ++i)
+	{
+		auto rotationComp = (DirectX::XMFLOAT4) * ec->EntityManager->GetComponent<RotationComponent>(entities[i]);
+		auto rotation = XMLoadFloat4(&rotationComp);
+		if (XMVector3Equal(rotation, XMVectorZero()))
+		{
+			rotation = XMQuaternionRotationRollPitchYaw(0.f, -90.f, 0.f);
+		}
+
+		auto direction = XMVectorSet(0, 0, 1, 0);
+		direction = XMVector3Rotate(direction, rotation);
+		XMStoreFloat3(&dirLights[i].Direction, XMVector3Normalize(direction));
+		lightBuffer.DirLights[i] = dirLights[0].GetLight();
+	}
+
+	entities = ec->EntityManager->GetEntities<PointLightComponent>(pointLightCount);
 	lightBuffer.PointLightCount = pointLightCount;
 	if (pointLightCount > 0)
 	{

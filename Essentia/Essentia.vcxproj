@@ -280,6 +280,7 @@
     <ClCompile Include="PostProcessMotionBlur.cpp" />
     <ClCompile Include="PostProcessTemporalAA.cpp" />
     <ClCompile Include="PostProcessToneMap.cpp" />
+    <ClCompile Include="ReconstructNormals.cpp" />
     <ClCompile Include="RenderStage.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -372,6 +373,7 @@
     <ClInclude Include="PostProcessMotionBlur.h" />
     <ClInclude Include="PostProcessTemporalAA.h" />
     <ClInclude Include="PostProcessToneMap.h" />
+    <ClInclude Include="ReconstructNormals.h" />
     <ClInclude Include="RenderBucket.h" />
     <ClInclude Include="RenderComponents.h" />
     <ClInclude Include="RenderStage.h" />
@@ -614,6 +616,14 @@
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">5.1</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.1</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="ReconstructNormalsPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
     </FxCompile>
     <FxCompile Include="ScreenSpaceAOPS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>

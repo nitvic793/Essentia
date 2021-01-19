@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FrameContext.h"
+#include "Utility.h"
 
 enum RenderStageType
 {
@@ -32,6 +33,9 @@ class RenderStageManager
 {
 public:
 	void RegisterStage(std::string_view stageName, IRenderStage* stage);
+	template<typename RenderStageType>
+	void RegisterStage(RenderStageType* stage);
+
 	void SetEnabled(std::string_view stageName, bool enabled);
 	const RenderStageMap& GetRenderStageMap();
 private:
@@ -39,3 +43,10 @@ private:
 };
 
 extern RenderStageManager GRenderStageManager;
+
+template<typename RenderStageType>
+inline void RenderStageManager::RegisterStage(RenderStageType* stage)
+{
+	std::string_view typeName = TypeName<RenderStageType>();
+	RegisterStage(typeName, stage);
+}

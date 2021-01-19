@@ -12,28 +12,37 @@
                     "TextureLoadType": 0
                 },
                 {
-                    "Name": "Assets/Textures/floor_normals.png",
-                    "Width": 1024,
-                    "Height": 1024,
+                    "Name": "Assets/Textures/defaultNormal.DDS",
+                    "Width": 46,
+                    "Height": 45,
                     "Format": 28,
                     "IsCubeMap": false,
                     "HasMips": true,
-                    "TextureLoadType": 0
+                    "TextureLoadType": 1
                 },
                 {
-                    "Name": "Assets/Textures/defaultRoughness.png",
+                    "Name": "Assets/Textures/defaultRoughness.DDS",
                     "Width": 1024,
                     "Height": 1024,
                     "Format": 61,
                     "IsCubeMap": false,
                     "HasMips": true,
-                    "TextureLoadType": 0
+                    "TextureLoadType": 1
                 },
                 {
-                    "Name": "Assets/Textures/defaultMetal.png",
+                    "Name": "Assets/Textures/defaultMetal.DDS",
                     "Width": 128,
                     "Height": 128,
                     "Format": 29,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/floor_normals.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
                     "IsCubeMap": false,
                     "HasMips": true,
                     "TextureLoadType": 0
@@ -82,6 +91,24 @@
                     "IsCubeMap": true,
                     "HasMips": false,
                     "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/defaultRoughness.png",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/defaultMetal.png",
+                    "Width": 128,
+                    "Height": 128,
+                    "Format": 29,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
                 },
                 {
                     "Name": "Assets/Textures/Sponza_Thorn_diffuse.DDS",
@@ -633,10 +660,91 @@
                     "TextureLoadType": 1
                 },
                 {
-                    "Name": "Assets/Textures/defaultMetal.DDS",
-                    "Width": 128,
-                    "Height": 128,
-                    "Format": 29,
+                    "Name": "Assets/Textures/basketball_diffuse.jpg",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 0
+                },
+                {
+                    "Name": "Assets/Textures/basketball_bump.DDS",
+                    "Width": 4096,
+                    "Height": 4096,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/basketbal_Roughness.DDS",
+                    "Width": 2048,
+                    "Height": 2048,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/basketbal_Metallic.DDS",
+                    "Width": 2048,
+                    "Height": 2048,
+                    "Format": 61,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Cat_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/Cat_bump.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/helmet_diffuse.DDS",
+                    "Width": 1024,
+                    "Height": 1024,
+                    "Format": 28,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/soccer_diffuse.DDS",
+                    "Width": 2048,
+                    "Height": 2048,
+                    "Format": 11,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/soccer_normal.DDS",
+                    "Width": 2048,
+                    "Height": 2048,
+                    "Format": 11,
+                    "IsCubeMap": false,
+                    "HasMips": true,
+                    "TextureLoadType": 1
+                },
+                {
+                    "Name": "Assets/Textures/soccer_roughness.DDS",
+                    "Width": 2048,
+                    "Height": 2048,
+                    "Format": 56,
                     "IsCubeMap": false,
                     "HasMips": true,
                     "TextureLoadType": 1
@@ -651,7 +759,8 @@
                 "Assets/Models/cat.obj",
                 "Assets/Models/helmet.obj",
                 "Assets/Models/basketball.obj",
-                "Assets/Models/soccer.obj"
+                "Assets/Models/soccer.obj",
+                "Assets/Terrain/heightmap.png"
             ],
             "Models": [
                 "Assets/Models/Sponza.fbx"
@@ -665,6 +774,231 @@
                     "Assets/Textures/floor_normals.png",
                     "Assets/Textures/floor_roughness.png",
                     "Assets/Textures/floor_metal.png"
+                ]
+            },
+            {
+                "MaterialName": "53544355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Thorn_diffuse.DDS",
+                    "Assets/Textures/Sponza_Thorn_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "56574355",
+                "Textures": [
+                    "Assets/Textures/VasePlant_diffuse.DDS",
+                    "Assets/Textures/VasePlant_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "58594355",
+                "Textures": [
+                    "Assets/Textures/VaseRound_diffuse.DDS",
+                    "Assets/Textures/VaseRound_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "60614355",
+                "Textures": [
+                    "Assets/Textures/Background_Albedo.DDS",
+                    "Assets/Textures/Background_Normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "62634355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Bricks_a_Albedo.DDS",
+                    "Assets/Textures/Sponza_Bricks_a_Normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "64654355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Arch_diffuse.DDS",
+                    "Assets/Textures/Sponza_Arch_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "66674355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Ceiling_diffuse.DDS",
+                    "Assets/Textures/Sponza_Ceiling_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "68694355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Column_a_diffuse.DDS",
+                    "Assets/Textures/Sponza_Column_a_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "70714355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Floor_diffuse.DDS",
+                    "Assets/Textures/Sponza_Floor_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "72734355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Column_c_diffuse.DDS",
+                    "Assets/Textures/Sponza_Column_c_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "74754355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Details_diffuse.DDS",
+                    "Assets/Textures/Sponza_Details_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "76774355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Column_b_diffuse.DDS",
+                    "Assets/Textures/Sponza_Column_b_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "41424344",
+                "Textures": [
+                    "Assets/Textures/floor_albedo.png",
+                    "Assets/Textures/defaultNormal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/defaultMetal.DDS"
+                ]
+            },
+            {
+                "MaterialName": "78794380",
+                "Textures": [
+                    "Assets/Textures/Sponza_FlagPole_diffuse.DDS",
+                    "Assets/Textures/Sponza_FlagPole_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Metallic_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "81824383",
+                "Textures": [
+                    "Assets/Textures/Sponza_Fabric_Green_diffuse.DDS",
+                    "Assets/Textures/Sponza_Fabric_Green_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Sponza_Fabric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "84854383",
+                "Textures": [
+                    "Assets/Textures/Sponza_Fabric_Blue_diffuse.DDS",
+                    "Assets/Textures/Sponza_Fabric_Blue_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Sponza_Fabric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "86874383",
+                "Textures": [
+                    "Assets/Textures/Sponza_Fabric_Red_diffuse.DDS",
+                    "Assets/Textures/Sponza_Fabric_Red_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Sponza_Fabric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "88894390",
+                "Textures": [
+                    "Assets/Textures/Sponza_Curtain_Blue_diffuse.DDS",
+                    "Assets/Textures/Sponza_Curtain_Blue_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Sponza_Curtain_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "91924390",
+                "Textures": [
+                    "Assets/Textures/Sponza_Curtain_Red_diffuse.DDS",
+                    "Assets/Textures/Sponza_Curtain_Red_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Sponza_Curtain_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "93944390",
+                "Textures": [
+                    "Assets/Textures/Sponza_Curtain_Green_diffuse.DDS",
+                    "Assets/Textures/Sponza_Curtain_Green_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Sponza_Curtain_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "95964397",
+                "Textures": [
+                    "Assets/Textures/ChainTexture_Albedo.DDS",
+                    "Assets/Textures/ChainTexture_Normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/ChainTexture_Metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "98994380",
+                "Textures": [
+                    "Assets/Textures/VaseHanging_diffuse.DDS",
+                    "Assets/Textures/VaseHanging_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Metallic_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "1001014355",
+                "Textures": [
+                    "Assets/Textures/Vase_diffuse.DDS",
+                    "Assets/Textures/Vase_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "1021034355",
+                "Textures": [
+                    "Assets/Textures/Lion_Albedo.DDS",
+                    "Assets/Textures/Lion_Normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
+                ]
+            },
+            {
+                "MaterialName": "1041054355",
+                "Textures": [
+                    "Assets/Textures/Sponza_Roof_diffuse.DDS",
+                    "Assets/Textures/Sponza_Roof_normal.DDS",
+                    "Assets/Textures/defaultRoughness.DDS",
+                    "Assets/Textures/Dielectric_metallic.DDS"
                 ]
             },
             {
@@ -776,30 +1110,12 @@
                 ]
             },
             {
-                "MaterialName": "41424344",
-                "Textures": [
-                    "Assets/Textures/floor_albedo.png",
-                    "Assets/Textures/floor_normals.png",
-                    "Assets/Textures/defaultRoughness.png",
-                    "Assets/Textures/defaultMetal.png"
-                ]
-            },
-            {
                 "MaterialName": "75764377",
                 "Textures": [
                     "Assets/Textures/Sponza_FlagPole_diffuse.DDS",
                     "Assets/Textures/Sponza_FlagPole_normal.DDS",
                     "Assets/Textures/defaultRoughness.png",
                     "Assets/Textures/Metallic_metallic.DDS"
-                ]
-            },
-            {
-                "MaterialName": "78794380",
-                "Textures": [
-                    "Assets/Textures/Sponza_Fabric_Green_diffuse.DDS",
-                    "Assets/Textures/Sponza_Fabric_Green_normal.DDS",
-                    "Assets/Textures/defaultRoughness.png",
-                    "Assets/Textures/Sponza_Fabric_metallic.DDS"
                 ]
             },
             {
@@ -949,6 +1265,40 @@
         ],
         "Entities": [
             {
+                "Name": "Entity 0",
+                "Entity": {
+                    "entity.ID": 0
+                },
+                "Parent": {
+                    "entity.ID": 18446744073709551615
+                },
+                "Components": [
+                    "PositionComponent",
+                    "RotationComponent",
+                    "PostProcessVolumeComponent",
+                    "ScaleComponent",
+                    "BaseDrawableComponent"
+                ],
+                "PositionComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
+                },
+                "RotationComponent": {
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0,
+                    "W": 0.0
+                },
+                "PostProcessVolumeComponent": {},
+                "ScaleComponent": {
+                    "X": 1.0,
+                    "Y": 1.0,
+                    "Z": 1.0
+                },
+                "BaseDrawableComponent": {}
+            },
+            {
                 "Name": "Extra",
                 "Entity": {
                     "entity.ID": 1
@@ -993,22 +1343,25 @@
                 "Components": [
                     "PositionComponent",
                     "RotationComponent",
+                    "SphereCollider",
                     "ScaleComponent",
                     "DrawableComponent",
                     "BoundingOrientedBoxComponent",
-                    "SphereCollider",
                     "RigidBodyComponent"
                 ],
                 "PositionComponent": {
-                    "X": 1.9995123147964478,
-                    "Y": 10.0,
-                    "Z": 0.38768160343170168
+                    "X": 1.999541997909546,
+                    "Y": 0.4999997019767761,
+                    "Z": 0.38768258690834048
                 },
                 "RotationComponent": {
-                    "X": -0.0,
-                    "Y": 0.0,
-                    "Z": -0.0,
+                    "X": -0.0000075237685450701978,
+                    "Y": 1.97212350616649e-11,
+                    "Z": 0.000007749693395453506,
                     "W": 1.0
+                },
+                "SphereCollider": {
+                    "Radius": 0.5
                 },
                 "ScaleComponent": {
                     "X": 1.0,
@@ -1020,9 +1373,6 @@
                     "MaterialName": "0"
                 },
                 "BoundingOrientedBoxComponent": {},
-                "SphereCollider": {
-                    "Radius": 0.5
-                },
                 "RigidBodyComponent": {
                     "Mass": 10.0
                 }
@@ -1041,37 +1391,37 @@
                     "ScaleComponent",
                     "DrawableComponent",
                     "BoundingOrientedBoxComponent",
-                    "BoxCollider",
-                    "RigidBodyComponent"
+                    "RigidBodyComponent",
+                    "BoxCollider"
                 ],
                 "PositionComponent": {
-                    "X": 5.0,
-                    "Y": 6.0,
-                    "Z": 0.0
+                    "X": 6.005485534667969,
+                    "Y": 0.49999624490737917,
+                    "Z": -0.0045273988507688049
                 },
                 "RotationComponent": {
-                    "X": -0.0,
-                    "Y": 0.0,
-                    "Z": -0.0,
-                    "W": 1.0
+                    "X": -0.003272131085395813,
+                    "Y": 0.003273200476542115,
+                    "Z": -0.7070884704589844,
+                    "W": 0.7071099281311035
                 },
                 "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
+                    "X": 0.9999977350234985,
+                    "Y": 0.9999985694885254,
+                    "Z": 0.9999976754188538
                 },
                 "DrawableComponent": {
                     "MeshName": "Assets/Models/cube.obj",
                     "MaterialName": "0"
                 },
                 "BoundingOrientedBoxComponent": {},
+                "RigidBodyComponent": {
+                    "Mass": 10.0
+                },
                 "BoxCollider": {
                     "HalfExtentX": 0.5,
                     "HalfExtentY": 0.5,
                     "HalfExtentZ": 0.5
-                },
-                "RigidBodyComponent": {
-                    "Mass": 10.0
                 }
             },
             {
@@ -1088,13 +1438,13 @@
                     "ScaleComponent",
                     "MoveableUnitComponent",
                     "DrawableComponent",
-                    "SelectedComponent",
-                    "BoundingOrientedBoxComponent"
+                    "BoundingOrientedBoxComponent",
+                    "SelectedComponent"
                 ],
                 "PositionComponent": {
                     "X": 10.0,
                     "Y": 1.0,
-                    "Z": 0.0
+                    "Z": 3.2133352756500246
                 },
                 "RotationComponent": {
                     "X": -0.0,
@@ -1112,8 +1462,8 @@
                     "MeshName": "Assets/Models/sphere.obj",
                     "MaterialName": "0"
                 },
-                "SelectedComponent": {},
-                "BoundingOrientedBoxComponent": {}
+                "BoundingOrientedBoxComponent": {},
+                "SelectedComponent": {}
             },
             {
                 "Name": "Terrain",
@@ -1248,15 +1598,15 @@
                     "Z": 0.0
                 },
                 "RotationComponent": {
-                    "X": 0.0,
-                    "Y": 0.0,
-                    "Z": 0.0,
-                    "W": 0.0
+                    "X": 0.6823992133140564,
+                    "Y": 0.0041954596526920799,
+                    "Z": -0.042865555733442309,
+                    "W": 0.7297097444534302
                 },
                 "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
+                    "X": 0.999975860118866,
+                    "Y": 0.9999944567680359,
+                    "Z": 0.9999949932098389
                 },
                 "DirectionalLightComponent": {
                     "Color": {
@@ -1266,9 +1616,9 @@
                     },
                     "Intensity": 0.800000011920929,
                     "Direction": {
-                        "X": -0.023000000044703485,
-                        "Y": -0.5773502588272095,
-                        "Z": 0.027000000700354577
+                        "X": -0.05237990617752075,
+                        "Y": -0.9962663650512695,
+                        "Z": 0.0686274841427803
                     }
                 }
             },
@@ -1289,7 +1639,7 @@
                 "PositionComponent": {
                     "X": 0.0,
                     "Y": 3.0,
-                    "Z": 6.992559432983398
+                    "Z": 8.227195739746094
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -1409,7 +1759,7 @@
                 "PositionComponent": {
                     "X": -6.650000095367432,
                     "Y": 3.0,
-                    "Z": 6.992559432983398
+                    "Z": 8.227195739746094
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -1449,7 +1799,7 @@
                 "PositionComponent": {
                     "X": -15.300000190734864,
                     "Y": 3.0,
-                    "Z": 6.992559432983398
+                    "Z": 8.227195739746094
                 },
                 "RotationComponent": {
                     "X": 0.0,
@@ -1487,20 +1837,20 @@
                     "CameraComponent"
                 ],
                 "PositionComponent": {
-                    "X": -19.08647918701172,
-                    "Y": 10.0302734375,
-                    "Z": 4.561089992523193
+                    "X": -26.623165130615236,
+                    "Y": 13.152674674987793,
+                    "Z": -1.4114341735839844
                 },
                 "RotationComponent": {
-                    "X": 0.25500038266181948,
-                    "Y": 1.6649969816207886,
+                    "X": 0.0,
+                    "Y": 0.0,
                     "Z": 0.0,
                     "W": 0.0
                 },
                 "ScaleComponent": {
-                    "X": 1.0,
-                    "Y": 1.0,
-                    "Z": 1.0
+                    "X": 0.0,
+                    "Y": 0.0,
+                    "Z": 0.0
                 },
                 "CameraComponent": {
                     "CameraInstance.Width": 1920.0,
@@ -1523,8 +1873,8 @@
                     "PositionComponent",
                     "RotationComponent",
                     "ScaleComponent",
-                    "PlaneCollider",
-                    "RigidBodyStaticComponent"
+                    "RigidBodyStaticComponent",
+                    "PlaneCollider"
                 ],
                 "PositionComponent": {
                     "X": 0.0,
@@ -1542,13 +1892,13 @@
                     "Y": 1.0,
                     "Z": 1.0
                 },
+                "RigidBodyStaticComponent": {},
                 "PlaneCollider": {
                     "NormalX": 0.0,
                     "NormalY": 1.0,
                     "NormalZ": 0.0,
                     "Distance": 0.0
-                },
-                "RigidBodyStaticComponent": {}
+                }
             }
         ]
     }
