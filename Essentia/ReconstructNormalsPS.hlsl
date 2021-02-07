@@ -12,11 +12,25 @@ cbuffer PerFrame : register(b1)
     PerFrameData FrameData;
 }
 
-Texture2D<float> DepthTexture : register(t0);
+Texture2D DepthTexture : register(t0);
 
 SamplerState AnisoSampler       : register(s0);
 SamplerState LinearWrapSampler  : register(s2);
 SamplerState PointClampSampler  : register(s3);
+
+float3 VSPositionFromDepth(float2 vTexCoord, float depth)
+{
+    // Get the depth value for this pixel
+    float z = depth;
+    // Get x/w and y/w from the viewport position
+    float x = vTexCoord.x * 2 - 1;
+    float y = (1 - vTexCoord.y) * 2 - 1;
+    float4 vProjectedPos = float4(x, y, z, 1.0f);
+    // Transform by the inverse projection matrix
+    float4 vPositionVS = mul(vProjectedPos, FrameData.CamInvProjection);
+    // Divide by w to get the view-space position
+    return vPositionVS.xyz / vPositionVS.w;
+}
 
 float3 WorldPosFromDepth(float2 uv, float depth)
 {
@@ -97,5 +111,7 @@ float3 ReconstructNormal(float2 uv)
 
 float4 main(VertexToPixel input) : SV_TARGET
 {
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+    float3 pos = WorldPosFromDepth(input.uv, DepthTexture.Sample(LinearWrapSampler, input.uv).r);
+    //float3 normal = ReconstructNormal(input.uv);
+    return float4(pos, 1.0f);
 }

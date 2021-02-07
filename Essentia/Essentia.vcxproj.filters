@@ -124,6 +124,9 @@
     <Filter Include="Shaders\Terrain">
       <UniqueIdentifier>{9ad45292-d3ca-4573-95ac-53df443ac7df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shaders\DepthOfField">
+      <UniqueIdentifier>{b062abe0-2113-4130-9dda-c90e3dcba690}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -145,6 +148,9 @@
     </None>
     <None Include="AnimationCommon.hlsli">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="DofCommon.hlsli">
+      <Filter>Shaders\DepthOfField</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -665,9 +671,6 @@
     <FxCompile Include="BlurPS.hlsl">
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
-    <FxCompile Include="DepthOfFieldPS.hlsl">
-      <Filter>Shaders\PostProcess</Filter>
-    </FxCompile>
     <FxCompile Include="QuadPS.hlsl">
       <Filter>Shaders\PostProcess</Filter>
     </FxCompile>
@@ -778,6 +781,15 @@
     </FxCompile>
     <FxCompile Include="ReconstructNormalsPS.hlsl">
       <Filter>Shaders\Misc</Filter>
+    </FxCompile>
+    <FxCompile Include="DepthOfFieldPS.hlsl">
+      <Filter>Shaders\DepthOfField</Filter>
+    </FxCompile>
+    <FxCompile Include="CocDownscale.hlsl">
+      <Filter>Shaders\DepthOfField</Filter>
+    </FxCompile>
+    <FxCompile Include="DofComposite.hlsl">
+      <Filter>Shaders\DepthOfField</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

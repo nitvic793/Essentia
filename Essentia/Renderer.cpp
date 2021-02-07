@@ -34,6 +34,7 @@
 #include "VoxelRadiancePostProcess.h"
 #include "TerrainRenderStage.h"
 #include "AnimationComponent.h"
+#include "ReconstructNormals.h"
 
 #include "PipelineStates.h"
 #include "SceneResources.h"
@@ -145,6 +146,7 @@ void Renderer::Initialize()
 	}
 
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<DepthOnlyStage>()));
+	//renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ReconstructNormals>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ScreenSpaceAOStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VoxelizationStage>()));
@@ -256,12 +258,6 @@ void Renderer::Clear()
 	gpuMemory->Commit(deviceResources->GetCommandQueue());
 }
 
-/***
-TODO:
-1. Use ambient IBL if Voxelization is disabled - Shader switching system
-2. Frustum & Occlusion Culling
-3. Fix Global Illumination
-*/
 void Renderer::Render(const FrameContext& frameContext)
 {
 	auto commandList = commandContext->GetDefaultCommandList();
@@ -334,18 +330,6 @@ void Renderer::Render(const FrameContext& frameContext)
 	//Update per frame data
 	XMStoreFloat4x4(&GSceneResources.FrameData.ViewProjectionTex, XMMatrixTranspose(viewProjTex));
 	auto voxelData = CreateVoxelParams(camera, CVoxelSize);
-	if (XMVector3Equal(XMLoadFloat3(&voxelData.VoxelGridCenter), (XMLoadFloat3(&GSceneResources.FrameData.VoxelData.VoxelGridCenter))))
-	{
-		//renderStageMap["VoxelizationStage"]->Enabled = false;
-		//renderStageMap["VoxelMipGenStage"]->Enabled = false;
-		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = false;
-	}
-	else
-	{
-		//renderStageMap["VoxelizationStage"]->Enabled = true;
-		//renderStageMap["VoxelMipGenStage"]->Enabled = true;
-		//renderStageMap["VoxelRadiancePostProcess"]->Enabled = true;
-	}
 
 	GSceneResources.FrameData.VoxelData = voxelData;
 	XMStoreFloat4x4(&GSceneResources.FrameData.CamView, XMMatrixTranspose(view));

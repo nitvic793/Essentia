@@ -265,7 +265,8 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			auto stages = GRenderStageManager.GetRenderStageMap();
 			for (auto stage : stages)
 			{
-				ImGui::Checkbox(stage.first.data(), &stage.second->Enabled);
+				std::string stageName(stage.first);
+				ImGui::Checkbox(stageName.c_str(), &stage.second->Enabled);
 			}
 		}
 
@@ -275,7 +276,9 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			static bool dof = true;
 
 			ImGui::DragFloat("DOF Focus Plane", &dofStage->DofParams.FocusPlaneZ);
-			ImGui::DragFloat("DOF Scale", &dofStage->DofParams.Scale, 0.01f, 0.f, 1.f, "%.3f", 0.5f);
+			ImGui::DragFloat("DOF NearZ", &dofStage->DofParams.zNear);
+			ImGui::DragFloat("DOF FarZ", &dofStage->DofParams.zFar);
+			ImGui::DragFloat("DOF Scale", &dofStage->DofParams.Scale, 0.01f);// 0.f, 1.f, "%.3f", 0.5f);
 
 			auto postProcesssMap = GPostProcess.GetStagesMap();
 			for (auto stage : postProcesssMap)

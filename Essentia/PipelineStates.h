@@ -20,6 +20,7 @@ public:
 	PipelineStateID BilateralBlurPSO;
 	PipelineStateID VoxelizePSO;
 	PipelineStateID	WireframePSO;
+	PipelineStateID	ReconstructNormalsPSO;
 
 	//Post Process PSOs
 	PipelineStateID QuadPSO;

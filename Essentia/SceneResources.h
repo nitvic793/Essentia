@@ -21,6 +21,7 @@ struct SceneResources
 	SceneRenderTarget		PreviousFrame;
 	SceneRenderTarget		AmbientOcclusion;
 	SceneRenderTarget		LightAccumTarget;
+	SceneRenderTarget		SceneNormals;
 	DepthTarget				DepthPrePass;
 	DepthTarget				ShadowDepthTarget;
 	ConstantBufferView		ShadowCBV;

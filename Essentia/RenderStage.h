@@ -48,5 +48,6 @@ template<typename RenderStageType>
 inline void RenderStageManager::RegisterStage(RenderStageType* stage)
 {
 	std::string_view typeName = TypeName<RenderStageType>();
+	typeName.remove_prefix(sizeof("class"));
 	RegisterStage(typeName, stage);
 }

@@ -21,16 +21,22 @@ public:
 	DepthOfFieldParams	DofParams;
 	BlurParams			BlurParams;
 private:
-	void RenderBlurTexture(uint32 backbufferIndex, TextureID input);
+	void RenderCocDownscale(uint32 backbufferIndex, TextureID input);
+	void RenderDepthOfField(uint32 backbufferIndex, TextureID input);
+	void RenderCompositePass(uint32 backbufferIndex, TextureID dofTexture, TextureID sceneTexture);
 
 	PipelineStateID dofPso;
+	PipelineStateID cocDownscalePso;
+	PipelineStateID dofCompositePso;
 
-	SceneRenderTarget blurIntermidateTarget;
-	SceneRenderTarget blurFinalTarget;
+	SceneRenderTarget cocDownscaleTarget;
 	SceneRenderTarget dofTarget;
+	SceneRenderTarget dofCompositeTarget;
 
 	ConstantBufferView		blurHorizontalCBV;
 	ConstantBufferView		blurVerticalCBV;
 	ConstantBufferView		dofCBV;
+
+	ScreenSize				internalResolution;
 };
 

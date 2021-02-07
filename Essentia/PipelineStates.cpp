@@ -81,6 +81,9 @@ void PipelineStates::Initialize()
 	psoDesc.PS = ShaderManager::LoadShader(L"BlurPS.cso");
 	BlurPSO = ec->ResourceManager->CreatePSO(psoDesc);
 
+	psoDesc.PS = ShaderManager::LoadShader(L"ReconstructNormalsPS.cso");
+	psoDesc.RTVFormats[0] = DXGI_FORMAT_R11G11B10_FLOAT;
+	ReconstructNormalsPSO = ec->ResourceManager->CreatePSO(psoDesc);
 }
 
 void PipelineStates::CreateDefaultPSOs()
