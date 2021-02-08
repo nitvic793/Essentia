@@ -12,6 +12,8 @@ cbuffer DepthOfFieldParams : register(b0)
 	float FarZ; // Camera FarZ
 	float FocusPlaneZ; // Focus Z Plane from Camera
 	float Scale; // DOF Scale
+    float ResolutionWidth;
+    float ResolutionHeight;
 };
 
 

@@ -12,6 +12,8 @@ cbuffer DepthOfFieldParams : register(b0)
 	float FarZ; // Camera FarZ
 	float FocusPlaneZ; // Focus Z Plane from Camera
 	float Scale; // DOF Scale
+    float ResolutionWidth;
+    float ResolutionHeight;
 };
 
 
@@ -34,9 +36,7 @@ float3 DepthOfField(float2 uv, float focusPoint, float focusScale, out float avg
     float tot = 1.0;
     float totalSampleSize = 0.f;
     float radius = RAD_SCALE;
-    float2 pixelSize;
-    SceneTexture.GetDimensions(pixelSize.x, pixelSize.y);
-    pixelSize = 1.f / pixelSize;
+    float2 pixelSize = 1.f / float2(ResolutionWidth, ResolutionHeight);
     for (float ang = 0.0; radius < MAX_BLUR_SIZE; ang += GOLDEN_ANGLE)
     {
         float2 tc = uv + float2(cos(ang), sin(ang)) * pixelSize * radius;

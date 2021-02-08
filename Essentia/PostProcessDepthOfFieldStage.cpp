@@ -51,9 +51,8 @@ void PostProcessDepthOfFieldStage::Initialize()
 	cocDownscaleTarget = CreateSceneRenderTarget(ec, internalResolution.Width, internalResolution.Height, texFormat);
 	dofTarget = CreateSceneRenderTarget(ec, internalResolution.Width, internalResolution.Height, texFormat);
 	dofCompositeTarget = CreateSceneRenderTarget(ec, fullRes.Width, fullRes.Height, texFormat);
-	DofParams = { 0, 0, 10.f, 0.01f };
+	DofParams = { 0, 0, 10.f, 0.01f, (float)internalResolution.Width, (float)internalResolution.Height };
 	GPostProcess.RegisterPostProcess("DepthOfField", this);
-
 }
 
 TextureID PostProcessDepthOfFieldStage::RenderPostProcess(uint32 backbufferIndex, TextureID inputTexture, const FrameContext& frameContext)

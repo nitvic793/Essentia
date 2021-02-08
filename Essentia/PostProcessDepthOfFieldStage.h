@@ -9,6 +9,8 @@ struct DepthOfFieldParams
 	float zFar;
 	float FocusPlaneZ;
 	float Scale;
+	float ResolutionWidth;
+	float ResolutionHeight;
 };
 
 class PostProcessDepthOfFieldStage :
