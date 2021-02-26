@@ -38,14 +38,14 @@ ID3D12DescriptorHeap* FrameManager::GetGPUDescriptorHeap(uint32 frameIndex) cons
 
 void FrameManager::Reset(uint32 frameIndex)
 {
-	heapIndex[frameIndex] = 0;
+	heapIndex[0] = 0;
 }
 
 uint32 FrameManager::Allocate(uint32 frameIndex, const DescriptorHeap& heap, uint32 numDescriptors, uint32 offset)
 {
-	auto index = heapIndex[frameIndex];
+	auto index = heapIndex[0];
 	device->CopyDescriptorsSimple(numDescriptors, gpuHeap[0].handleCPU(index + CFrameMaxDescriptorHeapCount * frameIndex), heap.handleCPU(offset), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	heapIndex[frameIndex] += numDescriptors;
+	heapIndex[0] += numDescriptors;
 	return index;
 }
 
