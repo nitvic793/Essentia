@@ -15,6 +15,24 @@ struct MoveUnitEvent : public es::IEvent
 	XMFLOAT3 TargetPos;
 };
 
+struct Rotatable : public IComponent
+{
+	float Speed = 1.f;
+	float Rotation = 0.f;
+
+	template<class Archive>
+	void save(Archive& archive) const
+	{
+	};
+
+	template<class Archive>
+	void load(Archive& archive)
+	{
+	}
+
+	GComponent(Rotatable)
+};
+
 class RotationSystem : public ISystem
 {
 public:
@@ -52,6 +70,21 @@ public:
 		}
 
 		{
+			auto entities = entityManager->GetEntities<Rotatable>(count);
+
+			for (uint32 i = 0; i < count; ++i)
+			{
+				auto comp = entityManager->GetComponent<Rotatable>(entities[i]);
+				auto transform = entityManager->GetTransform(entities[i]);
+				auto up = XMVectorSet(0, 1.f, 0, 0);
+				auto rotation = XMQuaternionRotationAxis(up, comp->Rotation);
+				comp->Rotation += deltaTime * comp->Speed;
+				XMStoreFloat4(transform.Rotation, rotation);
+				entities[i];
+			}
+		}
+
+		{
 			auto entities = cManager->GetEntities<BoundingOrientedBoxComponent, TerrainComponent>();
 			for (auto entity : entities)
 			{
@@ -69,8 +102,6 @@ public:
 				}
 			}
 		}
-
-
 
 		{
 			auto entities = cManager->GetEntities<PointLightComponent>();
@@ -123,7 +154,7 @@ public:
 			pos = pos + direction * deltaTime * moveComponent->MoveSpeed;
 			XMStoreFloat3(&position, pos);
 			*posComponent = position;
-			
+
 			auto distance = XMVectorGetX(XMVector3Length(target - pos));
 			const float epsilon = 0.1f;
 			if (distance <= epsilon)

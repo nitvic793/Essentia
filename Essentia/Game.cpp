@@ -78,11 +78,12 @@ void Game::Run()
 			localCounter += timer.DeltaTime;
 			auto kbState = keyboard->GetState();
 			auto mouseState = mouse->GetState();
-			coreSystemsManager.Update(kbState, mouseState, nullptr);
 			if (gameStateManager.IsPlaying())
 			{
 				gameSystemsManager.Update(kbState, mouseState, nullptr);
 			}
+
+			coreSystemsManager.Update(kbState, mouseState, nullptr);
 
 			Update();
 			//camera->Update();

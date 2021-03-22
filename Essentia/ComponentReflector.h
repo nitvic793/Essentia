@@ -106,18 +106,22 @@ private:
 	template<typename T>
 	void VisitFields(T* component, IVisitor* visitor, std::vector<Field> fields)
 	{
+		size_t offset = 0;
 		for (const Field& field : fields)
 		{
 			switch (field.FieldType)
 			{
 			case FieldTypes::kFieldTypeFloat:
-				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(float*)((char*)component + field.Offset));
+				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(float*)((char*)component + offset));
+				offset += sizeof(float);
 				break;
 			case FieldTypes::kFieldTypeInt32:
-				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(int32*)((char*)component + field.Offset));
+				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(int32*)((char*)component + offset));
+				offset += sizeof(int32);
 				break;
 			case FieldTypes::kFieldTypeFloat3:
-				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(DirectX::XMFLOAT3*)((char*)component + field.Offset));
+				visitor->Visit(T::ComponentName, field.FieldName.c_str(), *(DirectX::XMFLOAT3*)((char*)component + offset));
+				offset += sizeof(DirectX::XMFLOAT3);
 				break;
 			default:
 				break;

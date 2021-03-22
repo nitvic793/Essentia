@@ -9,22 +9,6 @@
 #include "MoveableUnitComponent.h"
 #include "ObjectInferenceSystem.h"
 
-struct TestComponent : public IComponent
-{
-	GComponent(TestComponent)
-
-		float	TestValue = 1.f;
-	int32	TestInt = 10;
-	template<class Archive>
-	void save(Archive& archive) const
-	{
-	};
-
-	template<class Archive>
-	void load(Archive& archive)
-	{
-	};
-};
 
 void Initialize(EngineContext* context)
 {
@@ -47,10 +31,10 @@ void LoadSystems(SystemManager* systemManager, IAllocator* allocator)
 	systemManager->RegisterSystem<MoveObjectSystem>(allocator);
 	systemManager->RegisterSystem<ObjectInferenceSystem>(allocator);
 
-	GContext->ComponentReflector->RegisterComponent<TestComponent>(
+	GContext->ComponentReflector->RegisterComponent<Rotatable>(
 		{
-			Field{FieldTypes::kFieldTypeFloat, 0, "TestValue", "float"},
-			Field{FieldTypes::kFieldTypeInt32, sizeof(float), "TestInt", "int32"}
+			Field{FieldTypes::kFieldTypeFloat, 0, "Speed", "float"},
+			Field{FieldTypes::kFieldTypeFloat, sizeof(float), "Rotation", "float"}
 		});
 
 	GContext->ComponentReflector->RegisterComponent<MoveableUnitComponent>(
