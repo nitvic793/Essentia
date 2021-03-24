@@ -8,6 +8,8 @@
 #include "EventTypes.h"
 #include "TerrainUpdateSystem.h"
 #include "PhysicsSystem.h"
+#include "Trace.h"
+#include <ScriptingSystem.h>
 
 void Game::Setup(Callback gameSystemsInitCallback)
 {
@@ -40,8 +42,9 @@ void Game::Setup(Callback gameSystemsInitCallback)
 	coreSystemsManager.RegisterSystem<UpdateCameraSystem>();
 	coreSystemsManager.RegisterSystem<EditorSaveSystem>();
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
-	coreSystemsManager.RegisterSystem<AnimationSystem>();
+	coreSystemsManager.RegisterSystem<AnimationSystem>(); 
 	coreSystemsManager.RegisterSystem<TerrainUpdateSystem>();
+	coreSystemsManager.RegisterSystem<ScriptingSystem>();
 
 	// Initialize renderer and core systems. 
 	renderer->Initialize();
@@ -97,7 +100,9 @@ void Game::Run()
 			if (kbState.IsKeyDown(DirectX::Keyboard::F5) && localCounter > 0.5f)
 			{
 				localCounter = 0;
+				es::Log("Reloading Game Systems...");
 				ReloadSystems();
+				es::Log("...Done");
 			}
 
 			{

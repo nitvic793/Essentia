@@ -26,6 +26,7 @@ public:
 	void			SetSystemReloadCallback(Callback callback);
 	void			AddEventCallback(Callback&& callback) { std::scoped_lock lock(centralMutex);  eventCallbacks.push(callback); }
 	SystemManager*	GetGameSystemsManager();
+	SystemManager*	GetCoreSystemsManager() { return &coreSystemsManager; }
 	std::mutex		centralMutex;
 	~Game();
 protected:

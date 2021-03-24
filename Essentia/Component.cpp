@@ -19,6 +19,27 @@ ComponentPoolBase* ComponentManager::GetPool(const char* componentName)
 	return poolStringMap[componentName];
 }
 
+ComponentPoolGeneric* ComponentManager::GetOrCreatePool(std::string_view name, size_t size)
+{
+	auto type = crc32(name);
+	if (pools.find(type) == pools.end())
+	{
+		size_t size = sizeof(ComponentPoolGeneric);
+		auto buffer = allocator->Alloc(size);
+		ComponentPoolGeneric* pool = new(buffer) ComponentPoolGeneric(name, size);
+		poolStringMap[name.data()] = pool;
+		pools.insert(
+			std::pair<ComponentTypeID,
+			ScopedPtr<ComponentPoolBase>>(
+				type,
+				ScopedPtr<ComponentPoolBase>((ComponentPoolBase*)pool)
+				)
+
+		);
+	}
+	return (ComponentPoolGeneric*)pools[type].get();
+}
+
 void ComponentManager::RemoveComponent(std::string_view componentName, EntityHandle handle)
 {
 	poolStringMap[componentName]->RemoveComponent(handle);
@@ -87,4 +108,65 @@ bool operator<(EntityHandle lhs, EntityHandle rhs)
 bool operator<=(EntityHandle lhs, EntityHandle rhs)
 {
 	return lhs.ID <= rhs.ID;
+}
+
+ComponentPoolGeneric::ComponentPoolGeneric(std::string_view name, size_t size) :
+	CComponentSize(size), componentName(name)
+{
+}
+
+ComponentTypeID ComponentPoolGeneric::GetType()
+{
+	return crc32(componentName);
+}
+
+void ComponentPoolGeneric::AddComponent(EntityHandle entity)
+{
+}
+
+void ComponentPoolGeneric::RemoveComponent(EntityHandle entity)
+{
+}
+
+IComponent* ComponentPoolGeneric::GetComponent(EntityHandle entity)
+{
+	return nullptr;
+}
+
+IComponent* ComponentPoolGeneric::GetAllComponents(uint32& count)
+{
+	return nullptr;
+}
+
+EntityHandle* ComponentPoolGeneric::GetEntities(uint32& count)
+{
+	return nullptr;
+}
+
+EntityHandle ComponentPoolGeneric::GetEntity(uint32 index)
+{
+	return EntityHandle();
+}
+
+bool ComponentPoolGeneric::HasEntity(EntityHandle entity)
+{
+	return false;
+}
+
+void ComponentPoolGeneric::Serialize(cereal::JSONOutputArchive& archive, EntityHandle entity)
+{
+}
+
+void ComponentPoolGeneric::Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity)
+{
+}
+
+const size_t ComponentPoolGeneric::GetTypeSize()
+{
+	return CComponentSize;
+}
+
+const char* ComponentPoolGeneric::GetTypeName()
+{
+	return componentName.data();
 }

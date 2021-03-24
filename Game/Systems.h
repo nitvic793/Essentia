@@ -78,9 +78,9 @@ public:
 				auto transform = entityManager->GetTransform(entities[i]);
 				auto up = XMVectorSet(0, 1.f, 0, 0);
 				auto rotation = XMQuaternionRotationAxis(up, comp->Rotation);
-				comp->Rotation += deltaTime * comp->Speed;
+				comp->Rotation += deltaTime * comp->Speed; 
+				//comp->Rotation = fmod(comp->Rotation, XM_PI);
 				XMStoreFloat4(transform.Rotation, rotation);
-				entities[i];
 			}
 		}
 

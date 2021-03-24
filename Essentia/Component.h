@@ -177,6 +177,33 @@ private:
 	std::unordered_map<Handle, uint32>	componentMap;
 };
 
+class ComponentPoolGeneric : public ComponentPoolBase
+{
+public:
+	using BufferPtr = void*;
+
+	ComponentPoolGeneric(std::string_view name, size_t size);
+
+	// Inherited via ComponentPoolBase
+	virtual ComponentTypeID GetType() override;
+	virtual void AddComponent(EntityHandle entity) override;
+	virtual void RemoveComponent(EntityHandle entity) override;
+	virtual IComponent* GetComponent(EntityHandle entity) override;
+	virtual IComponent* GetAllComponents(uint32& count) override;
+	virtual EntityHandle* GetEntities(uint32& count) override;
+	virtual EntityHandle GetEntity(uint32 index) override;
+	virtual bool HasEntity(EntityHandle entity) override;
+	virtual void Serialize(cereal::JSONOutputArchive& archive, EntityHandle entity) override;
+	virtual void Deserialize(cereal::JSONInputArchive& archive, EntityHandle entity) override;
+	virtual const size_t GetTypeSize() override;
+	virtual const char* GetTypeName() override;
+protected:
+	const size_t CComponentSize;
+	BufferPtr buffer;
+	std::string_view componentName;
+	uint64 currentOffset;
+};
+
 class ComponentManager
 {
 	template<typename T>
@@ -188,6 +215,8 @@ public:
 
 	template<typename T>
 	ComponentPool<T>* GetOrCreatePool();
+
+	ComponentPoolGeneric* GetOrCreatePool(std::string_view name, size_t size);
 
 	template<typename T>
 	void AddComponent(EntityHandle entity, const T& value = T());
