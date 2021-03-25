@@ -1,4 +1,0 @@
-
-foreign class Vec3 {
-    
-}

@@ -5,17 +5,17 @@
   <PropertyGroup />
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia.Scripting;$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia.Scripting;$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia.Scripting;$(SolutionDir)external\rpclib\include;$(SolutionDir)external\pxshared\include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)Essentia;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;%(AdditionalUsingDirectories);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
   </ItemDefinitionGroup>
 </Project>

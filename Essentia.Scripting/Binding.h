@@ -15,6 +15,11 @@ namespace es
 		const char* signature
 	);
 
+	WrenForeignClassMethods BindForeignClass(WrenVM*,
+		const char* module,
+		const char* className
+	);
+
 	class Binding
 	{
 	public:
@@ -28,6 +33,21 @@ namespace es
 			}
 
 			methods[fullSignature] = fn;
+		}
+
+		void BindForeignClass(const char* module, const char* className, WrenForeignClassMethods classMethods)
+		{
+			std::string identifier{ module };
+			identifier += className;
+			classes[identifier] = classMethods;
+		}
+
+		WrenForeignClassMethods GetForeignClassMethods(const char* identifier)
+		{
+			if (classes.find(identifier) != classes.end())
+				return classes[identifier];
+			else
+				return WrenForeignClassMethods{ nullptr, nullptr };
 		}
 
 		WrenForeignMethodFn GetMethod(const char* fullSignature)
@@ -48,22 +68,6 @@ namespace es
 
 		static Binding* instance;
 		std::unordered_map<std::string, WrenForeignMethodFn> methods;
+		std::unordered_map<std::string, WrenForeignClassMethods> classes;
 	};
-
-	WrenForeignMethodFn BindForeignMethod(WrenVM* vm,
-		const char* module,
-		const char* className,
-		bool isStatic,
-		const char* signature
-	)
-	{
-		std::string fullSignature{ module };
-		fullSignature += className;
-		fullSignature += signature;
-		if (isStatic) {
-			fullSignature += "s";
-		}
-
-		return Binding::GetInstance().GetMethod(fullSignature.c_str());
-	}
 }

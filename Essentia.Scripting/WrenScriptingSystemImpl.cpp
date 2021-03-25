@@ -9,6 +9,9 @@
 #include <StringHash.h>
 #include <FreeListAllocator.h>
 
+//Binding Includes
+#include "BaseBindings.h"
+
 //#include <vld.h>
 
 static WrenVM* vm = nullptr;
@@ -17,7 +20,7 @@ static WrenHandle* updateHandle = nullptr;
 static WrenHandle* mainClass = nullptr;
 constexpr const char* CBaseScriptsPath = "../../Assets/Scripts/";
 constexpr uint64 CMaxScriptBufferSize = 1 * 1024 * 1024; // 16MB
-static IAllocator *sgAllocator = nullptr;
+static IAllocator* sgAllocator = nullptr;
 static std::vector<void*> allocs;
 
 void WriteVMOutput(WrenVM* vm, const char* text)
@@ -102,6 +105,7 @@ static WrenVM* InitVM()
 	config.loadModuleFn = LoadVMModule;
 	//config.reallocateFn = ReAllocateVM;
 	config.bindForeignMethodFn = es::BindForeignMethod;
+	config.bindForeignClassFn = es::BindForeignClass;
 
 	config.initialHeapSize = 1024 * 1024 * 12; //16MB
 	return wrenNewVM(&config);
@@ -116,14 +120,23 @@ void vmTest(WrenVM* vm)
 {
 	int x = (int)wrenGetSlotDouble(vm, 1);
 	int y = (int)wrenGetSlotDouble(vm, 2);
-	wrenSetSlotDouble(vm, 0, (double)test(x,y));
+	wrenSetSlotDouble(vm, 0, (double)test(x, y));
+}
+
+void CreateBindings()
+{
+	using namespace es::bindings;
+
+	auto& binding = es::Binding::GetInstance();
+	binding.BindMethod("math.utils", "Utils", "test(_,_)", true, vmTest);
+	es::bindings::RegisterBindings();
 }
 
 void ScriptingSystemImpl::Initialize()
 {
 	vm = InitVM();
 
-	es::Binding::GetInstance().BindMethod("math.utils", "Utils", "test(_,_)", true, vmTest);
+	CreateBindings();
 	es::ModuleLoader::LoadModules(vm, CBaseScriptsPath);
 
 	wrenEnsureSlots(vm, 3);
