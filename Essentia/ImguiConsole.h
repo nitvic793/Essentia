@@ -55,7 +55,13 @@ struct ImguiConsole
         vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
         buf[IM_ARRAYSIZE(buf) - 1] = 0;
         va_end(args);
-        Items.push_back(Strdup(buf));
+        Items.push_front(Strdup(buf));
+
+        if (Items.size() > 128) {
+            auto& item = Items.back();
+            Items.pop_back();
+            free(item);
+        }
     }
 
     void    Draw(const char* title, bool* p_open)

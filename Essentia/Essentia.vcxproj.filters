@@ -370,6 +370,9 @@
     <ClCompile Include="ReconstructNormals.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
+    <ClCompile Include="FreeListAllocator.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -665,6 +668,9 @@
     </ClInclude>
     <ClInclude Include="ReconstructNormals.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
+    </ClInclude>
+    <ClInclude Include="FreeListAllocator.h">
+      <Filter>Header Files\Engine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

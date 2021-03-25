@@ -1,5 +1,7 @@
 #pragma once
 
+#include <FreeListAllocator.h>
+
 class ScriptingSystemImpl
 {
 public:
@@ -7,4 +9,5 @@ public:
 	void Update(float dt, float totalTime);
 	void Destroy();
 protected:
+	FreeListAllocator allocator;
 };

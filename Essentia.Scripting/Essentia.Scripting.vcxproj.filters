@@ -27,6 +27,12 @@
     <ClInclude Include="WrenScriptingSystemImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Binding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModuleLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -36,6 +42,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WrenScriptingSystemImpl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModuleLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

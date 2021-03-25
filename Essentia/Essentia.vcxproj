@@ -253,6 +253,7 @@
     <ClCompile Include="DebugDrawStage.cpp" />
     <ClCompile Include="DepthOnlyStage.cpp" />
     <ClCompile Include="EventSystem.cpp" />
+    <ClCompile Include="FreeListAllocator.cpp" />
     <ClCompile Include="GameStateManager.cpp" />
     <ClCompile Include="GenerateMipsStage.cpp" />
     <ClCompile Include="ImageLoader.cpp" />
@@ -329,6 +330,7 @@
     <ClInclude Include="CMath.h" />
     <ClInclude Include="EventSystem.h" />
     <ClInclude Include="EventTypes.h" />
+    <ClInclude Include="FreeListAllocator.h" />
     <ClInclude Include="GameStateManager.h" />
     <ClInclude Include="GenerateMipsStage.h" />
     <ClInclude Include="ImageLoader.h" />

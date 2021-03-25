@@ -43,6 +43,7 @@ protected:
 	EntityManager					entityManager;
 	SystemManager					coreSystemsManager;
 	SystemManager					gameSystemsManager;
+	SystemManager					scriptSystemsManager;
 	Callback						systemLoadCallback;
 	StackAllocator					frameAllocator;
 	std::queue<Callback>			eventCallbacks;

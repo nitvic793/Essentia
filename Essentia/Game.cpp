@@ -33,6 +33,7 @@ void Game::Setup(Callback gameSystemsInitCallback)
 
 	coreSystemsManager.Setup(&entityManager);
 	gameSystemsManager.Setup(&entityManager);
+	scriptSystemsManager.Setup(&entityManager);
 
 	RegisterComponents();
 	coreSystemsManager.RegisterSystem<PhysicsSystem>();
@@ -44,12 +45,14 @@ void Game::Setup(Callback gameSystemsInitCallback)
 	coreSystemsManager.RegisterSystem<FreeCameraSystem>();
 	coreSystemsManager.RegisterSystem<AnimationSystem>(); 
 	coreSystemsManager.RegisterSystem<TerrainUpdateSystem>();
-	coreSystemsManager.RegisterSystem<ScriptingSystem>();
+
+	scriptSystemsManager.RegisterSystem<ScriptingSystem>();
 
 	// Initialize renderer and core systems. 
 	renderer->Initialize();
 	renderer->EndInitialization();
 	coreSystemsManager.Initialize();
+	scriptSystemsManager.Initialize();
 
 	// gameSystemsManager is initialized through this external invocation.
 	if (gameSystemsInitCallback) 
@@ -84,6 +87,7 @@ void Game::Run()
 			if (gameStateManager.IsPlaying())
 			{
 				gameSystemsManager.Update(kbState, mouseState, nullptr);
+				scriptSystemsManager.Update(kbState, mouseState, nullptr);
 			}
 
 			coreSystemsManager.Update(kbState, mouseState, nullptr);
@@ -138,6 +142,7 @@ Game::~Game()
 {
 	coreSystemsManager.Destroy();
 	gameSystemsManager.Destroy();
+	scriptSystemsManager.Destroy();
 	renderer->CleanUp();
 	GComponentReflector.CleanUp();
 }

@@ -88,6 +88,9 @@ namespace String
 	}
 
     bool HasSuffix(const std::string& str, const std::string& suffix);
+
+	bool Replace(std::string& str, const std::string& from, const std::string& to);
+
 }
 
 //https://stackoverflow.com/questions/81870/is-it-possible-to-print-a-variables-type-in-standard-c/58331141#58331141
