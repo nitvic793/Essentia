@@ -13,17 +13,19 @@
 
 void Game::Setup(Callback gameSystemsInitCallback)
 {
+	frameAllocator.Initialize(CMaxScratchSize, Mem::GetDefaultAllocator());
+	GContext->FrameAllocator = &frameAllocator;
+
 	renderer = MakeScoped<Renderer>();
 	keyboard = MakeScoped<DirectX::Keyboard>();
 	mouse = MakeScoped<DirectX::Mouse>();
 	entityManager.Initialize(Mem::GetDefaultAllocator());
-	frameAllocator.Initialize(CMaxScratchSize, Mem::GetDefaultAllocator());
+	
 
 	auto ec = EngineContext::Context;
 	ec->EntityManager = &entityManager;
 	ec->RendererInstance = renderer.Get();
 	ec->DefaultAllocator = Mem::GetDefaultAllocator();
-	ec->FrameAllocator = &frameAllocator;
 	ec->ComponentReflector = &GComponentReflector;
 	ec->GameSystemManager = &gameSystemsManager;
 	ec->CoreSystemManager = &coreSystemsManager;
@@ -104,9 +106,11 @@ void Game::Run()
 			if (kbState.IsKeyDown(DirectX::Keyboard::F5) && localCounter > 0.5f)
 			{
 				localCounter = 0;
-				es::Log("Reloading Game Systems...");
 				ReloadSystems();
-				es::Log("...Done");
+
+				ReloadScriptSystemEvent event;
+				event.totalTime = timer.TotalTime;
+				es::GEventBus->Publish(&event);
 			}
 
 			{

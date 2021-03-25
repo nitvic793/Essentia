@@ -786,8 +786,7 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, Resourc
 
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionDesc* transitions, uint32 count)
 {
-	Vector<CD3DX12_RESOURCE_BARRIER> barriers;
-	barriers.Reserve(count);
+	Vector<CD3DX12_RESOURCE_BARRIER> barriers(count, Mem::GetFrameAllocator());
 
 	for (size_t i = 0; i < count; ++i)
 	{
@@ -800,8 +799,8 @@ void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const T
 
 void Renderer::TransitionBarrier(ID3D12GraphicsCommandList* commandList, const TransitionResourceDesc* transitions, uint32 count)
 {
-	Vector<CD3DX12_RESOURCE_BARRIER> barriers;
-	barriers.Reserve(count);
+	Vector<CD3DX12_RESOURCE_BARRIER> barriers(count, Mem::GetFrameAllocator());
+
 	for (size_t i = 0; i < count; ++i)
 	{
 		barriers.Push(CD3DX12_RESOURCE_BARRIER::Transition(transitions[i].Resource, transitions[i].From, transitions[i].To));

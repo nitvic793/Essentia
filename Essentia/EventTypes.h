@@ -36,3 +36,9 @@ struct ComponentAddEvent : public es::IEvent
 	T* component;
 	EntityHandle entity;
 };
+
+
+struct ReloadScriptSystemEvent : public es::IEvent
+{
+	float totalTime;
+};

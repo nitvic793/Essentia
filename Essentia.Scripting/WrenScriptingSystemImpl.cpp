@@ -16,7 +16,7 @@ static char* source = nullptr;
 static WrenHandle* updateHandle = nullptr;
 static WrenHandle* mainClass = nullptr;
 constexpr const char* CBaseScriptsPath = "../../Assets/Scripts/";
-constexpr uint64 CMaxScriptBufferSize = 16 * 1024 * 1024; // 16MB
+constexpr uint64 CMaxScriptBufferSize = 1 * 1024 * 1024; // 16MB
 static IAllocator *sgAllocator = nullptr;
 static std::vector<void*> allocs;
 
@@ -121,8 +121,6 @@ void vmTest(WrenVM* vm)
 
 void ScriptingSystemImpl::Initialize()
 {
-	allocator.Initialize(CMaxScriptBufferSize, Mem::GetDefaultAllocator());
-	sgAllocator = &allocator;
 	vm = InitVM();
 
 	es::Binding::GetInstance().BindMethod("math.utils", "Utils", "test(_,_)", true, vmTest);
@@ -152,4 +150,13 @@ void ScriptingSystemImpl::Destroy()
 	{
 		free(buffer);
 	}
+
+	allocs.clear();
+	allocator.Reset();
+}
+
+void ScriptingSystemImpl::InitializeAllocators()
+{
+	allocator.Initialize(CMaxScriptBufferSize, Mem::GetDefaultAllocator());
+	sgAllocator = &allocator;
 }

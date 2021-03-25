@@ -336,7 +336,7 @@ inline Vector<EntityHandle> ComponentManager::GetEntities()
 {
 	constexpr size_t argCount = sizeof...(Args);
 	Vector<EntityHandle> commonEntities(context->FrameAllocator);
-	Vector<EntityHandle> entityList(allocator);
+	Vector<EntityHandle> entityList(context->FrameAllocator);
 
 	int a = 0;
 	auto cb = [&](EntityHandle* entities, uint32 count)->void

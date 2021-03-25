@@ -69,7 +69,7 @@ public:
 
 	virtual void Free(byte* buff) override
 	{
-		current = buff;
+		//current = buff;
 	}
 
 	virtual void Reset() override

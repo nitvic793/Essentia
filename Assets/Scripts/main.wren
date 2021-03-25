@@ -1,5 +1,9 @@
 
 import "math.utils" for Utils
+import "meta" for Meta
+
+var test = Meta.getModuleVariables("main")
+System.print(test[0].type)
 
 class GameEngine {
   static update(deltaTime, elapsedTime) {
@@ -8,3 +12,4 @@ class GameEngine {
     System.print("Update Call: %(deltaTime), %(elapsedTime)")
   }
 }
+
