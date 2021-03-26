@@ -23,9 +23,11 @@ constexpr uint64 CMaxScriptBufferSize = 1 * 1024 * 1024; // 16MB
 static IAllocator* sgAllocator = nullptr;
 static std::vector<void*> allocs;
 
+
 void WriteVMOutput(WrenVM* vm, const char* text)
 {
-	es::Log("%s", text);
+	if (strcmp(text, "\n") == 0) return; // Ignore new lines as logging system logs each line on its own new line
+	es::Log("[info] %s", text);
 }
 
 void WriteVMErrorOutput(WrenVM* vm, WrenErrorType errorType,
@@ -107,7 +109,7 @@ static WrenVM* InitVM()
 	config.bindForeignMethodFn = es::BindForeignMethod;
 	config.bindForeignClassFn = es::BindForeignClass;
 
-	config.initialHeapSize = 1024 * 1024 * 12; //16MB
+	config.initialHeapSize = 1024 * 1024 * 12; //12MB
 	return wrenNewVM(&config);
 }
 
@@ -131,6 +133,8 @@ void CreateBindings()
 	binding.BindMethod("math.utils", "Utils", "test(_,_)", true, vmTest);
 	es::bindings::RegisterBindings();
 }
+
+
 
 void ScriptingSystemImpl::Initialize()
 {

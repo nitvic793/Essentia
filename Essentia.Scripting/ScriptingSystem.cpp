@@ -26,6 +26,7 @@ void ScriptingSystem::Destroy()
 void ScriptingSystem::OnReload(ReloadScriptSystemEvent* reloadEvent)
 {
 	es::Log("Reloading Scripts");
+	es::Log("----------------");
 	systemImpl->Destroy();
 	systemImpl->Initialize();
 

@@ -1,5 +1,8 @@
 #include "BaseBindings.h"
+#include "EngineBindings.h"
+#include "Vectors.h"
 #include <DirectXMath.h>
+#include "EntityBase.h"
 #include <memory>
 
 using namespace DirectX;
@@ -18,7 +21,16 @@ namespace es::bindings
 {
 	void RegisterBindings()
 	{
-		es::Binding::GetInstance().BindForeignClass("math.vector", "Vec3", { AllocateFloat3 , FinalizeType<XMFLOAT3> });
+		auto& binding = es::Binding::GetInstance();
+		binding.BindForeignClass("math.vector", "Vec3", { AllocateFloat3 , FinalizeType<XMFLOAT3> });
+		binding.BindForeignClass("engine", "Entity", { AllocateEntity , FinalizeType<EntityHandle> });
+
+		binding.BindMethod("math.vector", "Vec3", "normalize()", false, WrenFloat3Normalize);
+		binding.BindMethod("math.vector", "Vec3", "length()", false, WrenFloat3Length);
+		binding.BindMethod("math.vector", "Vec3", "dot(_)", false, WrenFloat3Dot);
+		binding.BindMethod("math.vector", "Vec3", "cross(_)", false, WrenFloat3Cross);
+
+		binding.BindMethod("engine", "Entity", "getPosition()", false, WrenEntityGetPosition);
 
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, x, Double);
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, y, Double);

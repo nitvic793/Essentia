@@ -1,21 +1,11 @@
 #pragma once
 
-#include <DirectXMath.h>
+#include <wren.hpp>
 
 namespace es::bindings
 {
-	using namespace DirectX;
-
-	void Normalize(XMFLOAT3& inVector)
-	{
-		auto vector = XMLoadFloat3(&inVector);
-		XMVector3Normalize(vector);
-		XMStoreFloat3(&inVector, vector);
-	}
-
-	float Dot(XMFLOAT3& lhs, XMFLOAT3& rhs)
-	{
-		auto l = XMLoadFloat3(&lhs);
-		auto r = XMLoadFloat3(&rhs);
-	}
+	void WrenFloat3Normalize(WrenVM* vm);
+	void WrenFloat3Dot(WrenVM* vm);
+	void WrenFloat3Cross(WrenVM* vm);
+	void WrenFloat3Length(WrenVM* vm);
 }

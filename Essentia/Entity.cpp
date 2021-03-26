@@ -51,6 +51,7 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 pare
 	}
 
 	entityNames[handle.Index] = name;
+	
 	handle.Version = generations[handle.Index];
 	TransformHandle parentTransform = { -1 };
 
@@ -71,6 +72,7 @@ EntityHandle EntityManager::CreateEntity(const Transform& transform, uint32 pare
 	componentManager.AddComponent<PositionComponent>(entity, position);
 	componentManager.AddComponent<RotationComponent>(entity, rotation);
 	componentManager.AddComponent<ScaleComponent>(entity, scale);
+	entityNameMap[name] = entity;
 
 	return entity;
 }
@@ -110,6 +112,11 @@ Vector<EntityHandle> EntityManager::GetChildren(EntityHandle entity)
 std::string_view EntityManager::GetEntityName(EntityHandle entity)
 {
 	return entityNames[entity.Handle.Index];
+}
+
+EntityHandle EntityManager::GetEntityByName(std::string_view name)
+{
+	return entityNameMap[name.data()];
 }
 
 Vector<IComponent*> EntityManager::GetEntityComponents(EntityHandle handle)

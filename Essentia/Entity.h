@@ -19,6 +19,7 @@ public:
 	EntityHandle			GetParent(EntityHandle entity);
 	Vector<EntityHandle>	GetChildren(EntityHandle entity);
 	std::string_view		GetEntityName(EntityHandle entity);
+	EntityHandle			GetEntityByName(std::string_view name);
 
 	template<typename T>
 	void				AddComponent(EntityHandle handle, const T& value = T());
@@ -49,6 +50,7 @@ private:
 	ComponentManager			componentManager;
 	TransformManager			transformManager;
 	IAllocator*					allocator;
+	std::unordered_map<std::string, EntityHandle> entityNameMap;
 };
 
 template<typename T>

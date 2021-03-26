@@ -45,6 +45,9 @@
     <ClInclude Include="Vectors.h">
       <Filter>Header Files\Bindings</Filter>
     </ClInclude>
+    <ClInclude Include="EngineBindings.h">
+      <Filter>Header Files\Bindings</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -63,6 +66,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Binding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Vectors.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineBindings.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
