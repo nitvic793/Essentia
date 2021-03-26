@@ -14,26 +14,14 @@ void AllocateFloat3(WrenVM* vm)
 	);
 }
 
-MWrenGetterDouble(DirectX::XMFLOAT3, Float3, x);
-MWrenGetterDouble(DirectX::XMFLOAT3, Float3, y);
-MWrenGetterDouble(DirectX::XMFLOAT3, Float3, z);
-
-MWrenSetterDouble(DirectX::XMFLOAT3, Float3, x);
-MWrenSetterDouble(DirectX::XMFLOAT3, Float3, y);
-MWrenSetterDouble(DirectX::XMFLOAT3, Float3, z);
-
 namespace es::bindings
 {
 	void RegisterBindings()
 	{
 		es::Binding::GetInstance().BindForeignClass("math.vector", "Vec3", { AllocateFloat3 , FinalizeType<XMFLOAT3> });
-		MWrenRegisterSetter(math.vector, MWrenGetSetterName(DirectX::XMFLOAT3, Float3, x), Vec3, x);
-		MWrenRegisterGetter(math.vector, MWrenGetGetterName(DirectX::XMFLOAT3, Float3, x), Vec3, x);
 
-		MWrenRegisterSetter(math.vector, MWrenGetSetterName(DirectX::XMFLOAT3, Float3, y), Vec3, y);
-		MWrenRegisterGetter(math.vector, MWrenGetGetterName(DirectX::XMFLOAT3, Float3, y), Vec3, y);
-
-		MWrenRegisterSetter(math.vector, MWrenGetSetterName(DirectX::XMFLOAT3, Float3, z), Vec3, z);
-		MWrenRegisterGetter(math.vector, MWrenGetGetterName(DirectX::XMFLOAT3, Float3, z), Vec3, z);
+		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, x, Double);
+		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, y, Double);
+		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, z, Double);
 	}
 }
