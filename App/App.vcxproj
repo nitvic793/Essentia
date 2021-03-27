@@ -205,7 +205,7 @@ xcopy $(SolutionDir)external\Physx-4.1\bin\win.x86_64.vc142.mt\release\*.dll $(T
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\wren\include;$(SolutionDir)external\rpclib\include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)external\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia.Shared;$(SolutionDir)Essentia;$(SolutionDir)external\wren\include;$(SolutionDir)external\rpclib\include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)external\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>NDEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
