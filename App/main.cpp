@@ -4,10 +4,10 @@
 #endif
 #define NOMINMAX
 
-#include "../Essentia/Game.h"
+#include <Game.h>
 #include "GameLoader.h"
 #include <dxgidebug.h>
-#include "FileWatcher.h"
+#include <FileWatcher.h>
 #include <thread>
 
 static const char* gameDll = "Game.dll";

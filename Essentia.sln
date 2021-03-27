@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Essentia.Scripting", "Essentia.Scripting\Essentia.Scripting.vcxproj", "{2A8DB0B1-571D-4DEA-BEDD-E15FD02C06B0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Essentia.Shared", "Essentia.Shared\Essentia.Shared.vcxitems", "{48515C92-459B-4F31-8F8B-C5E6338F2492}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

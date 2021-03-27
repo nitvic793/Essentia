@@ -5,7 +5,7 @@
 class ScriptingSystemImpl
 {
 public:
-	void Initialize();
+	void Initialize(const char* basePath);
 	void Update(float dt, float totalTime);
 	void Destroy();
 	void InitializeAllocators();

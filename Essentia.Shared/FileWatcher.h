@@ -1,3 +1,5 @@
+#pragma once
+
 //Credits: https://github.com/sol-prog
 //License: https://github.com/sol-prog/cpp17-filewatcher/blob/master/LICENSE
 #pragma once
@@ -46,7 +48,7 @@ public:
 			for (auto& file : std::filesystem::recursive_directory_iterator(path_to_watch)) {
 				auto current_file_last_write_time = std::filesystem::last_write_time(file);
 
-				if (endsWith(file.path().string(), ".h") || endsWith(file.path().string(), ".cpp"))
+				if (endsWith(file.path().string(), ".h") || endsWith(file.path().string(), ".cpp") || endsWith(file.path().string(), ".wren"))
 				{
 					// File creation
 					if (!contains(file.path().string())) {

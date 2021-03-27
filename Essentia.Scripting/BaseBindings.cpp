@@ -5,6 +5,8 @@
 #include "EntityBase.h"
 #include <memory>
 
+#pragma warning( disable : 4244 ) // Disable double to float cast warnings as they're generated through macro. *TODO*: Fix Me
+
 using namespace DirectX;
 
 void AllocateFloat3(WrenVM* vm)
@@ -15,6 +17,20 @@ void AllocateFloat3(WrenVM* vm)
 		(float)wrenGetSlotDouble(vm, 2),
 		(float)wrenGetSlotDouble(vm, 3)
 	);
+}
+
+void WrenCos(WrenVM* vm)
+{
+	auto val = wrenGetSlotDouble(vm, 1);
+	val = std::cos(val);
+	wrenSetSlotDouble(vm, 0, val);
+}
+
+void WrenSin(WrenVM* vm)
+{
+	auto val = wrenGetSlotDouble(vm, 1);
+	val = std::sin(val);
+	wrenSetSlotDouble(vm, 0, val);
 }
 
 namespace es::bindings
@@ -30,7 +46,11 @@ namespace es::bindings
 		binding.BindMethod("math.vector", "Vec3", "dot(_)", false, WrenFloat3Dot);
 		binding.BindMethod("math.vector", "Vec3", "cross(_)", false, WrenFloat3Cross);
 
+		binding.BindMethod("math", "Math", "cos(_)", true, WrenCos);
+		binding.BindMethod("math", "Math", "sin(_)", true, WrenSin);
+
 		binding.BindMethod("engine", "Entity", "getPosition()", false, WrenEntityGetPosition);
+		binding.BindMethod("engine", "Entity", "setPosition(_,_,_)", false, WrenEntitySetPosition);
 
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, x, Double);
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, y, Double);

@@ -25,31 +25,31 @@ namespace es::bindings
 
 	void RegisterBindings();
 
-	class ClassHandleMap
+	class WrenHandleMap
 	{
 	public:
-		static ClassHandleMap& GetInstance() 
+		static WrenHandleMap& GetInstance() 
 		{
-			static ClassHandleMap instance;
+			static WrenHandleMap instance;
 			return instance;
 		}
 
-		static WrenHandle* GetHandle(std::string_view module, std::string_view className, WrenVM* vm)
+		static WrenHandle* GetClassHandle(std::string_view module, std::string_view className, WrenVM* vm)
 		{
 			auto& instance = GetInstance();
 			std::string name{ module };
 			name += className;
 			if (!instance.Exists(name))
-				Register(module, className, vm);
+				RegisterWrenClass(module, className, vm);
 
-			return instance.handleMap[name];
+			return instance.classHandleMap[name];
 		}
 
-		static void Register(std::string_view module, std::string_view className, WrenVM* vm)
+		static void RegisterWrenClass(std::string_view module, std::string_view className, WrenVM* vm)
 		{
 			std::string name{ module };
 			name += className;
-
+			GetInstance().vmInstance = vm;
 			wrenGetVariable(vm, module.data(), className.data(), 0);
 			wrenEnsureSlots(vm, 1);
 			auto handle = wrenGetSlotHandle(vm, 0);
@@ -58,15 +58,31 @@ namespace es::bindings
 
 		void AddHandle(std::string& name, WrenHandle* handle)
 		{
-			handleMap[name] = handle;
+			classHandleMap[name] = handle;
 		}
 
 		bool Exists(std::string& name) const 
 		{
-			return handleMap.find(name) != handleMap.end();
+			return classHandleMap.find(name) != classHandleMap.end();
+		}
+
+		void ReleaseHandles()
+		{
+			if (!vmInstance) return;
+			for (auto& handle : classHandleMap)
+			{
+				wrenReleaseHandle(vmInstance, handle.second);
+			}
+
+			vmInstance = nullptr;
+		}
+
+		~WrenHandleMap()
+		{
 		}
 
 	protected:
-		std::unordered_map<std::string, WrenHandle*> handleMap;
+		std::unordered_map<std::string, WrenHandle*> classHandleMap;
+		WrenVM* vmInstance = nullptr;
 	};
 }

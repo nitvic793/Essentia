@@ -20,11 +20,22 @@ namespace es::bindings
 
 	void WrenEntityGetPosition(WrenVM* vm)
 	{
-		//EntityHandle* entity = (EntityHandle*)wrenGetSlotForeign(vm, 0);
-		//auto transform = GContext->EntityManager->GetTransform(*entity);
-		//auto handle = ClassHandleMap::GetHandle("math.vector", "Vec3", vm);
-		//void* bytes = wrenSetSlotNewForeign(vm, 0, 0, sizeof(XMFLOAT3)); 
-		//memcpy(bytes, transform.Position, sizeof(XMFLOAT3));
-		//wrenSetSlotHandle(vm, 0, handle);
+		EntityHandle* entity = (EntityHandle*)wrenGetSlotForeign(vm, 0);
+		auto transform = GContext->EntityManager->GetTransform(*entity);
+		wrenGetVariable(vm, "math.vector", "Vec3", 1);
+		void* bytes = wrenSetSlotNewForeign(vm, 0, 1, sizeof(XMFLOAT3)); 
+		memcpy(bytes, transform.Position, sizeof(XMFLOAT3));
 	}
+
+	void WrenEntitySetPosition(WrenVM* vm)
+	{
+		EntityHandle* entity = (EntityHandle*)wrenGetSlotForeign(vm, 0);
+		auto transform = GContext->EntityManager->GetTransform(*entity);
+		auto x = (float)wrenGetSlotDouble(vm, 1);
+		auto y = (float)wrenGetSlotDouble(vm, 2);
+		auto z = (float)wrenGetSlotDouble(vm, 3);
+		*transform.Position = XMFLOAT3(x, y, z);
+	}
+
+
 }

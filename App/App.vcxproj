@@ -111,7 +111,7 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)external\wren\include;$(SolutionDir)external\rpclib\include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)external\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)Essentia;$(SolutionDir)Essentia.Shared;$(SolutionDir)external\wren\include;$(SolutionDir)external\rpclib\include;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\include;$(SolutionDir)include;$(SolutionDir)external\PhysX-4.1\include;$(SolutionDir)external\pxshared\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <AdditionalOptions>/FS %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -239,7 +239,6 @@ xcopy $(SolutionDir)external\Physx-4.1\bin\win.x86_64.vc142.mt\release\*.dll $(T
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="FileWatcher.h" />
     <ClInclude Include="GameLoader.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -6,4 +6,5 @@ namespace es::bindings
 {
 	void AllocateEntity(WrenVM* vm);
 	void WrenEntityGetPosition(WrenVM* vm);
+	void WrenEntitySetPosition(WrenVM* vm);
 }

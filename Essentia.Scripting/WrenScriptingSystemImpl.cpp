@@ -3,13 +3,13 @@
 #include "Memory.h"
 #include <Trace.h>
 #include <wren.hpp>
-#include "Binding.h"
 #include "ModuleLoader.h"
 #include <sstream>
 #include <StringHash.h>
 #include <FreeListAllocator.h>
 
 //Binding Includes
+#include "Binding.h"
 #include "BaseBindings.h"
 
 //#include <vld.h>
@@ -18,10 +18,12 @@ static WrenVM* vm = nullptr;
 static char* source = nullptr;
 static WrenHandle* updateHandle = nullptr;
 static WrenHandle* mainClass = nullptr;
-constexpr const char* CBaseScriptsPath = "../../Assets/Scripts/";
+static WrenHandle* initHandle = nullptr;
+
 constexpr uint64 CMaxScriptBufferSize = 1 * 1024 * 1024; // 16MB
 static IAllocator* sgAllocator = nullptr;
 static std::vector<void*> allocs;
+static const char* SBasePath = nullptr; // populated on script system init
 
 
 void WriteVMOutput(WrenVM* vm, const char* text)
@@ -80,7 +82,7 @@ WrenLoadModuleResult LoadVMModule(WrenVM* vm, const char* name)
 	std::string path(name);
 	String::Replace(path, ".", "/");
 	path += ".wren";
-	path = CBaseScriptsPath + path;
+	path = SBasePath + path;
 	std::ifstream fin;
 	fin.open(path, std::ios::in);
 	std::stringstream buffer;
@@ -134,23 +136,28 @@ void CreateBindings()
 	es::bindings::RegisterBindings();
 }
 
-
-
-void ScriptingSystemImpl::Initialize()
+void ScriptingSystemImpl::Initialize(const char* basePath)
 {
+	SBasePath = basePath;
 	vm = InitVM();
 
 	CreateBindings();
-	es::ModuleLoader::LoadModules(vm, CBaseScriptsPath);
+	es::ModuleLoader::LoadModules(vm, basePath);
 
 	wrenEnsureSlots(vm, 3);
 	wrenGetVariable(vm, "main", "GameEngine", 0);
 	mainClass = wrenGetSlotHandle(vm, 0);
 	updateHandle = wrenMakeCallHandle(vm, "update(_,_)");
+	initHandle = wrenMakeCallHandle(vm, "init()");
+
+	wrenCall(vm, initHandle);
+
+	wrenReleaseHandle(vm, initHandle);
 }
 
 void ScriptingSystemImpl::Update(float dt, float totalTime)
 {
+	wrenEnsureSlots(vm, 4);
 	wrenSetSlotHandle(vm, 0, mainClass);
 	wrenSetSlotDouble(vm, 1, dt);
 	wrenSetSlotDouble(vm, 2, totalTime);
@@ -159,6 +166,7 @@ void ScriptingSystemImpl::Update(float dt, float totalTime)
 
 void ScriptingSystemImpl::Destroy()
 {
+	es::bindings::WrenHandleMap::GetInstance().ReleaseHandles();
 	wrenReleaseHandle(vm, mainClass);
 	wrenReleaseHandle(vm, updateHandle);
 	wrenFreeVM(vm);

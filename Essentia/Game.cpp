@@ -15,6 +15,7 @@ void Game::Setup(Callback gameSystemsInitCallback)
 {
 	frameAllocator.Initialize(CMaxScratchSize, Mem::GetDefaultAllocator());
 	GContext->FrameAllocator = &frameAllocator;
+	GContext->GameInstance = this;
 
 	renderer = MakeScoped<Renderer>();
 	keyboard = MakeScoped<DirectX::Keyboard>();
@@ -54,7 +55,6 @@ void Game::Setup(Callback gameSystemsInitCallback)
 	renderer->Initialize();
 	renderer->EndInitialization();
 	coreSystemsManager.Initialize();
-	scriptSystemsManager.Initialize();
 
 	// gameSystemsManager is initialized through this external invocation.
 	if (gameSystemsInitCallback) 
@@ -68,6 +68,8 @@ void Game::Setup(Callback gameSystemsInitCallback)
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
 	camera = MakeScopedArgs<Camera>((float)windowSize.Width, (float)windowSize.Height);
+
+	scriptSystemsManager.Initialize(); //Initialize scripting sub-system only after other systems are initialized
 }
 
 void Game::Run()
@@ -107,10 +109,6 @@ void Game::Run()
 			{
 				localCounter = 0;
 				ReloadSystems();
-
-				ReloadScriptSystemEvent event;
-				event.totalTime = timer.TotalTime;
-				es::GEventBus->Publish(&event);
 			}
 
 			{
@@ -129,7 +127,11 @@ void Game::Run()
 
 void Game::ReloadSystems()
 {
-	systemLoadCallback();
+	//systemLoadCallback();
+
+	ReloadScriptSystemEvent event;
+	event.totalTime = timer.TotalTime;
+	es::GEventBus->Publish(&event);
 }
 
 void Game::SetSystemReloadCallback(Callback callback)

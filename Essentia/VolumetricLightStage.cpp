@@ -34,20 +34,6 @@ void VolumetricLightStage::Initialize()
 	blurFinalTarget = CreateSceneRenderTarget(GContext, halfResSize.Width, halfResSize.Height, renderer->GetHDRRenderTargetFormat());
 	blurIntermediateTarget = CreateSceneRenderTarget(GContext, halfResSize.Width, halfResSize.Height, renderer->GetHDRRenderTargetFormat());
 	GSceneResources.LightAccumTarget = lightAccumTarget;
-	uint32 count = 0;
-	auto entities = entityManager->GetEntities<PostProcessVolumeComponent>(count);
-	if (count == 0)
-	{
-		volumeEntity = GContext->EntityManager->CreateEntity();
-		GContext->EntityManager->AddComponent<PostProcessVolumeComponent>(volumeEntity);
-		GContext->EntityManager->AddComponent<BaseDrawableComponent>(volumeEntity, BaseDrawableComponent::Create());
-		auto transform = GContext->EntityManager->GetTransform(volumeEntity);
-		//*transform.Scale = DirectX::XMFLOAT3(100.f, 100.f, 100.f);
-	}
-	else
-	{
-		volumeEntity = entities[0];
-	}
 
 	lightAccumCBV = GContext->ShaderResourceManager->CreateCBV(sizeof(LightAccumParams));
 	bilateralBlurCBV = GContext->ShaderResourceManager->CreateCBV(sizeof(BilateralBlurParams));
