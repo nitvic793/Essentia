@@ -51,6 +51,8 @@ namespace es::bindings
 
 		binding.BindMethod("engine", "Entity", "getPosition()", false, WrenEntityGetPosition);
 		binding.BindMethod("engine", "Entity", "setPosition(_,_,_)", false, WrenEntitySetPosition);
+		binding.BindMethod("engine", "Entity", "position", false, WrenEntityGetPosition);
+		binding.BindMethod("engine", "Entity", "position=(_)", false, WrenEntitySetPositionVec3);
 
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, x, Double);
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, y, Double);

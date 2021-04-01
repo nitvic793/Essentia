@@ -42,6 +42,7 @@ ResourceID ResourceManager::CreateResource(D3D12_RESOURCE_DESC desc, D3D12_CLEAR
 	currentResourceID++;
 	device->CreateCommittedResource(&heapProperties, heapFlags, &desc, initialResourceState, clearVal, IID_PPV_ARGS(resources[id].ReleaseAndGetAddressOf()));
 	resources[id]->SetName((std::wstring(L"Resource ") + std::to_wstring(id)).c_str());
+	//resourceStateMap[id] = initialResourceState;
 	return id;
 }
 
@@ -71,3 +72,4 @@ void ResourceManager::Release(ResourceID resourceID)
 {
 	resources[resourceID].Reset();
 }
+

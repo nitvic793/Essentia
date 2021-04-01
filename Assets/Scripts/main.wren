@@ -32,10 +32,10 @@ class GameEngine {
   }
 
   static update(deltaTime, elapsedTime) {
-    var pos = __sphere.getPosition()
+    var pos = __sphere.position
     
-    xPos = 7 + Math.sin(elapsedTime) * __speed
-    __sphere.setPosition(xPos, pos.y, 4.0)
+    pos.x = 7 + Math.sin(elapsedTime) * __speed
+    __sphere.position = pos
     
     //System.print("Update Call: %(deltaTime), %(elapsedTime)")
   }
