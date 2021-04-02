@@ -42,7 +42,7 @@ namespace es::bindings
 		EntityHandle* entity = (EntityHandle*)wrenGetSlotForeign(vm, 0);
 		auto transform = GContext->EntityManager->GetTransform(*entity);
 		auto val = (XMFLOAT3*)wrenGetSlotForeign(vm, 1);
-		*transform.Position = *val;
+		memcpy(transform.Position, val, sizeof(XMFLOAT3));
 	}
 
 }

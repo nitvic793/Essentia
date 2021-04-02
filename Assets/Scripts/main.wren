@@ -1,7 +1,7 @@
 
 import "math.vector" for Vec3
 import "math" for Math
-import "engine" for Entity, MyBehavior
+import "engine" for Entity, Behavior
 import "meta" for Meta
 
 var point = Vec3.new(1.0, 0.0, 0.0).normalize()
@@ -11,10 +11,9 @@ var test = Meta.getModuleVariables("main")
 
 // var sphere = Entity.new("SphereEntity")
 // var pos = sphere.getPosition()
-// System.print(pos.x)
+//System.print(pos.x)
 
-System.print("Init Main")
-
+System.print(test[0])
 
 class GameEngine {
   static xPos=(val){
@@ -27,14 +26,15 @@ class GameEngine {
 
   static init() {
     xPos = 0
-    __sphere = Entity.new("SphereEntity3")
-    __speed = 3.0
+    __sphere = Entity.get("SphereEntity3")
+    __speed = 2.0
   }
 
   static update(deltaTime, elapsedTime) {
     var pos = __sphere.position
-    
-    pos.x = 7 + Math.sin(elapsedTime) * __speed
+    var radius = 2.0
+    pos.x = 7 + Math.sin(elapsedTime * __speed) * radius
+    pos.z = 7 + -Math.cos(elapsedTime * __speed) * radius
     __sphere.position = pos
     
     //System.print("Update Call: %(deltaTime), %(elapsedTime)")

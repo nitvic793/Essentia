@@ -1,6 +1,6 @@
 
 foreign class Entity {
-    construct new(name) {}
+    construct get(name) {}
     foreign getPosition()
     foreign setPosition(x, y, z)
     foreign position
@@ -14,9 +14,4 @@ class Behavior {
     update() {
         System.print("Base")
     }
-}
-
-class MyBehavior is Behavior {
-    construct new(){}
-
 }
