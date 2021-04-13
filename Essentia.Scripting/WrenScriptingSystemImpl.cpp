@@ -89,8 +89,8 @@ WrenLoadModuleResult LoadVMModule(WrenVM* vm, const char* name)
 	buffer << fin.rdbuf() << '\0';
 	std::string source = buffer.str();
 
-	auto vbuffer = malloc(source.size());
-	allocs.push_back(vbuffer);
+	auto vbuffer = sgAllocator->Alloc(source.size());//malloc(source.size());
+	//allocs.push_back(vbuffer);
 	char* cbuffer = (char*)vbuffer;
 	memcpy(cbuffer, source.c_str(), source.size());
 	WrenLoadModuleResult result;
@@ -145,7 +145,7 @@ void ScriptingSystemImpl::Initialize(const char* basePath)
 	es::ModuleLoader::LoadModules(vm, basePath);
 
 	wrenEnsureSlots(vm, 3);
-	wrenGetVariable(vm, "main", "GameEngine", 0);
+	wrenGetVariable(vm, "main", "Game", 0);
 	mainClass = wrenGetSlotHandle(vm, 0);
 	updateHandle = wrenMakeCallHandle(vm, "update(_,_)");
 	initHandle = wrenMakeCallHandle(vm, "init()");

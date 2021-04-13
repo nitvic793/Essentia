@@ -69,7 +69,9 @@ void es::ModuleLoader::LoadModules(WrenVM* vm, const char* basePath)
 				auto marker = allocator.Push();
 				auto moduleName = GetScriptModuleName(modulePath, basePath);
 				if (moduleName == "main")
+				{
 					LoadModule(vm, moduleName.c_str(), modulePath.c_str(), &allocator);
+				}
 				allocator.Pop(marker);
 			}
 		}

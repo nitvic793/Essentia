@@ -8,4 +8,5 @@ namespace es::bindings
 	void WrenEntityGetPosition(WrenVM* vm);
 	void WrenEntitySetPosition(WrenVM* vm);
 	void WrenEntitySetPositionVec3(WrenVM* vm);
+	void WrenEntityRotate(WrenVM* vm);
 }

@@ -15,6 +15,7 @@ struct MoveUnitEvent : public es::IEvent
 	XMFLOAT3 TargetPos;
 };
 
+//@Serializable()
 struct Rotatable : public IComponent
 {
 	float Speed = 1.f;
@@ -80,7 +81,7 @@ public:
 				auto rotation = XMQuaternionRotationAxis(up, comp->Rotation);
 				comp->Rotation += deltaTime * comp->Speed; 
 				//comp->Rotation = fmod(comp->Rotation, XM_PI);
-				XMStoreFloat4(transform.Rotation, rotation);
+				//XMStoreFloat4(transform.Rotation, rotation);
 			}
 		}
 

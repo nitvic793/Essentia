@@ -105,6 +105,14 @@ public:
 		freeBlocks = block;
 	};
 
+
+	virtual void Reset()
+	{
+		freeBlocks = (BlockPtr)buffer;
+		freeBlocks->size = totalSize;
+		freeBlocks->next = nullptr;
+	}
+
 	~FreeListAllocator()
 	{
 		if (parent)

@@ -45,4 +45,14 @@ namespace es::bindings
 		memcpy(transform.Position, val, sizeof(XMFLOAT3));
 	}
 
+	void WrenEntityRotate(WrenVM* vm)
+	{
+		EntityHandle* entity = (EntityHandle*)wrenGetSlotForeign(vm, 0);
+		float angle = (float)wrenGetSlotDouble(vm, 1);
+		auto axis = (XMFLOAT3*)wrenGetSlotForeign(vm, 2);
+		auto transform = GContext->EntityManager->GetTransform(*entity);
+		auto quaternion = XMQuaternionRotationAxis(XMLoadFloat3(axis), angle);
+		XMStoreFloat4(transform.Rotation, quaternion);
+	}
+
 }

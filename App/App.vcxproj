@@ -97,12 +97,18 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+    <CustomBuildBeforeTargets>
+    </CustomBuildBeforeTargets>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -128,6 +134,14 @@ xcopy $(SolutionDir)Assets $(TargetDir)\Assets /K /D /H /Y /s /i
 xcopy $(SolutionDir)Scene $(TargetDir) /K /D /H /Y /s /i
 xcopy $(SolutionDir)external\Physx-4.1\bin\win.x86_64.vc142.mt\debug\*.dll $(TargetDir) /K /D /H /Y</Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugGame|x64'">
     <ClCompile>
@@ -152,6 +166,14 @@ xcopy $(SolutionDir)Assets $(TargetDir)\Assets /K /D /H /Y /s /i
 xcopy $(SolutionDir)Scene $(TargetDir) /K /D /H /Y /s /i
 xcopy $(SolutionDir)external\Physx-4.1\bin\win.x86_64.vc142.mt\release\*.dll $(TargetDir) /K /D /H /Y</Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -222,6 +244,14 @@ xcopy $(SolutionDir)Assets $(TargetDir)\Assets /K /D /H /Y /s /i
 xcopy $(SolutionDir)Scene $(TargetDir) /K /D /H /Y /s /i
 xcopy $(SolutionDir)external\Physx-4.1\bin\win.x86_64.vc142.mt\release\*.dll $(TargetDir) /K /D /H /Y</Command>
     </PostBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ProjectReference Include="..\Essentia.Scripting\Essentia.Scripting.vcxproj">

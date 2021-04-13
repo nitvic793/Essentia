@@ -38,4 +38,31 @@ namespace es::bindings
 		XMStoreFloat3(&result, XMVector3Length(XMLoadFloat3(vector)));
 		wrenSetSlotDouble(vm, 0, result.x);
 	}
+
+	void WrenFloat3Add(WrenVM* vm)
+	{
+		XMFLOAT3* lhs = (XMFLOAT3*)wrenGetSlotForeign(vm, 0);
+		XMFLOAT3* rhs = (XMFLOAT3*)wrenGetSlotForeign(vm, 1);
+		XMFLOAT3 result;
+		XMStoreFloat3(&result, XMLoadFloat3(lhs) + XMLoadFloat3(rhs));
+		void* bytes = wrenSetSlotNewForeign(vm, 0, 0, sizeof(XMFLOAT3));
+		memcpy(bytes, &result, sizeof(XMFLOAT3));
+	}
+
+	void WrenFloat3Subtract(WrenVM* vm)
+	{
+		XMFLOAT3* lhs = (XMFLOAT3*)wrenGetSlotForeign(vm, 0);
+		XMFLOAT3* rhs = (XMFLOAT3*)wrenGetSlotForeign(vm, 1);
+		XMFLOAT3 result;
+		XMStoreFloat3(&result, XMLoadFloat3(lhs) - XMLoadFloat3(rhs));
+		void* bytes = wrenSetSlotNewForeign(vm, 0, 0, sizeof(XMFLOAT3));
+		memcpy(bytes, &result, sizeof(XMFLOAT3));
+	}
+
+	void WrenFloat3Equals(WrenVM* vm)
+	{
+		XMFLOAT3* lhs = (XMFLOAT3*)wrenGetSlotForeign(vm, 0);
+		XMFLOAT3* rhs = (XMFLOAT3*)wrenGetSlotForeign(vm, 1);
+		memcpy(lhs, rhs, sizeof(XMFLOAT3));
+	}
 }

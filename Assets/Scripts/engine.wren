@@ -5,13 +5,19 @@ foreign class Entity {
     foreign setPosition(x, y, z)
     foreign position
     foreign position=(rhs)
+    foreign rotate(angles, axis)
 }
 
 class Engine {
 }
 
 class Behavior {
+    construct new(){
+
+    }
+
     update() {
         System.print("Base")
+        return "Update"
     }
 }
