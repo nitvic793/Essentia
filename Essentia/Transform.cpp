@@ -170,3 +170,8 @@ void TransformManager::CleanUp()
 {
 	Mem::Free(transforms.Buffer);
 }
+
+void TransformManager::Reset()
+{
+	transforms.Size = 0;
+}

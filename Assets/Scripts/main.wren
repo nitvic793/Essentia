@@ -28,13 +28,14 @@ class Game {
     xPos = 0
     __sphere = Entity.get("SphereEntity3")
     __speed = 1.0
-    __rotationSpeed = 1.0
+    __rotationSpeed = 20.0 // Degrees/second
+    __piDiv180 = 3.14/180.0
   }
 
   static update(deltaTime, elapsedTime) {
     var pos = __sphere.position
     var up = Vec3.new(0,1,0).normalize()
-    __sphere.rotate(elapsedTime * __rotationSpeed, up)
+    __sphere.rotate(__piDiv180 * elapsedTime * __rotationSpeed , up)
     //pos = pos + Vec3.new(1,1,1)
     var radius = 1
     pos.x = 7 + Math.sin(elapsedTime * __speed) * radius

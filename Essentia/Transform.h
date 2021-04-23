@@ -57,6 +57,7 @@ public:
 	const Transform			GetWorldTransform(EntityHandle entity);
 	const bool				HasValidParent(EntityHandle entity);
 	Vector<EntityHandle>	GetChildren(EntityHandle entity);
+	void					Reset();
 	~TransformManager();
 private:
 	void UpdateTransform(TransformHandle transform);

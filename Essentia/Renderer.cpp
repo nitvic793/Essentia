@@ -62,7 +62,7 @@ void Renderer::Initialize()
 	shaderResourceManager = ScopedPtr<ShaderResourceManager>(Allocate<ShaderResourceManager>());
 	frameManager = ScopedPtr<FrameManager>(Allocate<FrameManager>());
 
-	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", false);
+	window->Initialize(GetModuleHandle(0), width, height, "Essentia", "Essentia", true);
 	deviceResources->Initialize(window.get(), renderTargetFormat);
 
 	device = deviceResources->GetDevice();
@@ -265,7 +265,16 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	auto renderStageMap = GRenderStageManager.GetRenderStageMap();
 	uint32 camCount;
-	const auto& camera = frameContext.EntityManager->GetComponents<CameraComponent>(camCount)[0].CameraInstance;
+	auto cameras = frameContext.EntityManager->GetComponents<CameraComponent>(camCount);
+
+	Camera* camPtr = &cameras[0].CameraInstance;
+	if (camCount == 0)
+	{
+		void* buffer = Mem::GetFrameAllocator()->Alloc(sizeof(Camera)); // Allocate temporary camera
+		camPtr = new(buffer) Camera((float)width, (float)height);
+	}
+
+	const auto& camera = *camPtr;
 	auto imageIndex = backBufferIndex;
 
 	perObject.View = camera.GetViewTransposed();
@@ -593,7 +602,7 @@ void Renderer::DrawMesh(ID3D12GraphicsCommandList* commandList, MeshHandle mesh)
 
 void Renderer::SetRenderTargets(RenderTargetID* renderTargets, int rtCount, DepthStencilID* depthStencilId, bool singleHandleToRTsDescriptorRange)
 {
-	Vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(rtCount);
+	Vector<D3D12_CPU_DESCRIPTOR_HANDLE> handles(rtCount, Mem::GetFrameAllocator());
 	for (size_t i = 0; i < rtCount; ++i)
 	{
 		handles.Push(renderTargetManager->GetRTVHandle(renderTargets[i]));

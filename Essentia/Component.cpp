@@ -99,6 +99,14 @@ void ComponentManager::AddComponent(const char* name, EntityHandle entity, IComp
 	pool->EmitAddComponentEvent(entity);
 }
 
+void ComponentManager::Reset()
+{
+	for (auto& pool : pools)
+	{
+		pool.second->Reset();
+	}
+}
+
 
 bool operator<(EntityHandle lhs, EntityHandle rhs)
 {

@@ -192,6 +192,11 @@ public:
 		auto camEntity = entityManager->GetEntities<CameraComponent>(count);
 		auto transform = entityManager->GetTransform(camEntity[0]);
 		auto cameras = entityManager->GetComponents<CameraComponent>(count);
+		if (count == 0)
+		{
+			return;
+		}
+
 		auto& camera = cameras[0].CameraInstance;
 		bool debugNav = false;
 #ifdef EDITOR
@@ -311,6 +316,12 @@ public:
 		uint32 count = 0;
 		auto entities = GetEntities<CameraComponent>(count);
 		auto components = GetComponents<CameraComponent>(count);
+
+		if (count == 0)
+		{
+			return; // No Camera found
+		}
+
 		const Camera& camera = components[0].CameraInstance;
 		auto imageIndex = GContext->RendererInstance->GetCurrentBackbufferIndex();
 		auto drawables = GetComponents<BaseDrawableComponent>(count);

@@ -25,3 +25,8 @@ void GameStateManager::SetIsPlaying(bool playing)
 {
     isPlaying = playing;
 }
+
+void GameStateManager::UnloadScene()
+{
+    GContext->EntityManager->Reset();
+}

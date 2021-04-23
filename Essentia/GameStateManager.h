@@ -10,6 +10,7 @@ public:
 	std::string_view	GetCurrentScene();
 	const bool			IsPlaying();
 	void				SetIsPlaying(bool playing);
+	void				UnloadScene();
 
 private:
 	std::string currentSceneName;

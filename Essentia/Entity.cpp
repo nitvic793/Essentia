@@ -94,6 +94,16 @@ bool EntityManager::HasValidParent(EntityHandle handle)
 	return transformManager.HasValidParent(handle);
 }
 
+void EntityManager::Reset()
+{
+	generations.clear();
+	entityNameMap.clear();
+	entityNames.clear();
+	freeIndices.clear();
+	componentManager.Reset();
+	transformManager.Reset();
+}
+
 ComponentManager* EntityManager::GetComponentManager()
 {
 	return &componentManager;

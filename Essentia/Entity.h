@@ -15,6 +15,7 @@ public:
 	bool					IsAlive(EntityHandle handle);
 	void					Destroy(EntityHandle handle);
 	bool					HasValidParent(EntityHandle handle);
+	void					Reset();
 	ComponentManager*		GetComponentManager();
 	EntityHandle			GetParent(EntityHandle entity);
 	Vector<EntityHandle>	GetChildren(EntityHandle entity);

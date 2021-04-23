@@ -111,6 +111,12 @@ void Game::Run()
 				ReloadSystems();
 			}
 
+			if (kbState.IsKeyDown(DirectX::Keyboard::F6) && localCounter > 0.5f)
+			{
+				localCounter = 0;
+				entityManager.Reset();
+			}
+
 			{
 				std::scoped_lock lock(centralMutex);
 				while (!eventCallbacks.empty())

@@ -28,6 +28,7 @@ public:
 	virtual const char*		GetTypeName() = 0 ;
 	virtual void			EmitAddComponentEvent(EntityHandle entity) {};
 	virtual void			EmitRemoveComponentEvent(EntityHandle entity) {};
+	virtual void			Reset() {};
 	virtual ~ComponentPoolBase() {}
 };
 
@@ -170,6 +171,13 @@ public:
 		es::GEventBus->Publish(&event);
 	}
 
+	virtual void Reset() override
+	{
+		components.clear();
+		entities.clear();
+		componentMap.clear();
+	}
+
 	~ComponentPool() {}
 private:
 	std::vector<T>						components;
@@ -251,7 +259,8 @@ public:
 	Vector<IComponent*>		GetComponents(EntityHandle handle);
 	Vector<ComponentData>	GetEntityComponents(EntityHandle handle);
 	Vector<const char*>		GetComponentNameList();
-	void				AddComponent(const char* name, EntityHandle entity, IComponent* initValue = nullptr);
+	void					AddComponent(const char* name, EntityHandle entity, IComponent* initValue = nullptr);
+	void					Reset();
 private:
 	IAllocator* allocator;
 	EngineContext* context;
