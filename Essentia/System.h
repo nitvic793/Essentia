@@ -17,6 +17,7 @@ public:
 	virtual void Initialize() {};
 	virtual void Update(float deltaTime, float totalTime) {};
 	virtual void Destroy() {};
+	virtual void Reset() {};
 	virtual ~ISystem() {};
 
 	const char* GetName() const;
@@ -66,6 +67,7 @@ public:
 	void Initialize();
 	void Update(const DirectX::Keyboard::State& kbState, const DirectX::Mouse::State& mouseState, Camera* camera);
 	void Destroy();
+	void Reset();
 	const std::vector<ScopedPtr<ISystem>> &GetSystems();
 private:
 	std::vector<ScopedPtr<ISystem>> systems;

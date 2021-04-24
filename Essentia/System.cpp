@@ -39,6 +39,14 @@ void SystemManager::Destroy()
 	systems.clear();
 }
 
+void SystemManager::Reset()
+{
+	for (auto& system : systems)
+	{
+		system->Reset();
+	}
+}
+
 const std::vector<ScopedPtr<ISystem>>& SystemManager::GetSystems()
 {
 	return systems;

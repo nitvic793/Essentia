@@ -114,6 +114,7 @@ void Game::Run()
 			if (kbState.IsKeyDown(DirectX::Keyboard::F6) && localCounter > 0.5f)
 			{
 				localCounter = 0;
+				ResetSystems();
 				entityManager.Reset();
 			}
 
@@ -138,6 +139,13 @@ void Game::ReloadSystems()
 	ReloadScriptSystemEvent event;
 	event.totalTime = timer.TotalTime;
 	es::GEventBus->Publish(&event);
+}
+
+void Game::ResetSystems()
+{
+	coreSystemsManager.Reset();
+	gameSystemsManager.Reset();
+	scriptSystemsManager.Reset();
 }
 
 void Game::SetSystemReloadCallback(Callback callback)

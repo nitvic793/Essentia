@@ -16,6 +16,7 @@ public:
 	virtual void Initialize() override;
 	virtual void Update(float deltaTime, float totalTime) override;
 	virtual void Destroy() override;
+	virtual void Reset() override;
 private:
 	ScopedPtr<PhysicsContext> physicsContext;
 

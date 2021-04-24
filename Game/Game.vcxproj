@@ -135,8 +135,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;rpc.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)external\rpclib\lib\Debug;$(SolutionDir)external\PhysX-4.1\bin\win.x86_64.vc142.mt\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;rpc.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;wren.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)external\rpclib\lib\Debug;$(SolutionDir)external\PhysX-4.1\bin\win.x86_64.vc142.mt\debug;$(SolutionDir)external\wren\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
     <PreBuildEvent>
       <Command>
@@ -250,8 +250,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;rpc.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)external\rpclib\lib\Release;$(SolutionDir)external\PhysX-4.1\bin\win.x86_64.vc142.mt\release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib.;d3dcompiler.lib;runtimeobject.lib;rpc.lib;$(SolutionDir)packages\Assimp_native_4.1.4.1.0\build\native\lib\x64-Release\assimp-vc140-mt.lib;PhysX_64.lib;PhysXCommon_64.lib;PhysXCooking_64.lib;PhysXFoundation_64.lib;PhysXExtensions_static_64.lib;PhysXPvdSDK_static_64.lib;wren.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)external\rpclib\lib\Release;$(SolutionDir)external\PhysX-4.1\bin\win.x86_64.vc142.mt\release;$(SolutionDir)external\wren\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -277,6 +277,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Essentia.Scripting\Essentia.Scripting.vcxproj">
+      <Project>{2a8db0b1-571d-4dea-bedd-e15fd02c06b0}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Essentia\Essentia.vcxproj">
       <Project>{24aafa1a-f030-40ac-ba34-4f6593604a9d}</Project>
     </ProjectReference>
