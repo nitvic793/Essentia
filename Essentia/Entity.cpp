@@ -102,10 +102,6 @@ void EntityManager::Reset()
 	freeIndices.clear();
 	componentManager.Reset();
 	transformManager.Reset();
-
-	freeIndices.reserve(CMaxInitialEntityCount);
-	generations.reserve(CMaxInitialEntityCount);
-	entityNames.resize(CMaxInitialEntityCount);
 }
 
 ComponentManager* EntityManager::GetComponentManager()

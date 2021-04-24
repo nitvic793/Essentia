@@ -22,8 +22,7 @@ ScriptingSystem::ScriptingSystem() :
 					switch (status) {
 					case FileStatus::created:
 					case FileStatus::modified:
-						// Queue event so that it can be triggered safely in the main thread
-						game->AddEventCallback([&]() 
+						game->AddEventCallback([&]()
 							{
 								game->ReloadSystems();
 							});

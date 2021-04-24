@@ -23,7 +23,6 @@ public:
 	void			Setup(Callback gameSystemInitCallback);
 	void			Run();
 	void			ReloadSystems();
-	void			ResetSystems();
 	void			SetSystemReloadCallback(Callback callback);
 	void			AddEventCallback(Callback&& callback) { std::scoped_lock lock(centralMutex);  eventCallbacks.push(callback); }
 	SystemManager*	GetGameSystemsManager();
