@@ -14,6 +14,7 @@
 #include "ImguiConsole.h"
 #include "System.h"
 #include "Trace.h"
+#include "Game.h"
 
 using namespace DirectX;
 
@@ -492,6 +493,59 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			transformUpdateEvent.entity = entities[0];
 			es::GEventBus->Publish(&transformUpdateEvent);
 		}
+	}
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("New")) {}
+			if (ImGui::MenuItem("Open", "Ctrl+O")) 
+			{
+				auto context = GContext;
+				GContext->GameInstance->AddEventCallback([context]()
+					{
+						context->GameInstance->ResetSystems();
+						context->GameStateManager->UnloadScene();
+						context->GameStateManager->LoadScene("scene.json");
+					});
+
+			}
+
+			if (ImGui::BeginMenu("Open Recent"))
+			{
+				ImGui::MenuItem("fish_hat.c");
+				ImGui::MenuItem("fish_hat.inl");
+				ImGui::MenuItem("fish_hat.h");
+				if (ImGui::BeginMenu("More.."))
+				{
+					ImGui::MenuItem("Hello");
+					ImGui::MenuItem("Sailor");
+					if (ImGui::BeginMenu("Recurse.."))
+					{
+						ImGui::EndMenu();
+					}
+					ImGui::EndMenu();
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::MenuItem("Save", "Ctrl+S")) {}
+			if (ImGui::MenuItem("Save As..")) {}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Edit"))
+		{
+			if (ImGui::MenuItem("Undo", "CTRL+Z")) {}
+			if (ImGui::MenuItem("Redo", "CTRL+Y", false, false)) {}  // Disabled item
+			ImGui::Separator();
+			if (ImGui::MenuItem("Cut", "CTRL+X")) {}
+			if (ImGui::MenuItem("Copy", "CTRL+C")) {}
+			if (ImGui::MenuItem("Paste", "CTRL+V")) {}
+			ImGui::EndMenu();
+		}
+
+		ImGui::Text("Current Scene: %s", GContext->GameStateManager->GetCurrentScene().data());
+		ImGui::EndMainMenuBar();
 	}
 
 	ImGui::Render();

@@ -176,6 +176,24 @@ void PhysicsSystem::Destroy()
 	physicsContext->Destroy();
 }
 
+void PhysicsSystem::Reset()
+{
+	uint32 count;
+	auto entities = GContext->EntityManager->GetEntities<RigidBodyStaticComponent>(count);
+	for (uint32 i = 0; i < count; ++i)
+	{
+		auto comp = GContext->EntityManager->GetComponent<RigidBodyStaticComponent>(entities[i]);
+		comp->RigidBodyStatic->release();
+	}
+
+	entities = GContext->EntityManager->GetEntities<RigidBodyComponent>(count);
+	for (uint32 i = 0; i < count; ++i)
+	{
+		auto rigidBodyComponent = GContext->EntityManager->GetComponent<RigidBodyComponent>(entities[i]);
+		rigidBodyComponent->RigidBody->release();
+	}
+}
+
 void PhysicsSystem::OnTransformUpdate(TransformUpdateEvent* event)
 {
 	auto comp = GContext->EntityManager->GetComponentManager()->TryGetComponent<RigidBodyComponent>(event->entity);
