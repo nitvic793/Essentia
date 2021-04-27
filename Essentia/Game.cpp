@@ -114,6 +114,7 @@ void Game::Run()
 			if (kbState.IsKeyDown(DirectX::Keyboard::F6) && localCounter > 0.5f)
 			{
 				localCounter = 0;
+				gameStateManager.SetIsPlaying(false);
 				ResetSystems();
 				entityManager.Reset();
 			}

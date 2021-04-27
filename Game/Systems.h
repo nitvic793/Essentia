@@ -7,31 +7,15 @@
 #include "EventTypes.h"
 #include "Trace.h"
 #include "MoveableUnitComponent.h"
+#include "Binding.h"
+#include "BaseBindings.h"
+#include "Rotatable.h"
 
 using namespace DirectX;
 
 struct MoveUnitEvent : public es::IEvent
 {
 	XMFLOAT3 TargetPos;
-};
-
-//@Serializable()
-struct Rotatable : public IComponent
-{
-	float Speed = 1.f;
-	float Rotation = 0.f;
-
-	template<class Archive>
-	void save(Archive& archive) const
-	{
-	};
-
-	template<class Archive>
-	void load(Archive& archive)
-	{
-	}
-
-	GComponent(Rotatable)
 };
 
 class RotationSystem : public ISystem

@@ -20,9 +20,11 @@ class ConstantBufferViewPool;
 struct ImguiConsole;
 class Game;
 
+
 namespace es
 {
 	class EventBus;
+	class ScriptBinding;
 }
 
 
@@ -54,6 +56,7 @@ struct EngineContext
 	es::EventBus*			EventBus = nullptr;
 	ImguiConsole*			Console = nullptr;
 	Game*					GameInstance = nullptr;
+	es::ScriptBinding*		ScriptBinding = nullptr;
 
 	EngineContext()
 	{

@@ -20,7 +20,7 @@ namespace es
 		const char* className
 	);
 
-	class Binding
+	class ScriptBinding
 	{
 	public:
 		void BindMethod(const char* module, const char* className, const char* signature, bool isStatic, WrenForeignMethodFn fn)
@@ -58,15 +58,15 @@ namespace es
 				return nullptr;
 		}
 
-		static Binding& GetInstance()
+		static ScriptBinding& GetInstance()
 		{
-			static Binding instance;
+			static ScriptBinding instance;
 			return instance;
 		}
 
 	protected:
 
-		static Binding* instance;
+		static ScriptBinding* instance;
 		std::unordered_map<std::string, WrenForeignMethodFn> methods;
 		std::unordered_map<std::string, WrenForeignClassMethods> classes;
 	};

@@ -4,10 +4,16 @@
     <Filter Include="Utility">
       <UniqueIdentifier>{c7d6058c-80d0-47db-a7cc-7d305db422f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{247474f8-56fc-4714-915e-d25a1e83b3fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="$(MSBuildThisFileDirectory)FileWatcher.h">
       <Filter>Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="$(MSBuildThisFileDirectory)Rotatable.h">
+      <Filter>Components</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

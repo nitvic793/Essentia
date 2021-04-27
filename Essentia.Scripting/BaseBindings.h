@@ -17,10 +17,30 @@ namespace es::bindings
 	}
 
 	template<typename T>
+	void AllocateTypeDirect(WrenVM* vm)
+	{
+		void* bytes = wrenSetSlotNewForeign(vm, 0, 0, sizeof(T));
+		new (bytes) T();
+	}
+
+	template<typename T>
+	T** AllocateTypePtr(WrenVM* vm)
+	{
+		T** bytes = (T**)wrenSetSlotNewForeign(vm, 0, 0, sizeof(T*));
+		return bytes;
+	}
+
+	template<typename T>
 	void FinalizeType(void* bytes) 
 	{
 		T* type = (T*)bytes;
 		type->~T();
+	}
+
+	template<typename T>
+	void FinalizeTypePtr(void* bytes)
+	{
+		//T** type = (T**)bytes; Do nothing as it is just a pointer to a resource in C++ heap 
 	}
 
 	void RegisterBindings();

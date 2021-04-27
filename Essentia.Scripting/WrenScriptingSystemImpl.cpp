@@ -131,7 +131,7 @@ void CreateBindings()
 {
 	using namespace es::bindings;
 
-	auto& binding = es::Binding::GetInstance();
+	auto& binding = es::ScriptBinding::GetInstance();
 	binding.BindMethod("math.utils", "Utils", "test(_,_)", true, vmTest);
 	es::bindings::RegisterBindings();
 }

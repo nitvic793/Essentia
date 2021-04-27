@@ -28,5 +28,6 @@ void GameStateManager::SetIsPlaying(bool playing)
 
 void GameStateManager::UnloadScene()
 {
+    isPlaying = false;
     GContext->EntityManager->Reset();
 }
