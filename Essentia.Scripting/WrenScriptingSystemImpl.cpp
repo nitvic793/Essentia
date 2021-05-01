@@ -136,23 +136,33 @@ void CreateBindings()
 	es::bindings::RegisterBindings();
 }
 
+static WrenHandle* controllerHandle = nullptr;
+static WrenHandle* controllerUpdateHandle = nullptr;
+
 void ScriptingSystemImpl::Initialize(const char* basePath)
 {
 	SBasePath = basePath;
 	vm = InitVM();
 
 	CreateBindings();
-	es::ModuleLoader::LoadModules(vm, basePath);
+	es::ModuleLoader::LoadModule(vm, basePath, "main");
+	es::ModuleLoader::LoadModule(vm, basePath, "rotationController");
 
 	wrenEnsureSlots(vm, 3);
 	wrenGetVariable(vm, "main", "Game", 0);
 	mainClass = wrenGetSlotHandle(vm, 0);
 	updateHandle = wrenMakeCallHandle(vm, "update(_,_)");
 	initHandle = wrenMakeCallHandle(vm, "init()");
-
+	auto registerControllerHandle = wrenMakeCallHandle(vm, "registerController(_)");
 	wrenCall(vm, initHandle);
-
 	wrenReleaseHandle(vm, initHandle);
+
+	wrenEnsureSlots(vm, 3);
+	wrenGetVariable(vm, "main", "Game", 0);
+	wrenGetVariable(vm, "rotationController", "RotationController", 1);
+	wrenCall(vm, registerControllerHandle);
+
+	wrenReleaseHandle(vm, registerControllerHandle);
 }
 
 void ScriptingSystemImpl::Update(float dt, float totalTime)

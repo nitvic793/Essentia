@@ -80,6 +80,32 @@ void es::ModuleLoader::LoadModules(WrenVM* vm, const char* basePath)
 	allocator.Reset();
 }
 
+void es::ModuleLoader::LoadModule(WrenVM* vm, const char* basePath, const char* moduleName)
+{
+	StackAllocator allocator;
+	allocator.Initialize(CMaxTempScriptBufferSize, Mem::GetDefaultAllocator());
+	for (const auto& entry : fs::recursive_directory_iterator(basePath))
+	{
+		if (entry.is_regular_file() && entry.path().has_extension())
+		{
+			if (entry.path().extension() == CScriptExtension)
+			{
+				auto modulePath = entry.path().generic_string();
+				auto marker = allocator.Push();
+				auto moduleNameInferred = GetScriptModuleName(modulePath, basePath);
+				if (moduleNameInferred == moduleName)
+				{
+					LoadModule(vm, moduleNameInferred.c_str(), modulePath.c_str(), &allocator);
+					allocator.Pop(marker);
+					return;
+				}
+			}
+		}
+	}
+
+	allocator.Reset();
+}
+
 void es::ModuleLoader::LoadModule(WrenVM* vm, const char* moduleName, const char* modulePath, IAllocator* allocator)
 {
 	auto source = ReadFile(modulePath, allocator);

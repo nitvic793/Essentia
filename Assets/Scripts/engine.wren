@@ -9,14 +9,29 @@ foreign class Entity {
 }
 
 class Engine {
+    // controllers{
+    //     return __controllers
+    // }
+
+    // static controllers=(controllerList){
+    //     __controllers = controllerList
+    // }
+
+    // static registerController(controller){
+    //     __controllers.add(controller.new())
+    // }
 }
 
-class Behavior {
+class Controller {
     construct new(){
 
     }
 
-    update() {
+    init(){
+
+    }
+
+    update(deltaTime, totalTime) {
         System.print("Base")
         return "Update"
     }

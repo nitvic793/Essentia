@@ -139,6 +139,22 @@ namespace es::bindings
 				*newHandle = entities[index];
 			});
 
+		binding.BindMethod("components", "Rotatable", "getEntities()", true, [](WrenVM* vm)
+			{
+				wrenEnsureSlots(vm, 3);
+				uint32 count;
+				auto entities = GContext->EntityManager->GetEntities<Rotatable>(count);
+				wrenGetVariable(vm, "engine", "Entity", 1);
+				wrenSetSlotNewList(vm, 0);
+				
+				for (uint32 i = 0; i < count; ++i)
+				{
+					EntityHandle* handle = (EntityHandle*)wrenSetSlotNewForeign(vm, 2, 1, sizeof(EntityHandle));
+					*handle = entities[i];
+					wrenInsertInList(vm, 0, -1, 2); // Append entity to list
+				}
+			});
+
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, x, Double);
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, y, Double);
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, z, Double);
