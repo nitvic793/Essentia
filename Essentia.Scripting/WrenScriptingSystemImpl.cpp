@@ -19,6 +19,7 @@ static char* source = nullptr;
 static WrenHandle* updateHandle = nullptr;
 static WrenHandle* mainClass = nullptr;
 static WrenHandle* initHandle = nullptr;
+static WrenHandle* registerControllerHandle = nullptr;
 
 constexpr uint64 CMaxScriptBufferSize = 1 * 1024 * 1024; // 16MB
 static IAllocator* sgAllocator = nullptr;
@@ -146,23 +147,21 @@ void ScriptingSystemImpl::Initialize(const char* basePath)
 
 	CreateBindings();
 	es::ModuleLoader::LoadModule(vm, basePath, "main");
-	es::ModuleLoader::LoadModule(vm, basePath, "rotationController");
+	es::ModuleLoader::LoadModule(vm, basePath, "controllers.rotationController");
 
 	wrenEnsureSlots(vm, 3);
 	wrenGetVariable(vm, "main", "Game", 0);
 	mainClass = wrenGetSlotHandle(vm, 0);
 	updateHandle = wrenMakeCallHandle(vm, "update(_,_)");
 	initHandle = wrenMakeCallHandle(vm, "init()");
-	auto registerControllerHandle = wrenMakeCallHandle(vm, "registerController(_)");
+	registerControllerHandle = wrenMakeCallHandle(vm, "registerController(_)");
 	wrenCall(vm, initHandle);
 	wrenReleaseHandle(vm, initHandle);
 
 	wrenEnsureSlots(vm, 3);
 	wrenGetVariable(vm, "main", "Game", 0);
-	wrenGetVariable(vm, "rotationController", "RotationController", 1);
+	wrenGetVariable(vm, "controllers.rotationController", "RotationController", 1);
 	wrenCall(vm, registerControllerHandle);
-
-	wrenReleaseHandle(vm, registerControllerHandle);
 }
 
 void ScriptingSystemImpl::Update(float dt, float totalTime)
@@ -179,6 +178,7 @@ void ScriptingSystemImpl::Destroy()
 	es::bindings::WrenHandleMap::GetInstance().ReleaseHandles();
 	wrenReleaseHandle(vm, mainClass);
 	wrenReleaseHandle(vm, updateHandle);
+	wrenReleaseHandle(vm, registerControllerHandle);
 	wrenFreeVM(vm);
 
 	for (auto& buffer : allocs)

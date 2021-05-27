@@ -15,6 +15,7 @@
 #include "System.h"
 #include "Trace.h"
 #include "Game.h"
+#include <ShObjIdl.h>
 
 using namespace DirectX;
 
@@ -502,6 +503,17 @@ void ImguiRenderStage::Render(const uint32 frameIndex, const FrameContext& frame
 			if (ImGui::MenuItem("New")) {}
 			if (ImGui::MenuItem("Open", "Ctrl+O")) 
 			{
+				IFileOpenDialog* pFileOpen;
+
+				// Create the FileOpenDialog object.
+				auto hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+					IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+
+				if (SUCCEEDED(hr))
+				{
+					pFileOpen->Show(nullptr);
+				}
+
 				auto context = GContext;
 				GContext->GameInstance->AddEventCallback([context]()
 					{

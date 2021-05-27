@@ -339,6 +339,7 @@
     <ClInclude Include="ImguiConsole.h" />
     <ClInclude Include="ImGuizmo.h" />
     <ClInclude Include="ImSequencer.h" />
+    <ClInclude Include="JobSystem.h" />
     <ClInclude Include="PhysicsComponents.h" />
     <ClInclude Include="PhysicsContext.h" />
     <ClInclude Include="PhysicsHelper.h" />

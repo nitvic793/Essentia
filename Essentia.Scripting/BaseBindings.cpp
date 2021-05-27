@@ -59,6 +59,78 @@ void AllocateComponent(WrenVM* vm)
 	*outComp = inComp;
 }
 
+template<typename ComponentType>
+void WrenComponentGetCount(WrenVM* vm)
+{
+	uint32 count;
+	ComponentType* components = GContext->EntityManager->GetComponents<ComponentType>(count);
+	wrenSetSlotDouble(vm, 0, (double)count);
+}
+
+template<typename ComponentType>
+void WrenComponentGetEntity(WrenVM* vm)
+{
+	uint32 index = (uint32)wrenGetSlotDouble(vm, 1);
+	uint32 count;
+	auto entities = GContext->EntityManager->GetEntities<ComponentType>(count);
+	wrenGetVariable(vm, "engine", "Entity", 1);
+	EntityHandle* newHandle = (EntityHandle*)wrenSetSlotNewForeign(vm, 0, 1, sizeof(EntityHandle));
+	*newHandle = entities[index];
+}
+
+template<typename ComponentType>
+void WrenComponentGetEntities(WrenVM* vm)
+{
+	wrenEnsureSlots(vm, 3);
+	uint32 count;
+	auto entities = GContext->EntityManager->GetEntities<ComponentType>(count);
+	wrenGetVariable(vm, "engine", "Entity", 1);
+	wrenSetSlotNewList(vm, 0);
+
+	for (uint32 i = 0; i < count; ++i)
+	{
+		EntityHandle* handle = (EntityHandle*)wrenSetSlotNewForeign(vm, 2, 1, sizeof(EntityHandle));
+		*handle = entities[i];
+		wrenInsertInList(vm, 0, -1, 2); // Append entity to list
+	}
+}
+
+template<typename ComponentType>
+void WrenComponentGetComponents(WrenVM* vm)
+{
+	wrenEnsureSlots(vm, 3);
+	uint32 count;
+	ComponentType* components = GContext->EntityManager->GetComponents<ComponentType>(count);
+	wrenGetVariable(vm, "components", ComponentType::ComponentName, 1);
+	wrenSetSlotNewList(vm, 0);
+
+	for (uint32 i = 0; i < count; ++i)
+	{
+		ComponentType** component = (ComponentType**)wrenSetSlotNewForeign(vm, 2, 1, sizeof(ComponentType**));
+		*component = &components[i];
+		wrenInsertInList(vm, 0, -1, 2); // Append component to list
+	}
+}
+
+template<typename ComponentType>
+void WrenComponentGetArrayIndex(WrenVM* vm)
+{
+	uint32 index = (uint32)wrenGetSlotDouble(vm, 1);
+	uint32 count;
+	ComponentType* components = GContext->EntityManager->GetComponents<ComponentType>(count);
+	ComponentType** bytes = (ComponentType**)wrenSetSlotNewForeign(vm, 0, 0, sizeof(ComponentType**));
+	(*bytes) = &components[index];
+}
+
+template<typename ComponentType>
+void BindComponentHelpers(es::ScriptBinding& binding)
+{
+	binding.BindMethod("components", ComponentType::ComponentName, "count()", true, WrenComponentGetCount<ComponentType>);
+	binding.BindMethod("components", ComponentType::ComponentName, "getEntity(_)", true, WrenComponentGetEntity<ComponentType>);
+	binding.BindMethod("components", ComponentType::ComponentName, "getEntities()", true, WrenComponentGetEntities<ComponentType>);
+	binding.BindMethod("components", ComponentType::ComponentName, "getComponents()", true, WrenComponentGetComponents<ComponentType>);
+	binding.BindMethod("components", ComponentType::ComponentName, "[_]", true, WrenComponentGetArrayIndex<ComponentType>);
+}
 
 namespace es::bindings
 {
@@ -104,7 +176,7 @@ namespace es::bindings
 		binding.BindMethod("components", "Rotatable", "Rotation", false, [](WrenVM* vm)
 			{
 				Rotatable** comp = (Rotatable**)wrenGetSlotForeign(vm, 0);
-				wrenSetSlotDouble(vm, 0, (float)(*comp)->Rotation);
+				wrenSetSlotDouble(vm, 0, (double)(*comp)->Rotation);
 			});
 
 		binding.BindMethod("components", "Rotatable", "Speed", false, [](WrenVM* vm)
@@ -113,47 +185,7 @@ namespace es::bindings
 				wrenSetSlotDouble(vm, 0, (double)(*comp)->Speed);
 			});
 
-		binding.BindMethod("components", "Rotatable", "[_]", true, [](WrenVM* vm)
-			{
-				uint32 index = (uint32)wrenGetSlotDouble(vm, 1);
-				uint32 count;
-				Rotatable* components = GContext->EntityManager->GetComponents<Rotatable>(count);
-				Rotatable** bytes = (Rotatable**)wrenSetSlotNewForeign(vm, 0, 0, sizeof(Rotatable**));
-				(*bytes) = &components[index];
-			});
-
-		binding.BindMethod("components", "Rotatable", "count()", true, [](WrenVM* vm)
-			{
-				uint32 count;
-				Rotatable* components = GContext->EntityManager->GetComponents<Rotatable>(count);
-				wrenSetSlotDouble(vm, 0, (double)count);
-			});
-
-		binding.BindMethod("components", "Rotatable", "getEntity(_)", true, [](WrenVM* vm)
-			{
-				uint32 index = (uint32)wrenGetSlotDouble(vm, 1);
-				uint32 count;
-				auto entities = GContext->EntityManager->GetEntities<Rotatable>(count);
-				wrenGetVariable(vm, "engine", "Entity", 1);
-				EntityHandle* newHandle = (EntityHandle*)wrenSetSlotNewForeign(vm, 0, 1, sizeof(EntityHandle));
-				*newHandle = entities[index];
-			});
-
-		binding.BindMethod("components", "Rotatable", "getEntities()", true, [](WrenVM* vm)
-			{
-				wrenEnsureSlots(vm, 3);
-				uint32 count;
-				auto entities = GContext->EntityManager->GetEntities<Rotatable>(count);
-				wrenGetVariable(vm, "engine", "Entity", 1);
-				wrenSetSlotNewList(vm, 0);
-				
-				for (uint32 i = 0; i < count; ++i)
-				{
-					EntityHandle* handle = (EntityHandle*)wrenSetSlotNewForeign(vm, 2, 1, sizeof(EntityHandle));
-					*handle = entities[i];
-					wrenInsertInList(vm, 0, -1, 2); // Append entity to list
-				}
-			});
+		BindComponentHelpers<Rotatable>(binding);
 
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, x, Double);
 		MWrenBindGetterSetter(math.vector, Vec3, XMFLOAT3, Float3, y, Double);

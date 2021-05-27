@@ -8,9 +8,9 @@ import "components" for Rotatable
 var point = Vec3.new(1.0, 0.0, 0.0).normalize()
 var point2 = Vec3.new(0.1, 0.5, 0.0).normalize()
 var result = point.dot(point2)
-var test = Meta.getModuleVariables("main")
 
-
+var test = Meta.getModuleVariables("engine")
+System.print(test)
 
 class Game {
   static init() {
