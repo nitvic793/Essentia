@@ -28,7 +28,7 @@ class ObjectInferenceSystem : public ISystem
 public:
 	virtual void Initialize() override
 	{
-		objectMap = std::map<std::string_view, ObjectData>{
+		objectMap = std::unordered_map<std::string_view, ObjectData>{
 			{"soccer" , { "Assets/Models/soccer.obj", "soccer", XMFLOAT3(0.5f,0.5f,0.5f)}},
 			{"helmet" , { "Assets/Models/helmet.obj", "helmet", XMFLOAT3(0.05f,0.05f,0.05f), XMFLOAT3(90.f, 0.f, 0.f)}},
 			{"cat" , { "Assets/Models/cat.obj", "cat", XMFLOAT3(0.05f,0.05f,0.05f), XMFLOAT3(90.f, 0.f, 0.f)}},
@@ -75,7 +75,7 @@ private:
 	rpc::server* server;
 	std::queue<std::string> objectQueue;
 	std::mutex mutex;
-	std::map<std::string_view, ObjectData> objectMap;
+	std::unordered_map<std::string_view, ObjectData> objectMap;
 	std::vector<EntityHandle> createEntities;
 
 	bool QueueObjectInstantiation(std::string objectName)

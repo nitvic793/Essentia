@@ -33,7 +33,7 @@ class RotationController is Controller {
             entity.position = pos
 
             var rotatableComponent = Rotatable[i]
-            System.print("Rotatable Comp[%(i)]: %(comp.Rotation), Comp Count = %(compCount)")
+            //System.print("Rotatable Comp[%(i)]: %(comp.Rotation), Comp Count = %(compCount)")
         }
     }
 }

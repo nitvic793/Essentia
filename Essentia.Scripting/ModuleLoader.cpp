@@ -68,10 +68,8 @@ void es::ModuleLoader::LoadModules(WrenVM* vm, const char* basePath)
 				auto modulePath = entry.path().generic_string();
 				auto marker = allocator.Push();
 				auto moduleName = GetScriptModuleName(modulePath, basePath);
-				if (moduleName == "main")
-				{
-					LoadModule(vm, moduleName.c_str(), modulePath.c_str(), &allocator);
-				}
+
+				LoadModule(vm, moduleName.c_str(), modulePath.c_str(), &allocator);
 				allocator.Pop(marker);
 			}
 		}
