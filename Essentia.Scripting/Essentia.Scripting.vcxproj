@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.props" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
@@ -194,6 +195,7 @@
     <Import Project="..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets" Condition="Exists('..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets')" />
     <Import Project="..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets" Condition="Exists('..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" />
     <Import Project="..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets" Condition="Exists('..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets')" />
+    <Import Project="..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.targets" Condition="Exists('..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
@@ -203,5 +205,7 @@
     <Error Condition="!Exists('..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk12_desktop_2017.2020.8.15.1\build\native\directxtk12_desktop_2017.targets'))" />
     <Error Condition="!Exists('..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinPixEventRuntime.1.0.200127001\build\WinPixEventRuntime.targets'))" />
     <Error Condition="!Exists('..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\VisualLeakDetector.2.5.0.0\build\native\VisualLeakDetector.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Direct3D.D3D12.1.4.10\build\native\Microsoft.Direct3D.D3D12.targets'))" />
   </Target>
 </Project>

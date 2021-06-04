@@ -10,6 +10,11 @@
 #include <FileWatcher.h>
 #include <thread>
 
+// Agility SDK 
+extern "C" { __declspec(dllexport) extern const UINT D3D12SDKVersion = 4; }
+
+extern "C" { __declspec(dllexport) extern const char* D3D12SDKPath = u8".\\D3D12\\"; }
+
 static const char* gameDll = "Game.dll";
 #if defined(_DEBUG) | defined(DEBUG)
 static const char* buildCommandLineStr = "msbuild.exe ../../Essentia.sln /target:Game /p:Platform=x64 /property:Configuration=Debug";

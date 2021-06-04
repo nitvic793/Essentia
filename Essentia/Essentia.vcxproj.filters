@@ -672,6 +672,9 @@
     <ClInclude Include="FreeListAllocator.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
+    <ClInclude Include="JobSystem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="BlurPS.hlsl">
