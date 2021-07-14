@@ -25,6 +25,11 @@ namespace es
 {
 	class EventBus;
 	class ScriptBinding;
+
+	namespace jobs
+	{
+		class JobSystem;
+	}
 }
 
 
@@ -57,16 +62,12 @@ struct EngineContext
 	ImguiConsole*			Console = nullptr;
 	Game*					GameInstance = nullptr;
 	es::ScriptBinding*		ScriptBinding = nullptr;
+	es::jobs::JobSystem*	JobSystem = nullptr;
 
 	EngineContext()
 	{
 		Context = this;
 		GContext = this;
 	}
-
-	//bool IsPlaying() const
-	//{
-	//	return bIsPlaying;
-	//}
 };
 

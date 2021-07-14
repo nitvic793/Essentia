@@ -262,6 +262,7 @@
     <ClCompile Include="ImGradient.cpp" />
     <ClCompile Include="ImGuizmo.cpp" />
     <ClCompile Include="ImSequencer.cpp" />
+    <ClCompile Include="JobSystem.cpp" />
     <ClCompile Include="PhysicsContext.cpp" />
     <ClCompile Include="PhysicsHelper.cpp" />
     <ClCompile Include="PhysicsSystem.cpp" />
@@ -324,6 +325,7 @@
     <ClInclude Include="ComponentFactory.h" />
     <ClInclude Include="ComponentReflector.h" />
     <ClInclude Include="ComputeContext.h" />
+    <ClInclude Include="ConcurrentQueue.h" />
     <ClInclude Include="ConstantBufferViewPool.h" />
     <ClInclude Include="DebugDraw.h" />
     <ClInclude Include="DebugDrawStage.h" />

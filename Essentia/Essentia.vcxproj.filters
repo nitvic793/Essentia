@@ -127,6 +127,12 @@
     <Filter Include="Shaders\DepthOfField">
       <UniqueIdentifier>{b062abe0-2113-4130-9dda-c90e3dcba690}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Serialization">
+      <UniqueIdentifier>{ecb0c726-7629-43e4-986b-12eb64ba4d35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Serialization">
+      <UniqueIdentifier>{7747ca59-c3eb-4dde-9038-90c82c88db49}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -268,9 +274,6 @@
     <ClCompile Include="ComponentFactory.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Serialization.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="DepthOnlyStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
@@ -285,9 +288,6 @@
     </ClCompile>
     <ClCompile Include="StringHash.cpp">
       <Filter>Source Files\Utility</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugDraw.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ShadowRenderStage.cpp">
       <Filter>Source Files\Renderer\RenderStages</Filter>
@@ -371,6 +371,15 @@
       <Filter>Source Files\Renderer\RenderStages</Filter>
     </ClCompile>
     <ClCompile Include="FreeListAllocator.cpp">
+      <Filter>Source Files\Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugDraw.cpp">
+      <Filter>Source Files\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="Serialization.cpp">
+      <Filter>Source Files\Serialization</Filter>
+    </ClCompile>
+    <ClCompile Include="JobSystem.cpp">
       <Filter>Source Files\Engine</Filter>
     </ClCompile>
   </ItemGroup>
@@ -540,9 +549,6 @@
     <ClInclude Include="PostProcessTemporalAA.h">
       <Filter>Header Files\Renderer\PostProcessStages</Filter>
     </ClInclude>
-    <ClInclude Include="Interface.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ComponentFactory.h">
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
@@ -558,9 +564,6 @@
     <ClInclude Include="ComponentReflector.h">
       <Filter>Header Files\Utility</Filter>
     </ClInclude>
-    <ClInclude Include="DebugDraw.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DebugDrawStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
     </ClInclude>
@@ -572,9 +575,6 @@
     </ClInclude>
     <ClInclude Include="ShadowRenderStage.h">
       <Filter>Header Files\Renderer\RenderStages</Filter>
-    </ClInclude>
-    <ClInclude Include="Serialization.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PostProcessComponents.h">
       <Filter>Header Files\Engine</Filter>
@@ -673,7 +673,19 @@
       <Filter>Header Files\Engine</Filter>
     </ClInclude>
     <ClInclude Include="JobSystem.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugDraw.h">
+      <Filter>Header Files\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="Serialization.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="Interface.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="ConcurrentQueue.h">
+      <Filter>Header Files\Utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -10,10 +10,13 @@
 #include "PhysicsSystem.h"
 #include "Trace.h"
 #include <ScriptingSystem.h>
+#include <JobSystem.h>
 
 void Game::Setup(Callback gameSystemsInitCallback)
 {
 	frameAllocator.Initialize(CMaxScratchSize, Mem::GetDefaultAllocator());
+	es::jobs::InitJobSystem();
+
 	GContext->FrameAllocator = &frameAllocator;
 	GContext->GameInstance = this;
 
@@ -119,6 +122,7 @@ void Game::Run()
 				entityManager.Reset();
 			}
 
+			// Flush callbacks at end of frame
 			{
 				std::scoped_lock lock(centralMutex);
 				while (!eventCallbacks.empty())
@@ -166,6 +170,7 @@ Game::~Game()
 	scriptSystemsManager.Destroy();
 	renderer->CleanUp();
 	GComponentReflector.CleanUp();
+	es::jobs::DestroyJobSystem();
 }
 
 void Game::Render()
