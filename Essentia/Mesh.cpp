@@ -125,7 +125,8 @@ MeshHandle MeshManager::CreateMesh(const MeshData& meshData, MeshView& meshView)
 	meshView.IndexCount = (uint32)meshData.Indices.size();
 
 	context->SubmitCommands(commandList.Get());
-	context->WaitForGPU(GContext->DeviceResources->GetSwapChain()->GetCurrentBackBufferIndex()); // Todo: Create function which gets back buffer index automatically
+	context->WaitForFrame();
+	//context->WaitForGPU(GContext->DeviceResources->GetSwapChain()->GetCurrentBackBufferIndex()); // Todo: Create function which gets back buffer index automatically
 	BoundingBox meshBounds;
 	BoundingBox::CreateFromPoints(meshBounds, meshData.Vertices.size(), (const XMFLOAT3*)&meshData.Vertices.data()->Position, sizeof(Vertex));
 

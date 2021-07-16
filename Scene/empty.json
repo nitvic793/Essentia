@@ -1,0 +1,170 @@
+{
+  "Scene": {
+    "Resources": {
+      "Textures": [
+      ],
+      "CubeMaps": [],
+      "Meshes": [
+        "Assets/Models/cube.obj",
+        "Assets/Models/sphere.obj"
+      ],
+      "Models": [
+      ]
+    },
+    "Materials": [
+    ],
+    "Entities": [
+      {
+        "Name": "Entity 0",
+        "Entity": {
+          "entity.ID": 0
+        },
+        "Parent": {
+          "entity.ID": 18446744073709551615
+        },
+        "Components": [
+          "PositionComponent",
+          "RotationComponent",
+          "PostProcessVolumeComponent",
+          "ScaleComponent",
+          "BaseDrawableComponent"
+        ],
+        "PositionComponent": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "RotationComponent": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0,
+          "W": 0.0
+        },
+        "PostProcessVolumeComponent": {},
+        "ScaleComponent": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "BaseDrawableComponent": {}
+      },
+      {
+        "Name": "DirectionalLight",
+        "Entity": {
+          "entity.ID": 8
+        },
+        "Parent": {
+          "entity.ID": 18446744073709551615
+        },
+        "Components": [
+          "PositionComponent",
+          "RotationComponent",
+          "ScaleComponent",
+          "DirectionalLightComponent"
+        ],
+        "PositionComponent": {
+          "X": 0.0,
+          "Y": 4.0,
+          "Z": 0.0
+        },
+        "RotationComponent": {
+          "X": 0.6823992133140564,
+          "Y": 0.0041954596526920799,
+          "Z": -0.042865555733442309,
+          "W": 0.7297097444534302
+        },
+        "ScaleComponent": {
+          "X": 0.999975860118866,
+          "Y": 0.9999944567680359,
+          "Z": 0.9999949932098389
+        },
+        "DirectionalLightComponent": {
+          "Color": {
+            "X": 0.8999999761581421,
+            "Y": 0.8999999761581421,
+            "Z": 0.8999999761581421
+          },
+          "Intensity": 0.800000011920929,
+          "Direction": {
+            "X": -0.05237990617752075,
+            "Y": -0.9962663650512695,
+            "Z": 0.0686274841427803
+          }
+        }
+      },
+      {
+        "Name": "Skybox",
+        "Entity": {
+          "entity.ID": 10
+        },
+        "Parent": {
+          "entity.ID": 18446744073709551615
+        },
+        "Components": [
+          "PositionComponent",
+          "RotationComponent",
+          "ScaleComponent",
+          "SkyboxComponent"
+        ],
+        "PositionComponent": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "RotationComponent": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0,
+          "W": 0.0
+        },
+        "ScaleComponent": {
+          "X": 1.0,
+          "Y": 1.0,
+          "Z": 1.0
+        },
+        "SkyboxComponent": {
+          "CubeMapName": "Assets/Textures/SunnyCubeMap.dds"
+        }
+      },
+      {
+        "Name": "Camera",
+        "Entity": {
+          "entity.ID": 14
+        },
+        "Parent": {
+          "entity.ID": 18446744073709551615
+        },
+        "Components": [
+          "PositionComponent",
+          "RotationComponent",
+          "ScaleComponent",
+          "CameraComponent"
+        ],
+        "PositionComponent": {
+          "X": -26.623165130615236,
+          "Y": 13.152674674987793,
+          "Z": -1.4114341735839844
+        },
+        "RotationComponent": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0,
+          "W": 0.0
+        },
+        "ScaleComponent": {
+          "X": 0.0,
+          "Y": 0.0,
+          "Z": 0.0
+        },
+        "CameraComponent": {
+          "CameraInstance.Width": 1920.0,
+          "CameraInstance.Height": 1080.0,
+          "CameraInstance.NearZ": 0.10000000149011612,
+          "CameraInstance.FarZ": 300.0,
+          "CameraInstance.FieldOfView": 45.0,
+          "CameraInstance.IsOrthographic": false
+        }
+      }
+    ]
+  }
+}

@@ -66,7 +66,7 @@ void Game::Setup(Callback gameSystemsInitCallback)
 	}
 
 	// This function also loads resources(textures, meshes) along with the scene entities.
-	gameStateManager.LoadScene("scene.json");
+	gameStateManager.LoadScene("scene.json"); // empty.json for empty
 	Initialize();
 
 	auto windowSize = renderer->GetWindow()->GetWindowSize();
@@ -127,7 +127,7 @@ void Game::Run()
 				std::scoped_lock lock(centralMutex);
 				while (!eventCallbacks.empty())
 				{
-					auto& eventCb = eventCallbacks.front();
+   					auto& eventCb = eventCallbacks.front();
 					eventCb();
 					eventCallbacks.pop();
 				}
