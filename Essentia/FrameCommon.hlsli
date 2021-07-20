@@ -1,24 +1,9 @@
 
 
-struct VoxelParams
-{
-    float3 VoxelGridCenter;
-    float VoxelRadianceDataSize; // voxel half-extent in world space units
-    float VoxelRadianceDataSizeRCP; // 1.0 / voxel-half extent
-    uint VoxelRadianceDataRes; // voxel grid resolution
-    float VoxelRadianceDataResRCP; // 1.0 / voxel grid resolution
-    uint VoxelRadianceNumCones;
-    float VoxelRadianceNumConesRCP;
-    float VoxelRadianceMaxDistance;
-    float VoxelRadianceRayStepSize;
-    uint VoxelRadianceMips;
-};
-
 // All per frame data
 struct PerFrameData
 {
     float4x4 ViewProjectionTex;
-    VoxelParams VoxelData;
     float4x4 ShadowView; // Global Directional Light Shadow View Matrix
     float4x4 ShadowProjection; // Global Directional Light Shadow Projection Matrix
     float4x4 CamView; // Main Camera View Matrix

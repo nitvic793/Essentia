@@ -2,25 +2,10 @@
 
 #include <DirectXMath.h>
 
-constexpr uint32_t CVoxelSize = 128;
 constexpr uint32_t CMaxDirLights = 4;
 constexpr uint32_t CMaxPointLights = 64;
 constexpr uint32_t CMaxSpotLights = 16;
 constexpr uint32_t CMaxBones = 128;
-
-struct DECLSPEC_ALIGN(16) VoxelParams
-{
-	DirectX::XMFLOAT3	VoxelGridCenter;
-	float				VoxelRadianceDataSize;				// voxel half-extent in world space units
-	float				VoxelRadianceDataSizeRCP;			// 1.0 / voxel-half extent
-	uint32_t			VoxelRadianceDataRes;				// voxel grid resolution
-	float				VoxelRadianceDataResRCP;			// 1.0 / voxel grid resolution
-	uint32_t			VoxelRadianceNumCones;
-	float				VoxelRadianceNumConesRCP;
-	float				VoxelRadianceMaxDistance;
-	float				VoxelRadianceRayStepSize;
-	uint32_t			VoxelRadianceMips;
-};
 
 struct PerObjectConstantBuffer
 {
@@ -40,7 +25,6 @@ struct ShadowConstantBuffer
 struct PerFrameConstantBuffer
 {
 	DirectX::XMFLOAT4X4 ViewProjectionTex; //Required to get apply SSAO Position
-	VoxelParams			VoxelData;
 	DirectX::XMFLOAT4X4 ShadowView;
 	DirectX::XMFLOAT4X4 ShadowProjection;
 	DirectX::XMFLOAT4X4 CamView;

@@ -5,8 +5,9 @@ using namespace DirectX;
 
 uint32_t FindPosition(float AnimationTime, const AnimationChannel* channel)
 {
-	for (uint32_t i = 0; i < channel->PositionKeys.size() - 1; i++) {
-		if (AnimationTime < (float)channel->PositionKeys[i + 1].Time) {
+	const auto keySize = channel->PositionKeys.size();
+	for (uint32_t i = 0; i < keySize - 1; i++) {
+		if (AnimationTime < (float)channel->PositionKeys.at(i + 1).Time) {
 			return i;
 		}
 	}
@@ -17,8 +18,9 @@ uint32_t FindPosition(float AnimationTime, const AnimationChannel* channel)
 
 uint32_t FindScaling(float AnimationTime, const AnimationChannel* channel)
 {
-	for (uint32_t i = 0; i < channel->ScalingKeys.size() - 1; i++) {
-		if (AnimationTime < (float)channel->ScalingKeys[i + 1].Time) {
+	const auto size = channel->ScalingKeys.size();
+	for (uint32_t i = 0; i < size - 1; i++) {
+		if (AnimationTime < (float)channel->ScalingKeys.at(i + 1).Time) {
 			return i;
 		}
 	}
@@ -29,8 +31,9 @@ uint32_t FindScaling(float AnimationTime, const AnimationChannel* channel)
 
 uint32_t FindRotation(float AnimationTime, const AnimationChannel* channel)
 {
-	for (uint32_t i = 0; i < channel->RotationKeys.size() - 1; i++) {
-		if (AnimationTime < (float)channel->RotationKeys[i + 1].Time) {
+	const auto size = channel->RotationKeys.size();
+	for (uint32_t i = 0; i < size - 1; i++) {
+		if (AnimationTime < (float)channel->RotationKeys.at(i + 1).Time) {
 			return i;
 		}
 	}

@@ -29,9 +29,6 @@
 #include "ScreenSpaceAOStage.h"
 #include "VolumetricLightStage.h"
 #include "ApplyVolumetricFog.h"
-#include "VoxelizationStage.h"
-#include "GenerateMipsStage.h"
-#include "VoxelRadiancePostProcess.h"
 #include "TerrainRenderStage.h"
 #include "AnimationComponent.h"
 #include "ReconstructNormals.h"
@@ -149,12 +146,7 @@ void Renderer::Initialize()
 	//renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ReconstructNormals>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ScreenSpaceAOStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<ShadowRenderStage>()));
-	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VoxelizationStage>()));
 	renderStages[eRenderStagePreMain].Push(ScopedPtr<IRenderStage>(Allocate<VolumetricLightStage>()));
-
-
-	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelRadiancePostProcess>()));
-	renderStages[eRenderStageCompute].Push(ScopedPtr<IRenderStage>(Allocate<VoxelMipGenStage>()));
 
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<MainPassRenderStage>()));
 	renderStages[eRenderStageMain].Push(ScopedPtr<IRenderStage>((IRenderStage*)Mem::Alloc<TerrainRenderStage>()));
@@ -216,10 +208,13 @@ void Renderer::Clear()
 	auto imageIndex = backBufferIndex;
 
 	//Reset Compute Context
-	auto computeAllocator = computeContext->GetAllocator(backBufferIndex);
-	auto computeCList = computeContext->GetDefaultCommandList();
-	computeContext->ResetAllocator(computeAllocator);
-	computeContext->ResetCommandList(computeCList, computeAllocator);
+	if (renderStages[eRenderStageCompute].size() > 0)
+	{
+		auto computeAllocator = computeContext->GetAllocator(backBufferIndex);
+		auto computeCList = computeContext->GetDefaultCommandList();
+		computeContext->ResetAllocator(computeAllocator);
+		computeContext->ResetCommandList(computeCList, computeAllocator);
+	}
 
 	auto commandAllocator = commandContext->GetAllocator(backBufferIndex);
 	auto commandList = commandContext->GetDefaultCommandList();
@@ -338,9 +333,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	XMMATRIX viewProjTex = XMMatrixMultiply(XMMatrixMultiply(view, projection), T);
 	//Update per frame data
 	XMStoreFloat4x4(&GSceneResources.FrameData.ViewProjectionTex, XMMatrixTranspose(viewProjTex));
-	auto voxelData = CreateVoxelParams(camera, CVoxelSize);
 
-	GSceneResources.FrameData.VoxelData = voxelData;
 	XMStoreFloat4x4(&GSceneResources.FrameData.CamView, XMMatrixTranspose(view));
 	XMStoreFloat4x4(&GSceneResources.FrameData.CamProjection, XMMatrixTranspose(projection));
 	XMStoreFloat4x4(&GSceneResources.FrameData.CamInvView, XMMatrixTranspose(XMMatrixInverse(nullptr, view)));
@@ -376,45 +369,45 @@ void Renderer::Render(const FrameContext& frameContext)
 
 	PIXEndEvent(commandList);
 
-	commandContext->SubmitCommands(commandList);
-	commandContext->ResetCommandList(commandList, commandContext->GetAllocator(backBufferIndex));
-
 	/***COMPUTE**/
-	auto computeCList = computeContext->GetDefaultCommandList();
-	auto gfxFence = commandContext->GetFence();
-	auto gfxFenceValue = commandContext->FenceValue(backBufferIndex);
-
-	deviceResources->computeQueue->Wait(gfxFence, gfxFenceValue);
-
-	computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
-	computeCList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
-
-	PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Pre Compute Stage");
-
-	for (auto& stage : renderStages[eRenderStageCompute])
+	if (renderStages[eRenderStageCompute].size() > 0)
 	{
-		PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Sub Compute Stage");
-		if (stage->Enabled)
+		commandContext->SubmitCommands(commandList);
+		commandContext->ResetCommandList(commandList, commandContext->GetAllocator(backBufferIndex));
+
+		auto computeCList = computeContext->GetDefaultCommandList();
+		auto gfxFence = commandContext->GetFence();
+		auto gfxFenceValue = commandContext->FenceValue(backBufferIndex);
+
+		deviceResources->computeQueue->Wait(gfxFence, gfxFenceValue);
+
+		computeCList->SetComputeRootSignature(computeContext->GetComputeRootSignature());
+		computeCList->SetDescriptorHeaps((UINT)heaps.size(), heaps.data());
+
+		PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Pre Compute Stage");
+
+		for (auto& stage : renderStages[eRenderStageCompute])
 		{
-			stage->Render(backBufferIndex, frameContext);
+			PIXBeginEvent(computeCList, PIX_COLOR_DEFAULT, L"Sub Compute Stage");
+			if (stage->Enabled)
+			{
+				stage->Render(backBufferIndex, frameContext);
+			}
+
+			PIXEndEvent(computeCList);
 		}
 
 		PIXEndEvent(computeCList);
+
+		computeContext->SubmitCommands(computeCList);
+
+		// Wait for compute work to be over
+		auto computeFence = computeContext->GetFence();
+		auto computeFenceValue = computeContext->FenceValue(backBufferIndex);
+		deviceResources->commandQueue->Wait(computeFence, computeFenceValue);
 	}
 
-	PIXEndEvent(computeCList);
-
-	computeContext->SubmitCommands(computeCList);
-
 	/***END COMPUTE**/
-
-	// Wait for compute work to be over
-	auto computeFence = computeContext->GetFence();
-	auto computeFenceValue = computeContext->FenceValue(backBufferIndex);
-	deviceResources->commandQueue->Wait(computeFence, computeFenceValue);
-
-	if (renderStageMap["VoxelizationStage"]->Enabled)
-		TransitionBarrier(commandList, GSceneResources.VoxelGridResource, D3D12_RESOURCE_STATE_UNORDERED_ACCESS, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
@@ -432,7 +425,7 @@ void Renderer::Render(const FrameContext& frameContext)
 	commandList->RSSetViewports(1, &viewport);
 	commandList->RSSetScissorRects(1, &scissorRect);
 
-	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture, GSceneResources.VoxelGridSRV };
+	TextureID textures[] = { GSceneResources.ShadowDepthTarget.Texture , GSceneResources.AmbientOcclusion.Texture };
 	SetShaderResourceViews(commandList, RootSigSRVPixel2, textures, _countof(textures));
 	SetConstantBufferView(commandList, RootSigCBAll1, perFrameView);
 	SetConstantBufferView(commandList, RootSigCBAll2, GSceneResources.ShadowCBV);
