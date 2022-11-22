@@ -33,7 +33,7 @@ float4 main(VertexToPixel input) : SV_TARGET
     if (blurSize >= 1.f)
         outputColor = dofColor.rgb;
     else
-        outputColor = lerp(sceneColor, dofColor.rgb, clamp(blurSize - 0.5f, 0.f, 1.f));
-    //outputColor = lerp(sceneColor, dofColor.rgb, 1.f - clamp(1.f / blurSize, 0.f, 1.f));
+        //outputColor = lerp(sceneColor, dofColor.rgb, clamp(blurSize - 0.5f, 0.f, 1.f));
+        outputColor = lerp(sceneColor, dofColor.rgb, 1.f - clamp(1.f / blurSize, 0.f, 1.f));
     return float4(outputColor, 1.0f);
 }

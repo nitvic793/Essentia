@@ -15,6 +15,6 @@ float4 main(VertexToPixel input) : SV_TARGET
 {
     float3 fog = FogTexture.Sample(LinearWrapSampler, input.uv).rgb ;
     float3 inputColor = InputTexture.Sample(LinearWrapSampler, input.uv).rgb;
-    fog = lerp(fog * 1.5f, fog * fog, 0.2f);
+    fog = lerp(fog * 1.5f, fog * fog, 0.5f);
     return float4(inputColor + fog, 1.0f);
 }

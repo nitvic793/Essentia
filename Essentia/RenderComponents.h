@@ -75,7 +75,7 @@ struct DrawableComponent : public IDrawable
 		return component;
 	}
 
-	bool IsAnimated() const
+	constexpr bool IsAnimated() const
 	{
 		return Flags & kDrawableAnimatedMesh;
 	}

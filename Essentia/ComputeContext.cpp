@@ -52,7 +52,7 @@ void ComputeContext::Initialize(DeviceResources* deviceResources)
 
 	hr = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_COMPUTE, commandAllocators[0].Get(), NULL, IID_PPV_ARGS(commandList.ReleaseAndGetAddressOf()));
 
-	for (int i = 0; i < CFrameBufferCount; i++)
+	for (int i = 0; i < CFrameBufferCount; i++) 
 	{
 		hr = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fences[i].ReleaseAndGetAddressOf()));
 		if (FAILED(hr))

@@ -35,7 +35,7 @@ void Camera::Update(float deltaTime, float totalTime)
 void Camera::UpdateView()
 {
 	auto rotation = XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&Rotation));
-	auto direction = XMVectorSet(0, 0, 1, 0);
+	auto direction = XMVectorSet(0, 0, 1, 0);// Default Normal
 	direction = XMVector3Rotate(direction, rotation);
 	XMStoreFloat3(&Direction, direction);
 	auto view = GetViewMatrix();

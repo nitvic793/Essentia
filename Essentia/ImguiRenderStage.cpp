@@ -176,6 +176,9 @@ void ShowSystemsWindow(bool* showWindow)
     auto& gameSystems = GContext->GameSystemManager->GetSystems();
     static bool showOpen = true;
     ImGui::Begin("Systems", showWindow);
+
+    ImGui::TextColored({ 1.f, 0.f, 0.f, 1.f }, "Core");
+
     for (auto& system : coreSystems)
     {
         ImGui::Text(system->GetName());

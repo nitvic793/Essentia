@@ -23,6 +23,27 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Essentia.Scripting", "Essen
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Essentia.Shared", "Essentia.Shared\Essentia.Shared.vcxitems", "{48515C92-459B-4F31-8F8B-C5E6338F2492}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{6D5FF449-3249-4CC6-9320-FB5FC22B0B17}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\Scripts\components.wren = Assets\Scripts\components.wren
+		Assets\Scripts\engine.wren = Assets\Scripts\engine.wren
+		Assets\Scripts\main.wren = Assets\Scripts\main.wren
+		Assets\Scripts\math.wren = Assets\Scripts\math.wren
+		Assets\Scripts\meta.wren = Assets\Scripts\meta.wren
+		Assets\Scripts\random.wren = Assets\Scripts\random.wren
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Math", "Math", "{A203AB83-B2E2-4E54-873F-98597AAAAB3E}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\Scripts\math\utils.wren = Assets\Scripts\math\utils.wren
+		Assets\Scripts\math\vector.wren = Assets\Scripts\math\vector.wren
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Controllers", "Controllers", "{96417585-7D1E-46EF-9134-B7CDC667F934}"
+	ProjectSection(SolutionItems) = preProject
+		Assets\Scripts\controllers\rotationController.wren = Assets\Scripts\controllers\rotationController.wren
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -86,6 +107,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A203AB83-B2E2-4E54-873F-98597AAAAB3E} = {6D5FF449-3249-4CC6-9320-FB5FC22B0B17}
+		{96417585-7D1E-46EF-9134-B7CDC667F934} = {6D5FF449-3249-4CC6-9320-FB5FC22B0B17}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D24D6B1-D27D-448C-881E-1D70C8EBA167}

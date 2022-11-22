@@ -1,5 +1,5 @@
 
-
+// TODO: Parameterize Shader variables
 static const float GOLDEN_ANGLE = 2.39996323;
 static const float MAX_BLUR_SIZE = 10.0;
 static const float RAD_SCALE = 0.5; // Smaller = nicer blur, larger = faster

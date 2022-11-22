@@ -10,7 +10,7 @@ class RotationController is Controller {
 
     init(){
         _speed = 1
-        _rotationSpeed = 40.0 // Degrees/second
+        _rotationSpeed = 250.0 // Degrees/second
         _piDiv180 = 3.14/180.0
         System.print("Init RotationController")
     }
@@ -21,7 +21,7 @@ class RotationController is Controller {
         var components = Rotatable.getComponents()
         for (i in 0...compCount) {
             var comp = components[i]
-            var speed = comp.Speed
+            var speed = comp.Speed * _speed
             var entity = entities[i]
             var pos = entity.position
             var up = Vec3.new(0,1,0).normalize()
